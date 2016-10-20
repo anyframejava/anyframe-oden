@@ -1,0 +1,76 @@
+<project name="Oden Test" default="all-local" basedir=".">
+	<property name="bundle.name" value="oden.test" />
+	<property name="version" value="1.0.0"/>
+	
+	<property name="src" location="${basedir}/src/main/java"/>
+	<property name="build" location="${basedir}/build"/>		
+	<property name="dist" location="${basedir}/dist"/>
+	
+<!--	<property name="osgi.fwk" location="../anyframe.oden.bundle/lib/felix.jar"/>		-->
+		
+	<path id="classpath">
+		<fileset dir="${bundle.loc}"/>
+<!--		<pathelement location="${osgi.fwk}"/>		-->
+		<pathelement location="lib/junit-4.7.jar"/>
+	</path>
+	
+	<target name="clean" description="clean up">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+	<target name="init" depends="clean">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+		
+		<!-- prepare bnd -->
+		<!--
+		<taskdef resource="aQute/bnd/ant/taskdef.properties" classpath="${basedir}/lib/biz.aQute.bnd-latest.jar" />
+		<available file="bnd.bnd" property="use.bnd" />
+		<bndprepare basedir="${basedir}" print="false" />
+		-->
+	</target>
+	
+	<target name="compile.service" depends="init">
+		<javac srcdir="${src}" destdir="${build}"
+			debug="on" debuglevel="lines,vars,source">
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+		
+	<!--
+	<target name="dist.bundle" depends="compile.service">
+		<jar destfile="${dist}/${bundle.name}.jar" basedir="${build}"/>
+	</target>
+	-->
+
+	<target name="compile.test" depends="compile.service">
+		<javac srcdir="src/test/java" destdir="${build}">
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	
+	<target name="test" depends="compile.test">
+		<junit printsummary="yes" haltonfailure="yes" fork="yes">
+			<sysproperty key="oden.bundle.root" value="${bundle.loc}"/>
+			<classpath>
+				<path refid="classpath"/>
+				<pathelement location="${build}"/>
+			</classpath>
+			<batchtest fork="yes" todir="${dist}">
+				<fileset dir="src/test/java">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+			<formatter type="plain" />
+		</junit>
+	</target>
+		
+
+
+	<target name="all-local">
+		<property name="bundle.loc" value="../anyframe.oden.bundle/bundle"/>
+		<antcall target="test"/>
+	</target>
+</project> 

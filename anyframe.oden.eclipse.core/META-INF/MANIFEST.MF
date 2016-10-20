@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Anyframe Oden
+Bundle-SymbolicName: anyframe.oden.eclipse.core; singleton:=true
+Bundle-Version: 1.0.0.RC2
+Bundle-Vendor: SAMSUNG SDS
+Bundle-Activator: anyframe.oden.eclipse.core.OdenActivator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ClassPath: .,
+ lib/dom4j-1.6.1.jar,
+ lib/miglayout-3.7-swt.jar
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.console,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors,
+ org.eclipse.core.resources,
+ org.eclipse.ui.ide,
+ org.eclipse.ui.forms,
+ anyframe.common.eclipse.core

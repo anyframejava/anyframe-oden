@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.command;
 
@@ -29,7 +31,7 @@ import anyframe.oden.bundle.common.DateUtil;
 import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.core.RepositoryProviderService;
+import anyframe.oden.bundle.core.DelegateService;
 
 /**
  * JSON 으로 output을 출력하는 명령어 구현
@@ -45,10 +47,14 @@ public class RepositoryCommandImpl implements Command {
 	
 	public final static String PROTOCOL_ACTION = "protocol";
 	
-	private RepositoryProviderService repositoryProvider;
+	private DelegateService delegateService;
 	
-	protected void setRepositoryProvider(RepositoryProviderService ds){
-		this.repositoryProvider = ds;
+	protected void setDelegateService(DelegateService ds){
+		this.delegateService = ds;
+	}
+	
+	protected void unsetDelegateService(DelegateService ds){
+		this.delegateService = null;
 	}
 	
 	/**
@@ -83,7 +89,7 @@ public class RepositoryCommandImpl implements Command {
 	}
 
 	private JSONArray getRepositoryStructure(String[] repoArgs) throws OdenException {
-		List<FileInfo> files = repositoryProvider.getFilesFromRepo(repoArgs);
+		List<FileInfo> files = delegateService.getFilesFromRepo(repoArgs);
 		return jsonizedFileList(files);
 	}
 
@@ -110,7 +116,7 @@ public class RepositoryCommandImpl implements Command {
 	}
 
 	private JSONArray getRepositoryProtocols() {
-		List<String> types = repositoryProvider.getRepositoryProtocols();
+		List<String> types = delegateService.getRepositoryProtocols();
 		return new JSONArray(types);
 	}
 
@@ -130,7 +136,7 @@ public class RepositoryCommandImpl implements Command {
 	
 	private String getRepositoryUsages() throws OdenException {
 		StringBuffer usages = new StringBuffer();
-		for(Iterator<String> it = repositoryProvider.getRepositoryUsages().iterator(); it.hasNext();) {
+		for(Iterator<String> it = delegateService.getRepositoryUsages().iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");
 			if(it.hasNext())
 				usages.append(" | ");

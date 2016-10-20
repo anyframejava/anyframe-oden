@@ -1,43 +1,40 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 import org.ungoverned.osgi.service.shell.Command;
 
-import anyframe.common.bundle.log.Logger;
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
-import anyframe.oden.bundle.core.DeployFile;
-import anyframe.oden.bundle.core.DeployFileUtil;
-import anyframe.oden.bundle.core.RepositoryProviderService;
-import anyframe.oden.bundle.core.job.Job;
-import anyframe.oden.bundle.core.job.JobManager;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.FileMap;
+import anyframe.oden.bundle.core.Logger;
 import anyframe.oden.bundle.prefs.Prefs;
 
 /**
@@ -55,19 +52,6 @@ public class TaskCommandImpl extends OdenCommand {
 	
 	public final static String[] POLICY_OPT = {"policy", "p"};
 	
-	
-	private BundleContext context;
-	
-	protected void activate(ComponentContext context){
-		this.context = context.getBundleContext();
-	}
-	
-	protected JobManager jobManager;
-	
-	protected void setJobManager(JobManager jm){
-		this.jobManager = jm;
-	}
-	
 	protected PolicyCommandImpl policyCommand;
 	
 	protected void setPolicyCommand(Command cmd){
@@ -75,18 +59,9 @@ public class TaskCommandImpl extends OdenCommand {
 			this.policyCommand = (PolicyCommandImpl) cmd;
 	}
 	
-	protected RepositoryProviderService repositoryProvider;
-	
-	protected void setRepositoryProvider(RepositoryProviderService r){
-		this.repositoryProvider = r;
+	protected void unsetPolicyCommand(Command cmd){
+		this.policyCommand = null;
 	}
-	
-	private DeployLogService2 deploylog;
-	
-	protected void setDeployLogService(DeployLogService2 deploylog) {
-		this.deploylog = deploylog;
-	}
-	
 	
 	public void execute(String line, PrintStream out, PrintStream err) {
 		String consoleResult = "";
@@ -101,7 +76,7 @@ public class TaskCommandImpl extends OdenCommand {
 			
 			if(Cmd.INFO_ACTION.equals(action)){
 				String task = cmd.getActionArg();
-				if(task.length() == 0){
+				if(task.length() < 1){
 					ja = doListActionJ();
 				}else { 
 					ja = doInfoActionJ(task);
@@ -144,12 +119,8 @@ public class TaskCommandImpl extends OdenCommand {
 				if(doInfoAction(task).length() == 0) 
 					throw new OdenException("Couldn't find a task: " + cmd.getActionArg());
 				
-				Set<DeployFile> dfiles = preview(task);
-				String txid = deploy(dfiles, task, extractUserName(cmd));
-				if(isJSON)
-					ja.put(new JSONObject().put("txid", txid));
-				else
-					consoleResult = "Task is scheduled. Transaction id is: " + txid;
+				doRunAction(task, extractUserName(cmd), isJSON ? new PrintStream(System.out) : out);
+				consoleResult = "Task is finished.";
 			}else if(TEST_ACTION.equals(action)){
 				if(cmd.getActionArg().length() < 1)
 					throw new OdenException("Couldn't execute command.");
@@ -159,22 +130,13 @@ public class TaskCommandImpl extends OdenCommand {
 				if(doInfoAction(task).length() == 0) 
 					throw new OdenException("Couldn't find a task: " + cmd.getActionArg());
 				
-				Set<DeployFile> dfiles = preview(task);
-				if(isJSON){
-					ja = (JSONArray) JSONUtil.jsonize(dfiles);
-				} else {
-					StringBuffer buf = new StringBuffer();
-					for(DeployFile dfile : dfiles){
-						buf.append(DeployFileUtil.modeToString(dfile.mode()) +  ": " + 
-								dfile.getRepo().toString() + " " + dfile.getPath() + 
-								" >> " + dfile.getAgent().agentName() + "\n");
-					}
-					consoleResult = buf.toString();
-				}
+				ja = doTestAction(task);
+				if(!isJSON)
+					consoleResult = formatTest(ja);
 			}else if(action.length() == 0 || Cmd.HELP_ACTION.equals(action)){
 				consoleResult = getFullUsage();
 			}else {
-				throw new OdenException("Couldn't execute that action: " + action);
+				throw new OdenException("Couldn't the run specified action: " + action);
 			}
 			
 			if(isJSON)
@@ -199,6 +161,23 @@ public class TaskCommandImpl extends OdenCommand {
 				Logger.log(LogService.LOG_ERROR, e.getMessage(), e);	
 			}
 		}
+	}
+
+	private String formatTest(JSONArray ja) throws JSONException {
+		StringBuffer buf = new StringBuffer();
+		for(int i=0; i< ja.length(); i++){
+			JSONObject repos = ja.getJSONObject(i);
+			for(Iterator<String> it = repos.keys(); it.hasNext();){
+				String repo = it.next();
+				buf.append("REPOSITORY: " + repo + "\nFILES:\n");
+				JSONObject files = repos.getJSONObject(repo);
+				for(Iterator<String> it2 = files.keys(); it2.hasNext();){
+					String file = it2.next();
+					buf.append("\t"+ file + " >> " + JSONUtil.toString(files.getJSONArray(file)));
+				}
+			}
+		}
+		return buf.toString();
 	}
 	
 	private void removeTask(String taskName) throws OdenException {
@@ -232,20 +211,16 @@ public class TaskCommandImpl extends OdenCommand {
 		} 
 		return arr;
 	}	
+	
+	private void doRunAction(String taskName, String user, PrintStream out) 
+			throws OdenException {
+		Map<List<String>, FileMap> repomap = preview(taskName);
 		
-	private String deploy(final Set<DeployFile> dfiles, String taskName, final String user) throws OdenException {
-		Job j = new TaskDeployJob(context, dfiles, user);
-		j.schedule("task run " + taskName);	
-		return j.id();	// txid
-	}
-
-	private Set<DeployFile> preview(String taskName) throws OdenException{
+		// repo arguments 를 얻어온 뒤  repo에 해당하는  preview 결과를 배
 		Cmd cmd = infoCmd(taskName);
 		Opt op = cmd.getOption(POLICY_OPT);
 		if(op == null) 
 			throw new OdenParseException(cmd.toString());
-		
-		Set<DeployFile> dfiles = new ArraySet<DeployFile>();
 		
 		String[] policies = op.getArgArray();
 		for(String policy : policies){
@@ -253,14 +228,42 @@ public class TaskCommandImpl extends OdenCommand {
 				throw new OdenException("Couldn't find a policy: " + policy);
 			
 			Cmd policyInfo = policyCommand.infoCmd(policy);
-			policyCommand.preview(dfiles, policyInfo);
+			policyCommand.deploy(repomap, policyInfo, user, out);
 		}
-		return dfiles;
+	}
+
+	private Map<List<String>, FileMap> preview(String taskName) throws OdenException{
+		Cmd cmd = infoCmd(taskName);
+		Opt op = cmd.getOption(POLICY_OPT);
+		if(op == null) 
+			throw new OdenParseException(cmd.toString());
+		
+		Map<List<String>, FileMap> repomap = new HashMap<List<String>, FileMap>();
+		
+		String[] policies = op.getArgArray();
+		for(String policy : policies){
+			if(!existPolicy(policy))
+				throw new OdenException("Couldn't find a policy: " + policy);
+			
+			Cmd policyInfo = policyCommand.infoCmd(policy);
+			policyCommand.preview(repomap, policyInfo);
+		}
+		return repomap;
+	}
+	
+	private JSONArray doTestAction(String taskName) throws OdenException{		
+		Map<List<String>, FileMap> repomap = preview(taskName);
+		
+		JSONArray ja = new JSONArray();
+		try {
+			ja = JSONUtil.jsonArray(repomap);
+		} catch (JSONException e) {
+			throw new OdenException(e);
+		}		
+		return ja;
 	}
 	
 	private boolean existPolicy(String policyname) {
-		if(policyCommand == null)
-			return false;
 		return policyCommand.getPrefs().get(policyname).length() > 0;
 	}
 

@@ -1,25 +1,11 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
 package anyframe.oden.bundle.repository;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.net.ftp.FTP;
@@ -27,6 +13,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.common.OdenIncompleteArgumentException;
 
 /**
  * This pool manipulate ftp connection instances.
@@ -34,46 +21,62 @@ import anyframe.oden.bundle.common.OdenException;
  * @author joon1k
  *
  */
-class FTPConnectionPool {
-	// map Thread id & FTP connection.
-	private Map<String, FTPClient> pool = 
-			new HashMap<String, FTPClient>();
-
-	public FTPConnectionPool(){
+public class FTPConnectionPool {
+	private Map<List<String>, FTPClient> pool = 
+			new HashMap<List<String>, FTPClient>();
+	
+	private static FTPConnectionPool instance;
+	
+	protected FTPConnectionPool(){
 	}
-		
-	public FTPClient connection(String addr, String id, String pwd) throws OdenException{	
-		String key = key(Thread.currentThread().getId(), addr, id, pwd);
+	
+	public static FTPConnectionPool instance(){
+		if(instance == null)
+			instance = new FTPConnectionPool();	
+		return instance;
+	}
+	
+	public FTPClient connection(String[] repoargs) throws OdenException{		
+		if(repoargs.length < 2)
+			throw new OdenIncompleteArgumentException(repoargs);
+
+		List<String> key = Arrays.asList(repoargs);
 		FTPClient conn = pool.get(key);
 		if(conn == null || !conn.isConnected()){
-			if(conn != null)
-				remove(key);
-			conn = initFTP(addr, id, pwd);
+			String uri = repoargs[0];
+			String id = repoargs.length > 2 ? repoargs[2] : null;
+			String pwd = repoargs.length > 3 ? repoargs[3] : null;
+			
+			conn = initFTP(uri, id, pwd);
 			pool.put(key, conn);
 		}
+		
+		String repoRoot = repoargs[1];
+		try {
+			if(repoRoot != null)
+				conn.changeWorkingDirectory(repoRoot);
+		} catch (IOException e) {
+			// because of socket timeout, this occurs. so make connection again
+			try { conn.disconnect(); } catch (IOException e1) { }
+			conn = connection(repoargs);		
+		}
+		conn.setDataTimeout(30000);
 		return conn;
 	}
 	
-	public static String key(long thread, String addr, String id, String pwd){
-		return String.valueOf(thread) + ", " + addr + ", " + id + ", " + pwd;
-	}
-	
-	private FTPClient initFTP(String addr, String id, String pwd) throws OdenException{
+	private FTPClient initFTP(String uri, String id, String pwd) throws OdenException{
 		URI _uri = null;
 		try {
-			_uri = new URI(addr);
+			_uri = new URI(stripProtocol(uri));
 		} catch (URISyntaxException e) {
-			throw new OdenException("Illegal URI syntax: " + addr);
+			throw new OdenException("Illegal URI syntax: " + uri);
 		}
 		int port = _uri.getPort();
 		
 		FTPClient ftp = new FTPClient();
 		try {
 			ftp.setDefaultTimeout(10000);	// wait to connect
-			ftp.setDataTimeout(600000);
 			ftp.connect(_uri.getHost(), port == -1 ? 21 : port);
-//System.out.println("connected to ftp: " + Thread.currentThread().getId()
-//		+ " by " + new Throwable().getStackTrace()[4].getMethodName());
 			if(!FTPReply.isPositiveCompletion( ftp.getReplyCode()))
 				throw new IOException();
 		} catch (IOException e) {
@@ -101,16 +104,14 @@ class FTPConnectionPool {
 	        
 	}
 	
-	public void remove(String key){
-		FTPClient conn = pool.get(key);
-		if(conn != null){
-			try{
-				conn.logout();
-				conn.disconnect();
-//System.out.println("disconnected to ftp: " + Thread.currentThread().getId());				
-				pool.remove(key);
-			}catch(IOException e){}
+	private String stripProtocol(String uri) {
+		StringBuffer buf = new StringBuffer(uri);
+		
+		// remove protocol
+		if(uri.startsWith("ftp://")){
+			buf.delete(0, "ftp://".length());
 		}
+		return buf.toString();
 	}
 	
 }

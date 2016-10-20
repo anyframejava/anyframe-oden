@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="anyframe.common.eclipse.core.views.anyframe"
+            name="Anyframe">
+      </category>
+      <view
+            category="anyframe.common.eclipse.core.views.anyframe"
+            class="anyframe.oden.eclipse.core.explorer.ExplorerView"
+            icon="icons/find.png"
+            id="anyframe.oden.eclipse.core.explorer.ExplorerView"
+            name="Oden Explorer">
+      </view>
+      <view
+            category="anyframe.common.eclipse.core.views.anyframe"
+            class="anyframe.oden.eclipse.core.snapshot.SnapshotView"
+            icon="icons/camera.png"
+            id="anyframe.oden.eclipse.core.snapshot.SnapshotView"
+            name="Oden Snapshot">
+      </view>
+      <view
+            category="anyframe.common.eclipse.core.views.anyframe"
+            class="anyframe.oden.eclipse.core.history.DeploymentHistoryView"
+            icon="icons/report_magnify.png"
+            id="anyframe.oden.eclipse.core.history.DeploymentHistoryView"
+            name="Oden Deployment History">
+      </view>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="anyframe.oden.eclipse.core.editors.OdenEditor"
+            extensions="config"
+            icon="icons/script.png"
+            id="anyframe.oden.eclipse.core.editors.OdenEditor"
+            name="Policy and Task Editor">
+      </editor>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="anyframe.common.eclipse.core.preferences.anyframe"
+            class="anyframe.oden.eclipse.core.preferences.PreferencePage"
+            id="anyframe.oden.eclipse.core.preferences.Preference"
+            name="Oden">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="anyframe.oden.eclipse.core.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+
+</plugin>

@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle;
 
@@ -20,7 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -35,6 +36,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
+import sun.misc.JarFilter;
+
 /**
  * OSGi Framework Launcher. Lauch OSGi Framework, start some bundles
  * and put some properties to the OSGi Context.
@@ -48,8 +51,6 @@ public class Oden {
 	private final static String CACHE = "meta";
 	
 	private final static String BUNDLE_LOC = "bundle";
-
-	private static final int DEF_PORT = 9862;
 	
 	private static Bundle framework = null;
 	
@@ -104,18 +105,15 @@ public class Oden {
         Properties thirdProp = loadINI(CONFIG_FILE);
         if(thirdProp != null){
         	configMap.putAll(thirdProp);
-        	if(thirdProp.getProperty("agent.port") == null)
-        		configMap.put("agent.port", DEF_PORT);
-        }else {
-        	// get port from args or 9862
-            configMap.put("agent.port", String.valueOf(getPort(args)));
         }
         
+        int agentPort = getPort(args);
+        if(agentPort > 0)
+        	configMap.put("agent.port", String.valueOf(agentPort));
         replaceKey(configMap, "agent.port", "ch.ethz.iks.r_osgi.port");
         replaceKey(configMap, "log.level", "felix.log.level");
         replaceKey(configMap, "http.port", "org.osgi.service.http.port");
         replaceKey(configMap, "shell.port", "osgi.shell.telnet.port");
-        replaceKey(configMap, "shell.maxconn", "osgi.shell.telnet.maxconn");
         return configMap;
         
     }
@@ -128,7 +126,7 @@ public class Oden {
     	}catch(Exception e) {
     		// ignore
     	}
-    	return DEF_PORT;
+    	return -1;
 	}
 	
 	/**
@@ -146,11 +144,7 @@ public class Oden {
     }
     
     private static void installBundles(String loc) throws IOException, BundleException{
-    	File[] files =new File(loc).listFiles(new FilenameFilter(){
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".jar");
-			}
-		});
+    	File[] files =new File(loc).listFiles(new JarFilter());
     	for(File file : files){
     		String name = file.getName();
     		if(file.isFile() && !"felix.jar".equals(name)){

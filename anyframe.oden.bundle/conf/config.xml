@@ -1,22 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <oden>
 	<agents>
-		<agent name="Agent-one">
-			<address host="localhost" port="9862" />
-			<default-location value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample" />
-			<backup-location value="/Users/coelumscio/local/oden/Snapshots" />
-			<location name="webapp" value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample" />
-			<location name="classes" value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample/WEB-INF/classes" />
-			<location name="_RootDirectory" value="/" />
-		</agent>
-		<agent name="Agent-Two">
-			<address host="localhost" port="9863" />
-			<default-location value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample" />
-			<backup-location value="/Users/coelumscio/local/oden/Snapshots" />
-			<location name="webapp" value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample" />
-			<location name="classes" value="/Users/coelumscio/local/oden/DeploymentTarget/apache-tomcat-6.0.20/webapps/anyframe-sample/WEB-INF/classes" />
-			<location name="_RootDirectory" value="/" />
+		<agent name="localhost">
+			<address host="localhost" port="9862"/>
+			<default-location value="C:/apps/anyframe-sample"/>
+			<location name="backup" value="C:/apps/anyframe-sample/backup"/>
 		</agent>
 	</agents>
 </oden>

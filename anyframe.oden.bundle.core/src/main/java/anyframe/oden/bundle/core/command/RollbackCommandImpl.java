@@ -1,44 +1,33 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
-import anyframe.common.bundle.log.Logger;
-import anyframe.oden.bundle.common.ArraySet;
-import anyframe.oden.bundle.common.FileUtil;
 import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.core.AgentLoc;
-import anyframe.oden.bundle.core.DeployFile;
-import anyframe.oden.bundle.core.Repository;
-import anyframe.oden.bundle.core.DeployFile.Mode;
-import anyframe.oden.bundle.core.job.DeployJob;
-import anyframe.oden.bundle.core.job.Job;
-import anyframe.oden.bundle.core.record.DeployLogService2;
-import anyframe.oden.bundle.core.txmitter.TransmitterService;
+import anyframe.oden.bundle.core.Logger;
 import anyframe.oden.bundle.prefs.Prefs;
 
 /**
@@ -46,25 +35,8 @@ import anyframe.oden.bundle.prefs.Prefs;
  * @author joon1k
  *
  */
-public class RollbackCommandImpl extends OdenCommand {	
-	private BundleContext context;
-	
-	protected void activate(ComponentContext context){
-		this.context = context.getBundleContext();
-	}
-	
-	private DeployLogService2 deploylog;
-	
-	protected void setDeployLogService(DeployLogService2 deploylog) {
-		this.deploylog = deploylog;
-	}
-	
-	private TransmitterService txmitterService;
-	
-	protected void setTransmitterService(TransmitterService tx){
-		this.txmitterService = tx;
-	}
-	
+public class RollbackCommandImpl extends OdenCommand {
+
 	public RollbackCommandImpl(){
 	}
 	
@@ -86,11 +58,8 @@ public class RollbackCommandImpl extends OdenCommand {
 						throw new OdenException("Couldn't find that file: " + cmd.getActionArg());
 					} else {
 						String planName = findPlanNameWithFileName(fname);
-						String txid = doRollback(fname, planName, extractUserName(cmd)); 
-						if(isJSON)
-							ja.put(new JSONObject().put("txid", txid));
-						else
-							consoleResult = "Rollback is scheduled. Transaction id: " + txid;
+						doRollback(fname, planName, extractUserName(cmd)); 
+						consoleResult = "Finished.";
 					}
 				}else {
 					throw new OdenException("Couldn't execute command.");
@@ -125,7 +94,7 @@ public class RollbackCommandImpl extends OdenCommand {
 		}		
 	}
 	
-	private String doRollback(String fname, String planName, String user) throws OdenException {
+	private void doRollback(String fname, String planName, String user) throws OdenException {
 		if(planName.length() == 0)
 			throw new OdenException("Couldn't find a plan info for the " + planName);
 		
@@ -133,42 +102,15 @@ public class RollbackCommandImpl extends OdenCommand {
 		if(planCmd == null)
 			throw new OdenException("Couldn't find a plan: " + planName);
 		
-		String srcArgs = planCmd.getOptionArg(SnapshotCommandImpl.SOURCE_OPT);
-		// Because this is rollback action, dest is src & src is dest.
-		AgentLoc dest = new AgentLoc(srcArgs, configService);
-		String bak = configService.getBackupLocation(dest.agentName()); 
-		if(bak == null)
-			throw new OdenException("Couldn't fina a backup location from config.xml.");
-		AgentLoc src = new AgentLoc(dest.agentName(), dest.agentAddr(), bak);
+		String destArgs = planCmd.getOptionArg(SnapshotCommandImpl.DEST_OPT);
+		AgentLoc agent = new AgentLoc(destArgs, configService);
 		
-		return rollback(src, fname, dest, user);
+		String target = new AgentLoc(agent.agentName() + 
+				planCmd.getOptionArg(SnapshotCommandImpl.SOURCE_OPT) , configService).location();
+		
+		delegateService.rollback(agent.agentAddr(), agent.location(), fname, target, user);
 	}
 
-	private String rollback(AgentLoc src, String file, AgentLoc dest, String user) 
-			throws OdenException {
-		final DeployFile toRollback = new DeployFile(
-				new Repository(src), file, dest, 0L, 0L, Mode.NA);
-		
-		Set<DeployFile> fs = new ArraySet<DeployFile>();
-		Job j = new DeployJob(context, fs, user) {
-			
-			@Override
-			protected void run() throws Exception {
-				toRollback.setBackupLocation(FileUtil.combinePath(
-						configService.getBackupLocation(toRollback.getAgent().agentName()), id));
-				String addr = toRollback.getRepo().args()[0];
-				String parent = toRollback.getRepo().args()[1];
-				String path = toRollback.getPath();
-				if(txmitterService.exist(addr, parent, path) &&
-						txmitterService.removeDir(deployFiles, toRollback))
-					txmitterService.restore(deployFiles, toRollback);
-			}
-			
-		};
-		j.schedule("rollback run " + file);
-		return j.id();
-	}
-	
 	public String getName() {
 		return "rollback";
 	}

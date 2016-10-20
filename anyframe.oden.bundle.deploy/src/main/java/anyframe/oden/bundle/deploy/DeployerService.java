@@ -1,23 +1,28 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.deploy;
 
 import java.io.IOException;
 import java.util.List;
+
+import anyframe.oden.bundle.common.FileInfo;
+import anyframe.oden.bundle.common.OdenException;
 
 /**
  * This class provides some methods to manipulate remote files. 
@@ -28,20 +33,14 @@ import java.util.List;
  *
  */
 public interface DeployerService {
+	public void init(String fpath, long date, boolean update) throws IOException;
+	
+	public void write(byte[] buf) throws IOException;
 
-	public boolean init(String parent, String relpath, long date, boolean update);
+	public void write(byte[] buf, int size) throws IOException;
 	
-	public boolean write(byte[] buf);
-
-	public boolean write(byte[] buf, int size);
-	
-	public DoneFileInfo close(List<String> updatefiles, String bakdir) throws IOException;
-	
-	
-	public boolean exist(String parent, String child);
-	
-	public boolean writable(String parent, String child);
-	
+    public List<String> close() throws IOException;
+        
     /**
      * compress srcdir to destdir/filename
      * 
@@ -49,8 +48,10 @@ public interface DeployerService {
      * @param destdir
      * @param filename
      * @return size of the compressed file.
+     * @throws OdenException
      */
-    public DoneFileInfo compress(String srcdir, String destdir);
+    public FileInfo compress(String srcdir, String destdir) 
+    		throws OdenException;
 
     /**
      * extract srcdir/zipname to destdir
@@ -59,8 +60,10 @@ public interface DeployerService {
      * @param zipname
      * @param destdir
      * @return file list which are extracted.
+     * @throws OdenException
      */
-	public List<DoneFileInfo> extract(String srcdir, String zipname, String destdir);
+	public List<String> extract(String srcdir, String zipname, String destdir)
+			throws OdenException;
 
     /**
      * remove file dir/filename
@@ -68,7 +71,7 @@ public interface DeployerService {
      * @param dir
      * @param filename
      */
-	public void removeFile(String dir, String filename);
+	public void removeFile(String dir, String filename) throws OdenException;
 	
 	/**
 	 * get last modified date for parentpath/path
@@ -77,13 +80,5 @@ public interface DeployerService {
 	 * @param path
 	 * @return 0L if the file does not exist or if an I/O error occurs
 	 */
-	public long getDate(String parentpath, String path) ;
-	
-
-	public List<DoneFileInfo> backupNRemoveDir(String dir, String bak);
-	
-	public DoneFileInfo backupNCopy(String srcPath, String filePath, String destPath, String bakPath);
-	
-	public DoneFileInfo backupNRemove(String srcPath, String filePath, String bakPath);
-	
+	public long getDate(String parentpath, String path) throws OdenException;
 }

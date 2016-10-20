@@ -4,40 +4,32 @@
 	<service>
 		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
 	</service>
-	<reference name="REPOSITORY_PROVIDER_SERVICE"
-         interface="anyframe.oden.bundle.core.RepositoryProviderService"
-         cardinality="1..1"
+	<reference name="DELEGATE_SERVICE"
+         interface="anyframe.oden.bundle.core.DelegateService"
+         cardinality="0..1"
          policy="dynamic"
-         bind="setRepositoryProvider"
+         bind="setDelegateService"
+         unbind="unsetDelegateService"
    />
    <reference name="PERSISTENCE_SERVICE"
          interface="anyframe.oden.bundle.prefs.PrefsService"
-         cardinality="1..1"
+         cardinality="0..1"
          policy="dynamic"
          bind="setPrefsService"
+         unbind="unsetPrefsService"
    />
    <reference name="ODEN_CONFIG_SERVICE"
          interface="anyframe.oden.bundle.core.config.OdenConfigService"
-         cardinality="1..1"
+         cardinality="0..1"
          policy="dynamic"
          bind="setConfigService"
+         unbind="unsetConfigService"
    />
    <reference name="POLICY_COMMAND"
          interface="org.ungoverned.osgi.service.shell.Command"
-         cardinality="1..n"
+         cardinality="0..n"
          policy="dynamic"
          bind="setPolicyCommand"
-   />
-   <reference name="DEPLOY_LOG_SERVICE"
-         interface="anyframe.oden.bundle.core.record.DeployLogService2"
-         cardinality="1..1"
-         policy="dynamic"
-         bind="setDeployLogService"
-   />
-   <reference name="JOB_MANAGER"
-         interface="anyframe.oden.bundle.core.job.JobManager"
-         cardinality="1..1"
-         policy="dynamic"
-         bind="setJobManager"
+         unbind="unsetPolicyCommand"
    />
 </component>

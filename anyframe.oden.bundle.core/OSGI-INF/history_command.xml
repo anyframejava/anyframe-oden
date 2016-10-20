@@ -4,22 +4,11 @@
 	<service>
 		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
 	</service>
-	<reference name="DEPLOY_LOG_SERVICE"
-		interface="anyframe.oden.bundle.core.record.DeployLogService2"
-		cardinality="1..1"
-		policy="dynamic"
-		bind="setDeployLogService"
-	/>
-	<reference name="ODEN_CONFIG_SERVICE"
-         interface="anyframe.oden.bundle.core.config.OdenConfigService"
-         cardinality="1..1"
+   <reference name="DEPLOY_LOG_SERVICE"
+         interface="anyframe.oden.bundle.core.record.DeployLogService"
+         cardinality="0..1"
          policy="dynamic"
-         bind="setConfigService"
-   />
-   <reference name="TRANSMITTER_SERVICE"
-         interface="anyframe.oden.bundle.core.txmitter.TransmitterService"
-         cardinality="1..1"
-         policy="dynamic"
-         bind="setTransmitterService"
+         bind="setDeployLogService"
+         unbind="unsetDeployLogService"
    />
 </component>

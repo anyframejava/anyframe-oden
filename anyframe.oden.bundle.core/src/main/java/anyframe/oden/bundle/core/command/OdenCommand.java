@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.command;
 
@@ -22,6 +24,7 @@ import java.net.UnknownHostException;
 
 import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.core.DelegateService;
 import anyframe.oden.bundle.core.config.AgentElement;
 import anyframe.oden.bundle.core.config.OdenConfigService;
 import anyframe.oden.bundle.prefs.Prefs;
@@ -35,18 +38,36 @@ import anyframe.oden.bundle.prefs.PrefsService;
  *
  */
 abstract class OdenCommand implements CustomCommand {
+	protected DelegateService delegateService;
+
 	protected PrefsService prefsService;
 	
 	protected OdenConfigService configService;
-		
+	
+	public void setDelegateService(DelegateService ds){
+		this.delegateService = ds;
+	}
+	
+	public void unsetDelegateService(DelegateService ds){
+		this.delegateService = null;
+	}
+	
 	public void setPrefsService(PrefsService prefsService){
 		this.prefsService = prefsService;
+	}
+	
+	public void unsetPrefsService(PrefsService prefsService){
+		this.prefsService = null;
 	}
 	
 	public void setConfigService(OdenConfigService configService) {
 		this.configService = configService;
 	}
 	
+	public void unsetConfigService(OdenConfigService configService) {
+		this.configService = null;
+	}
+		
 	protected Prefs getPrefs(String name){
 		return prefsService.getPrefs(name);
 	}
@@ -62,7 +83,7 @@ abstract class OdenCommand implements CustomCommand {
 		String info = getPrefs(prefs).get(name);
 		if(info.length() == 0 )
 			return null;
-		return new Cmd("foo fooAction \"" + name + "\" " + info);
+		return new Cmd("foo", "fooAction \"" + name + "\" " + info);
 	}
 	
 	/**
@@ -73,7 +94,8 @@ abstract class OdenCommand implements CustomCommand {
 	 * @throws FileNotFoundException
 	 * @throws OdenException
 	 */
-	protected String getURIFromAgent(String agentName) throws OdenException {
+	protected String getURIFromAgent(String agentName) 
+			throws FileNotFoundException, OdenException {
 		AgentElement agent = configService.getAgent(agentName);
 		if(agent != null){
 			return agent.getHost() + ":" + agent.getPort();

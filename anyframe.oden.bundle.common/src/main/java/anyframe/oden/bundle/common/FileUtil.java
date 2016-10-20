@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.common;
 
@@ -26,9 +28,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
@@ -43,13 +43,6 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class FileUtil {
-	
-	/**
-	 * create a new empty file. Before filling contents to this file,
-	 * if some errors are occured, remove this file.
-	 * @param f
-	 * @throws IOException
-	 */
 	public static boolean createNewFile(File f) throws IOException {
 		File parent = f.getParentFile();
 		if (!parent.exists()) {
@@ -69,14 +62,8 @@ public class FileUtil {
 	 */
 	public static long compress(File dir, File jar) 
 			throws IOException{
-		if(!dir.exists())
-			throw new IOException("Couldn't find: " + dir);
-		if(jar.exists()){
-			if(!jar.canWrite())
-				throw new IOException("Fail to write: " + jar.getPath());
+		if(jar.exists())
 			jar.delete();
-		}
-			
 		
 		ZipOutputStream jout = null;
 		try{
@@ -143,16 +130,12 @@ public class FileUtil {
 	 * @throws IOException 
 	 * @throws ZipException 
 	 */
-	public static List<String> updateJar(File ref, File target) 
-			throws IOException {
-		if(!ref.exists())
-			throw new IOException("Couldn't find: " + ref);
-		if(!target.exists() || !target.canWrite())
-			throw new IOException("Fail to write: " + target);
-		
+	public static List<String> updateJar(File target, File ref) 
+			throws ZipException, IOException {
 		List<String> updatedfiles = null;
 		
 		File tmpdir = temporaryDir();
+		
 		try{
 			// extract target to tmp
 			extractZip(target, tmpdir);
@@ -247,32 +230,27 @@ public class FileUtil {
 	 * 
 	 * @param src
 	 * @param dest dir
-	 * @throws IOException 
-	 * @throws ZipException 
 	 * @throws ZipException
 	 * @throws IOException
 	 */
-	public static Map<FileInfo, Boolean> extractZip(File src, File dest) 
-			throws IOException {
-		if(!src.exists())
-			throw new IOException("Couldn't find: " + src);
-		
-		Map<FileInfo, Boolean> extractedfiles = new HashMap<FileInfo, Boolean>();
+	public static List<String> extractZip(File src, File dest) 
+			throws ZipException, IOException {
+		List<String> extractedfiles = new ArrayList<String>();
+		InputStream in = null;
+		OutputStream out = null;
 		
 		ZipFile zip = new ZipFile(src);
 		Enumeration<? extends ZipEntry> e = zip.entries();
 		while(e.hasMoreElements()){
-			ZipEntry entry = (ZipEntry) e.nextElement();
-			File f = new File(dest, entry.getName());
-			if(entry.isDirectory()) {
-				if(!f.exists()) f.mkdirs();
-			} else {
-				InputStream in = null;
-				OutputStream out = null;
-			
-				boolean success = false;
-				long time = entry.getTime();
-				try{
+			File f = null;
+			long time = 0;
+			try {				
+				ZipEntry entry = (ZipEntry) e.nextElement();
+				time = entry.getTime();
+				if(entry.isDirectory()) {
+					f = new File(dest, entry.getName());
+					f.mkdirs();
+				} else {
 					in = new BufferedInputStream(zip.getInputStream(entry)); 
 					
 					f = new File(dest, entry.getName());
@@ -283,16 +261,13 @@ public class FileUtil {
 					out = new BufferedOutputStream(new FileOutputStream(f));
 					
 					copy(in, out);
-					success = true;
-				}catch(Exception e2){
-				}finally {
-					// do u wanna read this?
-					try{ if(out != null) out.close(); }catch(IOException x){}
-					try{ if(in != null) in.close(); }catch(IOException x){}
-					if(f != null) f.setLastModified(time);
+					extractedfiles.add(f.getPath());
 				}
-				extractedfiles.put(
-						new FileInfo(entry.getName(), false, f.lastModified(), f.length()), success);
+			}finally {
+				// do u wanna read this?
+				try{ if(out != null) out.close(); }catch(IOException x){}
+				try{ if(in != null) in.close(); }catch(IOException x){}
+				if(f != null) f.setLastModified(time);
 			}
 		}
 		return extractedfiles;
@@ -314,10 +289,10 @@ public class FileUtil {
 	}
 	
 	/**
-	 * change path to normized path. it's separator is '/'. 
+	 * change path to normized path. it's separator is '/'.  it is not end with '/'.
 	 * 
-	 * @param path 
-	 * @return path with separated '/'.  it is not end with '/'.
+	 * @param path
+	 * @return
 	 */
 	public static String normalize(String path){
 		if(path == null)
@@ -337,13 +312,10 @@ public class FileUtil {
 	 * @return
 	 */
 	public static String combinePath(String parent, String child){
-		if(parent == null && child == null)
-			return null;
-		else if(parent == null || parent.length() == 0)
-			return normalize(child);
-		else if(child == null || child.length() == 0)
-			return normalize(parent);
-		return normalize(parent) + "/" + normalize(child);
+		String _parent = normalize(parent);
+		String _child = normalize(child);
+	
+		return _parent + "/" + _child;
 	}
 	
 	public static String parentPath(String path){
@@ -357,11 +329,9 @@ public class FileUtil {
 		return path.substring(path.lastIndexOf('/')+1);
 	}
 	
-	public static String nameOnly(String file) {
-		int dot = file.indexOf(".");
-		if(dot == -1)
-			return file;
-		return file.substring(0, dot);
+	public static void removeFile(File file) {
+		if(file.exists())
+			file.delete();
 	}
 
 	public static void removeDir(File path) {
@@ -384,9 +354,6 @@ public class FileUtil {
 	}
 	
 	public static long copy(File src, File dest) throws IOException{
-		if(!src.exists() || !dest.exists() || !dest.canWrite())
-			throw new IOException();
-		
 		long size = 0;
 		InputStream in = null;
 		OutputStream out = null;
@@ -509,6 +476,7 @@ public class FileUtil {
 		return buf.append(tok).toString();
 	}
 	
+	// TODO 빈 와일드카드 문제.  *  문제 
 	public static String toRegex(String wildcard) {		
 		// **/ >> (.*/)?
 		// ** >> (.*/)?
@@ -518,6 +486,35 @@ public class FileUtil {
 		if(converted.contains("@@"))
 			converted = converted.replaceAll("@@", "(.*/)?") + "((^|/).*)?$";
 		return converted;
+	}
+	
+	public static void writeToFile(File target, byte[] contents) throws IOException {
+		OutputStream out = null;
+		try {
+			FileUtil.createNewFile(target);
+			out = new BufferedOutputStream(new FileOutputStream(target));
+			out.write(contents);
+		} catch (IOException e) {
+			throw e;
+		} finally {
+			try {
+				if(out != null) out.close();
+			} catch (IOException e) {
+			}
+		}
+	}
+
+	public static void main(String[] args) throws ZipException, IOException {
+		final String JAR ="/Users/joon1k/dev_rscs/anyframe-sample/build/anyframe-sample-services.jar";
+		final String REF="/Users/joon1k/dev_rscs/anyframe-sample/src/webapps/WEB-INF/lib/anyframe-sample-services.jar";
+		
+		File jar = new File(JAR);
+		if(!jar.exists())
+			jar.createNewFile();
+		
+//		compress(new File(DIR), JAR);
+		
+		updateJar(new File(JAR), new File(REF) );
 	}
 	
 	public static File uniqueFile(File path, String prefix, String postfix)

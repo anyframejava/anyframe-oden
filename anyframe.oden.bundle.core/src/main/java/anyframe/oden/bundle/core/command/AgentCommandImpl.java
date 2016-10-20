@@ -1,21 +1,24 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.command;
 
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Iterator;
 
@@ -24,12 +27,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import anyframe.common.bundle.gate.CustomCommand;
-import anyframe.common.bundle.log.Logger;
 import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.config.AgentElement;
 import anyframe.oden.bundle.core.config.OdenConfigService;
-import anyframe.oden.bundle.core.txmitter.TransmitterService;
 
 /**
  * Oden Shell command to get agent information in the config.xml
@@ -38,24 +39,18 @@ import anyframe.oden.bundle.core.txmitter.TransmitterService;
  *
  */
 public class AgentCommandImpl implements CustomCommand {
-	
-	public final static String[] DETAIL_OPT = {"detail"};
-	
+
 	private OdenConfigService configsvc;
 	
 	protected void setConfigService(OdenConfigService configsvc){
 		this.configsvc = configsvc;
 	}
 	
-	private TransmitterService txmitterService;
-	
-	protected void setTransmitterService(TransmitterService tx){
-		this.txmitterService = tx;
+	protected void unsetConfigService(OdenConfigService configsvc) {
+		this.configsvc = null;
 	}
 	
 	public void execute(String line, PrintStream out, PrintStream err) {
-		JSONArray ja = new JSONArray();
-		String consoleResult = "";
 		boolean isJSON = false;
 		try{
 			Cmd cmd = new Cmd(line);
@@ -63,27 +58,15 @@ public class AgentCommandImpl implements CustomCommand {
 			isJSON = cmd.getOption(Cmd.JSON_OPT) != null;
 			
 			if("info".equals(action)){
-				String agentName = cmd.getActionArg();
-				if(agentName.length() > 0) {
-					ja.put(agentInfo(agentName));
-					if(!isJSON) consoleResult = formatAgentList(ja);
-				} else if(cmd.getOption(DETAIL_OPT) != null){
-					ja = agentList();
-				} else {
-					ja = simpleAgentList();
-				}
-			}else if(action.length() == 0 || "help".equals(action)){
-				out.println(getFullUsage());
+				if(isJSON)
+					out.println(agentList().toString());
+				else
+					out.println(formatAgentList(agentList()));
+			}else if("help".equals(action)){
+				out.println(getUsage());
 			}else {
 				throw new OdenException("Couldn't execute specified action: " + action);
 			}
-			
-			if(isJSON)
-				out.println(ja.toString());
-			else if(consoleResult.length() > 0)
-				out.println(consoleResult);
-			else
-				out.println(JSONUtil.toString(ja));
 		}catch(OdenException e){
 			err.println(isJSON ? JSONUtil.jsonizedException(e) : e.getMessage());
 		}catch(Exception e){
@@ -91,60 +74,27 @@ public class AgentCommandImpl implements CustomCommand {
 		}
 	}
 
-	private JSONArray simpleAgentList() throws OdenException { 
-		JSONArray jagents = new JSONArray();
-		for(String name : configsvc.getAgentNames()){
-			try{
-				AgentElement agent = configsvc.getAgent(name);
-				if(agent == null)
-					throw new OdenException("Fail to get agent information: " + name);
-				
-				JSONObject jagent = new JSONObject();
-				try{
-					jagent.put("name", agent.getName());
-					jagent.put("addr", agent.getHost() + ":" + agent.getPort());
-					jagents.put(jagent);
-				}catch(JSONException e){
-					Logger.error(e);
-				}
-			}catch(OdenException e){
-				Logger.error(e);
-			}
-		}
-		return jagents;
-	}
-	
 	// [{"name":"", "host":"", "port":"", "loc":"", "locs", {"":"", "":""}}, {..} ]
 	private JSONArray agentList() throws OdenException {
 		JSONArray jagents = new JSONArray();
-		for(String name : configsvc.getAgentNames()){
-			try{
-				JSONObject jagent = agentInfo(name);
-				jagents.put(jagent);
-			}catch(OdenException e){
-			}
-		}
-		return jagents;
-	}
-	
-	private JSONObject agentInfo(String name) throws OdenException {
-		JSONObject jagent = new JSONObject();
 		try {
-			AgentElement agent = configsvc.getAgent(name);
-			if(agent == null)
-				throw new OdenException("Fail to get agent information: " + name);
-			jagent.put("name", agent.getName());
-			jagent.put("host", agent.getHost());
-			jagent.put("port", agent.getPort());
-			jagent.put("loc", agent.getDefaultLoc().getValue());
-			jagent.put("backup", agent.getBackupLoc().getValue());
-			jagent.put("locs", getLocs(agent));
-			boolean alive = txmitterService.available(agent.getAddr());
-			jagent.put("status", String.valueOf(alive));
+			for(String name : configsvc.getAgentNames()){
+				JSONObject jagent = new JSONObject();
+				jagents.put(jagent);
+				
+				AgentElement agent = configsvc.getAgent(name);
+				jagent.put("name", agent.getName());
+				jagent.put("host", agent.getHost());
+				jagent.put("port", agent.getPort());
+				jagent.put("loc", agent.getDefaultLoc().getValue());
+				jagent.put("locs", getLocs(agent));
+			}
+		} catch (FileNotFoundException e) {
+			throw new OdenException(e);
 		} catch (JSONException e) {
 			throw new OdenException("Fail to jsonize. " + e.getMessage());
 		}
-		return jagent;
+		return jagents;
 	}
 	
 	private String formatAgentList(JSONArray agents) throws OdenException {
@@ -155,9 +105,7 @@ public class AgentCommandImpl implements CustomCommand {
 				buf.append("Agent: " + agent.get("name") + "\n");
 				String port = agent.getString("port");
 				buf.append("Address: " + agent.getString("host") + (port == null ? "" : ":" + port) + "\n");
-				buf.append("Status: " + agent.getString("status") + "\n");				
 				buf.append("Default Location: " + agent.getString("loc") + "\n");
-				buf.append("Backup Location: " + agent.getString("backup") + "\n");
 				buf.append("Locations:\n");
 				JSONObject locs = agent.getJSONObject("locs");
 				for(Iterator<String> it = locs.keys(); it.hasNext();){
@@ -191,11 +139,7 @@ public class AgentCommandImpl implements CustomCommand {
 	}
 
 	public String getUsage() {
-		return "agent help";
-	}
-	
-	private String getFullUsage() {
-		return "agent info [<agent-name>]";
+		return "agent info";
 	}
 
 }

@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.oden.bundle.core.config;
 
@@ -32,7 +34,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
-import anyframe.oden.bundle.common.StringUtil;
 
 /**
  * @see anyframe.oden.bundle.core.config.OdenConfigService
@@ -44,46 +45,28 @@ public class OdenConfigImpl implements OdenConfigService {
 
 	protected String CONFIG = "conf/config.xml";
 	
-	public void addAgent(AgentElement agent) throws OdenException {
+	public void addAgent(AgentElement agent) 
+			throws FileNotFoundException, OdenException {
 		removeAgent(agent.getName());
 		List<AgentElement> agents = loadAgentList();
 		agents.add(agent);
 		storeAgentList(agents);
 	}
 
-	public AgentElement getAgent(String name) {
-		try{
+	public AgentElement getAgent(String name) 
+			throws FileNotFoundException, OdenException {
+		if(name != null){
 			for(AgentElement agent : loadAgentList()){
-				if(name.equals(agent.getName()) && isValid(agent)){
+				if(name.equals(agent.getName())){
 					return agent;
 				}
 			}
-		}catch(Exception e){
 		}
 		return null;
 	}
-	
-	private boolean isValid(AgentElement agent) {
-		if(StringUtil.empty(agent.getName()) ||
-				StringUtil.empty(agent.getAddr()) ||
-				StringUtil.empty(agent.getPort()) ||
-				agent.getDefaultLoc() == null ||
-				agent.getBackupLoc() == null)
-			return false;
-		return true;
-	}
 
-	public String getBackupLocation(String agentName) throws OdenException {
-		AgentElement a = getAgent(agentName);
-		if(a != null){
-			AgentLocation l = a.getBackupLoc();
-			if(l != null)
-				return l.getValue();
-		}
-		throw new OdenException("Couldn't find any backup location from config.xml.");
-	}
-
-	public List<String> getAgentNames() throws OdenException {
+	public List<String> getAgentNames() 
+			throws FileNotFoundException, OdenException {
 		List<String> names = new ArrayList<String>();
 		for(AgentElement agent : loadAgentList()){
 			names.add(agent.getName());
@@ -91,7 +74,8 @@ public class OdenConfigImpl implements OdenConfigService {
 		return names;
 	}
 
-	public void removeAgent(String name) throws OdenException {
+	public void removeAgent(String name) 
+			throws FileNotFoundException, OdenException {
 		List<AgentElement> agents = loadAgentList();
 		for(AgentElement agent : agents){
 			if(agent.getName().equals(name)){
@@ -102,7 +86,8 @@ public class OdenConfigImpl implements OdenConfigService {
 		storeAgentList(agents);
 	}
 	
-	protected List<AgentElement> loadAgentList() throws OdenException{
+	protected List<AgentElement> loadAgentList() 
+			throws FileNotFoundException, OdenException{
 		List<AgentElement> agents = new ArrayList<AgentElement>();
 		InputStream in = null;
 		
@@ -139,8 +124,6 @@ public class OdenConfigImpl implements OdenConfigService {
 										agent.setPort(getAttributeValue(parser, "port"));
 									}else if(tag.equals("default-location")){
 										agent.setDefaultLoc(getAttributeValue(parser, "value"));
-									}else if(tag.equals("backup-location")){
-										agent.setBackupLoc(getAttributeValue(parser, "value"));
 									}else if(tag.equals("location")){
 										agent.addLoc(
 												getAttributeValue(parser, "name"),
@@ -159,10 +142,11 @@ public class OdenConfigImpl implements OdenConfigService {
 			} catch (XmlPullParserException e) {
 				throw new OdenException("Fail to parse: " + CONFIG);
 			}
-		} catch (FileNotFoundException e) {
-			throw new OdenException(e);
 		}finally {
-			try { if(in != null) in.close(); } catch (IOException e) {}
+			if(in != null)
+				try {
+					in.close();
+				} catch (IOException e) {}
 		}
 		return agents;
 	}
@@ -176,7 +160,7 @@ public class OdenConfigImpl implements OdenConfigService {
 	}
 	
 	protected void storeAgentList(List<AgentElement> agents) 
-			throws OdenException {
+			throws FileNotFoundException{
 		PrintWriter writer = null;
 		try {
 			File configFile = new File(CONFIG);
@@ -197,8 +181,6 @@ public class OdenConfigImpl implements OdenConfigService {
 			}
 			writer.println("\t</agents>");
 			writer.println("</oden>");
-		} catch (FileNotFoundException e) {
-			throw new OdenException(e);
 		} finally {
 			if(writer != null)
 				writer.close();

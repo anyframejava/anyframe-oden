@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oden>
+<agents>
+<agent name="agent0">
+<address host="localhost" port="10009"/>
+<default-location value="/Users/joon1k/dev_rscs/works/oden/anyframe.oden.bundle.test/tttdest/tttdest"/>
+<location name="path01" value="/Users/joon1k/dev_rscs/works/oden/anyframe.oden.bundle.test/tttdest0/tttdest01"/>
+<location name="path02" value="/Users/joon1k/dev_rscs/works/oden/anyframe.oden.bundle.test/tttdest1/tttdest02"/>
+</agent>
+</agents>
+</oden>

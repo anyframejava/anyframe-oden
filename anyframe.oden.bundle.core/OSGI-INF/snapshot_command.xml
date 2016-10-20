@@ -4,28 +4,25 @@
 	<service>
 		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
 	</service>
+	<reference name="DELEGATE_SERVICE"
+         interface="anyframe.oden.bundle.core.DelegateService"
+         cardinality="0..1"
+         policy="dynamic"
+         bind="setDelegateService"
+         unbind="unsetDelegateService"
+   />
    <reference name="PERSISTENCE_SERVICE"
          interface="anyframe.oden.bundle.prefs.PrefsService"
-         cardinality="1..1"
+         cardinality="0..1"
          policy="dynamic"
          bind="setPrefsService"
+         unbind="unsetPrefsService"
    />
    <reference name="ODEN_CONFIG_SERVICE"
          interface="anyframe.oden.bundle.core.config.OdenConfigService"
-         cardinality="1..1"
+         cardinality="0..1"
          policy="dynamic"
          bind="setConfigService"
+         unbind="unsetConfigService"
    />   
-   <reference name="TRANSMITTER_SERVICE"
-         interface="anyframe.oden.bundle.core.txmitter.TransmitterService"
-         cardinality="1..1"
-         policy="dynamic"
-         bind="setTransmitterService"
-   />
-   <reference name="DEPLOY_LOG_SERVICE"
-         interface="anyframe.oden.bundle.core.record.DeployLogService2"
-         cardinality="1..1"
-         policy="dynamic"
-         bind="setDeployLogService"
-   />
 </component>
