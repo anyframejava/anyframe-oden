@@ -1,18 +1,20 @@
-/*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+/* 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package anyframe.common.bundle.gate;
 
@@ -59,12 +61,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 
 /**
- * Support Shell to allow multi user access, Anyframe custom command
- * and some logging. This class modified the org.apache.felix.shell.Activator.
- * If needed more details, see org.apache.felix.shell.Activator. 
+ * @see org.apache.felix.shell.impl.Activator
  * 
- * @author joon1k
- *
  */
 public class Activator implements BundleActivator {
     private transient BundleContext m_context = null;
@@ -108,6 +106,8 @@ public class Activator implements BundleActivator {
 	                + org.apache.felix.shell.Command.class.getName()
 	                + ")(objectClass="
 	                + org.ungoverned.osgi.service.shell.Command.class.getName()
+	                + ")(objectClass="
+	                + CustomCommand.class.getName()
 	                + "))");
 	        }
 	        catch (InvalidSyntaxException ex)
@@ -375,7 +375,7 @@ public class Activator implements BundleActivator {
                     }
                 }
             }
-            else
+            else if(commandLine.length() > 0)
             {
                 err.println("Command not found. Type 'help' for usage.");
             }
