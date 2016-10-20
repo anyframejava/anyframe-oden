@@ -18,8 +18,8 @@
 	</target>
 	
 	<target name="compile.bundle" depends="init">
-		<condition property="dbg" else="off">
-			<isset property="dbg"/>
+		<condition property="dbg" value="off">
+			<not><isset property="dbg"/></not>
 		</condition>
 		<javac srcdir="${src}" destdir="${build}"
 				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
