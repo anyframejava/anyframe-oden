@@ -195,7 +195,6 @@ public class CompareAgentsJob extends Job {
 			if(uniqName == null)
 				throw new IOException("Fail to find unique file name.");
 			
-			// create local unique file
 			Map<DeployerService, Long> dstimes = Collections.EMPTY_MAP; 
 			// get ds times
 			dstimes = getDSTimes(deploys, uniqName);
@@ -218,18 +217,18 @@ public class CompareAgentsJob extends Job {
 		}
 
 		private Map<DeployerService, Long> getDSTimes(Set<DeployerService> deploys, 
-				String uniqName){
+				final String uniqName){
 			final Map dstimes = new HashMap<DeployerService, Long>();
 			try{
 				// write to
 				for(DeployerService ds : deploys){
 					ds.init(agents.get(ds).getValue(), uniqName, 0);
 					// some ftp can't transfer 0 byte file
-					ds.write(new ByteArray(new byte[4]));	
+					ds.write(agents.get(ds).getValue(), uniqName, 
+							new ByteArray(new byte[4]));	
 				}
 			}catch(Exception e){
 				Logger.error(e);
-				return dstimes;
 			}finally{
 				// close concurrently
 				List<Thread> ths = new ArrayList<Thread>();
@@ -237,7 +236,8 @@ public class CompareAgentsJob extends Job {
 					ths.add(new Thread(){
 						public void run() {
 							try { 
-								DoneFileInfo info = ds.close(null, null); 
+								DoneFileInfo info = ds.close(
+										agents.get(ds).getValue(), uniqName, null, null); 
 								dstimes.put(ds, info.lastModified());
 							} catch (Exception e) {
 								error = e;

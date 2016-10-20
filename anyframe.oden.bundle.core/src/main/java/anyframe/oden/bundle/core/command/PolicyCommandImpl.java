@@ -37,6 +37,7 @@ import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
 import anyframe.oden.bundle.core.AgentLoc;
+import anyframe.oden.bundle.core.AgentTimeDiffs;
 import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.DeployFileUtil;
 import anyframe.oden.bundle.core.Repository;
@@ -328,6 +329,21 @@ public class PolicyCommandImpl extends OdenCommand {
 		
 		DeployerManager deployerMgr = new DeployerManager(context, null, false);
 		
+		AgentTimeDiffs dffs = null;
+		try {
+			dffs = new AgentTimeDiffs();
+		} catch (IOException e1) {
+			throw new OdenException(e1);
+		}
+		
+		long repo_t;
+		try {
+			repo_t = reposvc.getDate(repo.args());
+		} catch (IOException e1) {
+			throw new OdenException(e1);
+		}
+		long repo_t_diff = System.currentTimeMillis() - repo_t;
+		
 		List<String> files = reposvc.resolveFileRegex(repo.args(), includes, excludes);
 		for(String file : files){
 			FatInputStream in = null;
@@ -346,8 +362,11 @@ public class PolicyCommandImpl extends OdenCommand {
 						if(ds.exist(agent.location(), in.getPath()) ) {
 							if(!ds.writable(agent.location(), in.getPath()))
 								throw new OdenException("Not writable file.");
-							if(update && !DeployerHelper.isNewFile(ds, in.getLastModified(), 
-									agent.location(), in.getPath()))
+							
+							if(update && !DeployerHelper.isNewFile(
+									ds.getDate(agent.location(), in.getPath()) - 
+									dffs.getDiffTime(ds, configService.getAgent(agent.agentName()).getDefaultLoc().getValue()),
+									in.getLastModified() - repo_t_diff))
 								continue;
 							m = Mode.UPDATE;
 						}else {
@@ -356,6 +375,7 @@ public class PolicyCommandImpl extends OdenCommand {
 						DeployFileUtil.updateDeployFiles(dfiles, 
 								new DeployFile(repo, file, agent, in.size(), in.getLastModified(), m) );
 					}catch(Exception e){
+						Logger.error(e);
 						DeployFileUtil.updateDeployFiles(dfiles, 
 								DeployFileUtil.notBeDeployedFile(repo, in.getPath(), agent, e) );
 					}

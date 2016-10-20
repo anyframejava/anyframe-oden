@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
@@ -121,41 +123,60 @@ public class DeployerImpl implements DeployerService {
 		return f.lastModified();
 	}
 	
+	private Map<String, DeployOutputStream> fileStreams =
+		new ConcurrentHashMap<String, DeployOutputStream>();
 	
-	private DeployOutputStream out = null;
+	private MODE mode = MODE.INIT;
+	
+	enum MODE {INIT, WRITE, CLOSE}
 	
 	public void init(String parent, String path, long date) throws Exception{
-		if(out != null)
-			try{ close(null, null); }catch(IOException e){}
-		out = new DeployOutputStream(parent, path, date);
-	}
-	
-	public boolean write(ByteArray buf) throws Exception {
-		return write(buf.getBytes());
-	}
-	
-	public boolean write(byte[] buf) throws Exception{
-		return out.write(buf, buf.length);
-	}
-
-	public boolean write(byte[] buf, int size) throws Exception{
-		return out.write(buf, size);
-	}
-	
-	/**
-	 * @param updatefiles updated files when updating jar. null if you do not want to update jar.
-	 * @param bakdir dir for backup. null if you don't want backup.
-	 * @throws IOException 
-	 */
-	public DoneFileInfo close(List<String> updatefiles, String bakdir) throws Exception {
-		if(out == null) return null;
-		try{
-			return out.close(updatefiles, bakdir);
-		}finally{
-			out = null;
+		synchronized (lock) {
+			if(mode != MODE.INIT){
+				// close all open streams.
+				for(String f : fileStreams.keySet()){
+					try{
+						fileStreams.remove(f).close(null, null);
+					}catch(IOException e){
+					}
+				}
+				mode = MODE.INIT;
+			}
+			
+			final String key = parent + path;
+			if(fileStreams.containsKey(key))
+				throw new IOException("Couldn't open the file again: " + 
+						FileUtil.combinePath(parent, path));
+			fileStreams.put(key, new DeployOutputStream(parent, path, date));
 		}
 	}
 	
+	public boolean write(String parent, String path, ByteArray buf) throws Exception {
+		synchronized (lock) {
+			if(mode == MODE.CLOSE)
+				throw new IOException("Writing any bytes is not allowed while closing mode.");
+			mode = MODE.WRITE;
+			
+			DeployOutputStream out = fileStreams.get(parent + path);
+			if(out == null)
+				throw new IOException("No open stream: " + 
+						FileUtil.combinePath(parent, path));
+			return out.write(buf.getBytes());	
+		}
+	}
+	
+	public DoneFileInfo close(String parent, String path, 
+			List<String> updatefiles, String bakdir) throws Exception {
+		synchronized (lock) {
+			mode = MODE.CLOSE;
+			
+			final String key = parent + path;
+			
+			if(fileStreams.containsKey(key))
+				return fileStreams.remove(key).close(updatefiles, bakdir);
+			return null;
+		}
+	}
 	
 	private StoppableJob job;
 	

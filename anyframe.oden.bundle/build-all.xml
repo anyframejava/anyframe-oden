@@ -1,5 +1,5 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="1.2.0"/>
+	<property name="version" value="1.2.1"/>
 	
 	<target name="build.all">
 		<condition property="todo" else="all-local">
@@ -16,8 +16,6 @@
 		<ant antfile="../anyframe.oden.bundle.hessiancli/build.xml" target="${todo}" inheritall="false" />
 		
 		<ant antfile="../anyframe.oden.bundle.hessiansvr/build.xml" target="${todo}" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ftpdeploy/build.xml" target="${todo}" inheritall="false" />
 					
 		<ant antfile="../anyframe.oden.bundle.ent.misc/build.xml" target="${todo}" inheritall="false" />
 

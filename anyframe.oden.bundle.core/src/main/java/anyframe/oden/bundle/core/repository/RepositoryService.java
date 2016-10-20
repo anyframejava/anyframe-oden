@@ -17,6 +17,7 @@
 package anyframe.oden.bundle.core.repository;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import anyframe.oden.bundle.common.FatInputStream;
@@ -89,4 +90,6 @@ public interface RepositoryService {
 	 * @throws OdenException
 	 */
 	public File getFile(String[] repoargs, String fpath, String destpath) throws OdenException;
+	
+	public long getDate(String[] args) throws IOException;
 }

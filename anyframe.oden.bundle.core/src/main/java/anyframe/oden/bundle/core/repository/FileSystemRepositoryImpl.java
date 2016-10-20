@@ -132,12 +132,13 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 				if(file == null || file.isHidden() || !file.canRead()) 
 					continue;
 
-				String rpath = FileUtil.getRelativePath(root, path);				
-				if(file.isDirectory() && recursive)
-					matched.addAll(getMatchedFiles(root, path, includes, excludes, recursive));
-				else
+				String rpath = FileUtil.getRelativePath(root, path);
+				if(file.isFile()){
 					if(FileUtil.matched(rpath, includes, excludes))
-						matched.add(rpath);				
+						matched.add(rpath);
+				} else if(recursive) {	// directory
+					matched.addAll(getMatchedFiles(root, path, includes, excludes, recursive));
+				}
 			}
 		}
 		return matched;
@@ -202,5 +203,9 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 			try { if(in != null) in.close(); } catch (IOException e) { }
 		}
 		return result;
+	}
+	
+	public long getDate(String[] args) throws IOException{
+		return System.currentTimeMillis();
 	}
 }

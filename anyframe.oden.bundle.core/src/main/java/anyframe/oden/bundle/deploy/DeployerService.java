@@ -39,7 +39,7 @@ public interface DeployerService {
 	 */
 	public void init(String parent, String relpath, long date) throws Exception;
 	
-	public boolean write(ByteArray buf) throws Exception;
+	public boolean write(String parent, String path, ByteArray buf) throws Exception;
 	
 	/**
 	 * close DeployerStream and the information about the file
@@ -49,7 +49,8 @@ public interface DeployerService {
 	 * @return
 	 * @throws Exception
 	 */
-	public DoneFileInfo close(List<String> updatefiles, String bakdir) throws Exception;
+	public DoneFileInfo close(String parent, String path, 
+			List<String> updatefiles, String bakdir) throws Exception;
 	
 	/**
 	 * get this JVM's stat

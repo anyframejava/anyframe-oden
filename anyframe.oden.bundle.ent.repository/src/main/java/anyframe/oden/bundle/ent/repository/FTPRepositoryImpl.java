@@ -21,6 +21,7 @@ package anyframe.oden.bundle.ent.repository;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +35,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
+import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenIncompleteArgumentException;
 import anyframe.oden.bundle.core.repository.AbstractRepositoryimpl;
@@ -317,5 +319,65 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 			try { if(in != null) in.close(); } catch (IOException e) { }
 		}
 		return result;
+	}
+	
+	public long getDate(String[] args) throws IOException{
+		FTPClient ftp;
+		try {
+			ftp = initFTP(args);
+		} catch (OdenException e) {
+			throw new IOException(e.getMessage());
+		}
+		
+		File uniqf = uniqueFile(ftp);
+		if(uniqf == null || !uniqf.createNewFile())
+			throw new IOException("Fail to create unique file.");
+		
+		InputStream in = null;
+		try{
+			in = new BufferedInputStream(new FileInputStream(uniqf));
+			if(!ftp.storeFile(uniqf.getName(), in))
+				throw new IOException(ftp.getReplyString());
+			// not necessary to call completePending..
+		}finally{
+			if(in != null)
+				in.close();
+		}
+		
+		FTPFile transfered = ftpfile(ftp, uniqf.getName());
+		if(transfered == null)
+			throw new IOException("Couldn't find that file: " + uniqf.getName());
+		long t = transfered.getTimestamp().getTimeInMillis();
+		
+		if(!ftp.deleteFile(uniqf.getName()))
+			throw new IOException(ftp.getReplyString());
+		return t;
+	}
+
+	private File uniqueFile(FTPClient ftp) {
+		Exception excepn= null;
+		File tmpdir;
+		try {
+			tmpdir = FileUtil.temporaryDir();
+		} catch (IOException e1) {
+			return null;
+		}
+		
+		final int maxiter = 100;
+		for(int i=0; i<maxiter; i++){
+			File tmp = new File(tmpdir, "oden0" + String.valueOf(i) + ".tmp");
+			if(tmp.exists())
+				continue;
+			
+			try{	
+				ftpfile(ftp, tmp.getName());
+			}catch(IOException e){
+				return tmp;
+			}
+		}
+		
+		if(excepn != null)		// write one exception only 
+			Logger.error(excepn);
+		return null;
 	}
 }

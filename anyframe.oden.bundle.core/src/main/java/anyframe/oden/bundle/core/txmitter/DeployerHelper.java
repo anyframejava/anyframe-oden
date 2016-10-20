@@ -26,6 +26,7 @@ import anyframe.oden.bundle.core.AgentLoc;
 import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.Repository;
 import anyframe.oden.bundle.core.DeployFile.Mode;
+import anyframe.oden.bundle.deploy.ByteArray;
 import anyframe.oden.bundle.deploy.DeployerService;
 import anyframe.oden.bundle.deploy.DoneFileInfo;
 
@@ -37,21 +38,35 @@ import anyframe.oden.bundle.deploy.DoneFileInfo;
  */
 public class DeployerHelper {
 	public static void readyToDeploy(DeployerService ds, DeployFile f) throws Exception{
+		final String parent = f.getAgent().location();
+		final String child = f.getPath();
 		try {		
-			String parent = f.getAgent().location();
-			String child = f.getPath();
 			f.setMode(ds.exist(parent, child) ? Mode.UPDATE : Mode.ADD);
-			try { ds.close(null, null); } catch (Exception ee){}
-			ds.init(f.getAgent().location(), f.getPath(), f.getDate());
+			ds.init(parent, child, f.getDate());
 		}catch(Exception e){
-			try { ds.close(null, null); } catch (Exception e1) {}
+			try { ds.close(parent, child, null, null); } catch (Exception e1) {}
 			throw e;
 		} 
+	}
+	
+	public static boolean write(DeployerService ds, DeployFile f, ByteArray buf) throws Exception {
+		return ds.write(f.getAgent().location(), f.getPath(), buf);
+	}
+	
+	public static DoneFileInfo close(DeployerService ds, DeployFile f, 
+			List<String> updatefiles, String bakdir) throws Exception {
+		final String parent = f.getAgent().location();
+		final String child = f.getPath();
+		return ds.close(parent, child, updatefiles, bakdir);
 	}
 	
 	public static boolean isNewFile(DeployerService ds,
 			long filedate, String parent, String path) throws Exception {
 		return ds.getDate(parent, path) < filedate;
+	}
+	
+	public static boolean isNewFile(long agentf_t, long repof_t){
+		return agentf_t < repof_t;
 	}
 	
 	public static boolean removeDir(DeployerService ds, String txid, Set<DeployFile> fs, 

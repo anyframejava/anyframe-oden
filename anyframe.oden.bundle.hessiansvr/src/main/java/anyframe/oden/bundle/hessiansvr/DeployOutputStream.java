@@ -81,6 +81,10 @@ public class DeployOutputStream{
 		return false;		
 	}
 	
+	public boolean write(byte[] buf) {
+		return write(buf, buf.length);
+	}
+	
 	/**
 	 * close this stream and copy temp file to original one. Before copying,
 	 * backup original one to the bakdir.
@@ -97,7 +101,7 @@ public class DeployOutputStream{
 			// tmpfile can have 0 size cause File.createTempFile method.
 			if(tmpfile == null || !tmpfile.exists())
 				throw new IOException("Fail to transfer file: " + filePath);
-			tmpfile.setLastModified(date);
+			if(date > -1) tmpfile.setLastModified(date);
 			
 			File destfile = new File(parentPath, filePath);
 			if(bakdir != null && !(new File(bakdir).isAbsolute()) )
@@ -127,4 +131,5 @@ public class DeployOutputStream{
 			if(tmpfile != null) tmpfile.delete();	
 		}
 	}
+
 }

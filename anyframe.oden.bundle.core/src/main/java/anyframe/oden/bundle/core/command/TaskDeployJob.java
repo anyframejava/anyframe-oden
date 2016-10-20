@@ -175,7 +175,8 @@ public class TaskDeployJob extends DeployJob {
 				for(DeployFile f : sameNameFiles){	
 					DeployerService deployer = inProgressFiles.get(f);
 					try{
-						if(deployer != null && !deployer.write(new ByteArray(buf, size)))
+						if(deployer != null && 
+								!DeployerHelper.write(deployer, f, new ByteArray(buf, size)))
 							throw new OdenException("Fail to write: " + f.getPath());
 					}catch(Exception e){	// while writing..
 						inProgressFiles.remove(f);
@@ -203,7 +204,8 @@ public class TaskDeployJob extends DeployJob {
 			Thread th = new Thread(){			
 				public void run() {
 					try {
-						DoneFileInfo info = deployer.close(null, deployerManager.backupLocation(f));
+						DoneFileInfo info = DeployerHelper.close(
+								deployer, f, null, deployerManager.backupLocation(f));
 						if(info == null || info.size() == -1L)
 							throw new IOException("Fail to close: " + f.getPath());
 						if(info.size() == in.size())
