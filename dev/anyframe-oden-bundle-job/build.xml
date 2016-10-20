@@ -1,6 +1,6 @@
 <project name="Oden Job" default="all.dbg" basedir=".">	
 	<property name="bundle.name" value="anyframe-oden-bundle-job" />
-	<property name="version" value="1.0.0"/>
+	<property name="version" value="1.1.0"/>
 		
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>

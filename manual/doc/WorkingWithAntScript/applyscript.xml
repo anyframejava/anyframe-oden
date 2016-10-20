@@ -1,8 +1,8 @@
 <section id="workingwithantscript_applyscript">
 	<title>Apply with Oden Ant Script</title>
-
+n
 	<para>
-		Oden에서 제공하는 Ant Scipt를 빌드 파일에 적용하는 방법에 대해
+		ODEN에서 제공하는 Ant Scipt를 빌드 파일에 적용하는 방법에 대해
 		설명한다.
 	</para>
 
@@ -10,9 +10,9 @@
 		<title><![CDATA[<oden-task/>]]></title>
 
 		<para>
-			Oden Ant에서는 배포를 위해 <![CDATA[<oden-task/>]]>라는
-			Ant Task를 제공한다. 이 Task는 Oden을 통한 배포에 관련된 모든 기능을 제공하고 있다.
-			Oden의 개념과
+			ODEN Ant에서는 배포를 위해 <![CDATA[<oden-task/>]]>라는
+			Ant Task를 제공한다. 이 Task는 ODEN을 통한 배포에 관련된 모든 기능을 제공하고 있다.
+			ODEN의 개념과
 			비교할때, policy, task 명령어가 갖고 있는 모든 기능을 포함한다.
 		</para>
 
@@ -44,13 +44,13 @@
 					<tbody>
 						<row>
 							<entry>server</entry>
-							<entry>Oden Server가 설치된 곳의 URL</entry>
+							<entry>ODEN Server가 설치된 곳의 URL</entry>
 							<entry>Yes</entry>
 							<entry>N/A</entry>
 						</row>
 						<row>
 							<entry>port</entry>
-							<entry>Oden Server가 설치된 곳의 Oden Server 접근 Port</entry>
+							<entry>ODEN Server가 설치된 곳의 ODEN Server 접근 Port</entry>
 							<entry>Yes</entry>
 							<entry>N/A</entry>
 						</row>
@@ -105,7 +105,7 @@
 
 		<para>
 		<![CDATA[<deploy/>]]>는
-			Oden의 policy 명령어와 유사한 개념이며, 어떤 리소스를 어느곳으로 보낼 것인지에 대한 설정을 하게된다.
+			ODEN의 policy 명령어와 유사한 개념이며, 어떤 리소스를 어느곳으로 보낼 것인지에 대한 설정을 하게된다.
 		</para>
 
 		<section id="workingwithantscript_applyscript_deploy_para">
@@ -134,7 +134,7 @@
 						<tbody>
 							<row>
 								<entry>repository</entry>
-								<entry>Oden Server에서 접근할 Build Repository. file://&lt;경로>와 같은 형태로 Repository의 경로를 입력한다.</entry>
+								<entry>ODEN Server에서 접근할 Build Repository. file://&lt;경로>와 같은 형태로 Repository의 경로를 입력한다.</entry>
 								<entry>Yes</entry>
 								<entry>N/A</entry>
 							</row>
@@ -188,7 +188,7 @@
 
 		<para>
 		<![CDATA[<remove/>]]>는
-			Oden의 policy 명령어 중 -d 옵션을 사용하는 명령어와 유사한 개념이며, 지정한 리소스는 Oden Server에서
+			ODEN의 policy 명령어 중 -d 옵션을 사용하는 명령어와 유사한 개념이며, 지정한 리소스는 ODEN Server에서
 			삭제되게 된다.
 		</para>
 
@@ -218,14 +218,14 @@
 						<tbody>
 							<row>
 								<entry>includes</entry>
-								<entry>Oden Server의 어떤 파일을 삭제할 것인지에 대한 옵션. wild card 사용
+								<entry>ODEN Server의 어떤 파일을 삭제할 것인지에 대한 옵션. wild card 사용
 									가능(,(콤마)로 구분하여 여러 값을 입력할 수 있다.)</entry>
 								<entry>Yes</entry>
 								<entry>N/A</entry>
 							</row>
 							<row>
 								<entry>excludes</entry>
-								<entry>Oden Server에서 어떤 파일을 제외할 것인지에 대한 옵션. wild card 사용
+								<entry>ODEN Server에서 어떤 파일을 제외할 것인지에 대한 옵션. wild card 사용
 									가능(,(콤마)를 기준으로 여러값을 넣을 수
 									있다.)</entry>
 								<entry>No</entry>
@@ -258,7 +258,7 @@
 
 		<para>
 		<![CDATA[<agent/>]]>는
-			Oden Server에 등록된 Agent의 정보를 나타낸다. 여기에 배포 대상 위치를 지정할 수 있다. 
+			ODEN Server에 등록된 Agent의 정보를 나타낸다. 여기에 배포 대상 위치를 지정할 수 있다. 
 		</para>
 
 		<section id="workingwithantscript_applyscript_agent_grouping">
@@ -353,7 +353,7 @@
 								<tbody>
 									<row>
 										<entry>name</entry>
-										<entry>Oden Server의 conf/config.xml 파일에 정의된 agent 이름</entry>
+										<entry>ODEN Server의 conf/config.xml 파일에 정의된 agent 이름</entry>
 										<entry>Yes</entry>
 										<entry>N/A</entry>
 									</row>

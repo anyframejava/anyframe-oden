@@ -33,8 +33,7 @@ Import-Package: com.caucho.hessian.io,
  org.osgi.service.component,
  org.osgi.service.http
 Service-Component: OSGI-INF/oden_external_deployer.xml,
- OSGI-INF/external_page_handler.xml, 
- OSGI-INF/oden_external_servlet.xml
+  OSGI-INF/oden_external_servlet.xml
 Export-Package: org.anyframe.oden.bundle.external,
  org.anyframe.oden.bundle.external.config,
  org.anyframe.oden.bundle.external.deploy

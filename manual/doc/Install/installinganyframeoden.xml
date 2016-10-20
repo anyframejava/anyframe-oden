@@ -1,21 +1,21 @@
 <section id="install_installinganyframeoden">
-	<title>Installing The Oden</title>
+	<title>Installing The ODEN</title>
 
 	<section id="install_installinganyframeoden_serverandAgents">
 		<title>Server and Agents</title>
 
 		<para>
-			Oden은 Server모드와 Agent모드가 존재한다. Agent는 파일이 배포될 서버인 Target Server
+			ODEN은 Server모드와 Agent모드가 존재한다. Agent는 파일이 배포될 서버인 Target Server
 			<footnote>
 				<para>
 					이 문서에서는 파일이 배포될 서버를 Target Server라 칭한다. 
 				</para>
 			</footnote>
-			에 설치되어 Oden Server에서 지시하는 명령에 따라 파일을 배포한다. Oden Server는 여러개의
+			에 설치되어 ODEN Server에서 지시하는 명령에 따라 파일을 배포한다. ODEN Server는 여러개의
 			Agent를
-			관리하며 사용자는 커맨드 라인이나 Oden Admin과 같은 GUI환경을 통해 Oden Server에 명령을
+			관리하며 사용자는 커맨드 라인이나 ODEN Admin과 같은 GUI환경을 통해 ODEN Server에 명령을
 			내리게
-			된다. 사용자는 Agent에 직접 명령을 내릴 수 없으며, Oden Server를 통해 Agent에 명령을 내려야
+			된다. 사용자는 Agent에 직접 명령을 내릴 수 없으며, ODEN Server를 통해 Agent에 명령을 내려야
 			한다.
 		</para>
 
@@ -25,31 +25,31 @@
 
 			<para>
 				배포될 파일이 존재하는 시스템에 
-				Oden Server를 설치해야 한다. 
+				ODEN Server를 설치해야 한다. 
 			</para>
 
 			<para>
-				Oden의 압축을 풀면 아래와 같은 구조로 되어 있다. 
+				ODEN의 압축을 풀면 아래와 같은 구조로 되어 있다. 
 				<mediaobject>
 					<imageobject>
-						<title>Oden Folder Structure</title>
+						<title>ODEN Folder Structure</title>
 						<imagedata fileref="../image/Install/file_struct.png" align="center"/>
 					</imageobject>
 				</mediaobject>
 			</para>
 		    <para>
-		    	압축파일에는 Oden 및 Oden Admin이 모두 포함되어 있다. Oden은 Server모드(bin/startup.sh or bin/startup.cmd)로도 
+		    	압축파일에는 ODEN 및 ODEN Admin이 모두 포함되어 있다. ODEN은 Server모드(bin/startup.sh or bin/startup.cmd)로도 
 		    	Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. Agent만 설치하고 싶다면, oden폴더만 복사하여
 		    	Agent모드로 부팅시키면 된다.
 		    </para>
 		    
 		    <para>
-				Oden Admin은 Oden Server와 같은 시스템에 설치되어야 한다. bin/startup.sh(bin/startup.cmd)로 바로 실행시킬 수도 있고,
+				ODEN Admin은 ODEN Server와 같은 시스템에 설치되어야 한다. bin/startup.sh(bin/startup.cmd)로 바로 실행시킬 수도 있고,
 				WAS의 application형태로 사용할 수도 있다.		    
 		    </para>
 		    
 			<para>
-				Oden Agent로 동작시에는 conf/oden.ini파일 대신 conf/agent.ini파일을 참조하여 동작한다.   
+				ODEN Agent로 동작시에는 conf/oden.ini파일 대신 conf/agent.ini파일을 참조하여 동작한다.   
 		    </para>
 		</section>
 
@@ -58,13 +58,13 @@
 			<title>Configuring Server and Agents</title>
 
 			<para>
-				conf/oden.ini를 통해 Oden Server의 설정을 변경할 수 있다. 
-				변경 내용을 적용하기 위해서는 Oden을 재구동 시켜야 한다. 
+				conf/oden.ini를 통해 ODEN Server의 설정을 변경할 수 있다. 
+				변경 내용을 적용하기 위해서는 ODEN을 재구동 시켜야 한다. 
 				(Agent의 경우 conf/agent.ini 를 통해 일부 옵션을 지원한다.)
 				<itemizedlist>
 					<listitem>
 						<para>
-							bundle.libs: Oden library 목록. bundle 폴더에 있는  jar 파일중
+							bundle.libs: ODEN library 목록. bundle 폴더에 있는  jar 파일중
 							이 목록 외의 파일만 active 상태가 되며, 이 목록에 설정된 파일은
 							비활성화 상태가 되어 library 로써만 사용된다. 일반적으로 사용자가
 							수정할 필요는 없다. 
@@ -79,13 +79,13 @@
 						<para>
 							log.level: log파일에 뿌려질 로그 레벨(1 = error, 2 = warning, 3 =
 							info, 4 = debug). 로그파일은 meta폴더에서 확인할 수 있다.
-							Oden에 문제가 생겼을 시 디버깅하기
+							ODEN에 문제가 생겼을 시 디버깅하기
 							위한 용도로 사용되며, 일반적으로 수정할 필요는 없다.
 						</para>
 					</listitem>
 					<listitem>
 						<para>
-							http.port: Oden과 통신할 때 사용되는 포트.
+							http.port: ODEN과 통신할 때 사용되는 포트.
 						</para>
 					</listitem>
 					<listitem>
@@ -148,21 +148,21 @@
 			<title>Starting Up Server and Agents</title>
 
 			<para>
-				Oden Server 및 Agent의 설치 및 설정이 끝났으면, 아래의 명령으로 Oden을 Server모드로 구동시킬 수 있다. 
+				ODEN Server 및 Agent의 설치 및 설정이 끝났으면, 아래의 명령으로 ODEN을 Server모드로 구동시킬 수 있다. 
 			</para>
 
 			<programlisting><![CDATA[bin/startup.sh
-(Windows 에서는 Oden core의 bin폴더로 이동한 뒤 startup.cmd를 실행한다.)]]></programlisting>
+(Windows 에서는 ODEN core의 bin폴더로 이동한 뒤 startup.cmd를 실행한다.)]]></programlisting>
 
 			<para>
-				아래의 명령으로 Oden을 Agent모드로 구동시킬 수 있다. 
+				아래의 명령으로 ODEN을 Agent모드로 구동시킬 수 있다. 
 			</para>
 
 			<programlisting><![CDATA[bin/startup-agent.sh
-(Windows 에서는 Oden core의 bin폴더로 이동한 뒤 startup-agent.cmd를 실행한다.)]]></programlisting>
+(Windows 에서는 ODEN core의 bin폴더로 이동한 뒤 startup-agent.cmd를 실행한다.)]]></programlisting>
 
 			<para>
-				Oden Server를 실행시킨 뒤 커맨드라인을 통해 Oden 명령어를 실행시킬 수 있다.   
+				ODEN Server를 실행시킨 뒤 커맨드라인을 통해 ODEN 명령어를 실행시킬 수 있다.   
 			</para>
 			
 			<programlisting><![CDATA[>cd bin
@@ -174,13 +174,13 @@
 				<para>
 					Server 및 Agent 실행 시, Target Server의 파일 및 디렉토리에 대한 
 					소유자(ownership) 및 권한(permission)에 유의한다.
-					Oden을 통해 배포한 파일은 Agent를 구동시킨 사용자의 소유 및 
+					ODEN을 통해 배포한 파일은 Agent를 구동시킨 사용자의 소유 및 
 					권한(umask)를 갖게 된다. 배포할 폴더에 Agent를 구동시킨 사용자가
 					접근 권한이 없다면 배포는 실패하게 될 것이다. 
 				</para>
 				<para>
-					Oden이 설치되는 경로에 공백이 있으면 안된다. Windows의 바탕화면이나 내폴더의 경우,
-					중간에 공백이 있는 경로가 있으므로 Oden이 제대로 동작하지 않을 것이다.  
+					ODEN이 설치되는 경로에 공백이 있으면 안된다. Windows의 바탕화면이나 내폴더의 경우,
+					중간에 공백이 있는 경로가 있으므로 ODEN이 제대로 동작하지 않을 것이다.  
 				</para>
 			</important>
 		</section>	
@@ -206,20 +206,20 @@
 			
 			<note>
 				<para>
-					Oden Admin에서는 별도의 계정관리 기능이 있으며 본장의 계정관리는 웹콘솔을 위한 계정관리 이다.
+					ODEN Admin에서는 별도의 계정관리 기능이 있으며 본장의 계정관리는 웹콘솔을 위한 계정관리 이다.
 				</para>
 			</note>
 		</section>
 	</section>
 	
 	<section id="install_installinganyframeoden_odenadmin">
-		<title>Oden Admin</title>
+		<title>ODEN Admin</title>
 		
 		<section id="install_installinganyframeoden_odenadmin_install">
-			<title>Installing Oden Admin</title>
+			<title>Installing ODEN Admin</title>
 		
 			<para>
-				별도의 WAS없이 독립적으로 Oden Admin을 사용할 수도 있고, 새 WAS의 application으로 Oden Admin을 사용할 수도 있다.
+				별도의 WAS없이 독립적으로 ODEN Admin을 사용할 수도 있고, 새 WAS의 application으로 ODEN Admin을 사용할 수도 있다.
 			</para>
 		
 			<section id="install_installinganyframeoden_odenadmin_install_innerwas">
@@ -227,18 +227,21 @@
 				<programlisting><![CDATA[startup.sh
 (Windows에서는 startup.cmd)]]></programlisting>
 				<para>
-					admin폴더의 startup.sh나 startup.cmd를 실행시키면 자동으로 Oden Admin이 시작된다.
+					admin폴더의 startup.sh나 startup.cmd를 실행시키면 자동으로 ODEN Admin이 시작된다.
 				</para>
 				<programlisting><![CDATA[http://localhost:9880]]></programlisting>
 				<para>
 					위 주소로 Admin에 접근 가능하다. 기본 포트는 9880이다. 포트를 변경하려면 스크립트 파일(startup.sh  혹은 startup.cmd)을 열어 --httpPort의 값을 원하는 포트값으로 수정하여 준다.
+				</para>
+				<para>
+					Admin 내부에서 사용하는 db 및 ODEN Server 포트를  변경하려면 스크립트 파일(startup.sh  혹은 startup.cmd)을 열어 oden.db.port 및 oden.port의 값을 원하는 포트값으로 수정하면 된다.
 				</para>
 			</section>
 		
 			<section id="install_installinganyframeoden_odenadmin_install_outerwas">
 				<title>별도 WAS에 설치</title>
 				<para>
-					Tomcat을 기준으로 설명한다. (Tomcat 6.0 이상이 anyframe.oden.admin.war를 WAS의 webapps폴더로 복사한다. Tomcat을 부팅시키면 아래의 주소로 Oden Admin에 접근할 수 있다. 
+					Tomcat을 기준으로 설명한다. (Tomcat 6.0 이상이 anyframe.oden.admin.war를 WAS의 webapps폴더로 복사한다. Tomcat을 부팅시키면 아래의 주소로 ODEN Admin에 접근할 수 있다. 
 				</para>
 				<programlisting><![CDATA[http://localhost:8080/anyframe.oden.admin]]></programlisting>
 			</section>

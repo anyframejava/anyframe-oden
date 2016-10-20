@@ -2,6 +2,24 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.3.0 (2012-04-10)
+-------------------------------------
+* 압축 배포 전송 기능 구현.
+* 재 배포 기능 구현.
+* 시스템 간 연계를 위한 Interface 구현.
+
+* 소스 코드 변경
+    - anyframe-oden-bundle-job 변경,  anyframe-oden-bundle 변경,  anyframe-oden-bundle-hessiancli 변경,  anyframe-oden-bundle-core 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+ODEN-7	ODEN ID 중복 발생 문제
+ODEN-8	배포 원복 시 속도 저하 문제
+
+
+
 Changes in version 2.2.0 (2011-06-30)
 -------------------------------------
 * 배포 원복 기능 구현.

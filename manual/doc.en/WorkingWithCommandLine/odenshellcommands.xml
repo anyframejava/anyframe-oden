@@ -165,11 +165,11 @@
 		<section id="workingwithcommandline_odenshellcommands_deploy_undo">
 			<title>deploy undo</title>
 			<para>
-				배포를 원복하는 명령어  
+				Command to undo deployment
 			</para>
 			<programlisting><![CDATA[deploy undo <txid>]]></programlisting>
 			<itemizedlist>
-			<listitem><para>txid를 통해 배포 작업을 원복한다. </para></listitem>
+			<listitem><para>Deployment is undone via txid.  </para></listitem>
 			</itemizedlist>
 		</section>	
 	</section>

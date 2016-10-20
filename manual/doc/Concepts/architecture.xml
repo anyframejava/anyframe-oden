@@ -2,7 +2,7 @@
 	<title>Architecture</title>
 
 	<para>
-		Oden을 활용한 배포관리 환경은 크게 다음과 같은 구성요소로 이루어진다.
+		ODEN을 활용한 배포관리 환경은 크게 다음과 같은 구성요소로 이루어진다.
 		<itemizedlist>
 			<listitem>
 				<para>
@@ -25,7 +25,7 @@
 	</para>
 
 	<para>
-		Oden을 활용하여 배포대상물을 원하는 Target Server에 배포하고, 로그를 통해 결과를 조회할 수 있다. 
+		ODEN을 활용하여 배포대상물을 원하는 Target Server에 배포하고, 로그를 통해 결과를 조회할 수 있다. 
 		이러한 일련의 내용을 각 구간별로 설명하면 다음과 같다. 
 	</para>
 
@@ -37,7 +37,7 @@
 		</listitem>
 		<listitem>
 			<para>
-				명령어 혹은 Oden Admin을 통해 배포 요청 
+				명령어 혹은 ODEN Admin을 통해 배포 요청 
 			</para>
 		</listitem>
 		<listitem>
@@ -52,7 +52,7 @@
 		</listitem>
 		<listitem>
 			<para>
-				명령어 혹은 Oden Admin을 통해 배포결과 확인 
+				명령어 혹은 ODEN Admin을 통해 배포결과 확인 
 			</para>
 		</listitem>
 	</itemizedlist>
@@ -61,7 +61,7 @@
 		다음 그림은 이러한 배포 흐름을 개념적으로 설명한 것이다.
 		<mediaobject>
 			<imageobject>
-				<title>Oden Deployment Flow</title>
+				<title>ODEN Deployment Flow</title>
 				<imagedata fileref="../image/Concepts/concepts_deploymentflow.png"
 					align="left" width="6in"/>
 			</imageobject>

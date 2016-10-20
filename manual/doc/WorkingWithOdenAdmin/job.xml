@@ -2,7 +2,7 @@
 	<title>Job</title>
 
 	<para>
-		Job은 어디에서 어디로 배포될 것인지에 대한 내용이 기술된 Oden의 배포 설정 단위이다. 
+		Job은 어디에서 어디로 배포될 것인지에 대한 내용이 기술된 ODEN의 배포 설정 단위이다. 
 		Job은 하나의 SOURCE와 여러개의 Target으로 이루어져 있다. 
 		SOURCE는 배포할 파일이 위치한 경로(빌드서버)를 지칭하며, 
 		Target은 파일이 배포될 경로(개발 혹은 운영서버)를 말한다.
@@ -171,7 +171,7 @@
 				<title>SOURCE</title>
 
 				<para>
-					배포할 파일(빌드서버)의 경로를 입력하는 란이다. Oden Server가 빌드서버에 설치되므로 배포 파일이 존재하는
+					배포할 파일(빌드서버)의 경로를 입력하는 란이다. ODEN Server가 빌드서버에 설치되므로 배포 파일이 존재하는
 					path만 절대 경로로 적어주면 된다. SOURCE의 항목 중 Directory 항목은 반드시 입력하여야
 					한다. 
 				</para>
@@ -230,10 +230,10 @@
 								일반적으로 빌드시 기존에 빌드되었던 리소스 및 class파일을 모두 삭제하고 전체를
 								새로 빌드하거나 복사를 하게 된다. 결국 변경된 파일뿐만이 아니라 모든 파일들이
 								새로 생성되게 되므로 모든 파일들의 날짜가 지금 시점으로 변경이 되어 버린다.
-								Oden에서는 파일의 timestamp를 이용하여 변경된 파일을 감지하게 되는데, 
+								ODEN에서는 파일의 timestamp를 이용하여 변경된 파일을 감지하게 되는데, 
 								위와 같은 경우 모든 파일들의 날짜가 변경되었으므로 모든 파일이 변경되었다고
 								생각하게 된다. 하지만 빌드전 원본파일(class 파일의 원본파일은 java 파일임)의 
-								경우 변경된 것만 날짜가 갱신되었기 때문에 이 정보를 알 수 있다면, Oden에서는 어느 파일이 
+								경우 변경된 것만 날짜가 갱신되었기 때문에 이 정보를 알 수 있다면, ODEN에서는 어느 파일이 
 								새로 변경된 것인지 판단할 수가 있다. 그래서 배포할 파일말고 그것의 원본파일의 경로를
 								적어주는 곳이 Mappings란 곳이다.(형상관리를 이용하여 java파일들 내려받을
 								경우에도 대부분의 경우 변경된 파일만 내려받기 때문에 변경되지 않은 파일들의 날짜는
@@ -297,7 +297,7 @@
 			<section id="workingwithodenadmin_job_addremove_add_targets">
 				<title>Targets</title>
 				<para>
-					파일이 배포될 Target Server(개발 혹은 운영서버)를 입력하는 란이다. Target Server에는 Oden이 Agent모드로 동작하고 
+					파일이 배포될 Target Server(개발 혹은 운영서버)를 입력하는 란이다. Target Server에는 ODEN이 Agent모드로 동작하고 
 					있어야 한다. 하나 이상 필수로 입력해야만 한다.
 			</para>
 
@@ -308,8 +308,8 @@
 						</para>
 						<para>
 							Target Server를 모두 입력하고 저장한 뒤, Job을 다시 조회하면 STATUS 항목에 불이 들어온다.
-							녹색이면 Target Server의 Oden Agent와 정상적으로 통신했다는 의미이고, 회색이면 대상서버의
-							Oden Agent와 통신할 수 없음을 의미한다.
+							녹색이면 Target Server의 ODEN Agent와 정상적으로 통신했다는 의미이고, 회색이면 대상서버의
+							ODEN Agent와 통신할 수 없음을 의미한다.
 						</para>
 					</listitem>
 					<listitem>
@@ -327,7 +327,7 @@
 						</para>
 						<para>
 							Target Server의 URL을 입력하는 란이다. ip:port 혹은 domain:port 형태로
-							입력하여야 한다. port는 Oden Agent가 떠있는 포트로 기본 값은 9872이다.  
+							입력하여야 한다. port는 ODEN Agent가 떠있는 포트로 기본 값은 9872이다.  
 						</para>
 						<programlisting><![CDATA[ex> 127.0.0.1:9872]]></programlisting>
 					</listitem>
@@ -346,8 +346,8 @@
 				
 				<note>
 					<para>
-						Target이 Oden Agent와 1:1로 맵핑 되는 것은 아니다. Target이 지칭하는 시스템에
-						Oden Agent만 동작하고 있으면 되므로, 한대의 Oden Agent와 여러개의 Target이
+						Target이 ODEN Agent와 1:1로 맵핑 되는 것은 아니다. Target이 지칭하는 시스템에
+						ODEN Agent만 동작하고 있으면 되므로, 한대의 ODEN Agent와 여러개의 Target이
 						맵핑 될 수도 있다. 예를 들어 배포할 파일이 특정 시스템의 여러 경로에 배포되어야 할 경우,
 						Target을 PATH만 다르게하여 여러개 등록할 수 있다. 
 					</para>
@@ -457,6 +457,15 @@
 					것인지 무시할 것인지를 결정하는 옵션이다.
 				</para>
 			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Compress</emphasis>
+				</para>
+				<para>
+					배포 대상 파일을 압축하여 배포하고 싶은 경우 선택한다. 
+					이는 네트워크 구간에서 속도 저하가 우려될 경우 사용한다.
+				</para>
+			</listitem>
 		</itemizedlist>
 
 		<para>
@@ -487,7 +496,7 @@
 		<title>Job Clean Deploy</title>
 
 		<para>
-			Target Server 디렉토리를 초기화하고, 현재 Oden Server의 상태로 동기화 시키기 위한 명령이다. 다시 말하면,
+			Target Server 디렉토리를 초기화하고, 현재 ODEN Server의 상태로 동기화 시키기 위한 명령이다. 다시 말하면,
 			Target Server의 모든 파일이 삭제되고 SOURCE의 모든 파일이 다시 해당 서버로 배포가 되는 명령이다. 단,
 			Deploy와는 다르게 미리보기를 지원하지 않으며 옵션을 선택할 수도 없다. 아이콘을 클릭하는 순간 바로 배포가
 			되므로 주의해야 한다. 
@@ -524,7 +533,7 @@
 		<para>
 			dir과 같은 명령어는 명령이 바로 종료가 되어 명령어 종료 시점에 결과를 보여준다. 
 			하지만 어플리케이션을 구동하는 명령어 등과 같은 경우, 어플리케이션이 종료가 될 때까지 명령어가 종료되지 않기 때문에, 
-			Oden에서는 15초간 진행된 결과만 화면에 보여주고 빠져나오고, 해당 프로세스는 시스템에서 백그라운드로 동작하게 된다. 
+			ODEN에서는 15초간 진행된 결과만 화면에 보여주고 빠져나오고, 해당 프로세스는 시스템에서 백그라운드로 동작하게 된다. 
 			Unix의 ps 명령어나 Windows의 작업관리자 등을 통해 해당 프로세스를 확인할 수 있다. 대기시간 15초는 
 			core/conf/oden.ini의 exec.timeout 속성에서 변경할 수 있다. 
 		</para>

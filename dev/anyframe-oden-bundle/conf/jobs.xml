@@ -14,12 +14,4 @@
     <source dir="C:/workspace_dm/dm-pjt" excludes=""/>
     <target address="localhost:9872" dir="d:/testback" name="t0"/>
   </job>
-<job name="test1">
-    <source dir="c:/anyframe-5.0.0/hsqldb" excludes=""/>
-    <target address="localhost:9872" dir="c:/target1" name="target1"/>
-  </job>
-  <job name="testtest">
-    <source dir="d:/eclipse-workspace/workspace/anyframe-oden-admin" excludes=""/>
-    <target address="localhost:9872" dir="c:/target1" name="target1"/>
-  </job>
 </oden>

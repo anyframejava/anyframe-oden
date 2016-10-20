@@ -230,6 +230,7 @@ function drawGrid() {
 	function deployAll(cmd) {
 		var mode = $("#deploy_mode").val();
 		var del = $("#checkbox_d").attr("checked");
+		var compress = $("#checkbox_c").attr("checked");
 
 		var option = "";
 
@@ -242,9 +243,14 @@ function drawGrid() {
 			option += "d";
 		}
 
-		if(cmd == "none") {
-			script = "";
+		if(compress){
+			option += "c";
 		}
+
+		if(cmd == "none") {
+			cmd = "";
+		}
+		
 		var rowArray = new Array();
 		rowArray[0] = ".."+"@oden@"+".."+"@oden@"+"..";
 		
@@ -300,7 +306,9 @@ function drawGrid() {
 						</td>
 						<td width="500"></td>
 						<th scope="row"><label for="fail"><anyframe:message code="deploy.text.delete"/></label></th>
-						<td><input type="checkbox" id="checkbox_d" name="checkbox_opt" value="Delete" class="checkbox" checked></td>
+						<td><input type="checkbox" id="checkbox_d" name="checkbox_opt" value="Delete" class="checkbox" unchecked></td>
+						<th scope="row"><label for="fail"><anyframe:message code="deploy.text.compress"/></label></th>
+						<td><input type="checkbox" id="checkbox_c" name="checkbox_copt" value="Compress" class="checkbox" unchecked></td>
 						<td width="80" align="right"><a href="javascript:drawGrid();"><img src="<c:url value='/images/btn_preview.gif'/>" alt="preview" /></a></td>
 					</tr>
 				</tbody>

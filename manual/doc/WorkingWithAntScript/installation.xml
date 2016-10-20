@@ -1,15 +1,15 @@
 <section id="workingwithantscript_installation">
-	<title>Install Oden Ant Script</title>
+	<title>Install ODEN Ant Script</title>
 
 	<para>
-		Oden Ant Script를 사용하기 위해서는 별도의 jar 파일 및 설정이 필요하다.
+		ODEN Ant Script를 사용하기 위해서는 별도의 jar 파일 및 설정이 필요하다.
 		</para>
 
 	<section id="workingwithantscript_installation_download">
 		<title>Jar 파일 다운로드</title>
 
 		<para>
-			Oden Ant를 사용하기 위해서는
+			ODEN Ant를 사용하기 위해서는
 			<ulink url="http://www.anyframejava.org/project/oden">"Anyframe Open Source
 				Community"</ulink>
 			에서 배포하는 anyframe.oden.ant.jar 파일을 다운로드 받아야 한다.
@@ -25,7 +25,7 @@
 		<title>Configuration</title>
 
 		<para>
-			Oden Ant를 빌드파일에 추가해서 사용하기 위해서는 몇가지 설정이 필요하다.
+			ODEN Ant를 빌드파일에 추가해서 사용하기 위해서는 몇가지 설정이 필요하다.
 	</para>
 
 		<para>

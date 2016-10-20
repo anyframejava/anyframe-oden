@@ -1,20 +1,17 @@
 /*
- * Copyright 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
+ * Copyright 2002-2012 the original author or authors.
  *
- * No part of this "source code" may be reproduced, stored in a retrieval
- * system, or transmitted, in any form or by any means, mechanical,
- * electronic, photocopying, recording, or otherwise, without prior written
- * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
- * Any person is hereby authorized to store "source code" on a single
- * computer for personal use only and to print copies of "source code"
- * for personal use provided that the "source code" contains SAMSUNG SDS's
- * copyright notice.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * No licenses, express or implied, are granted with respect to any of
- * the technology described in this "source code". SAMSUNG SDS retains all
- * intellectual property rights associated with the technology described
- * in this "source code".
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.anyframe.oden.admin.service.impl;
 
@@ -168,7 +165,7 @@ public class JobServiceImpl implements JobService {
 	}
 
 	/**
-	 * Method for Job Deploy Preveiw page.
+	 * Method for Job Deploy page.
 	 * 
 	 * @param param
 	 * @param opt
@@ -182,6 +179,7 @@ public class JobServiceImpl implements JobService {
 		String option_result = "";
 		String option_iu = "";
 		String option_d = "";
+		String option_c = "";
 		String option_script = "";
 		String option_user = "";
 
@@ -193,7 +191,10 @@ public class JobServiceImpl implements JobService {
 		if (opt.indexOf("d") != -1) {
 			option_d += "-del ";
 		}
-
+		if (opt.indexOf("c") != -1) {
+			option_c += "-c ";
+		}
+		
 		List paramList = new ArrayList();
 
 		boolean boolDeployAll = false;
@@ -223,7 +224,7 @@ public class JobServiceImpl implements JobService {
 		if (boolDeployAll) {
 			// deploy all whole page
 		} else {
-			Set wholeList = getListByPage(job, option_iu + option_d, objPage);
+			Set wholeList = getListByPage(job, option_iu + option_d , objPage);
 
 			option_iu = option_iu.replaceAll("u", "i");
 			// mode + "@oden@" + file
@@ -258,7 +259,8 @@ public class JobServiceImpl implements JobService {
 		if (!(userid.equals(null) || userid.equals("")))
 			option_user = "-_user" + " " + userid + " ";
 
-		option_result = option_iu + option_d + option_script + option_user;
+		option_result = option_iu + option_d + option_c + option_script
+				+ option_user;
 
 		return odenCommonDao.getResultString("deploy", "run", doubleQuotation
 				+ job + doubleQuotation + " " + option_result);

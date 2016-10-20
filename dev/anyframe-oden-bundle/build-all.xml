@@ -1,5 +1,5 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.2.0"/>
+	<property name="version" value="2.3.0"/>
 	<property name="manual.dir" location="../manual/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	

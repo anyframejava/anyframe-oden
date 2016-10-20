@@ -2,7 +2,7 @@
 	<title>Example Code</title>
 
 	<para>
-		Oden Ant를 실제 사용하는 예이다.
+		ODEN Ant를 실제 사용하는 예이다.
 	</para>
 
 	<section id="workingwithantscript_example_code_buildconf">
@@ -38,7 +38,7 @@
 	</section>
 
 	<section id="workingwithantscript_example_code_build">
-		<title>Build 파일에 Oden 포함</title>
+		<title>Build 파일에 ODEN 포함</title>
 		
 		<para>
 			다음은 build.xml에 들어가야할 내용이다.  

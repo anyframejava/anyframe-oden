@@ -1,6 +1,23 @@
-Anyframe Oden Admin CHANGELOG
+Anyframe ODEN Admin CHANGELOG
 ==========================
 http://www.anyframejava.org
+
+Changes in version 2.3.0 (2012-04-10)
+-------------------------------------
+* 압축 배포 전송 기능 구현.
+* 재 배포 기능 구현.
+* ODEN Admin DB Port 설정 옵션 추가.
+
+* 소스 코드 변경
+    - anyframe-oden-admin,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+  - N/A.
+ 
+
 
 Changes in version 2.2.0 (2011-06-30)
 -------------------------------------

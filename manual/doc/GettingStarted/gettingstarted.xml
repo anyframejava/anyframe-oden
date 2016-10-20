@@ -3,9 +3,9 @@
 
 	<section id="gettingstarted_100">
 		<title>설치 및 실행</title>
-		<para>파일이 있는 시스템에는 Oden을 Server모드로, 파일이 배포될 시스템에는 Oden을 Agent모드로 구동해야 한다.
-		여기서는 편의상 동일 시스템에 Server와 Agent를 모두 설치하고 진행한다. Oden이 설치될 디렉토리 및 상위 디렉토리에 공백이 있어서는 안된다. 
-			Windows의 바탕화면의 경우 상위 폴더에 공백이 있기 때문에, Oden이 제대로 실행되지 않을 수도 있다.
+		<para>파일이 있는 시스템에는 ODEN을 Server모드로, 파일이 배포될 시스템에는 ODEN을 Agent모드로 구동해야 한다.
+		여기서는 편의상 동일 시스템에 Server와 Agent를 모두 설치하고 진행한다. ODEN이 설치될 디렉토리 및 상위 디렉토리에 공백이 있어서는 안된다. 
+			Windows의 바탕화면의 경우 상위 폴더에 공백이 있기 때문에, ODEN이 제대로 실행되지 않을 수도 있다.
 		</para>
 
 		<section id="gettingstarted_110">
@@ -19,7 +19,7 @@
 		<section id="gettingstarted_120">
 			<title>agent 실행</title>
 			<itemizedlist>
-			<listitem><para>bin폴더로 이동하여 startup-agent.cmd 실행(startup.cmd는 server모드, startup-agent.cmd는 agent모드로 Oden을 구동시킨다.)</para></listitem>
+			<listitem><para>bin폴더로 이동하여 startup-agent.cmd 실행(startup.cmd는 server모드, startup-agent.cmd는 agent모드로 ODEN을 구동시킨다.)</para></listitem>
 			</itemizedlist>
 		</section>
 		
@@ -45,7 +45,7 @@
 		
 		<section id="gettingstarted_140">
 			<title>연결 확인  </title>
-			<para>Oden이 설치된 경로의 bin폴더로 가서 아래와 같이 입력</para>
+			<para>ODEN이 설치된 경로의 bin폴더로 가서 아래와 같이 입력</para>
 			<programlisting><![CDATA[
 runc.cmd agent info sampleapp
 			]]></programlisting>
@@ -103,7 +103,7 @@ history info
 			<programlisting><![CDATA[
 history show
 			]]></programlisting>
-			<para>Oden이 설치된 폴더 이하에 target 폴더가 새로 생성되었고, doc이하의 파일들이 배포되었음을 확인한다.</para>
+			<para>ODEN이 설치된 폴더 이하에 target 폴더가 새로 생성되었고, doc이하의 파일들이 배포되었음을 확인한다.</para>
 		</section>
 	</section>
 
@@ -130,7 +130,7 @@ history show
 		
 		<section id="gettingstarted_340">
 			<title>커맨드라인으로 실행</title>
-			<para>커맨드라인으로 Oden에 명령을 내릴 경우, 별도로 id와 pwd를 입력받지 않기 때문에,
+			<para>커맨드라인으로 ODEN에 명령을 내릴 경우, 별도로 id와 pwd를 입력받지 않기 때문에,
 			어느 계정으로 수행할 것인지 미리 설정해 주어야 한다. 
 			</para>
 			<itemizedlist>
@@ -143,7 +143,7 @@ history show
 	
 	<section id="gettingstarted_400">
 		<title>변경파일만 배포</title>
-		<para>Oden은 원본파일과 배포된 파일의 시간과 size등을 비교하여 변경된 파일만 배포할 수 있다. 
+		<para>ODEN은 원본파일과 배포된 파일의 시간과 size등을 비교하여 변경된 파일만 배포할 수 있다. 
 		실제 CI환경을 통해 작업시, 빌드 단계에서 부터 수정된코드만 빌드(Incremental Build)를 해주어야 하나, 
 		여기서는 빌드작업없이 배포될 파일을 직접 수정한 뒤, 변경된 파일만 배포가 되었음을 확인할 것이다.  
 		</para>
@@ -186,7 +186,7 @@ task run sampleapp-update -sync
 </target>
 			]]></programlisting>
 			<para>컴파일은 기존 방식과 동일</para>
-			<para>Oden에 배포작업 추가시(task add 혹은 policy add 명령어 이용) -u 옵션을 붙여, 변경된 파일만 배포하도록 해야 한다. </para>
+			<para>ODEN에 배포작업 추가시(task add 혹은 policy add 명령어 이용) -u 옵션을 붙여, 변경된 파일만 배포하도록 해야 한다. </para>
 			<para>유의사항</para>
 			<itemizedlist>
 			<listitem><para>CTIP을 통해 형상관리에서 빌드할 파일들을 내려 받을 시 update된 파일만 받도록 설정하여야 함(일반적으로 디폴트 설정임).</para></listitem>
@@ -215,7 +215,7 @@ task run sampleapp-update -sync
   </oden-task>
 </target>
 			]]></programlisting>
-			<para>위 스크립트를 실행하면 localhost:9860에 설치되어 있는 Oden에 oden/oden0로 접속하여, file://doc이하의 모든 파일을 sampleapp의 default-location이하에 배포할 것이다.</para>
+			<para>위 스크립트를 실행하면 localhost:9860에 설치되어 있는 ODEN에 oden/oden0로 접속하여, file://doc이하의 모든 파일을 sampleapp의 default-location이하에 배포할 것이다.</para>
 			<programlisting><![CDATA[ant -f sample.xml]]></programlisting>
 			<para> 
 			수행 후 doc이하의 파일들이 target폴더로 배포될 것이며, 결과는 history info나 history show로 확인 가능하다. ant로 배포하였을 경우 

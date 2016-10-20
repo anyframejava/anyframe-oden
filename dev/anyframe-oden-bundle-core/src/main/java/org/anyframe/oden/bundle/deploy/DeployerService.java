@@ -1,22 +1,23 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.anyframe.oden.bundle.deploy;
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.anyframe.oden.bundle.common.FileInfo;
@@ -43,6 +44,9 @@ public interface DeployerService {
 
 	public void init(String parent, String path, long date, boolean useTmp,
 			int backupcnt) throws Exception;
+
+	// public void zinit(int backupcnt, String backDir, String undo)
+	// throws Exception;
 
 	public boolean write(String parent, String path, ByteArray buf)
 			throws Exception;
@@ -151,6 +155,15 @@ public interface DeployerService {
 	public void removeFile(String dir, String filename) throws Exception;
 
 	/**
+	 * remove directory which are located on the path.
+	 * 
+	 * @param path
+	 */
+	public void removeDir(File path) throws Exception;
+	
+	public void removeDirString(String path) throws Exception;
+
+	/**
 	 * get last modified date for parentpath/path
 	 * 
 	 * @param parentpath
@@ -226,9 +239,32 @@ public interface DeployerService {
 
 	public boolean touchAvailable() throws Exception;
 
-	public String execShellCommand(String command, String dir, long timeout)
+	public CfgReturnScript execShellCommand(String command, String dir, long timeout)
 			throws Exception;
 
 	public String odenHome() throws Exception;
 
+	/**
+	 * get temporary directory which use compressing deployment
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public String getTempDirectory() throws Exception;
+
+	public boolean copy(File src, String parent, String path) throws Exception;
+
+	/**
+	 * Oden Server use this method to compress deploy
+	 * 
+	 * @param src
+	 * @param dest
+	 * @param backupcnt
+	 * @param backupLocation
+	 * @param undo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, FileInfo> zipCopy(String src, String dest, int backupcnt,
+			String backupLocation, String undo) throws Exception;
 }

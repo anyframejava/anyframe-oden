@@ -2,14 +2,14 @@
 	<title>User Interface</title>
 
 	<para>
-		Oden은 기본적으로 CLI(Command Line Interface) 환경을 제공하며, 사용의 편리를 위해 별도의 GUI환경을 제공한다.
+		ODEN은 기본적으로 CLI(Command Line Interface) 환경을 제공하며, 사용의 편리를 위해 별도의 GUI환경을 제공한다.
 	</para>
 
 	<section id="concepts_userinterface_cli">
 		<title>Command Line Interface</title>
 
 		<para>
-			Oden Server에서 제공하는 스크립트를 통해 Oden으로 명령어를 전달할 수 있다.
+			ODEN Server에서 제공하는 스크립트를 통해 ODEN으로 명령어를 전달할 수 있다.
 			보다 자세한 사항은
 			<link linkend="workingwithcommandline">"Working with Command
 				Line"</link>
@@ -21,7 +21,7 @@
 		<title>Graphical User Interface</title>
 
 		<para>
-			Oden의 보다 용이한 사용을 위해 <link linkend="workingwithodenadmin">Oden Admin</link>이라는 GUI환경을 제공한다.
+			ODEN의 보다 용이한 사용을 위해 <link linkend="workingwithodenadmin">ODEN Admin</link>이라는 GUI환경을 제공한다.
 		</para>
 	</section>
 </section>

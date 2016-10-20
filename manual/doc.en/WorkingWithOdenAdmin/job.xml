@@ -135,7 +135,7 @@
 								<link linkend="workingwithodenadmin_job_rollback">Job Rollback</link>
 							</entry>
 							<entry align="left">
-								해당 Job의 최근 배포작업을 원복한다.
+								Recent deployment works of relevant Job are rollbacked. 
 							</entry>
 						</row>
 					</tbody>
@@ -560,7 +560,9 @@
 		<title>Job Rollback</title>
 
 		<para>
-			최근 배포한 파일을 원복 하는 명령이다. Admin 화면에서는 최신 배포만 기능을 제공 하며 이전의 배포 작업의 원복을 원할 경우는  Web Console에서 deploy undo txid를 직접 입력하여 수행한다. 
+			The Command is to undo the recently deployed file.
+			 Admin Screen only provides functionality to deploy the latest deployment.
+			  Therefore, in the case of undoing the previous deployments, at Web Console, enter deploy undo txid for execution.  
 		</para>
 
 	</section>

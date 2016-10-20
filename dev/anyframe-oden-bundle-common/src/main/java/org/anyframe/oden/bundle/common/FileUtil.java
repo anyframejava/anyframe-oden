@@ -1,18 +1,17 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.anyframe.oden.bundle.common;
 
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -37,6 +37,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
 
 /**
  * Collections of utility methods which are helping to manipulate file.
@@ -55,8 +56,9 @@ public class FileUtil {
 	public static void mkdirs(File f) throws IOException {
 		File parent = f.getParentFile();
 		if (parent != null && !parent.exists()) {
-			if(parent.mkdirs() == false)
-				throw new IOException("Fail to create dir: " + parent.getPath());
+			if (parent.mkdirs() == false)
+				throw new IOException("Fail to create dir: "
+						+ parent.getPath());
 		}
 //		return f.createNewFile();
 	}
@@ -700,5 +702,28 @@ public class FileUtil {
 						FileUtil.getRelativePath(root, f.getAbsolutePath()),
 						false, f.lastModified(), f.length()));
 		}
+	}
+	
+	/**
+	 * replace string
+	 * 
+	 * @param source
+	 * @param pattern
+	 * @param replace
+	 * @return
+	 */
+	public static String replace(String source, String pattern, String replace) {
+		int sIndex = 0;
+		int eIndex = 0;
+		String sourceTemp = null;
+		StringBuffer result = new StringBuffer();
+		sourceTemp = source.toUpperCase();
+		while ((eIndex = sourceTemp.indexOf(pattern.toUpperCase(), sIndex)) >= 0) {
+			result.append(source.substring(sIndex, eIndex));
+			result.append(replace);
+			sIndex = eIndex + pattern.length();
+		}
+		result.append(source.substring(sIndex));
+		return result.toString();
 	}
 }

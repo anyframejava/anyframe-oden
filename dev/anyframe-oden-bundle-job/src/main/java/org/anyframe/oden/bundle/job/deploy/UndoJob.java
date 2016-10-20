@@ -1,23 +1,23 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.anyframe.oden.bundle.job.deploy;
 
-import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.anyframe.oden.bundle.common.Assert;
 import org.anyframe.oden.bundle.common.BundleUtil;
@@ -58,15 +58,15 @@ public class UndoJob extends DeployJob {
 	protected String errorMessage;
 
 	private String txid;
-	
+
 	Integer nSuccess = 0;
-	
+
 	Integer backupcnt = 0;
-	
+
 	private boolean deployExcOpt;
-	
+
 	private final String HOME = BundleUtil.odenHome().getPath();
-	
+
 	public UndoJob(BundleContext context, String user, String desc,
 			String txid, DeployFileResolver resolver) throws OdenException {
 		super(context, user, desc, resolver);
@@ -104,58 +104,93 @@ public class UndoJob extends DeployJob {
 		if (deployFiles.size() == 0)
 			throw new OdenException("<txid> is not available.");
 		Iterator<DeployFile> it = deployFiles.iterator();
+		Map<String, DeployerService> dsMap = new HashMap<String, DeployerService>();
+		DeployerService ds;
+		
 		while (!stop && it.hasNext()) {
 			DeployFile f = it.next();
+			currentWork = f.getPath();
 			
 			try {
 				AgentLoc parent = f.getAgent();
-
-				// backup directory setting....
-				String oldbak = FileUtil.resolveDotNatationPath(
-						FileUtil.combinePath(HOME, FileUtil.combinePath(context
-								.getProperty("deploy.undo.loc"), txid)));
-				boolean isbak = (new File(oldbak)).exists();
-				
-				String file = f.getPath();
-				String parentLoc = parent.location();
-				
-				DeployerService ds = txmitterService.getDeployer(parent
-						.agentAddr());
+				if(dsMap.containsKey(parent.agentAddr())) {
+					ds = dsMap.get(parent.agentAddr());
+				} else {
+					dsMap.put(parent.agentAddr(), txmitterService.getDeployer(parent
+						.agentAddr()));
+					ds = dsMap.get(parent.agentAddr());
+				}
+//				DeployerService ds = txmitterService.getDeployer(parent
+//						.agentAddr());
 				if (ds == null)
 					throw new OdenException("Couldn't connect to the agent: "
 							+ parent.agentAddr());
 
+				// backup directory setting....
+				String oldbak = FileUtil.resolveDotNatationPath(FileUtil
+						.combinePath(ds.odenHome(), FileUtil.combinePath(
+								context.getProperty("deploy.undo.loc"), txid)));
+				boolean isbak = ds.exist(FileUtil.combinePath(ds.odenHome(),
+						context.getProperty("deploy.undo.loc")), txid);
+
+				String file = f.getPath();
+				String parentLoc = parent.location();
+
 				DoneFileInfo d = null;
 				boolean isException = deployExcOpt && f.isSuccess() == false ? true
 						: false; // deploy.exception.option=true 시 exception 파일은
-									// 롤백 제외 
-				if(! isException) { 
-					if(isbak) {
-						if (f.mode() == Mode.ADD ) {
+				// 롤백 제외
+				if (!isException) {
+					if (isbak) {
+						if (f.mode() == Mode.ADD) {
 							// 추가된 파일은 삭제
-							d = ds.backupNRemove(parentLoc, file, FileUtil.combinePath(context
-									.getProperty("deploy.undo.loc"), id), backupcnt);
-							
+							d = ds
+									.backupNRemove(
+											parentLoc,
+											file,
+											FileUtil
+													.combinePath(
+															context
+																	.getProperty("deploy.undo.loc"),
+															id), backupcnt);
+
 							if (d != null)
 								f.setMode(Mode.DELETE);
-						} else if (f.mode() == Mode.DELETE || f.mode() == Mode.UPDATE) {
+						} else if (f.mode() == Mode.DELETE
+								|| f.mode() == Mode.UPDATE) {
 							// 삭제, 갱신 파일은 copy
-							d = ds.backupNCopy(oldbak, file, parentLoc,
-									FileUtil.combinePath(context
-											.getProperty("deploy.undo.loc"), id),
-									backupcnt) ;
-							
+							d = ds
+									.backupNCopy(
+											oldbak,
+											file,
+											parentLoc,
+											FileUtil
+													.combinePath(
+															context
+																	.getProperty("deploy.undo.loc"),
+															id), backupcnt);
+
 							if (d != null)
-								f.setMode(d.isUpdate()? Mode.UPDATE :Mode.ADD);
+								f
+										.setMode(d.isUpdate() ? Mode.UPDATE
+												: Mode.ADD);
+							else
+								f.setMode(Mode.NA);
 						}
 					} else {
 						// initial deploy file
-						if(f.mode() == Mode.ADD)
-							d = ds.backupNRemove(parentLoc, file, FileUtil.combinePath(
-									context.getProperty("deploy.undo.loc"), id),
-									backupcnt);
-							if (d != null)
-								f.setMode(Mode.DELETE);
+						if (f.mode() == Mode.ADD)
+							d = ds
+									.backupNRemove(
+											parentLoc,
+											file,
+											FileUtil
+													.combinePath(
+															context
+																	.getProperty("deploy.undo.loc"),
+															id), backupcnt);
+						if (d != null)
+							f.setMode(Mode.DELETE);
 					}
 					if (d != null) {
 						f.setSuccess(d.success());
@@ -167,9 +202,11 @@ public class UndoJob extends DeployJob {
 			} catch (Exception e) {
 				f.setErrorLog(Utils.rootCause(e));
 				Logger.error(e);
+				setError(e.getMessage());
 			}
-
+			finishedWorks += 1;
 		}
+		dsMap.clear();
 	}
 
 	@Override
@@ -184,7 +221,8 @@ public class UndoJob extends DeployJob {
 			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);
-			} else if (deployFiles.size() == 0) {
+				// } else if (deployFiles.size() == 0) {
+			} else {
 				r.setSucccess(true);
 			}
 			r.setNSuccess(r.isSuccess() ? deployFiles.size() : nSuccess);

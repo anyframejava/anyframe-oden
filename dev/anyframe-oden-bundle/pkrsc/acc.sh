@@ -12,4 +12,4 @@ done
  
 PRGDIR=`dirname "$PRG"`
 
-java -jar $PRGDIR/../bundle/anyframe.oden.bundle.ent.auth-1.0.2.jar $*
+java -jar $PRGDIR/../bundle/anyframe-oden-bundle-auth-1.0.2.jar $*
