@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="BDBBuildLogger" immediate="true" >
-	<implementation class="org.anyframe.oden.bundle.build.log.BDBBuildLogger"/>
-	<service>
-		<provide interface="org.anyframe.oden.bundle.build.log.BuildLogService"/>
-	</service>
-</component>

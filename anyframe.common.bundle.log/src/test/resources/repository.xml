@@ -1,0 +1,15 @@
+<oden>
+	<repository type="ftp" uri="ftp://70.7.53.178" dir="c:/aa/bb">
+		<mappings>
+			<map src="dir1" dest="dira" />
+			<map src="dir2" dest="dirb" />
+		</mappings>
+	</repository>
+	 <repository type="fs" uri="/Users/joon1k/tDesktop">
+		<mappings>
+			<map src="dir1" dest="dira" />
+			<map src="dir2" dest="dirb" />
+		</mappings>
+	</repository>
+	<dest ip="localhost:9871" dir="/Users/joon1k/tDesktop" />
+ </oden>
