@@ -70,6 +70,7 @@ public class Cmd {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(-1); // abnormal
 		}
 	}
 
@@ -77,7 +78,9 @@ public class Cmd {
 		// home = new
 		// File(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile()
 		// + "/../anyframe.oden.bundle";
-		home = odenHome().getPath();
+//		home = odenHome().getPath();
+		home = java.net.URLDecoder.decode(odenHome().getPath(), "UTF-8");
+
 	}
 
 	@SuppressWarnings("PMD")

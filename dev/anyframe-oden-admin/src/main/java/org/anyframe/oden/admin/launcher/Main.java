@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -309,10 +310,11 @@ public class Main {
 				+ "] - HTTP Listener started: port=" + portNo);
 	}
 
-	private static File getHome() throws MalformedURLException {
+	@SuppressWarnings("deprecation")
+	private static File getHome() throws MalformedURLException, UnsupportedEncodingException {
 		URL url = new URL(Main.class.getProtectionDomain().getCodeSource()
 				.getLocation().toString());
-		return new File(url.getPath());
+		return new File(java.net.URLDecoder.decode(url.getPath(),"UTF-8"));
 	}
 
 	private static void extractZip(File src, String entryName, File dest)

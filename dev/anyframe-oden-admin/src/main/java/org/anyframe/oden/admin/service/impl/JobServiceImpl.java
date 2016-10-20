@@ -317,7 +317,7 @@ public class JobServiceImpl implements JobService {
 
 		List<String> jobNameList = null;
 		if (group.equals("ALL")) {
-			jobNameList = odenCommonDao.getStringList("job", "info");
+			jobNameList = odenCommonDao.getStringList("job", "info -nostatus");
 		} else {
 			jobNameList = groupservice.findByName(group);
 		}
@@ -339,7 +339,7 @@ public class JobServiceImpl implements JobService {
 
 			Job job = new Job();
 			// 2014.11.19 job info를 한번만 날리도록 수정
-			String buildCmd = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
+			String buildCmd = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN + " -nostatus");
 			List<JSONObject> objectArr = odenCommonDao.jsonObjectArrays(buildCmd);
 			job.setBuild(getBuildByobjectArray(objectArr));
 			
@@ -409,9 +409,10 @@ public class JobServiceImpl implements JobService {
 						}
 					}
 
-					if (job.getBuild() != "All") {
+					
+					if (!"All".equals(job.getBuild())) {
 						BuildHistory buildHistory = null;
-						if(buildCheck != false) {
+						if(buildCheck && job.getBuild().length() > 0) {
 							buildHistory = buildservice.findByName(job.getBuild());
 						}
 
@@ -419,10 +420,10 @@ public class JobServiceImpl implements JobService {
 							if (buildHistory.isSuccess()) {
 								job.setBuildDate(OdenConstants.A_HREF_HEAD + "javascript:popupOpen('" + buildHistory.getConsoleUrl() + "');"
 										+ OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_SUCCESS + "("
-										+ DateUtil.toStringDate(buildHistory.getDate()) + ")" + OdenConstants.A_HREF_TAIL);
+										+ DateUtil.toStringDateLikeDeploy(buildHistory.getDate()) + ")" + OdenConstants.A_HREF_TAIL);
 							} else {
 								job.setBuildDate(OdenConstants.A_HREF_HEAD + "javascript:popupOpen('" + buildHistory.getConsoleUrl() + "');"
-										+ OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_FAIL + "(" + DateUtil.toStringDate(buildHistory.getDate())
+										+ OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_FAIL + "(" + DateUtil.toStringDateLikeDeploy(buildHistory.getDate())
 										+ ")" + OdenConstants.A_HREF_TAIL);
 							}
 						} else {

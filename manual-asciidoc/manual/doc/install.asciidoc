@@ -1,0 +1,265 @@
+[[install]]
+
+== Install and Configuration
+---
+::
+
+본 장에서는 ODEN을 사용하기 위한 설치요구사항과 설치 및 설정에 대한 소개를 제공한다.
+
+[[install_systemrequirements]]
+
+
+=== System Requirements
+
+:: ODEN을 설치하기 위해서는 다음의 요구사항을 충족해야 한다.
+
+* ODEN Server 및 Agent 설치요구사항
+** Java Runtime Environment 1.5 or above
+
+** 20MB 이상 하드디스크 공간
+
+** 512MB RAM 이상
+
+* ODEN Admin 설치요구사항
+** Java Runtime Environment 1.5 or above
+
+** 30MB 이상 하드디스크 공간
+
+** 256MB RAM 이상
+
+* Linux, UNIX, Solaris, Mac OS X, MS Windows 등의 플랫폼
+
+* 서버간 방화벽 확인 (default Port 변경가능)
+** ODEN Server(Port:9860) -&gt; ODEN Agent(Port:9872)
+
+** 사용자PC -&gt; ODEN Admin(Port:9880)
+
+** ODEN Sever(Port:9860) -&gt; Jenkins(Port:9090)
+
+[[install_installinganyframeoden]]
+
+
+=== Installing The ODEN
+
+:: [[install_installinganyframeoden_serverandAgents]]
+
+
+==== Server and Agents
+
+:: ODEN은 Server모드와 Agent모드가 존재한다. Agent는 파일이 배포될 서버인 Target ServerODEN은 Server모드와 Agent모드가 존재한다. Agent는 파일이 배포될 서버인 Target Server footnote:[이 문서에서는 파일이 배포될 서버를 Target Server라 칭한다.]에 설치되어 ODEN Server에서 지시하는 명령에 따라 파일을 배포한다. ODEN Server는 여러개의 Agent를 관리하며 사용자는 커맨드 라인이나 ODEN Admin과 같은 GUI환경을 통해 ODEN Server에 명령을 내리게 된다. 사용자는 Agent에 직접 명령을 내릴 수 없으며, ODEN Server를 통해 Agent에 명령을 내려야 하며 대칭키 방식의 알고리즘을 통해 암호화 하여 주요 정보는 기밀성을 보장한다.
+
+
+
+[[install_installinganyframeoden_serverandAgents_install]]
+
+
+===== Installing Server and Agents
+
+:: 배포될 파일이 존재하는 시스템에 ODEN Server를 설치해야 하고 원활한 작동을 위해 설치 경로는 영문으로 구성 되어야 한다.
+
+ODEN의 압축을 풀면 아래와 같은 구조로 되어 있다.
+
+
+image::../image/Install/file_struct.png[]
+  
+
+
+압축파일에는 ODEN 및 ODEN Admin이 모두 포함되어 있다. ODEN은 Server모드(bin/startup.sh or bin/startup.cmd)로도 Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. 구동된 Server/Agent 중지를 원할 경우는 bin/ *-shutdown.sh or bin/ *-shutdown.cmd 를 실행한다. Agent만 설치하고 싶다면, core 디렉토리만 복사하여 Agent모드로 부팅시키면 된다.
+
+ODEN Admin은 ODEN Server와 같은 시스템에 설치되어야 한다. bin/startup.sh(bin/startup.cmd)로 바로 실행시킬 수도 있고, WAS의 application형태로 사용할 수도 있다.
+
+ODEN Agent로 동작시에는 conf/oden.ini파일 대신 conf/agent.ini파일을 참조하여 동작한다.
+
+[[install_installinganyframeoden_serverandAgents_configuring]]
+
+
+===== Configuring Server and Agents
+
+:: conf/oden.ini를 통해 ODEN Server의 설정을 변경할 수 있다. 변경 내용을 적용하기 위해서는 ODEN을 재구동 시켜야 한다. (Agent의 경우 conf/agent.ini 를 통해 일부 옵션을 지원한다.)
+
+* bundle.libs: ODEN library 목록. bundle 폴더에 있는 jar 파일중 이 목록 외의 파일만 active 상태가 되며, 이 목록에 설정된 파일은 비활성화 상태가 되어 library 로써만 사용된다. 일반적으로 사용자가 수정할 필요는 없다.
+
+* cmd.available: 사용가능한 명령어 목록. 수정할 필요 없음.
+
+* log.level: log파일에 뿌려질 로그 레벨(1 = error, 2 = warning, 3 = info, 4 = debug). 로그파일은 meta폴더에서 확인할 수 있다. ODEN에 문제가 생겼을 시 디버깅하기 위한 용도로 사용되며, 일반적으로 수정할 필요는 없다.
+
+* http.port: ODEN과 통신할 때 사용되는 포트.
+
+* deploy.undo: undo 기능 사용 여부. deploy.tmpfile도 true로 설정되어야함.
+
+* deploy.tmpfile: 배포 시 임시파일을 사용할 지 여부. true로 설정되면 배포 시 임시파일을 만들어 전송한 뒤, 기존파일을 대체함. 속도가 느림.
+
+* deploy.undo.loc: 배포전 기존 파일 백업 위치.
+
+* deploy.backupcnt: 배포전 기존 파일 백업 디렉토리 최대 개수.
+
+* deploy.threadcnt: 일괄 배포 시 구동되는 thread 개수. 설정하지 않을 경우, JVM 상에서 유효한 processors를 기준으로 ODEN 에서 자동 설정
+
+* deploy.exception.option: 배포 오류 발생 시 원복 여부. true로 설정되면 배포 오류 발생 시 배포 작업이 취소. false로 설정되면 오류 파일은 제외하고 나머지 파일 배포작업 수행.
+
+* console.user: 커맨드라인으로 명령어 실행 시 사용할 user id. conf/accounts.txt에 미리 등록되어 있어야 함.
+
+* deploy.readtimeout: Server에서 Agent로 요청시 응답이 오기까지 대기하는 시간. 기본 120초. deploy.undo가 활성화되어 있을 경우, 백업으로 인해 응답이 오기까지 시간이 오래 걸릴 수 있다.
+
+* page.scale: page처리 시 사용될 기본값. 수정할 필요없음.
+
+* exec.timeout: 커맨드 명령어 실행 시 대기할 최대 시간. 단위 ms. 설정하지 않을 경우, 커맨드를 강제 종료시키지 않고 끝나길 기다린다.
+
+* log.duration: 배포 이력 보관 기간. 단위 day. 기본값 365.
+
+* server.ip: ODEN Server의 IP. 허용되는 ODEN Server의 IP를 등록할 때 사용
+
+* security.key: 파일 전송 시 암호화 및 복호화를 하기 위한 키 값. 기능을 사용 할 경우 키 값을 정의하며, oden.ini 와 agent.ini 에 동일한 값이 정의 되어야 한다.
+
+* boot.only: 배포 대상 서버에 물리적으로 동일한 공간에서 다수의 Application이 동작 할 경우 하나의 Agent 기동을 원할 경우의 설정값. agent.ini 에 정의하며, Window Server의 경우 Subinacl 윈도우 유틸리티가 설치 되어야 한다. 또한 모든 경로의 접근을 위해 Admin 권한으로 Agent를 구동하여야 한다.
+
+* build.url: Jenkins와 연동을 위한 Jenkins접속 url. ex) http://127.0.0.1:9090
+
+[NOTE]
+====
+Jenkins와의 연동을 위해서는 추가적으로 아래의 작업이 필요하다. Jenkins의 ./jenkins/war/WEB-INF/web.xml에 아래내용을 추가한다.
+
+
+----
+<servlet>
+<servlet-name>Ctip Gen Servlet</servlet-name>
+<servlet-class>org.anyframe.ide.ctip.integration.CtipGenServlet</servlet-class>
+<init-param>
+<param-name>hudsonHome</param-name>
+<param-value>../jenkins</param-value>
+</init-param>
+<init-param>
+<param-name>hudsonJobDir</param-name>
+<param-value>../jenkins/jobs</param-value>
+</init-param>
+</servlet>
+<servlet-mapping>
+<servlet-name>Ctip Gen Servlet</servlet-name>
+<url-pattern>/anyframe/api/*</url-pattern>
+</servlet-mapping>
+----
+
+anyframe-ide-ctip-integration-2.7.0.jar 다운받아 ./jenkins/war/WEB-INF/lib 경로에 추가한다.
+
+
+
+
+====
+
+
+
+
+[[install_installinganyframeoden_serverandAgents_startingup]]
+
+
+===== Starting Up Server and Agents
+
+:: ODEN Server 및 Agent의 설치 및 설정이 끝났으면, 아래의 명령으로 ODEN을 Server모드로 구동시킬 수 있다.
+
+
+----
+bin/startup.sh
+(Windows 에서는 ODEN core의 bin폴더로 이동한 뒤 startup.cmd를 실행한다.)
+----
+
+아래의 명령으로 ODEN을 Agent모드로 구동시킬 수 있다.
+
+
+----
+bin/startup-agent.sh
+(Windows 에서는 ODEN core의 bin폴더로 이동한 뒤 startup-agent.cmd를 실행한다.)
+----
+
+ODEN Server를 실행시킨 뒤 커맨드라인을 통해 ODEN 명령어를 실행시킬 수 있다.
+
+
+----
+>cd bin
+>runc.sh help
+(Windows에서는 runc.cmd help)
+----
+
+
+[IMPORTANT]
+.Important
+====
+Server 및 Agent 실행 시, Target Server의 파일 및 디렉토리에 대한 소유자(ownership) 및 권한(permission)에 유의한다. ODEN을 통해 배포한 파일은 Agent를 구동시킨 사용자의 소유 및 권한(umask)를 갖게 된다. 배포할 폴더에 Agent를 구동시킨 사용자가 접근 권한이 없다면 배포는 실패하게 될 것이다.
+
+ODEN이 설치되는 경로에 공백이 있으면 안된다. Windows의 바탕화면이나 내폴더의 경우, 중간에 공백이 있는 경로가 있으므로 ODEN이 제대로 동작하지 않을 것이다.
+
+
+====
+
+
+[[install_installinganyframeoden_serverandAgents_managing_accounts]]
+
+
+===== Managing Accounts
+
+:: bin폴더의 acc.sh(acc.cmd) 명령어로 계정 추가할 수 있다. 기본적으로 제공되는 계정은 ID는 oden, PWD는 oden0이다.
+
+
+----
+acc.sh <id> <pwd>
+(Windows에서는 acc.cmd <id> <pwd>)
+----
+
+conf폴더의 accounts.txt에서 추가된 계정을 확인할 수 있다. 암호는 인코딩 되어 있다. 해당 라인을 삭제하면 계정이 삭제된다.
+
+명령어로 배포 시 어느 계정을 사용할 것인지 지정해 주어야 한다. conf폴더의 oden.ini의 console.user필드에 지정해 주어야 한다. 기본값은 oden이다. oden계정을 삭제하였을 경우, console.user값을 다른 계정으로 꼭 변경해 주어야 한다.
+
+
+[NOTE]
+====
+ODEN Admin에서는 별도의 계정관리 기능이 있으며 본장의 계정관리는 웹콘솔을 위한 계정관리 이다.
+
+
+====
+
+
+[[install_installinganyframeoden_odenadmin]]
+
+
+==== ODEN Admin
+
+:: [[install_installinganyframeoden_odenadmin_install]]
+
+
+===== Installing ODEN Admin
+
+:: 별도의 WAS없이 독립적으로 ODEN Admin을 사용할 수도 있고, 새 WAS의 application으로 ODEN Admin을 사용할 수도 있다.
+
+[[install_installinganyframeoden_odenadmin_install_innerwas]]
+
+
+====== 별도 WAS없이 사용
+
+:: 
+----
+startup.sh
+(Windows에서는 startup.cmd)
+----
+
+admin폴더의 startup.sh나 startup.cmd를 실행시키면 자동으로 ODEN Admin이 시작된다.
+
+
+----
+http://localhost:9880
+----
+
+위 주소로 Admin에 접근 가능하다. 기본 포트는 9880이다. 포트를 변경하려면 스크립트 파일(startup.sh 혹은 startup.cmd)을 열어 --httpPort의 값을 원하는 포트값으로 수정하여 준다.
+
+Admin 내부에서 사용하는 db 및 ODEN Server 포트를 변경하려면 스크립트 파일(startup.sh 혹은 startup.cmd)을 열어 oden.db.port 및 oden.port의 값을 원하는 포트값으로 수정하면 된다.
+
+[[install_installinganyframeoden_odenadmin_install_outerwas]]
+
+
+====== 별도 WAS에 설치
+
+:: Tomcat을 기준으로 설명한다. (Tomcat 6.0 이상이 anyframe.oden.admin.war를 WAS의 webapps폴더로 복사한다. Tomcat을 부팅시키면 아래의 주소로 ODEN Admin에 접근할 수 있다.
+
+
+----
+http://localhost:8080/anyframe.oden.admin
+----
+

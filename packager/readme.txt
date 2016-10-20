@@ -1,4 +1,4 @@
-﻿Anyframe ODEN, release 2.6.1 (2016.01.26)
+﻿Anyframe ODEN, release 2.6.2 (2016.05.19)
 ---------------------------------------------------
 
 1. Anyframe ODEN 소개

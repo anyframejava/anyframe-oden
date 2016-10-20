@@ -1,0 +1,34 @@
+buildscript {
+  repositories {
+    jcenter{ url 'http://70.121.224.52:8081/nexus/content/repositories/jcenter/' }
+    maven{ url 'http://70.121.224.52:8081/nexus/content/repositories/spring_io_libs_snapshot_local/' }
+  }
+  dependencies {
+    classpath("org.asciidoctor:asciidoctor-gradle-plugin:+") // for asciidoc
+    classpath 'org.asciidoctor:asciidoctorj-pdf:+' // for pdf --> io/console not supported; tty will not be manipulated
+  }
+}
+
+repositories { jcenter{ url 'http://70.121.224.52:8081/nexus/content/repositories/jcenter/' } }
+
+apply plugin: "org.asciidoctor.convert"
+
+asciidoctor {
+  sourceDir project.file('manual/doc')
+  separateOutputDirs = false
+  backends = ['html5', 'pdf']
+  options doctype: 'book', eruby: 'erubis'
+
+  attributes	'toc':'left', 'icons': 'font', 'setanchors':'true', 'source-highlighter': 'coderay', //'pdf-style': 'KaiGenGothicKR'
+  'pdf-style' : ''+project.file('manual/doc')+'/../themes/KR-theme.yml',
+  'pdf-fontsdir' : ''+project.file('manual/doc')+'/../fonts',
+  'docinfo' : ''+project.file('manual/doc') + '/book-docinfo.xml',
+  'numbered' : true,
+  'sectnumlevels' : '4'
+  resources {
+    from('manual/image') {
+    }
+    into "../image"
+  }
+  sources { include 'oden.adoc' }
+}

@@ -138,14 +138,18 @@ public class JobCommandImpl implements CustomCommand {
 				throw new OdenException("Invalid Job Name: "
 						+ cmd.getActionArg());
 			}
+			
+			Collection<JSONObject> targets = new Vector<JSONObject>();
+			if(cmd.getOption("nostatus") == null) {
+				targets= allTargetStatus(job.getTargets());
+			}
 			if (isJSON) {
 				JSONObject jo = new JSONObject();
 				jo.put("name", job.getName());
 				jo.put("group", job.getGroup());
 				jo.put("source", job.getSource().toJSON());
-				jo.put("targets",
-						new JSONArray(allTargetStatus(job.getTargets())));
-
+				jo.put("targets", new JSONArray(targets));
+				
 				JSONArray cs = new JSONArray();
 				for (CfgCommand c : job.getCommands()) {
 					cs.put(c.toJSON());
@@ -160,7 +164,8 @@ public class JobCommandImpl implements CustomCommand {
 			buf.append("group: " + job.getGroup() + "\n");
 			buf.append("source: " + job.getSource().toJSON() + "\n");
 			buf.append("targets: \n");
-			for (JSONObject targetStatus : allTargetStatus(job.getTargets())) {
+			
+			for (JSONObject targetStatus : targets) {
 				buf.append("\t" + targetStatus + "\n");
 			}
 			buf.append("commands: \n");

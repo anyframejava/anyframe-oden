@@ -2,6 +2,28 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.6.2 (2016-05-19)
+-------------------------------------
+* Admin 화면 버그 수정(Invalid job Name bug, time 표현시간 수정)
+* ODEN job info command 실행시 agent check 로직 제거(시간 단축)
+* ODEN 한글경로에서 실행가능하도록 수정, start.cmp, startup-agent.cmd script 개선
+* Manual framework 변경(docbook -> asciidoc)
+
+* 소스 코드 변경
+  - manual-asciidoc 추가, manual 삭제, anyframe-oden-bundle-admin, anyframe-oden-bundle, anyframe-oden-bundle-http, anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+
+ODEN-68 ODEN Admin Invalid job Name, time 시간 bug
+ODEN-69	oden job info "jobname" command 호출시 no agent check 추가
+ODEN-70	ODEN 한글 실행경로 관련 이슈
+ODEN-71 startup.cmd, startup-agent.cmd script 개선
+
+
+
 Changes in version 2.6.1 (2016-01-26)
 -------------------------------------
 * Apache 취약점 관련 commons-collections 버전업

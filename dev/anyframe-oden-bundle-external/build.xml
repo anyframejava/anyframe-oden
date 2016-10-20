@@ -1,5 +1,4 @@
 <project name="Oden External Interface" default="all.dbg" basedir=".">
-	
 	<property name="bundle.name" value="anyframe-oden-bundle-external" />
 	<property name="version" value="1.4.1"/>
 			

@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 
 <project name="ODEN Packaging" default="default" basedir=".">
-	<property name="version" value="2.6.1"/>
-	<!--property name="manual.dir" location="../../../manual/manual/target/oden"/-->
-	<property name="manual.dir" location="../../../RELEASE-anyframe-oden-manual/workspace/target"/>
+	<property name="version" value="2.6.2"/>
+	<property name="manual.dir" location="../../../RELEASE-anyframe-oden-manual-asciidoc/workspace"/>
 	<!--property name="manual.dir" location="../../../manual/Release/target"/-->
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
 	<!--property name="distDir" location="../dist"/-->
@@ -46,7 +45,7 @@
 	<target name="make.manual">
 		<echo>construct oden manual folder</echo>
 		<copy todir="${distDir}/${pksubname}/manual" failonerror="false">
-			<fileset dir="${manual.dir}/reference" includes="htmlsingle/**,image/**,pdf/**" excludes="image/WorkingWithEclipsePlugin/**"/>
+			<fileset dir="${manual.dir}/build" includes="asciidoc/**,htmlsingle/**,image/**,pdf/**" excludes="image/WorkingWithEclipsePlugin/**"/>
 		</copy>
 	</target>
 	<target name="copy.readme">
