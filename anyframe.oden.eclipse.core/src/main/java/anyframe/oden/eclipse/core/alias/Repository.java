@@ -35,13 +35,16 @@ public class Repository extends Alias {
 	static final String REPOSITORIES = "repositories"; //$NON-NLS-1$
 	static final String REPOSITORY = "repository"; //$NON-NLS-1$
 
-	static final String AGENT_TO_USE = "server-to-use"; //$NON-NLS-1$
+	static final String SERVER_TO_USE = "server-to-use"; //$NON-NLS-1$
 	static final String PROTOCOL = "protocol"; //$NON-NLS-1$
 	static final String PATH = "path"; //$NON-NLS-1$
+	
+	static final String DEPLOY_NOW = "deploynow";
+	static final String WITH_ZERO_CONFIG = "with-zero-config";
 
 	private static int repositorySerialNo = 0;
 
-	private String agentToUse;
+	private String serverToUse;
 	private String protocol;
 	private String path;
 
@@ -65,7 +68,7 @@ public class Repository extends Alias {
 	 * @param root
 	 */
 	public Repository(Element root) {
-		agentToUse = root.attributeValue(AGENT_TO_USE);
+		serverToUse = root.attributeValue(SERVER_TO_USE);
 		String string = root.attributeValue(HAS_NO_USER_NAME);
 		if (string != null)
 			hasNoUserName = Boolean.parseBoolean(string);
@@ -90,7 +93,7 @@ public class Repository extends Alias {
 	 */
 	public Element expressRepositoryInXML() {
 		DefaultElement root = new DefaultElement(REPOSITORY);
-		root.addAttribute(AGENT_TO_USE, agentToUse);
+		root.addAttribute(SERVER_TO_USE, serverToUse);
 		root.addAttribute(HAS_NO_USER_NAME, Boolean.toString(hasNoUserName));
 		root.addElement(NICKNAME).setText(nickname);
 		root.addElement(URL).setText(url);
@@ -108,7 +111,7 @@ public class Repository extends Alias {
 	 */
 	public Repository(Repository duplicate) {
 		this(duplicate.getNickname() + " - duplicated"); //$NON-NLS-1$
-		setAgentToUse(duplicate.getAgentToUse());
+		setServerToUse(duplicate.getServerToUse());
 		setHasNoUserName(duplicate.isHasNoUserName());
 		setUrl(duplicate.getUrl());
 		setProtocol(duplicate.getProtocol());
@@ -125,19 +128,19 @@ public class Repository extends Alias {
 	}
 
 	/**
-	 * Gets the Agent to use for this Build Repository
-	 * @return the Agent to use for this Build Repository
+	 * Gets the Server to use for this Build Repository
+	 * @return the Server to use for this Build Repository
 	 */
-	public String getAgentToUse() {
-		return agentToUse;
+	public String getServerToUse() {
+		return serverToUse;
 	}
 
 	/**
-	 * Sets the Agent to use for this Build Repository
-	 * @param agentToUse
+	 * Sets the Server to use for this Build Repository
+	 * @param serverToUse
 	 */
-	public void setAgentToUse(String agentToUse) {
-		this.agentToUse = agentToUse;
+	public void setServerToUse(String serverToUse) {
+		this.serverToUse = serverToUse;
 	}
 
 	/**

@@ -16,28 +16,22 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TableItem;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
-import anyframe.oden.eclipse.core.brokers.ShellException;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.PolicyPage;
-import anyframe.oden.eclipse.core.editors.TaskDetails;
-import anyframe.oden.eclipse.core.editors.TaskPage;
 import anyframe.oden.eclipse.core.editors.dialogs.SelectAgentsDialog;
-import anyframe.oden.eclipse.core.utils.DialogUtil;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
- * @since 1.0.0 RC1
+ * @since 1.0.0 RC2
  * 
  */
 public class NewDeployAction extends AbstractEditorsAction {
@@ -48,27 +42,26 @@ public class NewDeployAction extends AbstractEditorsAction {
 	
 	public NewDeployAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
-
+	
 	/**
-	 * 
+	 * New DeployAction Run 
 	 */
-	public void run() {
+	public void run(String title) {
 		SelectAgentsDialog dialog;
-		PolicyPage page = new PolicyPage();
+		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
+		
 		try {
 			dialog = new SelectAgentsDialog(Display.getCurrent()
-					.getActiveShell(), page.getShellUrl());
+					.getActiveShell(), page.getShellUrl(),page);
 			dialog.open();
 		} catch (Exception odenException) {
-			// TODO Auto-generated catch block
 			OdenActivator.error(
-					"Exception occured while open select Agent dialog.",
+					"Exception occured while open select Server dialog.",
 					odenException);
-			odenException.printStackTrace();
 		}
 	}
 

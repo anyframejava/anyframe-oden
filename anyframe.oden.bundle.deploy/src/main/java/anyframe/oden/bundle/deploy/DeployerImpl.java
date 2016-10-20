@@ -1,20 +1,18 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.deploy;
 
@@ -32,6 +30,7 @@ import java.util.zip.ZipException;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.common.PairValue;
 
 /**
  * @see DeployerService
@@ -79,25 +78,21 @@ public class DeployerImpl implements DeployerService, Serializable {
 		out.write(buf, 0, size);
 	}
 	
-	/**
-	 * @return updated file list if jar is updated, or empty list
-	 */
-	public List<String> close() throws IOException {
+	public long close(List<String> updatefiles) throws IOException {
 		if(this.out != null)
 			this.out.close();
 		
 		if(tmpfile == null || !tmpfile.exists())
-			return Collections.EMPTY_LIST;
+			return 0;
 		
 		try{
 			File destfile = new File(fpath);
 			FileUtil.createNewFile(destfile);
 			destfile.setLastModified(date);
 			
-			List<String> updatedfiles = Collections.EMPTY_LIST;
 			try{
 				if(updatejar){
-					updatedfiles = FileUtil.updateJar(destfile, tmpfile);
+					updatefiles.addAll(FileUtil.updateJar(destfile, tmpfile));
 				}else {
 					FileUtil.copy(tmpfile, destfile);
 				}
@@ -105,7 +100,7 @@ public class DeployerImpl implements DeployerService, Serializable {
 			}catch(ZipException e){
 				throw new IOException("Fail to update jar: " + fpath);
 			}
-			return updatedfiles;
+			return destfile.length();
 		}catch(RuntimeException e){
 			throw new IOException(e.getMessage());
 		}
@@ -134,8 +129,8 @@ public class DeployerImpl implements DeployerService, Serializable {
 		try {
 			uniquef = FileUtil.uniqueFile(destdir, "ss" + today(), "");
 			FileUtil.createNewFile(uniquef);
-			long size = FileUtil.compress(srcdir, uniquef);
-			return new FileInfo(uniquef.getName(), false, uniquef.lastModified(), size);
+			FileUtil.compress(srcdir, uniquef);
+			return new FileInfo(uniquef.getName(), false, uniquef.lastModified(), uniquef.length());
 		} catch (IOException e) {
 			if(uniquef != null && uniquef.exists())
 				FileUtil.removeFile(uniquef);
@@ -147,7 +142,7 @@ public class DeployerImpl implements DeployerService, Serializable {
 		return new SimpleDateFormat("yyMMdd").format(System.currentTimeMillis());
 	}
 	
-	public List<String> extract(String srcdir, String zipname, String destdir)
+	public List<PairValue<String, Boolean>> extract(String srcdir, String zipname, String destdir)
 			throws OdenException {
 		try{
 			cleanRollbackDestination(new File(destdir));
@@ -157,8 +152,8 @@ public class DeployerImpl implements DeployerService, Serializable {
 		}
 	}
 
-	private List<String> extractSnapshot(File src, File dest) throws OdenException {
-		List<String> extractedfiles = null;
+	private List<PairValue<String, Boolean>> extractSnapshot(File src, File dest) throws OdenException {
+		List<PairValue<String, Boolean>> extractedfiles = null;
 		try {
 			extractedfiles = FileUtil.extractZip(src, dest);
 		} catch (ZipException e) {

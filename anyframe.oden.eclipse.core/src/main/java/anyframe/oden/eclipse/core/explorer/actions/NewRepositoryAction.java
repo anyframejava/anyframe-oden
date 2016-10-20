@@ -18,10 +18,10 @@ package anyframe.oden.eclipse.core.explorer.actions;
 
 import org.eclipse.swt.widgets.Display;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.CreateBuildRepositoryDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * Add a new build repository action in the Oden view. This class extends
@@ -39,9 +39,9 @@ public class NewRepositoryAction extends AbstractExplorerViewAction {
 	 */
 	public NewRepositoryAction() {
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepository,
-				OdenMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryIcon);
+				UIMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepository,
+				UIMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryIcon);
 	}
 
 	/**

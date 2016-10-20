@@ -29,7 +29,7 @@ import java.io.File;
 public class OdenFiles {
 
 	public static final String USER_CONFIG_FOLDER = OdenActivator.getDefault().getStateLocation().toFile().getAbsolutePath();
-	public static final String USER_AGENT_FILE_NAME = USER_CONFIG_FOLDER + File.separator + "OdenServers.xml";
+	public static final String USER_SERVER_FILE_NAME = USER_CONFIG_FOLDER + File.separator + "OdenServers.xml";
 	public static final String USER_REPOSITORY_FILE_NAME = USER_CONFIG_FOLDER + File.separator + "OdenRepositories.xml";
 
 }

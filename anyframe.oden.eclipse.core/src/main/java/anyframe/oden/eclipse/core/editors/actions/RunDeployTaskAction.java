@@ -21,17 +21,18 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.TaskDetails;
 import anyframe.oden.eclipse.core.editors.TaskPage;
 import anyframe.oden.eclipse.core.explorer.dialogs.DeployNowDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -43,24 +44,24 @@ public class RunDeployTaskAction extends AbstractEditorsAction {
 	 */
 	public RunDeployTaskAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_RunDeployImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_RunDeployImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
-		TaskPage page = new TaskPage();
+	public void run(String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
 		DeployNowDialog dialog;
 		TaskDetails details = null;
-		ISelection selection = page.taskViewer.getSelection();
+		ISelection selection = page.getTaskViewer().getSelection();
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 		details = (TaskDetails) obj;
 		try {
 			dialog = new DeployNowDialog(Display.getCurrent().getActiveShell(),
-					null , details.getTaskName() , page.shellUrl);
+					null , details.getTaskName() , page.getShellUrl());
 			dialog.open();
 		} catch (Exception odenException) {
 			OdenActivator.error(

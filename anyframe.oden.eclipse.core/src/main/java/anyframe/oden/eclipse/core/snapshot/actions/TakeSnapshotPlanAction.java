@@ -20,10 +20,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotStatusProgress;
-import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 
 /**
@@ -42,9 +43,9 @@ public class TakeSnapshotPlanAction extends AbstractSnapshotViewAction {
 	 */
 	public TakeSnapshotPlanAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshot,
-				OdenMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshotTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshotIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshot,
+				UIMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshotTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_TakeSnapshotPlanAction_TakeSnapshotIcon);
 	}
 
 	/**
@@ -54,24 +55,24 @@ public class TakeSnapshotPlanAction extends AbstractSnapshotViewAction {
 		Object selected = OdenActivator.getDefault().getSnapshotView()
 		.getSelected();
 		if(selected==null){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-					OdenMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotPlanTake,
+			DialogUtil.openMessageDialog(UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotPlanTake,
 					MessageDialog.INFORMATION);
 		}else{
 			String selection = OdenActivator.getDefault().getSnapshotView()
 			.getSelected()[0].toString();
 			
 			if (DialogUtil.confirmMessageDialog(
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgDlgSnapshot,
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgDlgSnapshotConfirm
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgSnapshot,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgSnapshotConfirm
 					+ selection
-					+ OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
+					+ CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
 				try {
 					SnapshotStatusProgress
-					.statusProgress(OdenMessages.ODEN_SNAPSHOT_Actions_MsgRun
-							+ "\"" + selection + OdenMessages.ODEN_SNAPSHOT_TakeSnapshotPlanAction_1 + " -json"); //$NON-NLS-1$ //$NON-NLS-2$
+					.statusProgress(CommandMessages.ODEN_SNAPSHOT_Actions_MsgRun
+							+ "\"" + selection + UIMessages.ODEN_SNAPSHOT_TakeSnapshotPlanAction_1 + " -json"); //$NON-NLS-1$ //$NON-NLS-2$
 				} catch (OdenException e) {
-					OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_Actions_Exception_TakeSnapshot, e);
+					OdenActivator.error(UIMessages.ODEN_SNAPSHOT_Actions_Exception_TakeSnapshot, e);
 				} 
 			}
 		}

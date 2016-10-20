@@ -20,9 +20,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
-import anyframe.oden.eclipse.core.snapshot.SnapshotStatusProgress;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 import anyframe.oden.eclipse.core.snapshot.SnapshotViewContentProvider;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
@@ -43,9 +44,9 @@ public class SaveSnapshotPlanAction extends AbstractSnapshotViewAction {
 	 */
 	public SaveSnapshotPlanAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlan,
-				OdenMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlanTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlanIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlan,
+				UIMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlanTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_SaveSnapshotPlanAction_NewPlanIcon);
 	}
 
 	/**
@@ -56,8 +57,8 @@ public class SaveSnapshotPlanAction extends AbstractSnapshotViewAction {
 				.getSelected();
 		if (selected == null) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-					OdenMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotPlanSave,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotPlanSave,
 					MessageDialog.INFORMATION);
 		} else {
 
@@ -68,37 +69,40 @@ public class SaveSnapshotPlanAction extends AbstractSnapshotViewAction {
 			String dest = SnapshotView.destination;
 			String desc = SnapshotView.description;
 
-			String msg = OdenMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdHead
-					+ "\"" //$NON-NLS-1$
-					+ selection
-					+ "\"" + " " + OdenMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdSource + " /" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-6$
-					+ target
-					+ " " + OdenMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDest + " " + destAgent + "/" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					+ dest
-					+ " " + OdenMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDesc + " " + "\"" + desc + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					+ " -json"; //$NON-NLS-1$
-
-			//		String url = "http://" //$NON-NLS-1$
-			// + OdenActivator.getDefault().getAliasManager()
-			//						.getAgentManager().getAgent(agent).getUrl() + "/shell"; //$NON-NLS-1$
-
-			if (DialogUtil.confirmMessageDialog(
-					OdenMessages.ODEN_CommonMessages_Title_ConfirmSave,
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgDlgAlertSavePlan)) {
-				// SnapshotViewContentProvider.doOdenBroker(url, msg);
-				try {
-					 SnapshotViewContentProvider.doOdenBroker(SnapshotView.SHELL_URL,
-					 msg);
-				} catch (OdenException e) {
-					OdenActivator
-							.error(
-									OdenMessages.ODEN_SNAPSHOT_Actions_Exception_SaveSnapshotPlan,
-									e);
-					SnapshotView.clearComposite();
+			if(target.equalsIgnoreCase(dest)){
+				DialogUtil.openMessageDialog(
+						UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+						UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoSameDestSource,
+						MessageDialog.INFORMATION);
+			}else{
+				String msg = CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdHead
+				+ "\"" //$NON-NLS-1$
+				+ selection
+				+ "\"" + " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdSource + " /" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-6$
+				+ target
+				+ " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDest + " " + destAgent + "/" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ dest
+				+ " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDesc + " " + "\"" + desc + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ " -json"; //$NON-NLS-1$
+				
+				if (DialogUtil.confirmMessageDialog(
+						CommonMessages.ODEN_CommonMessages_Title_ConfirmSave,
+						UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgAlertSavePlan)) {
+					try {
+						SnapshotViewContentProvider.doOdenBroker(SnapshotView.SHELL_URL,
+								msg);
+					} catch (OdenException e) {
+						OdenActivator
+						.error(
+								UIMessages.ODEN_SNAPSHOT_Actions_Exception_SaveSnapshotPlan,
+								e);
+						SnapshotView.clearComposite();
+					}
 				}
+				
+				SnapshotView.refreshTree();
 			}
-
-			SnapshotView.refreshTree();
+			
 		}
 	}
 

@@ -25,7 +25,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 import anyframe.oden.eclipse.core.utils.OdenProgress;
 
@@ -48,7 +48,7 @@ public class SnapshotStatusProgress {
 	public static void statusProgress(final String msg) throws OdenException {
 
 		OdenProgress jobProgress = new OdenProgress(
-				OdenMessages.ODEN_SNAPSHOT_SnapshotView_StatusMsg) {
+				UIMessages.ODEN_SNAPSHOT_SnapshotView_StatusMsg) {
 
 			@Override
 			protected void executeMe() throws OdenException {

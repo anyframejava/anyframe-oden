@@ -1,20 +1,18 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.eclipse.core.utils;
 
@@ -24,10 +22,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * JSONUtil class
+ * parsing array to string
+ * 
+ * @author HONG JungHwan
+ * @version 1.0.0
+ * @since 1.0.0 RC2
+ * 
+ */
 public class JSONUtil {
 	public final static String KNOWN_EXCEPTION = "KnownException";	
 	public final static String UNKNOWN_EXCEPTION = "UnknownException";
-	
+
 	private static String jsonizedException(String key, Exception e) {
 		JSONArray jarr = new JSONArray();
 		try {
@@ -41,20 +48,20 @@ public class JSONUtil {
 		}
 		return jarr.toString();
 	}
-	
+
 	public static String jsonizedUnknowException(Exception e) {
 		return jsonizedException(UNKNOWN_EXCEPTION, e);
 	}
-	
+
 	public static String jsonizedKnownException(Exception e){
 		return jsonizedException(KNOWN_EXCEPTION, e);
 	}
-	
+
 	public static String jsonizedException(Exception e) {
-		
+
 		return jsonizedUnknowException(e);
 	}
-	
+
 	public static String toString(JSONArray jArr) {
 		StringBuffer buf = new StringBuffer();
 		try{
@@ -75,7 +82,7 @@ public class JSONUtil {
 		}
 		return buf.toString();
 	}
-	
+
 	private static String toStringWithoutNewLine(JSONArray jArr) {
 		StringBuffer buf = new StringBuffer();
 		try{
@@ -96,7 +103,7 @@ public class JSONUtil {
 		}
 		return buf.toString();
 	}
-	
+
 	private static String toString(JSONObject jObj) {
 		StringBuffer buf = new StringBuffer();
 		try{

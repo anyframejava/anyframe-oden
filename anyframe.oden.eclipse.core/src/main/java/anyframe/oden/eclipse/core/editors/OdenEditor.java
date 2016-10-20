@@ -37,38 +37,46 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import anyframe.oden.eclipse.core.alias.Agent;
-import anyframe.oden.eclipse.core.alias.AgentEditorInput;
+import anyframe.oden.eclipse.core.OdenActivator;
+import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.alias.ServerEditorInput;
 
 /**
  * Implement Oden editor. This class extends
  * MultiPageEditorPart class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0 RC1
  * 
  */
-public class OdenEditor extends MultiPageEditorPart implements
-		IResourceChangeListener {
-	public static final String ID = "anyframe.oden.eclipse.core.editors.OdenEditor";
+public class OdenEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
-	private static OdenEditor instance;
-	public static Agent agent;
+	/**
+	 * The ID of the view as specified by the extension.
+	 */
+	public static final String ID = OdenActivator.PLUGIN_ID + ".editors.OdenEditor";
+
+	private OdenEditor instance;
+	public static Server server;
+
 	private TextEditor textEditor;
 
-	private static IEditorPart editor;
+	private IEditorPart editor;
 
-	public static IEditorPart getEditor() {
+	private TaskPage taskPage;
+	private PolicyPage policyPage;
+
+	public IEditorPart getEditor() {
 		return editor;
 	}
 
-	public static void setEditor(IEditorPart editor) {
-		OdenEditor.editor = editor;
+	public void setEditor(IEditorPart editor) {
+		editor = editor;
 	}
 
 	private static IProject currentProject;
@@ -93,9 +101,6 @@ public class OdenEditor extends MultiPageEditorPart implements
 
 	private HashMap<Integer, Page> mapPages = new HashMap<Integer, Page>();
 	private int indexTextEditor = -1;
-
-	private boolean isDirty;
-
 	private static String[] pageNameKeys = { "Tasks" , "Policies" };
 
 	public OdenEditor() {
@@ -105,7 +110,7 @@ public class OdenEditor extends MultiPageEditorPart implements
 		instance = this;
 	}
 
-	public static OdenEditor getInstance() {
+	public OdenEditor getInstance() {
 		return instance;
 	}
 
@@ -115,47 +120,33 @@ public class OdenEditor extends MultiPageEditorPart implements
 		}
 		updateTitle();
 	}
-	
-	
+
+
 	void createPage(String pageNameKey) {
 		Page page = null;
 		if (pageNameKey.equals(pageNameKeys[0])) {
 			page = TaskPage.getInstance();
+			taskPage = (TaskPage) page;
 		} else if (pageNameKey.equals(pageNameKeys[1])) {
 			page = PolicyPage.getInstance();
+			policyPage = (PolicyPage) page;
 		}
-		agent = (Agent) ((AgentEditorInput) getEditorInput()).getAgent();
-		
+		server = (Server) ((ServerEditorInput) getEditorInput()).getServer();
+
 		int index = addPage(page.getPage(getContainer()));
 		setPageText(index, pageNameKey);
-		
+
 		mapPages.put(index, page);
 	}
-	
+
 	void updateTitle() {
 		IEditorInput input = getEditorInput();
 		setPartName(input.getName());
 		setTitleToolTip(input.getToolTipText());
 	}
-	
-	public boolean isDirty() {
-//		firePropertyChange(IWorkbenchPartConstants.PROP_DIRTY);
-//		return this.isDirty();
-		return super.isDirty();
-	}
-	
-	public final void setDirty(boolean isDirty) {
-//		if (this.isDirty == isDirty)
-//			return;
-//		this.isDirty = isDirty;
-		
-		firePropertyChange(IEditorPart.PROP_DIRTY);
-	}
 
-	
-	@SuppressWarnings("unchecked")
 	public void init(IEditorSite site, IEditorInput editorInput)
-			throws PartInitException {
+	throws PartInitException {
 		shell = site.getShell();
 		IResource selectionResource = null;
 		ISelection selection = site.getPage().getSelection();
@@ -163,7 +154,7 @@ public class OdenEditor extends MultiPageEditorPart implements
 			selectionResource = getSelectedResource(selection);
 
 		Locale.setDefault(new Locale("en"));
-		
+
 		super.init(site, editorInput);
 
 	}
@@ -175,7 +166,7 @@ public class OdenEditor extends MultiPageEditorPart implements
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
-							.getPages();
+					.getPages();
 				}
 			});
 		}
@@ -212,7 +203,7 @@ public class OdenEditor extends MultiPageEditorPart implements
 		if (!selection.isEmpty()) {
 			resources = new ArrayList<Object>();
 			Iterator<?> elements = ((IStructuredSelection) selection)
-					.iterator();
+			.iterator();
 			while (elements.hasNext()) {
 				Object next = elements.next();
 				if (next instanceof IResource) {
@@ -239,15 +230,31 @@ public class OdenEditor extends MultiPageEditorPart implements
 		return null;
 	}
 	public void updateTitle(String name) {
-//		input = getEditorInput();
 		try {
 			setPartName(name);
 			setTitleToolTip(name);
 		} catch (Exception e) {
 			// TODO: handle exception
-			
-		}
-		
-	}
 
+		}
+	}
+	/**
+	 * Returns the shared instance
+	 * @return the shared instance
+	 */
+	public static OdenEditor getDefault(String title) {
+		IWorkbenchPage Page = PlatformUI.getWorkbench()
+		.getActiveWorkbenchWindow().getActivePage();
+		IEditorPart[] editors = Page.getEditors();
+		for(IEditorPart edit : editors)
+			if(edit.getTitle().equals(title))
+				return (OdenEditor) edit;
+		return (OdenEditor) editors[0];
+	}
+	public TaskPage getTaskpage() {
+		return taskPage;
+	}
+	public PolicyPage getPolicypage() {
+		return policyPage;
+	}
 }

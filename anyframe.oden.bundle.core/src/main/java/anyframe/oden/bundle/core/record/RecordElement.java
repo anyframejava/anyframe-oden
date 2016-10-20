@@ -1,20 +1,18 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.core.record;
 
@@ -22,10 +20,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import anyframe.oden.bundle.core.command.CommandUtil;
+import anyframe.oden.bundle.common.PairValue;
 
 /**
- * This represents each deploy log.
+ * This represents each deploy log. policy의 agent 하나당 RecordElement하나가 생김
  * 
  * @author joon1k
  *
@@ -34,31 +32,18 @@ public class RecordElement implements Serializable{
 	private String host = "";
 	private String agent = "";
 	private String rootpath = "";
-	private List<String> paths = new ArrayList<String>();
+	private List<PairValue<String, Boolean>> paths = new ArrayList<PairValue<String, Boolean>>();
 	private long date;
+	private boolean success = false;
 	
-	public RecordElement() {
-	}
-	
-	public RecordElement(long date, String record) {
-		String[] records = CommandUtil.split(record);
-		this.date = date;
-		this.host = records.length > 0 ? records[0] : "";
-		this.agent = records.length > 1 ? records[1] : "";
-		this.rootpath = records.length > 2 ? records[2] : "";
-		if(records.length > 3){
-			for(String path : records[3].split(",")){
-				paths.add(path);
-			}
-		}
-	}
-	
-	public RecordElement(String host, String agent, String rootpath, List<String> paths, long date) {
+	public RecordElement(String host, String agent, String rootpath, 
+			List<PairValue<String, Boolean>> paths, long date, boolean success) {
 		this.host = host;
 		this.agent = agent;
 		this.rootpath = rootpath;
 		this.date = date;
 		this.paths = paths;
+		this.success = success;
 	}
 
 	public String getHost() {
@@ -93,10 +78,18 @@ public class RecordElement implements Serializable{
 		this.date = date;
 	}
 	
-	public List<String> getPaths() {
+	public List<PairValue<String, Boolean>> getPaths() {
 		return paths;
 	}
 	
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSucccess(boolean success) {
+		this.success = success;
+	}
+
 	/**
 	 * recordElement의 데이터 String으로 리턴.
 	 * date항목 제외. 각 항목 ""로 묶임. host, agent, path순서.
@@ -115,10 +108,11 @@ public class RecordElement implements Serializable{
 	 * @param paths
 	 * @return
 	 */
-	private String serialize(List<String> paths) {
+	private String serialize(List<PairValue<String, Boolean>> paths) {
 		StringBuffer buf = new StringBuffer();
 		for(int i=0; i<paths.size(); i++){
-			buf.append(paths.get(i));
+			String status = paths.get(i).value2() ? "S" : "F";
+			buf.append(paths.get(i).value1() + "    [" + status + "]");
 			if(i+1 < paths.size())
 				buf.append(',');
 		}

@@ -25,7 +25,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.alias.AgentManager;
+import anyframe.oden.eclipse.core.alias.ServerManager;
 import anyframe.oden.eclipse.core.alias.RepositoryManager;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
@@ -100,8 +100,8 @@ public abstract class AbstractExplorerViewAction extends Action implements IView
 	 * 
 	 * @return
 	 */
-	public AgentManager getAgents() {
-		return OdenActivator.getDefault().getAliasManager().getAgentManager();
+	public ServerManager getServers() {
+		return OdenActivator.getDefault().getAliasManager().getServerManager();
 	}
 
 	public RepositoryManager getRepositories() {

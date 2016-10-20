@@ -24,16 +24,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.alias.AgentManager;
-import anyframe.oden.eclipse.core.alias.RepositoryManager;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
 /**
  * Abstract implementation for a context menu action in the Oden view.
  * When adding actions is required, extend this class.
  * 
- * @author Hong Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  *

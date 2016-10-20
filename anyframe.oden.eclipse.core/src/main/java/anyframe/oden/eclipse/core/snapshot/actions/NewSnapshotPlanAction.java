@@ -19,9 +19,7 @@ package anyframe.oden.eclipse.core.snapshot.actions;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 import anyframe.oden.eclipse.core.snapshot.dialogs.SnapshotNewPlanDialog;
@@ -38,29 +36,25 @@ import anyframe.oden.eclipse.core.utils.DialogUtil;
  */
 public class NewSnapshotPlanAction extends AbstractSnapshotViewAction {
 
-	public static String agent;
-
 	/**
-	 * Constructor of DeleteSnapshotAction forward actionId, actionTooltipText,
+	 * Constructor of NewSnapshotAction forward actionId, actionTooltipText,
 	 * actionIconId to AbstractSnapshotViewAction
 	 */
 	public NewSnapshotPlanAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlan,
-				OdenMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlanTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlanIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlan,
+				UIMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlanTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_NewSnapshotPlanAction_NewSnapshotPlanIcon);
 	}
 
 	/**
 	 * Run this Action with message box
 	 */
 	public void run() {
-		new SnapshotView();
-		if (agent == null) {
-
+		if (SnapshotView.SHELL_URL == null) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgAlertAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgAlertAddPlan,
 					MessageDialog.WARNING);
 		} else {
 				SnapshotNewPlanDialog dialog = new SnapshotNewPlanDialog(

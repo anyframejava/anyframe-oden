@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
  * Tree label provider for Anyframe Oden Deployment History view outline.
  * 
  * @author RHIE Jihwan
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  *

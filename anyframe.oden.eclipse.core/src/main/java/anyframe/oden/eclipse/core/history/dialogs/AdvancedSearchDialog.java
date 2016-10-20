@@ -18,7 +18,6 @@ package anyframe.oden.eclipse.core.history.dialogs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -30,7 +29,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
@@ -53,10 +51,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -66,18 +62,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.texteditor.CaseAction;
 
 import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
-import anyframe.oden.eclipse.core.history.dialogs.AdvancedSearchDialog;
 
 /**
  * AdvancedSearchDialog,
  * for the Anyframe Oden Advanced Deployment History.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
- * @since 1.0.0 RC1
+ * @since 1.0.0 RC2
  *
  */
 public class AdvancedSearchDialog extends Dialog {
@@ -94,15 +88,9 @@ public class AdvancedSearchDialog extends Dialog {
 
 	private String[] attributeRelationArrayForDate;
 
-	private String[] attributeRelationArrayForStatus;
-
 	private DeploymentHistoryView view;
 
-	private Combo cmbAdvSearchType;
-
 	private Label msg;
-
-	private static boolean isCaseSensitive = false;
 
 	private ArrayList advancedList;
 
@@ -235,9 +223,6 @@ public class AdvancedSearchDialog extends Dialog {
 				} else if (tempStr.equals("Deployed Date")) {
 					((ComboBoxCellEditor) cellEditors[1])
 							.setItems(attributeRelationArrayForDate);
-//				} else if (tempStr.equals("Deployment Status")) {
-//					((ComboBoxCellEditor) cellEditors[1])
-//							.setItems(attributeRelationArrayForStatus);
 				}
 			}
 		});
@@ -262,9 +247,6 @@ public class AdvancedSearchDialog extends Dialog {
 						} else if (tempStr.equals("Deployed Date")) {
 							((ComboBoxCellEditor) cellEditors[1])
 									.setItems(attributeRelationArrayForDate);
-//						} else if (tempStr.equals("Deployment Status")) {
-//							((ComboBoxCellEditor) cellEditors[1])
-//									.setItems(attributeRelationArrayForStatus);
 						}
 					}
 
@@ -274,61 +256,6 @@ public class AdvancedSearchDialog extends Dialog {
 				});
 		Label label = new Label(compTable, SWT.NULL);
 		label.setText("");
-		final Button caseSensitive = new Button(compTable, SWT.CHECK);
-		caseSensitive.setText("Case Sensitive");
-		caseSensitive.setSelection(isCaseSensitive);
-		caseSensitive.addSelectionListener(new SelectionListener() {
-
-			public void widgetSelected(SelectionEvent arg0) {
-				isCaseSensitive = caseSensitive.getSelection();
-				String text = null;
-				AdvancedSearchInputAttribute advSrchInput = null;
-				Vector searchCriteria = AdvancedSearchInputAttribute
-						.getInputParamVect();
-				for (int i = 0; i < searchCriteria.size(); i++) {
-					advSrchInput = (AdvancedSearchInputAttribute) searchCriteria
-							.get(i);
-					text = advSrchInput.getAttributeValue();
-					if (isCaseSensitive
-							&& advSrchInput.getAttributeName().equals(
-									"Deployed Date") && text != null) {
-						MessageDialog
-								.openInformation(
-										viewer.getControl().getShell(),
-										"Regular Expression",
-										"Search with 'Deployed date' are not allowed when Case Sensitive checkbox is selected. ");
-						caseSensitive.setSelection(false);
-						isCaseSensitive = false;
-					}
-					if (isCaseSensitive
-							&& advSrchInput.getAttributeName().equals("IP")
-							&& text != null) {
-						MessageDialog
-								.openInformation(
-										viewer.getControl().getShell(),
-										"Regular Expression",
-										"Search with 'IP' are not allowed when Case Sensitive checkbox is selected. ");
-						caseSensitive.setSelection(false);
-						isCaseSensitive = false;
-					}
-					if (isCaseSensitive
-							&& advSrchInput.getAttributeName().equals(
-									"Deployment Status") && text != null) {
-						MessageDialog
-								.openInformation(
-										viewer.getControl().getShell(),
-										"Regular Expression",
-										"Search with 'Deployment Status' are not allowed when Case Sensitive checkbox is selected. ");
-						caseSensitive.setSelection(false);
-						isCaseSensitive = false;
-					}
-				}
-			}
-
-			public void widgetDefaultSelected(SelectionEvent arg0) {
-
-			}
-		});
 		Button btnInsert = new Button(compTable, SWT.NONE);
 		GridData buttonData = new GridData();
 		buttonData.widthHint = 60;
@@ -473,15 +400,11 @@ public class AdvancedSearchDialog extends Dialog {
 	 *            The composite object
 	 */
 	private void attachCellEditors(final TableViewer viewerObj, Composite parent) {
-		// TODO : attachCellEditor
-//		attributeNameArray = new String[] { "Item Name", "IP", "Deployed Date",
-//				"Deployment Status" };
 		attributeNameArray = new String[] { "Item Name", "IP", "Deployed Date" };
 		attributeRelationArrayForName = new String[] { "contains" };
 		attributeRelationArrayForIp = new String[] { "is" };
 		attributeRelationArrayForDate = new String[] { "is", "before", "after" };
-//		attributeRelationArrayForStatus = new String[] { "Success", "Failure",
-//				"N/A" };
+
 		viewerObj.setCellModifier(new ICellModifier() {
 
 			public boolean canModify(Object element, String property) {
@@ -508,11 +431,6 @@ public class AdvancedSearchDialog extends Dialog {
 						i = Arrays.asList(attributeRelationArrayForIp).indexOf(
 								((AdvancedSearchInputAttribute) element)
 										.getAttributeRelation());
-//					if (i == -1)
-//						i = Arrays.asList(attributeRelationArrayForStatus)
-//								.indexOf(
-//										((AdvancedSearchInputAttribute) element)
-//												.getAttributeRelation());
 					return i == -1 ? null : new Integer(i);
 				} else if (property.equals("attributeValue"))
 					return ((AdvancedSearchInputAttribute) element)
@@ -553,16 +471,6 @@ public class AdvancedSearchDialog extends Dialog {
 							&& (attributeNameArray[i].equals("IP")))
 						advSearchInputAttribute
 								.setAttributeRelation(attributeRelationArrayForIp[0]);
-//					else if ((advSearchInputAttribute.getAttributeName()
-//							.equals("Deployed Date")
-//							|| advSearchInputAttribute.getAttributeName()
-//									.equals("Item Name") || advSearchInputAttribute
-//							.getAttributeName().equals("IP"))
-//							&& (attributeNameArray[i]
-//									.equals("Deployment Status")))
-//						advSearchInputAttribute
-//								.setAttributeRelation(attributeRelationArrayForStatus[0]);
-
 					advSearchInputAttribute
 							.setAttributeName(attributeNameArray[i]);
 
@@ -584,11 +492,6 @@ public class AdvancedSearchDialog extends Dialog {
 									.equals("Deployed Date")) {
 						advSearchInputAttribute
 								.setAttributeRelation(attributeRelationArrayForDate[i]);
-//					} else if (i != -1
-//							&& advSearchInputAttribute.getAttributeName()
-//									.equals("Deployment Status")) {
-//						advSearchInputAttribute
-//								.setAttributeRelation(attributeRelationArrayForStatus[i]);
 					}
 				} else if (property.equals("attributeValue")) {
 					advSearchInputAttribute.setAttributeValue(value.toString());
@@ -607,35 +510,6 @@ public class AdvancedSearchDialog extends Dialog {
 
 		viewer.setColumnProperties(new String[] { "attributeName",
 				"attributeRelation", "attributeValue" });
-	}
-
-	/**
-	 * Runs the event loop for the given shell.
-	 * 
-	 * @param loopShell
-	 *            the shell
-	 */
-	private void runEventLoop(Shell loopShell) {
-
-		// Use the display provided by the shell if
-		// possible
-		Display display;
-		if (view.getTableViewer().getTable().getShell() == null) {
-			display = Display.getCurrent();
-		} else {
-			display = loopShell.getDisplay();
-		}
-
-		while (loopShell != null && !loopShell.isDisposed()) {
-			try {
-				if (!display.readAndDispatch()) {
-					display.sleep();
-				}
-			} catch (Throwable e) {
-
-			}
-		}
-		display.update();
 	}
 
 	protected void cancelPressed() {
@@ -675,10 +549,7 @@ public class AdvancedSearchDialog extends Dialog {
 
 					String name = advSrchInput.getAttributeName();
 					String relation = advSrchInput.getAttributeRelation();
-					String value = !(isCaseSensitive) ? advSrchInput
-							.getAttributeValue().toLowerCase() : advSrchInput
-							.getAttributeValue();
-
+					String value = advSrchInput.getAttributeValue();
 					String[] inputArr = { name, relation, value };
 
 					List.add(inputArr);

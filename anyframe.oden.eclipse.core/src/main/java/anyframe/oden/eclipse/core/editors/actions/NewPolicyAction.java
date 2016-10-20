@@ -16,17 +16,17 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.PolicyDetails;
 import anyframe.oden.eclipse.core.editors.PolicyPage;
-import anyframe.oden.eclipse.core.editors.TaskDetails;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -38,40 +38,40 @@ public class NewPolicyAction extends AbstractEditorsAction {
 	 */
 	public NewPolicyAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
-		PolicyPage page = new PolicyPage();
+	public void run(String title) {
+		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
 		page.getPolicyNameText().setEnabled(true);
 		page.getRemovePolicy().setEnabled(false);
 		page.chageMandaLabel();
 		// initialize Text
 		page.clearText();
 		// input temporary field
-		addTempTaskName();
+		addTempTaskName(title);
 		
 	}
 	
-	private void addTempTaskName() {
-		PolicyPage page = new PolicyPage();
+	private void addTempTaskName(String title) {
+		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
 		// create temp task 
-		String tempPolicyName = OdenMessages.ODEN_EDITORS_PolicyPage_TempPolicyName;
-		String tempPolicyDesc = OdenMessages.ODEN_EDITORS_PolicyPage_TempPolicyDesc;
+		String tempPolicyName = UIMessages.ODEN_EDITORS_PolicyPage_TempPolicyName;
+		String tempPolicyDesc = UIMessages.ODEN_EDITORS_PolicyPage_TempPolicyDesc;
 		
 		page.getPolicyNameText().setText(tempPolicyName);
 		page.getDescriptionText().setText(tempPolicyDesc);
 		PolicyDetails details = null;
 
 		details = new PolicyDetails(tempPolicyName, tempPolicyDesc, null, null, null);
-		PolicyPage.getPolicyViewer().add(details);
+		page.getPolicyViewer().add(details);
 		
-		PolicyPage.getPolicyViewer().getTable().select(page.lastNum);
+		page.getPolicyViewer().getTable().select(page.getLastNum());
 		page.getAddPolicy().setEnabled(false);
 		page.getRemovePolicy().setEnabled(true);
 	}

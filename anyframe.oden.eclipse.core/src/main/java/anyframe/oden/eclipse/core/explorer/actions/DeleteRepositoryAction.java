@@ -20,13 +20,14 @@ import java.util.Set;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 
 /**
- * Edit an existing agent action in the Oden view. This class extends
+ * Edit an existing server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
  * @author RHIE Jihwan
@@ -41,9 +42,9 @@ public class DeleteRepositoryAction extends AbstractExplorerViewAction {
 	 */
 	public DeleteRepositoryAction() {
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepository,
-				OdenMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepositoryToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepositoryIcon);
+				UIMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepository,
+				UIMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepositoryToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_RemoveRepositoryIcon);
 	}
 
 	/**
@@ -53,10 +54,10 @@ public class DeleteRepositoryAction extends AbstractExplorerViewAction {
 		Repository repository = getView().getSelectedRepository(false);
 
 		if (DialogUtil.confirmMessageDialog(
-				OdenMessages.ODEN_CommonMessages_Title_ConfirmDelete,
-				OdenMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_ConfirmDelete_MessagePre +
+				CommonMessages.ODEN_CommonMessages_Title_ConfirmDelete,
+				UIMessages.ODEN_EXPLORER_Actions_DeleteRepositoryAction_ConfirmDelete_MessagePre +
 				repository.getNickname() +
-				OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
+				CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
 
 			if (repository != null) {
 				OdenActivator.getDefault().getAliasManager().getRepositoryManager().removeRepository(repository.getNickname());

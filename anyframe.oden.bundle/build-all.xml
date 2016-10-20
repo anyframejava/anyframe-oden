@@ -1,12 +1,12 @@
 <project name="_Oden Full" default="build.all" basedir=".">
-	<property name="version" value="1.0.0.RC2"/>
+	<property name="version" value="1.0.0.PRE1"/>
 	
 	<target name="build.all">
 		<ant antfile="../anyframe.oden.bundle/build.xml" inheritall="false" />
 			
-		<ant antfile="/Users/coelumscio/local/versions/common/bundle/trunk/dev/anyframe.common.bundle.gate/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.common.bundle.gate/build.xml" inheritall="false" />
 
-		<ant antfile="/Users/coelumscio/local/versions/common/bundle/trunk/dev/anyframe.common.bundle.log/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.common.bundle.log/build.xml" inheritall="false" />
 
 		<ant antfile="../anyframe.oden.bundle.common/build.xml" inheritall="false" />
 		
@@ -66,13 +66,6 @@
 			<fileset dir="${basedir}/conf"
 				includes="*.ini,*.xml"/>
 		</copy>
-		<copy todir="${basedir}/pack">
-			<fileset dir="../doc/pdf"
-				includes="*.pdf"/>
-			<fileset dir="${basedir}"
-				includes="readme,oden.cmd"/>
-		</copy>
-		
 		<zip destfile="${basedir}/pack/oden-${version}.zip"
 			basedir="${basedir}/pack" excludes="*.zip,**/*.svn"/>
 	</target>

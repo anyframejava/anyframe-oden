@@ -28,11 +28,12 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
-import anyframe.oden.eclipse.core.brokers.ShellException;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.Cmd;
 
 /**
@@ -42,17 +43,18 @@ import anyframe.oden.eclipse.core.utils.Cmd;
  * @version 1.0.0 RC2
  * 
  */
-public class SnapshotViewContentProvider implements ITreeContentProvider,
-		IStructuredContentProvider {
+public class SnapshotViewContentProvider implements ITreeContentProvider, IStructuredContentProvider {
 
 	protected static TreeParent invisibleRoot;
 	protected static String inputText;
 	protected static String SHELL_URL;
-
+	
+	protected static OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	
 	private static String[] PLAN_OPT = { "plan", "p" }; //$NON-NLS-1$ //$NON-NLS-2$
 
-	private static final String MSG_SNAPSHOT_INFO_PLAN = OdenMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoPlan;
-	private static final String MSG_SNAPSHOT_INFO_FILE = OdenMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile;
+	private static final String MSG_SNAPSHOT_INFO_PLAN = CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoPlan;
+	private static final String MSG_SNAPSHOT_INFO_FILE = CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile;
 
 	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 	}
@@ -119,24 +121,24 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 						MSG_SNAPSHOT_INFO_PLAN + " -json"); //$NON-NLS-1$
 				JSONArray snapshotFileList = getSnaphotFileList(SHELL_URL,
 						MSG_SNAPSHOT_INFO_FILE + " -json"); //$NON-NLS-1$
-				
+
 				invisibleRoot = new TreeParent(""); //$NON-NLS-1$
-				
+
 				for (int i = 0; i < snapshotPlanList.size(); i++) {
 					String asb = snapshotPlanList.get(i);
 					plan = new TreeParent(asb);
-					
+
 					invisibleRoot.addChild(plan);
-					
+
 					try {
 						for (int j = 0; j < snapshotFileList.length(); j++) {
-							
+
 							JSONObject jo = snapshotFileList.getJSONObject(j);
-							
+
 							for(Iterator it = jo.keys(); it.hasNext();){
 								String fileName = (String) it.next();
 								String fileInfo = jo.getString(fileName);
-								
+
 								Cmd cmd = new Cmd(fileName + " = " +  fileInfo); //$NON-NLS-1$
 								String planName = cmd.getOptionArg(PLAN_OPT);
 								if (plan.toString().equalsIgnoreCase(planName)) {
@@ -144,10 +146,10 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 									plan.addChild(snapshotFile);
 								}
 							}
-							
+
 						}
 					} catch (JSONException e) {
-						OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MakingSnapshotTree, e);
+						OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MakingSnapshotTree, e);
 					}
 				}
 			}
@@ -178,13 +180,13 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 					for(Iterator it = jo.keys(); it.hasNext();){
 						String planName = (String) it.next();
 						snapshotPlanFullList.add(planName);
-//					String planInfo = jo.getString(planName);
+						//					String planInfo = jo.getString(planName);
 					}
 				}
 			} catch (OdenException e) {
-				OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotPlanList, e);
+				OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotPlanList, e);
 			} catch (Exception e) {
-//				OdenActivator.error("Exception", e);
+				//				OdenActivator.error("Exception", e);
 			}
 			return snapshotPlanFullList;
 		}
@@ -209,9 +211,9 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 				result = OdenBroker.sendRequest(shellUrl, msgSnapshotListFile);
 				ja = new JSONArray(result);
 			} catch (OdenException e) {
-				OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotList, e);
+				OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotList, e);
 			} catch (Exception e) {
-//				OdenActivator.error("Exception", e);
+				//				OdenActivator.error("Exception", e);
 			}
 			return ja;
 		}
@@ -236,7 +238,7 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 			} catch (OdenException e) {
 				throw new OdenException(e);
 			} catch (Exception e) {
-				OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetInfo, e);
+				OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetInfo, e);
 			}
 			return result;
 		}
@@ -258,11 +260,11 @@ public class SnapshotViewContentProvider implements ITreeContentProvider,
 			} catch (OdenException e) {
 				throw new OdenException(e);
 			} catch (Exception e) {
-				OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ConnectBroker, e);
+				OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ConnectBroker, e);
 			}
 		}
 	}
-	
+
 	/**
 	 * Parsing snapshot plan name
 	 * 

@@ -19,7 +19,7 @@ package anyframe.oden.eclipse.core.snapshot.actions;
 import org.eclipse.swt.widgets.Display;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.dialogs.SnapshotNewPlanDialog;
 import anyframe.oden.eclipse.core.snapshot.dialogs.SnapshotNewPlanDialog.Type;
@@ -39,7 +39,7 @@ public class DuplicateSnapshotPlanAction extends AbstractSnapshotViewAction {
 	 * forward actionId, actionTooltipText, actionIconId to AbstractSnapshotViewAction
 	 */
 	public DuplicateSnapshotPlanAction() {
-		super(OdenMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlan, OdenMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlanTooltip, OdenMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlanIcon);
+		super(UIMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlan, UIMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlanTooltip, UIMessages.ODEN_SNAPSHOT_Actions_DuplicateSnapshotPlanAction_DuplicatePlanIcon);
 	}
 	
 	/**

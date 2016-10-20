@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar" sourcepath="/apache-ant/apache-ant-1.7.1-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar" sourcepath="/commons-net-1.4.1/commons-net-1.4.1-src.zip"/>
 	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

@@ -46,17 +46,17 @@ public class SnapshotViewActionGroup extends ActionGroup{
 	public void fillContextMenu(IMenuManager contextmenu) {
 		SnapshotView snapshotView = OdenActivator.getDefault().getSnapshotView();
 		Object[] selection = (snapshotView == null) ? null : snapshotView.getSelected();
-		
+
 		if (selection == null || selection.length != 1) {
-			String agentName = SnapshotView.selectedName;
-			if(agentName!=null || "".equals(agentName)){ //$NON-NLS-1$
+			String serverNickname = SnapshotView.selectedName;
+			if(serverNickname!=null || "".equals(serverNickname)){ //$NON-NLS-1$
 				addAction(contextmenu, new NewSnapshotPlanAction());
 			}
 			return;
 		}
-		
+
 		TreeParent parent = ((TreeObject) selection[0]).getParent();
-		
+
 		if(parent.getName()==null || "".equals(parent.getName())){//plan //$NON-NLS-1$
 			addAction(contextmenu, new NewSnapshotPlanAction());
 			addAction(contextmenu, new DuplicateSnapshotPlanAction());
@@ -68,10 +68,10 @@ public class SnapshotViewActionGroup extends ActionGroup{
 			contextmenu.add(new Separator());
 			addAction(contextmenu, new RollbackSnapshotAction());
 		}
-		
-//		clearComposite();
+
+		//		clearComposite();
 	}
-	
+
 	private boolean addAction(IMenuManager menu, AbstractSnapshotViewAction action) {
 		if (action.isAvailable()) {
 			menu.add(action);

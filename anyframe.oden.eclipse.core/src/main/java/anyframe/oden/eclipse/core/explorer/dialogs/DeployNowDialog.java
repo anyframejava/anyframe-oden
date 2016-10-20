@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -46,44 +45,40 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.alias.Agent;
-import anyframe.oden.eclipse.core.alias.DeployNow;
 import anyframe.oden.eclipse.core.alias.Repository;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
-import anyframe.oden.eclipse.core.brokers.ShellException;
+import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.PolicyContentProvider;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.CommonUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 import anyframe.oden.eclipse.core.utils.JSONUtil;
 import anyframe.oden.eclipse.core.utils.OdenProgress;
 
 /**
- * Run Deploy in selected folder,files. This class extends TitleAreaDialog
+ * Run Deploy(Preview of deployed item) in selected folder,files. This class extends TitleAreaDialog
  * class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC2
  * 
  */
 public class DeployNowDialog extends TitleAreaDialog {
-
-	public enum Type {
-		CREATE, CHANGE, COPY
-	}
-
 	// Strings and messages from message properties
-	private String title = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Title;
-	private String subtitle = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_SubTitle;
+	private String title = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Title;
+	private String subtitle = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_SubTitle;
 
 	// Oden dialog image which appears on the upper right of the panel
 	private ImageDescriptor odenImageDescriptor = ImageUtil
-	.getImageDescriptor(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+	.getImageDescriptor(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 
-	public Agent agent;
+	public Server server;
 	public Object tree;
 
 	private ArrayList<String> relativepath;
@@ -94,41 +89,42 @@ public class DeployNowDialog extends TitleAreaDialog {
 	TableViewer tableViewer;
 	TableViewerColumn column1, column2, column3, column4;
 
-	private String col1 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Repo;
-	private String col2 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployPath;
-	private String col3 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployItem;
-	private String col4 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployAgent;
+	private String col1 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Repo;
+	private String col2 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployPath;
+	private String col3 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployItem;
+	private String col4 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployAgent;
 
-	private ArrayList<DeployNow> DeployItem;
+	private ArrayList<DeployNowInfo> DeployItem;
 	private Label itemCount;
-	private final String tempPolicyName =  OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName + Calendar.getInstance().getTimeInMillis();
-	private final String tempTaskName =  OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName + + Calendar.getInstance().getTimeInMillis();
+	private final String tempPolicyName =  CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName + Calendar.getInstance().getTimeInMillis();
+	private final String tempTaskName =  CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName + + Calendar.getInstance().getTimeInMillis();
 
-	private final String MSG_POLICY_ADD1 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Action
+	private final String MSG_POLICY_ADD1 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Action
 	+ " " + tempPolicyName;
-	private final String MSG_POLICY_OPT = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyOpt;
-	private final String MSG_POLICY_ADD2 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Include;
-	private final String MSG_POLICY_ADD3 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Exclude;
-	private final String MSG_POLICY_DELETE = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyDel + " " + tempPolicyName + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_ADD1 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd1 
+	private final String MSG_POLICY_OPT = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyOpt;
+	private final String MSG_POLICY_ADD2 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Include;
+	private final String MSG_POLICY_ADD3 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Exclude;
+	private final String MSG_POLICY_DELETE = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyDel + " " + tempPolicyName + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+	private final String MSG_TASK_ADD1 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd1 
 	+ tempTaskName + " -p ";
-	private final String MSG_TASK_ADD2 = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd2 + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_DELETE = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskDel + " " + tempTaskName + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_RUN = OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskRun + " " + tempTaskName  + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+	private final String MSG_TASK_ADD2 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd2 + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+	private final String MSG_TASK_DELETE = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskDel + " " + tempTaskName + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+	private final String MSG_TASK_RUN = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskRun + " " + tempTaskName  + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
 
 	private Repository repo;
 	private String protocol;
-	private String[] hiddenFolder = OdenMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder
+	private String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder
 	.split(",");
 	private String exclude = this.returnExclude();
 	private String taskName;
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
 
 	public DeployNowDialog(Shell parentShell, Object[] obj, String task,
 			String url) throws Exception {
 		super(parentShell);
 		this.tree = obj;
 		relativepath = new ArrayList<String>();
-		DeployItem = new ArrayList<DeployNow>();
+		DeployItem = new ArrayList<DeployNowInfo>();
 		if (obj != null) {
 			// Deploy now(Selected Tree)
 			Object[] objects = obj;
@@ -140,31 +136,31 @@ public class DeployNowDialog extends TitleAreaDialog {
 				repoUrl = OdenActivator.getDefault().getAliasManager()
 				.getRepositoryManager().getRepository(reponame)
 				.getUrl();
-				String agentname = OdenActivator.getDefault().getAliasManager()
+				String serverToUse = OdenActivator.getDefault().getAliasManager()
 				.getRepositoryManager().getRepository(reponame)
-				.getAgentToUse();
-				String agenturl = OdenActivator.getDefault().getAliasManager()
-				.getAgentManager().getAgent(agentname).getUrl();
-				shellurl = OdenMessages.ODEN_CommonMessages_ProtocolString_HTTP
-				+ agenturl + OdenMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
+				.getServerToUse();
+				String serverURL = OdenActivator.getDefault().getAliasManager()
+				.getServerManager().getServer(serverToUse).getUrl();
+				shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP
+				+ serverURL + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
 				repo = OdenActivator.getDefault().getAliasManager()
 				.getRepositoryManager().getRepository(reponame);
 				protocol = repo.getProtocol()
-				.equals(OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem) ? OdenMessages.ODEN_CommonMessages_ProtocolString_File
-						: OdenMessages.ODEN_CommonMessages_ProtocolString_FTP;
+				.equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem) ? CommonMessages.ODEN_CommonMessages_ProtocolString_File
+						: CommonMessages.ODEN_CommonMessages_ProtocolString_FTP;
 				if (repo.getProtocol()
-						.equals(OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FTP)) {
+						.equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FTP)) {
 					// ftp
 					String path = repo.getPath() + "/"
 					+ CommonUtil.replaceIgnoreCase(fullpath,
-							OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel
+							UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel
 							+ "/" + reponame + "/", "");
 					relativepath.add(path);
 				} else {
 					// file system
 					String path = protocol + repo.getPath() + "/"
 					+ CommonUtil.replaceIgnoreCase(fullpath,
-							OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel
+							UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel
 							+ "/" + reponame + "/", "");
 
 					relativepath.add(path);
@@ -177,7 +173,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 			} catch (OdenException odenException) {
 				OdenActivator
 				.error(
-						OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
+						UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
 						odenException);
 				odenException.printStackTrace();
 			}
@@ -217,7 +213,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 			public void widgetDisposed(DisposeEvent disposeEvent) {
 				ImageUtil
-				.disposeImage(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+				.disposeImage(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 			}
 		});
 		// TODO 도움말 만든 후 아래 내용을 확인할 것
@@ -243,7 +239,6 @@ public class DeployNowDialog extends TitleAreaDialog {
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.heightHint = 150;
 
-		// TODO : Grid Start
 		table = new Table(composite, SWT.SINGLE | SWT.FULL_SELECTION
 				| SWT.BORDER | SWT.V_SCROLL);
 		tableViewer = new TableViewer(table);
@@ -281,8 +276,8 @@ public class DeployNowDialog extends TitleAreaDialog {
 		.setText(tableViewer.getTable().getItemCount()
 				+ " items."
 				+ " "
-				+ OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_ItemStatement);
-		// TODO : Grid End
+				+ UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_ItemStatement);
+
 		((TableViewerSorter) tableViewer.getSorter()).doSort(1);
 		tableViewer.refresh();
 		return parentComposite;
@@ -292,18 +287,16 @@ public class DeployNowDialog extends TitleAreaDialog {
 		// Deploy Now
 		try {
 			deploynow();
-			close();
 		} catch (OdenException odenException) {
-			// TODO Auto-generated catch block
 			OdenActivator
 			.error(
-					OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeployItem,
+					UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeployItem,
 					odenException);
 			odenException.printStackTrace();
 		}
 	}
 	protected void cancelPressed() {
-		deleteTemp();
+		//		deleteTemp();
 		super.cancelPressed();
 	}
 	protected void setShellStyle(int newShellStyle) {
@@ -329,7 +322,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 		public String getText(Object element) {
 
-			return ((DeployNow) element).getDeployPath();
+			return ((DeployNowInfo) element).getDeployPath();
 		}
 	}
 
@@ -337,7 +330,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 		public String getText(Object element) {
 
-			return ((DeployNow) element).getDeployItem();
+			return ((DeployNowInfo) element).getDeployItem();
 		}
 	}
 
@@ -345,7 +338,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 		public String getText(Object element) {
 
-			return ((DeployNow) element).getDeployRepo();
+			return ((DeployNowInfo) element).getDeployRepo();
 		}
 	}
 
@@ -353,13 +346,12 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 		public String getText(Object element) {
 
-			return ((DeployNow) element).getDeployAgent();
+			return ((DeployNowInfo) element).getDeployAgent();
 		}
 	}
 
-	private ArrayList<DeployNow> searchDeployItem(String url) throws Exception {
-		ArrayList<DeployNow> returnList = new ArrayList<DeployNow>();
-		String result = "";
+	private ArrayList<DeployNowInfo> searchDeployItem(String url) throws Exception {
+		ArrayList<DeployNowInfo> returnList = new ArrayList<DeployNowInfo>();
 		String commnd = "";
 		String includes = "";
 
@@ -377,65 +369,51 @@ public class DeployNowDialog extends TitleAreaDialog {
 			try {
 				agents = getAgents();
 			} catch (OdenException odenException) {
-			
+
 			} catch (Exception odenException) {
-				// TODO Auto-generated catch block
 				OdenActivator
 				.error(
-						OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_GetAgent,
+						UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_GetAgent,
 						odenException);
-//				odenException.printStackTrace();
 			}
 			if(!(agents.equals(""))) {
 				// 1. add temp policy
 				for(String include : relativepath){
 					include = CommonUtil.replaceIgnoreCase(include, repo_root, "");
 					if (include.indexOf("[20") > 0)
-						include = include.substring(1, include.indexOf("[20")) + " ";
+						include = '"' + include.substring(1, include.indexOf("[20")) + '"'  + " ";
 					else
-						include = include.substring(1) + "/* " + include.substring(1)
-						+ "/** ";
+						include = '"' + include.substring(1) + "/*" + '"' + " " + '"' + include.substring(1)
+						+ "/**" + '"' + " ";
 					includes = includes + include + " ";
 				}
 				includes = includes.substring(0, includes.lastIndexOf(" "));
 				if (protocol
-						.equals(OdenMessages.ODEN_CommonMessages_ProtocolString_File)) {
+						.equals(CommonMessages.ODEN_CommonMessages_ProtocolString_File)) {
 					msgaddpoicy = MSG_POLICY_ADD1 + MSG_POLICY_OPT + repo_root
 					+ MSG_POLICY_ADD2 + includes + "-e" + " "
 					+ exclude + MSG_POLICY_ADD3 + " " + agents
 					+ "-desc deploynow" ;
 				} else {
-					if (repo.isHasNoUserName()) {
-						msgaddpoicy = MSG_POLICY_ADD1
-						+ MSG_POLICY_OPT
-						+ OdenMessages.ODEN_CommonMessages_ProtocolString_FTP
-						+ repo.getUrl() + " " + repo_root + " "
-						+ MSG_POLICY_ADD2 + includes + " " + "-e" + " "
-						+ exclude + MSG_POLICY_ADD3 + " " + agents
-						+ "-desc deploynow";
-					} else {
-						msgaddpoicy = MSG_POLICY_ADD1
-						+ MSG_POLICY_OPT
-						+ OdenMessages.ODEN_CommonMessages_ProtocolString_FTP
-						+ repo.getUrl() + " " + repo_root + " "
-						+ repo.getUser() + " " + repo.getPassword()
-						+ MSG_POLICY_ADD2 + includes + "-e" + " "
-						+ exclude + MSG_POLICY_ADD3 + " " + agents
-						+ "-desc deploynow";
-					}
+					msgaddpoicy = MSG_POLICY_ADD1
+					+ MSG_POLICY_OPT
+					+ CommonMessages.ODEN_CommonMessages_ProtocolString_FTP
+					+ repo.getUrl() + " " + repo_root + " "
+					+ repo.getUser() + " " + repo.getPassword()
+					+ MSG_POLICY_ADD2 + includes + "-e" + " "
+					+ exclude + MSG_POLICY_ADD3 + " " + agents
+					+ "-desc deploynow";
 				}
-				msgaddpoicy = msgaddpoicy + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+				msgaddpoicy = msgaddpoicy + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
 				try {
 					runCommand(msgaddpoicy);
 				} catch (OdenException odenException) {
-					
+
 				} catch (Exception odenException) {
-					// TODO Auto-generated catch block
 					OdenActivator
 					.error(
-							OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SavePolicy,
+							UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SavePolicy,
 							odenException);
-//					odenException.printStackTrace();
 				}
 
 				// 2. add temp task
@@ -447,12 +425,10 @@ public class DeployNowDialog extends TitleAreaDialog {
 					runCommand(msgaddtask);
 				} catch (OdenException odenException) {
 				} catch (Exception odenException) {
-					// TODO Auto-generated catch block
 					OdenActivator
 					.error(
-							OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SaveTask,
+							UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SaveTask,
 							odenException);
-//					odenException.printStackTrace();
 				}
 
 				commnd = "task test " + tempTaskName + " -json";
@@ -469,10 +445,9 @@ public class DeployNowDialog extends TitleAreaDialog {
 		return returnList;
 	}
 
-	private ArrayList<DeployNow> searchDeployItem(String url, String taskname)
+	private ArrayList<DeployNowInfo> searchDeployItem(String url, String taskname)
 	throws Exception {
-		ArrayList<DeployNow> returnList = new ArrayList<DeployNow>();
-		String result = "";
+		ArrayList<DeployNowInfo> returnList = new ArrayList<DeployNowInfo>();
 		String commnd = "";
 		try {
 			// seacrh method
@@ -483,13 +458,12 @@ public class DeployNowDialog extends TitleAreaDialog {
 			OdenActivator.error(
 					"Exception occured while searching deploy items.",
 					odenException);
-			odenException.printStackTrace();
 		}
 		return returnList;
 	}
 
-	private ArrayList<DeployNow> returnList(String commnd) {
-		ArrayList<DeployNow> returnList = new ArrayList<DeployNow>();
+	private ArrayList<DeployNowInfo> returnList(String commnd) {
+		ArrayList<DeployNowInfo> returnList = new ArrayList<DeployNowInfo>();
 
 		try {
 			String result = OdenBroker.sendRequest(shellurl, commnd);
@@ -500,8 +474,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 				String agents_ = "";
 				String repos = "";
 				for (int i = 0; i < array.length(); i++) {
-					for (Iterator<String> it = ((JSONObject) array.get(i)).keys(); it
-					.hasNext();) {
+					for (Iterator<String> it = ((JSONObject) array.get(i)).keys(); it.hasNext();) {
 						String key = it.next();
 						JSONArray jsonArr = new JSONArray(key);
 
@@ -543,43 +516,31 @@ public class DeployNowDialog extends TitleAreaDialog {
 								path = "";
 								item = file;
 							}	
-							DeployNow DeployItem = new DeployNow(repos, path, item,
+							DeployNowInfo DeployItem = new DeployNowInfo(repos, path, item,
 									agents_);
 							returnList.add(DeployItem);
 						}
 
 					}
 				}
-//			} else {
-//				// no connection
-//				OdenActivator.warning(OdenMessages.ODEN_CommonMessages_UnableToConnectServer);
 			}
-//		} catch (ShellException e) {
-//			OdenActivator.error(
-//					"Exception occured while searching deploy items.",
-//					e);
-//			e.printStackTrace();
 		} catch (OdenException odenException) {
 		} catch (Exception odenException) {
 
 			OdenActivator.error(
 					"Exception occured while searching deploy items.",
 					odenException);
-//			odenException.printStackTrace();
 		}
 
 		return returnList;
 	}
 
 	private void deploynow() throws OdenException {
-		// progress Bar call
 		try {
 			statusProgress(MSG_TASK_RUN);
+			super.close();
 		} catch (OdenException odenException) {
-			// TODO Auto-generated catch block
-//			OdenActivator.error("Exception occured while deploying items.",
-//					odenException);
-//			odenException.printStackTrace();
+
 		} catch ( Exception odenException) {
 			OdenActivator.error("Exception occured while deploying items.",odenException);
 		}
@@ -593,20 +554,18 @@ public class DeployNowDialog extends TitleAreaDialog {
 				String commnd;
 				// 1. task run
 				if (taskName != null) {
-					commnd = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskRun
-					+ " " + '"' + taskName + '"' + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+					commnd = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskRun
+					+ " " + '"' + taskName + '"' + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
 				} else {
 					commnd = msg;
 				}
 				try {
 					runCommand(commnd);
 				} catch (Exception odenException) {
-					// TODO Auto-generated catch block
 					OdenActivator
 					.error(
-							OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_RunTask,
+							UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_RunTask,
 							odenException);
-//					odenException.printStackTrace();
 				} finally{
 					deleteTemp();
 				}
@@ -620,20 +579,15 @@ public class DeployNowDialog extends TitleAreaDialog {
 		jobProgress.addJobChangeListener(new JobChangeAdapter() {
 			@Override
 			public void done(IJobChangeEvent event) {
-
-				String resultTemp = event.getResult().toString();
-				StringTokenizer tokenizer = new StringTokenizer(resultTemp, ":");
-				String strReturnStatus = tokenizer.nextToken();
+				
 			}
 		});
 
 	}
 
 	private String getAgents() throws Exception {
-		// progress Bar call
 		String dest = "";
-		// seacrh method
-		String commnd = OdenMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
+		String commnd = CommandMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
 
 		String result = OdenBroker.sendRequest(shellurl, commnd);
 		if( result != null) {	
@@ -647,8 +601,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 				OdenActivator.warning("You shoud add" +  '"' + "config.xml" + '"');
 			}
 		} else {
-			// no connection
-			OdenActivator.warning(OdenMessages.ODEN_CommonMessages_UnableToConnectServer);
+			OdenActivator.warning(CommonMessages.ODEN_CommonMessages_UnableToConnectServer);
 		}
 		return dest;
 	}
@@ -664,14 +617,12 @@ public class DeployNowDialog extends TitleAreaDialog {
 			try {
 				runCommand(msgdelpolicy);
 			} catch (OdenException odenExeption) {
-			
+
 			} catch (Exception odenException) {
-				// TODO Auto-generated catch block
 				OdenActivator
 				.error(
-						OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeletePolicy,
+						UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeletePolicy,
 						odenException);
-//				odenException.printStackTrace();
 			}
 
 			// 3. delete task
@@ -680,12 +631,10 @@ public class DeployNowDialog extends TitleAreaDialog {
 				runCommand(msgdeltask);
 			} catch (OdenException odenExeption) {
 			} catch (Exception odenException) {
-				// TODO Auto-generated catch block
 				OdenActivator
 				.error(
-						OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeleteTask,
+						UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_DeleteTask,
 						odenException);
-//				odenException.printStackTrace();
 			}
 		}
 
@@ -694,9 +643,17 @@ public class DeployNowDialog extends TitleAreaDialog {
 	private String returnExclude() {
 		String exclude = "";
 		for (String folder : hiddenFolder) {
-			exclude = exclude + folder + "/** ";
+			exclude = exclude + "**/" + folder + "/** ";
 		}
 		return exclude;
 	}
+	/**
+	 * Closes the dialog box Override so we can delete temporary policy and task
+	 */
+	public boolean close() {
+		deleteTemp();
+		return super.close();
+	}
+
 
 }

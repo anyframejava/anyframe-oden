@@ -22,18 +22,22 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.TaskDetails;
 import anyframe.oden.eclipse.core.editors.TaskPage;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -43,47 +47,46 @@ public class DeleteTaskAction extends AbstractEditorsAction {
 	/**
 	 * 
 	 */
-	private static final String MSG_TASK_DELE = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskDel;
-
+	private static final String MSG_TASK_DELE = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskDel;
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	
 	public DeleteTaskAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
-		TaskPage page = new TaskPage();
+	public void run(String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
+		
 		TaskDetails details = null;
-		ISelection selection = page.taskViewer.getSelection();
+		ISelection selection = page.getTaskViewer().getSelection();
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 		details = (TaskDetails) obj;
-		removeTask(details.getTaskName());
+		removeTask(details.getTaskName(), title);
 	}
 
-	private void removeTask(String Task) {
-		TaskPage page = new TaskPage();
+	private void removeTask(String Task , String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
 		String commnd = ""; 
-		String result = ""; 
-
-		commnd = MSG_TASK_DELE + " " + '"' + Task + '"' + " " + OdenMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt; 
+		
+		commnd = MSG_TASK_DELE + " " + '"' + Task + '"' + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt; 
 
 		try {
 			// Delete Task
-			if(page.chkNewTask() && page.newTask) {
+			if(page.chkNewTask() && page.isNewTask()) {
 				// new Task
 				page.removeTempcell();
 
 			} else {
-				result = OdenBroker.sendRequest(page.shellUrl, commnd);
-				DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
+				OdenBroker.sendRequest(page.getShellUrl(), commnd);
+				DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
 							"Success Delete Task.", 
 							MessageDialog.INFORMATION);
-				
-
 			}
 			// Show Task
 			page.loadInitData();
@@ -95,25 +98,16 @@ public class DeleteTaskAction extends AbstractEditorsAction {
 			// policy Data
 			page.loadInitPolicyData();
 
-			page.taskNameText.setEnabled(true);
+			page.getTaskNameText().setEnabled(true);
 			if(page.chkNewTaskExist()){
-				page.addTask.setEnabled(false);
+				page.getAddTask().setEnabled(false);
 			} else {
-				page.addTask.setEnabled(true);
+				page.getAddTask().setEnabled(true);
 			}
 
 		} catch (OdenException odenException) {
-//			DialogUtil
-//			.openMessageDialog(
-//					OdenMessages.ODEN_CommonMessages_Title_Warning,
-//					OdenMessages.ODEN_CommonMessages_UnableToConnectServer,  
-//					MessageDialog.WARNING);
-//			OdenActivator.error("Exception occured while http interface.",
-//					odenException);
-//			odenException.printStackTrace();
 		} catch (Exception odenException) {
 			OdenActivator.error("Exception occured while removing task.",odenException);
-//			odenException.printStackTrace();
 		}
 	}
 

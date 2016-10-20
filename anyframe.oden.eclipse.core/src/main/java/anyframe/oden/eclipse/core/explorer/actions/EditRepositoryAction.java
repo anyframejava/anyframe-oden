@@ -18,13 +18,13 @@ package anyframe.oden.eclipse.core.explorer.actions;
 
 import org.eclipse.swt.widgets.Display;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.CreateBuildRepositoryDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Edit an existing agent action in the Oden view. This class extends
+ * Edit an existing server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
  * @author RHIE Jihwan
@@ -39,9 +39,9 @@ public class EditRepositoryAction extends AbstractExplorerViewAction {
 	 */
 	public EditRepositoryAction() {
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepository,
-				OdenMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepositoryToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepositoryIcon);
+				UIMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepository,
+				UIMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepositoryToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_EditRepositoryAction_UpdateRepositoryIcon);
 	}
 
 	/**

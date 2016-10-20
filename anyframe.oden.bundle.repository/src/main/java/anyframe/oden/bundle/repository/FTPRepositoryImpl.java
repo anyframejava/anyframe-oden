@@ -1,35 +1,29 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.repository;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
 
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
@@ -58,76 +52,83 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 	 * @return
 	 * @throws OdenException
 	 */
+//	private FTPClient initFTP(String addr, String id, String pwd) throws OdenException{
+//		URL _url = null;
+//		try {
+//			_url = new URL(addr);
+//		} catch (MalformedURLException e) {
+//			throw new OdenException("Illegal URL syntax: " + addr);
+//		}
+//		int port = _url.getPort();
+//		
+//		FTPClient ftp = new FTPClient();
+//		try {
+//			ftp.setDefaultTimeout(10000);
+//			ftp.connect(_url.getHost(), port == -1 ? 21 : port);
+//			if(!FTPReply.isPositiveCompletion( ftp.getReplyCode()))
+//				throw new IOException();
+//		} catch (IOException e) {
+//			throw new OdenException("FTP connection failed: "
+//					+  ftp.getReplyString());
+//		}
+//		
+//		try {
+//			if(!ftp.login(id, pwd))
+//				throw new IOException();
+//		} catch (IOException e) {
+//			throw new OdenException("Could not login to FTP server. id: " +
+//					id + ", pwd: " + pwd);
+//		}
+//		
+//		try {
+//			ftp.setFileType(FTP.BINARY_FILE_TYPE);
+//			if (!FTPReply.isPositiveCompletion( ftp.getReplyCode()))
+//				throw new IOException();
+//		} catch (IOException e) {
+//			throw new OdenException("Could not set transfer type: "
+//	                +  ftp.getReplyString());
+//		}
+//        return ftp;
+//	        
+//	}
+	
 	private FTPClient initFTP(String addr, String id, String pwd) throws OdenException{
-		URL _url = null;
-		try {
-			_url = new URL(addr);
-		} catch (MalformedURLException e) {
-			throw new OdenException("Illegal URL syntax: " + addr);
-		}
-		int port = _url.getPort();
-		
-		FTPClient ftp = new FTPClient();
-		try {
-			ftp.setDefaultTimeout(10000);
-			ftp.connect(_url.getHost(), port == -1 ? 21 : port);
-			if(!FTPReply.isPositiveCompletion( ftp.getReplyCode()))
-				throw new IOException();
-		} catch (IOException e) {
-			throw new OdenException("FTP connection failed: "
-					+  ftp.getReplyString());
-		}
-		
-		try {
-			if(!ftp.login(id, pwd))
-				throw new IOException();
-		} catch (IOException e) {
-			throw new OdenException("Could not login to FTP server. id: " +
-					id + ", pwd: " + pwd);
-		}
-		
-		try {
-			ftp.setFileType(FTP.BINARY_FILE_TYPE);
-			if (!FTPReply.isPositiveCompletion( ftp.getReplyCode()))
-				throw new IOException();
-		} catch (IOException e) {
-			throw new OdenException("Could not set transfer type: "
-	                +  ftp.getReplyString());
-		}
-        return ftp;
-	        
+		return FTPConnectionPool.instance().connection(addr, id, pwd);
 	}
 	
 	private FTPClient initFTP(String[] repoargs) throws OdenException{
 		if(repoargs.length < 2)
 			throw new OdenIncompleteArgumentException(repoargs);
-		String uri = repoargs[0];
+		String addr = repoargs[0];
+		String repoRoot = repoargs[1];
 		String id = repoargs.length > 2 ? repoargs[2] : null;
 		String pwd = repoargs.length > 3 ? repoargs[3] : null;
-		
-		FTPClient ftp = initFTP(uri, id, pwd);
-		
-		String repoRoot = repoargs[1];
+
+		FTPClient ftp = initFTP(addr, id, pwd);
 		try {
-			if(repoRoot != null)
-				ftp.changeWorkingDirectory(repoRoot);
+			cd(ftp, repoRoot);
 		} catch (IOException e) {
 			throw new OdenException(e);
 		}
 		return ftp;
 	}
-	
-//	private FTPClient initFTP(String[] repoargs) throws OdenException{
-//		return FTPConnectionPool.instance().connection(repoargs);
-//	}
 
-	private void releaseFTP(FTPClient ftp) {
-		if(ftp != null && ftp.isConnected()){
-			try{
-				ftp.logout();
-				ftp.disconnect();
-			}catch(IOException e){}
-		}
+//	private void releaseFTP(FTPClient ftp) {
+//		if(ftp != null && ftp.isConnected()){
+//			try{
+//				ftp.logout();
+//				ftp.disconnect();
+//			}catch(IOException e){}
+//		}
+//	}
+	
+	private void releaseFTP(String[] args) {
+		long thread = Thread.currentThread().getId();
+		String addr = args[0];
+		String id = args.length > 2 ? args[2] : null;
+		String pwd = args.length > 3 ? args[3] : null;
+		
+		FTPConnectionPool.instance().remove(FTPConnectionPool.key(thread, addr, id, pwd));
 	}
 
 	/**
@@ -147,7 +148,8 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 			in = new FatInputStream(new FTPInputStream(
 					ftp.retrieveFileStream(abspath), ftp), file, 
 					ffile.isDirectory(),
-					ffile.getTimestamp().getTimeInMillis());
+					ffile.getTimestamp().getTimeInMillis(),
+					ffile.getSize());
 			return in;
 		} catch (Exception e) {
 			throw new OdenException(e);
@@ -166,15 +168,19 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 		String parent = FileUtil.parentPath(fpath);
 		String name = FileUtil.fileName(fpath);
 		
-		if(parent != null) 
-			ftp.changeWorkingDirectory(parent);
-		parent = ftp.printWorkingDirectory();
+		cd(ftp, parent);
 		
 		for(FTPFile ffile : ftp.listFiles()){
 			if(ffile.getName().equals(name))
 				return ffile;
 		}
-		throw new IOException("Couldn't find that file: " + fpath);
+		throw new IOException("Couldn't find that file: " + fpath + 
+				" from the FTP location: " + ftp.printWorkingDirectory());
+	}
+	
+	private void cd(FTPClient ftp, String dir) throws IOException {
+		if(!ftp.changeWorkingDirectory(dir))
+			throw new IOException("Fail to access the dir: " + dir);		
 	}
 	
 	/**
@@ -199,7 +205,7 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 		} catch (IOException e) {
 			throw new OdenException("Fail to run ftp command", e);
 		} finally {
-			releaseFTP(ftp);
+			releaseFTP(args);
 		}		
 		return matched;
 		
@@ -219,12 +225,10 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 			final List<String> includes, final List<String> excludes) 
 					throws IOException{
 		List<String> matched = new ArrayList<String>();
-		
-//		String currentdir = ftp.printWorkingDirectory(); 
-		ftp.changeWorkingDirectory(parent);
+		 
+		cd(ftp, parent);
 		parent = ftp.printWorkingDirectory();
 		FTPFile[] files = ftp.listFiles();		
-//		ftp.changeWorkingDirectory(currentdir);
 		if(files != null){
 			for(FTPFile file : files) { 
 				if(file == null || !file.hasPermission(FTPFile.USER_ACCESS, 
@@ -272,13 +276,17 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 		} catch (IOException e) {
 			throw new OdenException("Fail to run ftp command", e);
 		} finally {
-			releaseFTP(ftp);
+			releaseFTP(args);
 		}
 		return files;
 	}
 	
 	public String getUsage() {
 		return getProtocol() + "<host> <path> [<id> <password>]";
+	}
+	
+	public void close(String[] args) {
+		releaseFTP(args);
 	}
 	
 	protected class FTPRepositoryModel {
@@ -302,8 +310,10 @@ public class FTPRepositoryImpl extends AbstractRepositoryimpl {
 		public void close() throws IOException {
 			try{
 				super.close();
+				if(!ftp.completePendingCommand())
+					throw new IOException("Fail to read data from FTP.");
 			} finally {
-				releaseFTP(ftp);
+//				releaseFTP(ftp);
 			}	// end of try catch
 			
 		}

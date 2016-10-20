@@ -16,27 +16,20 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.TableItem;
 
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
-import anyframe.oden.eclipse.core.brokers.ShellException;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.PolicyDetails;
 import anyframe.oden.eclipse.core.editors.PolicyPage;
-import anyframe.oden.eclipse.core.editors.TaskDetails;
-import anyframe.oden.eclipse.core.editors.TaskPage;
-import anyframe.oden.eclipse.core.utils.DialogUtil;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -46,24 +39,23 @@ public class DeleteDeployAction extends AbstractEditorsAction {
 	/**
 	 * 
 	 */
-	
+
 	public DeleteDeployAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
-		PolicyPage page = new PolicyPage();
+	public void run(String title) {
+		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
 		PolicyDetails details = null;
 		ISelection selection = page.getDeployViewer().getSelection();
 
-		details = (PolicyDetails) ((IStructuredSelection) selection)
-				.getFirstElement();
+		details = (PolicyDetails) ((IStructuredSelection) selection).getFirstElement();
 		if (details != null) {
 			page.getDeployViewer().remove(details);
 		}

@@ -18,7 +18,6 @@ package anyframe.oden.eclipse.core.editors;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -54,73 +53,98 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.alias.Agent;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.actions.DeleteTaskAction;
 import anyframe.oden.eclipse.core.editors.actions.NewTaskAction;
 import anyframe.oden.eclipse.core.editors.actions.RunDeployTaskAction;
 import anyframe.oden.eclipse.core.editors.actions.SaveTaskAction;
 import anyframe.oden.eclipse.core.editors.actions.TaskRefreshAction;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.Cmd;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
+/**
+ * Implement Oden TaskPage. This class implement
+ * Page class.
+ * 
+ * @author HONG JungHwan
+ * @version 1.0.0 RC2
+ * 
+ */
 public class TaskPage implements Page {
 	//TaskPage
 	private static TaskPage instance;
-	private static final String HTTP_PROT = OdenMessages.ODEN_CommonMessages_ProtocolString_HTTP;
+	private final String HTTP_PROT = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP;
 
-	private static Label task;
-	private Label run;
-	private static Label descrip;
+	private Label task;
+	//	private Label run;
+	private Label descrip;
 
 	// text box
-	public static Text taskNameText;
-	public static Text descText;
+	private Text taskNameText;
+	public Text getTaskNameText() {
+		return taskNameText;
+	}
+
+	public void setTaskNameText(Text taskNameText) {
+		this.taskNameText = taskNameText;
+	}
+
+	private Text descText;
 	private Text filterText;
 
 	// Table list
 	private Table taskTable;
-	public static TableViewer taskViewer;
+	private TableViewer taskViewer;
 
 	private Table RunTable;
-	public static TableViewer runViewer;
+	private TableViewer runViewer;
 
-	// Local Variables
 	private FormToolkit toolkit;
 
 	// Button
-	public static Button addTask;
-	public static Button removeTask;
-	public static Button saveTask;
-	public static Button runTask;
-	public static Button runTask_;
+	private Button addTask;
+	private Button removeTask;
+	private Button saveTask;
+	private Button runTask;
+	private Button runTask_;
 
-	public static String shellUrl;
+	private String shellUrl;
 
-	public static int lastNum;
-	public static ArrayList<String> originTask;
-	public static boolean newTask;
+	private int lastNum;
+	private ArrayList<String> originTask;
+	private boolean newTask;
 	private ImageDescriptor _titleImageDescriptor = ImageUtil
 	.getImageDescriptor("icons/form_banner.gif");
 	private Image _TitleImage = ImageUtil.getImage(_titleImageDescriptor);
 
 	TableViewerColumn taskName, desc, check, policy, description;
 
-	private static final String MSG_TASK_SHOW = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskShow;
-	private static final String MSG_DETAIL_SHOW = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskInfo;
-	private static final String MSG_POLICY_SHOW = OdenMessages.ODEN_EDITORS_TaskPage_MsgPolicyInfo;
+	private final String MSG_TASK_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskShow;
+	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskInfo;
+	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgPolicyInfo;
 
-	private static final int leftWidth = 120;
-	private static final int rightWidth = 150;
-	private boolean taskNew;
+	private final int leftWidth = 120;
+	private final int rightWidth = 150;
+	//	private boolean taskNew;
 	private Composite client;
+	public Composite getClient() {
+		return client;
+	}
+
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	//	private TaskPage taskInstance;
+	private String serverNickname;
+
 	ViewerFilter filter = new ViewerFilter() {
 		public boolean select(Viewer viewer1, Object parentElement,
 				Object element) {
@@ -137,18 +161,17 @@ public class TaskPage implements Page {
 	};
 
 	public static TaskPage getInstance() {
-		if (instance == null) {
-			instance = new TaskPage();
-		}
-
+		instance = new TaskPage();
 		return instance;
 	}
 
 	public Composite getPage(final Composite parent) {
-		// get Agent object
+		// get Server object
 
-		Agent agent = OdenEditor.agent;
-		shellUrl = HTTP_PROT + agent.getUrl() + "/shell"; 
+		Server server = OdenEditor.server;
+		serverNickname = server.getNickname();
+
+		setShellUrl(HTTP_PROT + server.getUrl() + "/shell"); 
 
 		toolkit = new FormToolkit(parent.getDisplay());
 
@@ -172,12 +195,11 @@ public class TaskPage implements Page {
 
 		loadInitData();
 
-//		loadInitPolicyData();
 		// Event
 		filterEvent();
 		tableEvent();
 		temporaryEvent();
-		newTask = false;
+		setNewTask(false);
 
 		return form;
 	}
@@ -185,24 +207,19 @@ public class TaskPage implements Page {
 	private void createHeadSection(final ScrolledForm form, FormToolkit toolkit) {
 		Image titleImage =
 			new Image(form.getDisplay(), getClass().getResourceAsStream(
-					OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage));
-		form.setText(OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitle);
+					UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage));
+		form.setText(UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitle);
 		form.setBackgroundImage(_TitleImage);
 		form.setImage(titleImage);
-		form.setMessage( OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageDesc , SWT.NONE);
+		form.setMessage( UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageDesc , SWT.NONE);
 
 		fillLocalToolBar(form.getForm().getToolBarManager() , form);
 		form.getForm().getToolBarManager().update(true);
-		//		fillLocalPullDown(form.getForm().getMenuManager());
 		toolkit.decorateFormHeading(form.getForm());
 	}
 
-	private void fillLocalPullDown(IMenuManager menuManager) {
-		menuManager.add(new TaskRefreshAction());
-	}
-
 	private void fillLocalToolBar(IToolBarManager toolBarManager , ScrolledForm form) {
-		toolBarManager.add(new TaskRefreshAction());
+		toolBarManager.add(new TaskRefreshAction(serverNickname));
 	}
 
 	private void createLeftSection(final ScrolledForm form, FormToolkit toolkit , Composite parent) {
@@ -213,7 +230,7 @@ public class TaskPage implements Page {
 
 		client_left.setLayoutData(gd);
 		createAllTaskSection(form, toolkit,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection1 , client_left);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection1 , client_left);
 	}
 
 	private void createRightSection(final ScrolledForm form, FormToolkit toolkit , Composite parent) {
@@ -227,10 +244,10 @@ public class TaskPage implements Page {
 		client.setLayoutData(gd);
 
 		createTaskDetailSection(form, toolkit,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection2,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection2,
 				client);
 		createRunTaskSection(form, toolkit,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageRunSubTitle,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageRunSubTitle,
 				client);
 	}
 
@@ -270,52 +287,53 @@ public class TaskPage implements Page {
 
 		filterText.setLayoutData(gd);
 		filterText.setText("type filter text");
-		
-		createSpacer(toolkit, client , 2, 1);
-		
-		GridData gridData = new GridData(GridData.FILL_BOTH);
 
+		createSpacer(toolkit, client , 2, 1);
+
+
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.verticalSpan = 5;
 		gridData.widthHint = 200;
+		gridData.heightHint = 200;
 		// Task Table
 		taskTable = new Table(client, SWT.SINGLE | SWT.FULL_SELECTION
 				| SWT.BORDER | SWT.V_SCROLL);
-		taskViewer = new TableViewer(taskTable);
-		taskViewer.setContentProvider(new PolicyContentProvider());
+		setTaskViewer(new TableViewer(taskTable));
+		getTaskViewer().setContentProvider(new PolicyContentProvider());
 
 		taskTable.setHeaderVisible(true);
 		taskTable.setLinesVisible(true);
 
-		taskName = new TableViewerColumn(taskViewer, SWT.None);
+		taskName = new TableViewerColumn(getTaskViewer(), SWT.None);
 		taskName.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskTableCol1);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskTableCol1);
 		taskName.getColumn().setWidth(150);
 		taskName.setLabelProvider(new TaskNameColumnLabelProvider());
 
-		desc = new TableViewerColumn(taskViewer, SWT.None);
+		desc = new TableViewerColumn(getTaskViewer(), SWT.None);
 		desc.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskTableCol2);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskTableCol2);
 		desc.getColumn().setWidth(250);
 		desc.setLabelProvider(new TaskDescColumnLabelProvider());
 		taskTable.setLayoutData(gridData);
-		
+
 		// task add Button
-		addTask = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
-				SWT.PUSH);
-		addTask.addListener(SWT.Selection, listener);
+		setAddTask(toolkit.createButton(client,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
+				SWT.PUSH));
+		getAddTask().addListener(SWT.Selection, listener);
 		gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd.widthHint = 120;
-		addTask.setLayoutData(gd);
+		getAddTask().setLayoutData(gd);
 
 		// task remove Button
-		removeTask = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
-				SWT.PUSH);
-		removeTask.addListener(SWT.Selection, listener);
+		setRemoveTask(toolkit.createButton(client,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRemoveBtn,
+				SWT.PUSH));
+		getRemoveTask().addListener(SWT.Selection, listener);
 		gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd.widthHint = 120;
-		removeTask.setLayoutData(gd);
+		getRemoveTask().setLayoutData(gd);
 
 		new Label(client, SWT.NONE);
 		new Label(client, SWT.NONE);
@@ -323,9 +341,9 @@ public class TaskPage implements Page {
 		// task run Button
 		Image imageRun =
 			new Image(client.getDisplay(), getClass().getResourceAsStream(
-					OdenMessages.ODEN_EDITORS_TaskPage_RunDeployImage));
+					UIMessages.ODEN_EDITORS_TaskPage_RunDeployImage));
 		runTask = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
 				SWT.PUSH);
 		runTask.setImage(imageRun);
 		runTask.addListener(SWT.Selection, listener);
@@ -335,7 +353,7 @@ public class TaskPage implements Page {
 
 		section.setText(title);
 		section
-		.setDescription(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection1Desc);
+		.setDescription(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection1Desc);
 		section.setClient(client);
 		section.setExpanded(true);
 
@@ -365,11 +383,10 @@ public class TaskPage implements Page {
 
 		client.setLayoutData(gd);
 
-		// TODO Layout
 		// Task
 		createSpacer(toolkit, client , 6, 1);
 		task = new Label(client, SWT.LEFT);
-		task.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Man);
+		task.setText(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Man);
 		task.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
 		gd.horizontalSpan = 5;
@@ -382,17 +399,17 @@ public class TaskPage implements Page {
 
 		// Description
 		descrip = new Label(client, SWT.LEFT);
-		descrip.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskDescLabel_Opt);
+		descrip.setText(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskDescLabel_Opt);
 		descrip.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
-		descText = new Text(client, SWT.LEFT | SWT.BORDER);
-		descText.setLayoutData(gd);
+		setDescText(new Text(client, SWT.LEFT | SWT.BORDER));
+		getDescText().setLayoutData(gd);
 
 		// END Layout
 		// Section title & Description
 		section.setText(title);
 		section
-		.setDescription(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection2Desc);
+		.setDescription(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubSection2Desc);
 		section.setClient(client);
 
 		gd = new GridData(GridData.FILL_HORIZONTAL
@@ -426,25 +443,25 @@ public class TaskPage implements Page {
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 5;
 		gd.verticalSpan = 2;
-		gd.heightHint = 200;
+		gd.heightHint = 110;
 
 		RunTable = new Table(client, SWT.SINGLE | SWT.FULL_SELECTION
 				| SWT.BORDER | SWT.V_SCROLL | SWT.CHECK);
-		runViewer = new TableViewer(RunTable);
-		runViewer.setContentProvider(new PolicyContentProvider());
+		setRunViewer(new TableViewer(RunTable));
+		getRunViewer().setContentProvider(new PolicyContentProvider());
 
 		RunTable.setHeaderVisible(true);
 		RunTable.setLinesVisible(true);
 
-		policy = new TableViewerColumn(runViewer, SWT.None);
+		policy = new TableViewerColumn(getRunViewer(), SWT.None);
 		policy.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPagePolicyCol1);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPagePolicyCol1);
 		policy.getColumn().setWidth(200);
 		policy.setLabelProvider(new PolicyNameColumnLabelProvider());
 
-		description = new TableViewerColumn(runViewer, SWT.None);
+		description = new TableViewerColumn(getRunViewer(), SWT.None);
 		description.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPagePolicyCol2);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPagePolicyCol2);
 		description.getColumn().setWidth(150);
 		description.setLabelProvider(new PolicyDescColumnLabelProvider());
 		RunTable.setLayoutData(gd);
@@ -455,7 +472,7 @@ public class TaskPage implements Page {
 		gd = new GridData();
 		gd.widthHint = 120;
 		saveTask = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
 				SWT.PUSH);
 		saveTask.addListener(SWT.Selection, listener);
 		saveTask.setLayoutData(gd);
@@ -464,9 +481,9 @@ public class TaskPage implements Page {
 
 		Image imageRun =
 			new Image(parent.getDisplay(), getClass().getResourceAsStream(
-					OdenMessages.ODEN_EDITORS_TaskPage_RunDeployImage));
+					UIMessages.ODEN_EDITORS_TaskPage_RunDeployImage));
 		runTask_ = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskRunBtn,
 				SWT.PUSH);
 		runTask_.setImage(imageRun);
 		runTask_.addListener(SWT.Selection, listener);
@@ -475,7 +492,7 @@ public class TaskPage implements Page {
 		// END Layout
 		// Section title & Description
 		section.setText(title);
-		section.setDescription(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubTitle);
+		section.setDescription(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageSubTitle);
 		section.setClient(client);
 		section.setExpanded(true);
 
@@ -488,20 +505,21 @@ public class TaskPage implements Page {
 	}
 
 	private void chageLabel() {
-		// change Label
-		task
-		.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Opt);
-//		descrip
-//		.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskDescLabel_Opt);
+		task.setText(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Opt);
 	}
-
-	public static void chageMandaLabel() {
-		// change Label
-		task.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Man); 
-		descrip.setText(OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskDescLabel_Opt); 
+	
+	/**
+	 * change Mandatory label
+	 */
+	public void chageMandaLabel() {
+		task.setText(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskNameLabel_Man); 
+		descrip.setText(UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskDescLabel_Opt); 
 	}
-
-	public static void loadInitData()  {
+	
+	/**
+	 * task data loading
+	 */
+	public void loadInitData()  {
 		String commnd = ""; 
 		String result = ""; 
 		TaskDetails details = null;
@@ -511,7 +529,7 @@ public class TaskPage implements Page {
 		int index = 0;
 		int selectIndex = 0;
 		try {	
-			result = OdenBroker.sendRequest(shellUrl, commnd);
+			result = OdenBroker.sendRequest(getShellUrl(), commnd);
 			if (result != null ) {
 				JSONArray array = new JSONArray(result);
 
@@ -526,7 +544,7 @@ public class TaskPage implements Page {
 						String name = o.toString();
 
 						String desc = result_.getOptionArg(new String[] { "desc" }); 
-						if(!(name.matches(OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName+".*"))){
+						if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName+".*"))){
 							++index;
 							details = new TaskDetails(name, desc, null, null);
 							taskList.add(details);
@@ -537,24 +555,27 @@ public class TaskPage implements Page {
 						}
 					}
 				}
-				taskViewer.setInput(taskList);
-				lastNum = taskViewer.getTable().getItemCount() ;
-				taskViewer.getTable().select(selectIndex - 1);
+				getTaskViewer().setInput(taskList);
+				setLastNum(getTaskViewer().getTable().getItemCount());
+				getTaskViewer().getTable().select(selectIndex - 1);
 			}
 		} catch (OdenException odenException) {
 		} catch (Exception e) {
 			OdenActivator.error("Exception occured while loading Initial info.",e);
 		}
 	}
-
-	public static void loadInitPolicyData() {
+	
+	/**
+	 * the policy data of running task  
+	 */
+	public void loadInitPolicyData() {
 		String commnd = ""; 
 		String result = ""; 
 		TaskDetails details = null;
 		ArrayList policyList = new ArrayList();
 		commnd = MSG_POLICY_SHOW;
 		try {
-			result = OdenBroker.sendRequest(shellUrl, commnd);
+			result = OdenBroker.sendRequest(getShellUrl(), commnd);
 			if (result != null) {
 				JSONArray array = new JSONArray(result);
 
@@ -567,81 +588,81 @@ public class TaskPage implements Page {
 									o.toString()).toString());
 					String name = o.toString();
 					String desc = result_.getOptionArg(new String[] { "desc" }); 
-					if(!(name.matches(OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
+					if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
 						details = new TaskDetails(null, null, name, desc);
 						policyList.add(details);
 					}
 				}
 
-				runViewer.setInput(policyList);
+				getRunViewer().setInput(policyList);
 			}
 		} catch (OdenException odenException) {
-//			OdenActivator.error("Exception occured while loading policy info.",odenException);
-//			odenException.printStackTrace();
 		} catch (Exception e) {
 			OdenActivator.error("Exception occured while loading policy info.", e);
-//			e.printStackTrace();
 		}
-		
+
 	}
 
 	private Listener listener = new Listener() {
 		public void handleEvent(Event event) {
 			TaskDetails details = null;
-			ISelection selection = taskViewer.getSelection();
+			ISelection selection = getTaskViewer().getSelection();
 			Object obj = ((IStructuredSelection) selection).getFirstElement();
 			details = (TaskDetails) obj;
-			if (event.widget == removeTask) {
+			if (event.widget == getRemoveTask()) {
 				// validation check(remove)
 				if (checkRemove(obj)) {
-					if (DialogUtil.confirmMessageDialog(OdenMessages.ODEN_CommonMessages_Title_ConfirmDelete,
-							OdenMessages.ODEN_EDITORS_TaskPage_DialogMsg_ConfirmDeleteTask_MessagePre + details.getTaskName() + OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) { 
-						new DeleteTaskAction().run();
+					if (DialogUtil.confirmMessageDialog(CommonMessages.ODEN_CommonMessages_Title_ConfirmDelete,
+							UIMessages.ODEN_EDITORS_TaskPage_DialogMsg_ConfirmDeleteTask_MessagePre + details.getTaskName() + CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) { 
+						new DeleteTaskAction().run(serverNickname);
 						client.setVisible(false);
 					}
 				} else {
 					DialogUtil
 					.openMessageDialog(
-							OdenMessages.ODEN_CommonMessages_Title_Warning,
-							OdenMessages.ODEN_CommonMessages_SelectItemFirst,  //$NON-NLS-2$
+							CommonMessages.ODEN_CommonMessages_Title_Warning,
+							CommonMessages.ODEN_CommonMessages_SelectItemFirst,  //$NON-NLS-2$
 							MessageDialog.WARNING);
 				}
 			} else if (event.widget == saveTask) {
 				// validation check(save)
 				if (checkSave())
-					new SaveTaskAction().run();
+					new SaveTaskAction().run(serverNickname);
 
-			} else if (event.widget == addTask) {
+			} else if (event.widget == getAddTask()) {
 				// validation check(add)
 				client.setVisible(true);
-				new NewTaskAction().run();
+				new NewTaskAction().run(serverNickname);
 			} else if (event.widget == runTask || event.widget == runTask_ ) {
 				if (checkDeploy(obj)) {
 					if(dupTaskCheck())
-						new RunDeployTaskAction().run();
+						new RunDeployTaskAction().run(serverNickname);
 					else
-						DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,OdenMessages.ODEN_EDITORS_TaskPage_DialogMsg_FirstSave,
+						DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,UIMessages.ODEN_EDITORS_TaskPage_DialogMsg_FirstSave,
 								MessageDialog.WARNING);
 				} else {
-					DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning, OdenMessages.ODEN_CommonMessages_SelectItemFirst, 
+					DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning, CommonMessages.ODEN_CommonMessages_SelectItemFirst, 
 							MessageDialog.WARNING);
 				}
 			}
 		}
 	};
-
+	
+	/**
+	 * task detail data loading
+	 */
 	public void showTaskDetail(String taskName) {
 		String commnd = ""; 
 		String result = ""; 
 		String desc = "";
-		String[] descs = null;
+//		String[] descs = null;
 		String policies = ""; 
 		String[] policy = null;
-		PolicyDetails details = new PolicyDetails();
-		ArrayList deployList = new ArrayList();
+//		PolicyDetails details = new PolicyDetails();
+//		ArrayList deployList = new ArrayList();
 		commnd = MSG_DETAIL_SHOW + " " + '"' + taskName + '"' + " " + "-json";   
 		try {
-			result = OdenBroker.sendRequest(shellUrl, commnd);
+			result = OdenBroker.sendRequest(getShellUrl(), commnd);
 			JSONArray array = new JSONArray(result);
 
 			for (int i = 0; i < array.length(); i++) {
@@ -652,21 +673,19 @@ public class TaskPage implements Page {
 						+ (String) ((JSONObject) array.get(i))
 						.get(o.toString()).toString());
 				desc = result_.getOptionArg(new String[] { "desc" });
-//				policies = result_.getOptionArg(new String[] { "p", "policy" });  
 				policy = result_.getOptionArgArray(new String[] { "p", "policy" });  
 			}
 
 			for (int i = 0; i < policy.length; i++) {
-				policies = policies + policy[i];
+				policies = policies + policy[i] + ",";
 			}
 			// clear text Filed
 			clearText();
 			taskNameText.setText(taskName);
-			descText.setText(desc);
-			checkRuntable(policies);
+			getDescText().setText(desc);
+			checkRuntable(policies.substring(0, policies.lastIndexOf(",")));
 
 		} catch (OdenException e) {
-//			OdenActivator.error("Exception occured while loading deailed task info.",e);
 		} catch (Exception odenException) {
 			OdenActivator.error("Exception occured while loading deailed task info.",odenException);
 		}
@@ -705,31 +724,30 @@ public class TaskPage implements Page {
 		}
 	}
 
-	// TODO : Validation
 	private Boolean checkSave() {
 		if (taskNameText.getText().equals("")) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_TaskPage_DialogMsg_InputTaskName, MessageDialog.INFORMATION);
+					CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_TaskPage_DialogMsg_InputTaskName, MessageDialog.INFORMATION);
 			taskNameText.setFocus();
 			return false;
 
 		} else if (taskNameText.getEnabled() && dupTaskCheck()) {
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_CommonMessages_NameAlreadyExists,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					CommonMessages.ODEN_CommonMessages_NameAlreadyExists,
 					MessageDialog.WARNING);
 			taskNameText.setFocus();
 			return false;
-		} else if (taskNameText.getText().equals(OdenMessages.ODEN_EDITORS_TaskPage_TempTaskName)) {
+		} else if (taskNameText.getText().equals(UIMessages.ODEN_EDITORS_TaskPage_TempTaskName)) {
 			// check temporary taskName
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_CommonMessages_NameShouldBeSpecified + '"' + OdenMessages.ODEN_EDITORS_TaskPage_TempTaskName + '"',
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					CommonMessages.ODEN_CommonMessages_NameShouldBeSpecified + '"' + UIMessages.ODEN_EDITORS_TaskPage_TempTaskName + '"',
 					MessageDialog.WARNING);
 			taskNameText.setFocus();
 			return false;
 		}
 		// check policy
-		TableItem[] tia = runViewer.getTable().getItems();
+		TableItem[] tia = getRunViewer().getTable().getItems();
 		String policies = "";
 		for (int i = 0; i < tia.length; i++) {
 			if (tia[i].getChecked()) {
@@ -738,7 +756,7 @@ public class TaskPage implements Page {
 		}
 		if (policies.equals("")) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_CommonMessages_Title_Warning,
+					CommonMessages.ODEN_CommonMessages_Title_Warning,
 					"Select Policy", MessageDialog.INFORMATION);
 			return false;
 		}
@@ -761,47 +779,55 @@ public class TaskPage implements Page {
 			return false;
 	}
 
-	// TODO : Parsing Result String
-	public static String getOptionArgs(String full, String optionName) {
-		// remove '-' from option name
-		String _opt = optionName.startsWith("-") ? optionName.substring(1)
-				: optionName;
-
-		String[] options = full.split("^-| -");
-		for (String option : options) {
-			if (option.startsWith(_opt)) {
-				int idx = _opt.length();
-				if (option.length() > idx + 1
-						&& Character.isWhitespace(option.charAt(idx))
-						&& !Character.isWhitespace(option.charAt(idx + 1)))
-					return option.substring(idx + 1);
-				else
-					return "";
-			}
-		}
-		return null;
-	}
-
-	public static void clearText() {
+//	private static String getOptionArgs(String full, String optionName) {
+//		// remove '-' from option name
+//		String _opt = optionName.startsWith("-") ? optionName.substring(1)
+//				: optionName;
+//
+//		String[] options = full.split("^-| -");
+//		for (String option : options) {
+//			if (option.startsWith(_opt)) {
+//				int idx = _opt.length();
+//				if (option.length() > idx + 1
+//						&& Character.isWhitespace(option.charAt(idx))
+//						&& !Character.isWhitespace(option.charAt(idx + 1)))
+//					return option.substring(idx + 1);
+//				else
+//					return "";
+//			}
+//		}
+//		return null;
+//	}
+	
+	/**
+	 * initialize task detail data
+	 */
+	public void clearText() {
 		taskNameText.setText("");
-		descText.setText("");
-		runViewer.getTable().clearAll();
+		getDescText().setText("");
+		getRunViewer().getTable().clearAll();
 
 	}
 
 	private void checkRuntable(String ckPolicy) {
 		loadInitPolicyData();
-
 		TableItem[] tia = runViewer.getTable().getItems();
-		String policies = "";
 		for (int i = 0; i < tia.length; i++) {
-			if (ckPolicy.matches(".*" + tia[i].getText(0) + ".*")) { 
+			if (chkMatch(tia[i].getText(0) , ckPolicy )) {
 				tia[i].setChecked(true);
 			}
 		}
 	}
 
-	// TODO : Event List
+	private boolean chkMatch(String tableValue , String policyValue) {
+		String[] values = policyValue.split(",");
+		for(String value : values) {
+			if(value.equals(tableValue))
+				return true;
+		}
+		return false;
+	}
+	
 	private void filterEvent() {
 		// filter Text Event
 		filterText.addKeyListener(new KeyListener() {
@@ -810,9 +836,10 @@ public class TaskPage implements Page {
 			}
 
 			public void keyReleased(KeyEvent ke) {
-				// filter.setSearchText(filterText.getText());
-				TaskPage.this.taskViewer.addFilter(TaskPage.this.filter);
-				taskViewer.refresh();
+				if(!(filterText.getText().equals("type filter text")) && !(filterText.getText().equals(""))){
+					TaskPage.this.getTaskViewer().addFilter(TaskPage.this.filter);
+					getTaskViewer().refresh();
+				}
 
 			}
 		});
@@ -836,62 +863,77 @@ public class TaskPage implements Page {
 
 	private void tableEvent() {
 		// task table viewer event
-		taskViewer.getTable().addMouseListener(new MouseAdapter() {
+		getTaskViewer().getTable().addMouseListener(new MouseAdapter() {
 
 			public void mouseDown(MouseEvent e) {
-				if (taskViewer.getTable().getItem(new Point(e.x, e.y)) != null) {
+				if (getTaskViewer().getTable().getItem(new Point(e.x, e.y)) != null) {
 					if (chkNewTask()) {
 						// add task
 						clearText();
 						TaskDetails details = null;
-						ISelection selection = taskViewer.getSelection();
+						ISelection selection = getTaskViewer().getSelection();
 						Object obj = ((IStructuredSelection) selection)
 						.getFirstElement();
 						details = (TaskDetails) obj;
 						taskNameText.setText(details.getTaskName());
-						descText.setText(details.getDescription());
+						getDescText().setText(details.getDescription());
 						taskNameText.setEnabled(true);
-						addTask.setEnabled(false);
+						getAddTask().setEnabled(false);
 						loadInitPolicyData();
 
 					} else {
 						taskNameText.setEnabled(false);
-						removeTask.setEnabled(true);
+						getRemoveTask().setEnabled(true);
 						// change Label
 						chageLabel();
 						TaskDetails details = new TaskDetails();
-						ISelection selection = taskViewer.getSelection();
+						ISelection selection = getTaskViewer().getSelection();
 						Object obj = ((IStructuredSelection) selection).getFirstElement();
 						details = (TaskDetails) obj;
 						client.setVisible(true);
 						showTaskDetail(details.getTaskName());
 						if(chkNewTaskExist())
-							addTask.setEnabled(false);
+							getAddTask().setEnabled(false);
 						else
-							addTask.setEnabled(true);
+							getAddTask().setEnabled(true);
 					}
+				} else {
+					client.setVisible(false);
+					taskViewer.getTable().clearAll();
+					taskViewer.getTable().deselectAll();
+					runViewer.getTable().deselectAll();
+					loadInitData();
+					addTask.setEnabled(true);
+					taskViewer.refresh();
 				}
 			}
 		});
 
 	}
-	public static boolean chkNewTaskExist() {
-		int count = taskViewer.getTable().getItemCount();
+	/**
+	 * Returns the new task exist or not
+	 * @return true/false , When a new task exist , return true.
+	 */
+	public boolean chkNewTaskExist() {
+		int count = getTaskViewer().getTable().getItemCount();
 		int originCount = originTask.size();
 		if(count == originCount)
 			return false;
 
 		return true;
 	}
-	public static boolean chkNewTask() {
-		int selected= taskViewer.getTable().getSelectionIndex();
-		if(selected != lastNum)
+	/**
+	 * Returns the selected task of new task or not
+	 * @return true/false
+	 */
+	public boolean chkNewTask() {
+		int selected= getTaskViewer().getTable().getSelectionIndex();
+		if(selected != getLastNum())
 			return false;
 		return true;
 	}
 
 	private void temporaryEvent() {
-		// taskName , Desc Event
 		taskNameText.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent event) {
 			}
@@ -899,7 +941,7 @@ public class TaskPage implements Page {
 				tempProcess();
 			}
 		});
-		descText.addKeyListener(new KeyListener() {
+		getDescText().addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent event) {
 			}
 			public void keyReleased(KeyEvent ke) {
@@ -909,39 +951,41 @@ public class TaskPage implements Page {
 	}
 
 	private void tempProcess () {
-		ISelection selection = taskViewer.getSelection();
-
+//		ISelection selection = getTaskViewer().getSelection();
 		if(chkNewTask()) {
 			removeTempcell();
-			inputTempcell(lastNum);
+			inputTempcell(getLastNum());
 		} else {
-			int selected= taskViewer.getTable().getSelectionIndex();
+			int selected= getTaskViewer().getTable().getSelectionIndex();
 			removeTempcell();
 			inputTempcell(selected);
-			taskViewer.getTable().remove(selected + 1);
-			addTask.setEnabled(true);
+			getTaskViewer().getTable().remove(selected + 1);
+			getAddTask().setEnabled(true);
 		}
 
 	}
-	public static void removeTempcell() {
+	/**
+	 * Remove temporary cell
+	 */
+	public void removeTempcell() {
 		TaskDetails details = null;
-		ISelection selection = taskViewer.getSelection();
+		ISelection selection = getTaskViewer().getSelection();
 
 		details = (TaskDetails) ((IStructuredSelection) selection)
 		.getFirstElement();
 		if (details != null) {
-			taskViewer.remove(details);
+			getTaskViewer().remove(details);
 		}
-		taskViewer.refresh();
+		getTaskViewer().refresh();
 	}
 	private void inputTempcell( int num) {
 		String tempTaskName = taskNameText.getText();
-		String tempTaskDesc = descText.getText();
+		String tempTaskDesc = getDescText().getText();
 
 		TaskDetails details = null;
 		details = new TaskDetails(tempTaskName, tempTaskDesc,  null, null);
-		taskViewer.insert(details, num );
-		taskViewer.getTable().select(num );
+		getTaskViewer().insert(details, num );
+		getTaskViewer().getTable().select(num );
 
 	}
 
@@ -950,14 +994,14 @@ public class TaskPage implements Page {
 		String result = ""; 
 		commnd = MSG_TASK_SHOW;
 		try {	
-			result = OdenBroker.sendRequest(shellUrl, commnd);
+			result = OdenBroker.sendRequest(getShellUrl(), commnd);
 			if (result != null ) {
 				JSONArray array = new JSONArray(result);
 
 				for (int i = 0; i < array.length(); i++) {
 					Object o = ((JSONObject) array.get(i)).keys().next();
 					if(!(o.toString().equals("KnownException"))){ // no data
-						Cmd result_ = new Cmd("foo", "fooAction \""  //$NON-NLS-2$
+						new Cmd("foo", "fooAction \""  
 								+ o.toString()
 								+ "\" " 
 								+ (String) ((JSONObject) array.get(i)).get(
@@ -969,14 +1013,78 @@ public class TaskPage implements Page {
 					}
 				}
 			}			
-		
+
 		} catch (OdenException e) {
-			
+
 		} catch (Exception odenException) {
 			OdenActivator.error("Exception occured while check policy duplication.",odenException);
 		}
 		return false;
 	}
+	/**
+	 * Constructor UI component
+	 */
+	public void setRunViewer(TableViewer runViewer) {
+		this.runViewer = runViewer;
+	}
 
+	public TableViewer getRunViewer() {
+		return runViewer;
+	}
 
+	public void setDescText(Text descText) {
+		this.descText = descText;
+	}
+
+	public Text getDescText() {
+		return descText;
+	}
+
+	public void setShellUrl(String shellUrl) {
+		this.shellUrl = shellUrl;
+	}
+
+	public String getShellUrl() {
+		return shellUrl;
+	}
+
+	public void setAddTask(Button addTask) {
+		this.addTask = addTask;
+	}
+
+	public Button getAddTask() {
+		return addTask;
+	}
+
+	public void setNewTask(boolean newTask) {
+		this.newTask = newTask;
+	}
+
+	public boolean isNewTask() {
+		return newTask;
+	}
+
+	public void setRemoveTask(Button removeTask) {
+		this.removeTask = removeTask;
+	}
+
+	public Button getRemoveTask() {
+		return removeTask;
+	}
+
+	public void setTaskViewer(TableViewer taskViewer) {
+		this.taskViewer = taskViewer;
+	}
+
+	public TableViewer getTaskViewer() {
+		return taskViewer;
+	}
+
+	public void setLastNum(int lastNum) {
+		this.lastNum = lastNum;
+	}
+
+	public int getLastNum() {
+		return lastNum;
+	}
 }

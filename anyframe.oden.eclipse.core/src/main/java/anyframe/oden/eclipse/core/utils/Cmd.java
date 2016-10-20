@@ -1,10 +1,24 @@
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package anyframe.oden.eclipse.core.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import anyframe.oden.eclipse.core.OdenException;
 
 /**
  * rule) <name> [<action> [<action-arg>]] -<option> [<option-arg[=value]> ...] [-<option> ...]
@@ -21,60 +35,25 @@ public class Cmd {
 	public final static String SHOW_ACTION = "show";
 	public static final String[] JSON_OPT = {"json"};
 	public static final String USER_OPT = "_user";
-	
+
 	private String name = "";
 	private String action = "";
 	private String actionArg = "";
 	private List<Opt> options = new ArrayList<Opt>();
-	
+
 	public Cmd(String line)  {
 		parse(line);
 	}
-	
+
 	public Cmd(String cmdName, String args)  {
 		parse(cmdName + " " + args);
 	}
-	
-//	private void parse(String line)  {
-//		String[] args = CommandUtil.split(line);
-//		if(args.length == 0 || isOption(args[0]))
-//			System.out.println("Syntax Error command");
-//		
-//		int idx = 0;
-//		name = args[idx++];
-//		if(idx < args.length && !isOption(args[idx])){
-//			action = args[idx++];
-//			if(idx < args.length && !isOption(args[idx])){
-//				actionArg = args[idx++];
-//			}
-//		}
-//		
-//		if(idx < args.length){
-//			if(!isOption(args[idx]))
-//				System.out.println("Syntax Error command");
-//			
-//			// collect the others
-//			args[idx] = args[idx].substring(1); 	// remove '-'
-//			StringBuffer others = new StringBuffer(args[idx++] + " ");
-//			for(int i=idx; i<args.length; i++){
-//				if(args[i].startsWith("-"))
-//					others.append(args[i] + " ");
-//				else
-//					others.append("\"" + args[i] + "\" ");
-//			}
-//			
-//			// get options
-//			String[] sOpts = others.toString().split(" -");
-//			for(String sOpt : sOpts) {
-//				options.add(new Opt(sOpt));
-//			}
-//		}
-//	}
+
 	private void parse(String line) {
 		String[] args = CommandUtil.split(line);
 		if(args.length == 0 || isOption(args[0]))
 			System.out.println("Syntax Error command");
-		
+
 		int idx = 0;
 		name = args[idx++];
 		if(idx < args.length && !isOption(args[idx])){
@@ -83,11 +62,11 @@ public class Cmd {
 				actionArg = args[idx++];
 			}
 		}
-		
+
 		if(idx < args.length){
 			if(!isOption(args[idx]))
 				System.out.println("Syntax Error command");
-			
+
 			// collect the others
 			StringBuffer ops = new StringBuffer();
 			for(int i=idx; i<args.length; i++){
@@ -104,11 +83,11 @@ public class Cmd {
 				options.add(new Opt(ops.toString()));
 		}
 	}
-	
+
 	protected boolean isOption(String s) {
 		return s.matches("^-.*| -.*");
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -121,7 +100,7 @@ public class Cmd {
 	public List<Opt> getOptions() {
 		return options;
 	}
-	
+
 	public Opt getOption(String name){
 		for(Opt op : options){
 			if(name.equals(op.getName()))
@@ -129,7 +108,7 @@ public class Cmd {
 		}
 		return null;
 	}
-	
+
 	public Opt getOption(String[] names){
 		for(Opt op : options){
 			for(String name : names)
@@ -138,7 +117,7 @@ public class Cmd {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Return specified option's argument. If not, return "".
 	 * 
@@ -151,7 +130,7 @@ public class Cmd {
 			return args[0];
 		return "";
 	}
-	
+
 	public List<String> getOptionArgList(String[] names) {
 		Opt op = getOption(names);
 		if(op != null) {
@@ -159,7 +138,7 @@ public class Cmd {
 		}
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	public String[] getOptionArgArray(String[] names) {
 		Opt op = getOption(names);
 		if(op != null) {
@@ -167,7 +146,7 @@ public class Cmd {
 		}
 		return new String[0];
 	}
-	
+
 	public void removeOption(String[] names) {
 		for(Opt op : options){
 			for(String name : names){
@@ -176,9 +155,9 @@ public class Cmd {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer(name);
@@ -200,7 +179,7 @@ public class Cmd {
 			buf.append(" " + option.toString());
 		return buf.toString().trim();
 	}
-	
+
 }
 
 

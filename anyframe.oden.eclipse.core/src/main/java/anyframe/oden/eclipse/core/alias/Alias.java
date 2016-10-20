@@ -17,7 +17,7 @@
 package anyframe.oden.eclipse.core.alias;
 
 /**
- * A super class for Agent and Repository.
+ * A super class for Server and Repository.
  * 
  * @author RHIE Jihwan
  * @version 1.0.0

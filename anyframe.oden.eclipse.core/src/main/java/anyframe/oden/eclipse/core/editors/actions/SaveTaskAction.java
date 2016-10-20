@@ -21,18 +21,21 @@ import org.eclipse.swt.widgets.TableItem;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
-import anyframe.oden.eclipse.core.editors.TaskDetails;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.TaskPage;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -42,56 +45,55 @@ public class SaveTaskAction extends AbstractEditorsAction {
 	/**
 	 * 
 	 */
-	private static final String MSG_TASK_SAVE = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskAdd;
-	private static final String POLI_OPT = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPolicyOpt;
-	private static final String DESC_OPT = OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskDescOpt;
-
+	private static final String MSG_TASK_SAVE = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskAdd;
+	private static final String POLI_OPT = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskPolicyOpt;
+	private static final String DESC_OPT = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskDescOpt;
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	
 	public SaveTaskAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskSaveBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
+	public void run(String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
+
 		String commnd = ""; 
-		String result = ""; 
-		TaskDetails details = null;
 		String policies = "";
-		TaskPage page = new TaskPage();
+		
 		// check policy
-		TableItem[] tia = page.runViewer.getTable().getItems();
+		TableItem[] tia = page.getRunViewer().getTable().getItems();
 		for (int i = 0; i < tia.length; i++) {
 			if (tia[i].getChecked()) {
 				policies = policies + '"' + tia[i].getText(0) + '"' + " "; 
 			}
 		}
 		commnd = MSG_TASK_SAVE
-		+ " " + '"' + page.taskNameText.getText() + '"' + " " + POLI_OPT 
+		+ " " + '"' + page.getTaskNameText().getText() + '"' + " " + POLI_OPT 
 		+ " " + policies.trim() + " -json";
-		if(!(page.descText.getText().equals("")))
-			commnd = commnd +  " " + DESC_OPT + " " + '"' + page.descText.getText() + '"';
-
+		if(!(page.getDescText().getText().equals("")))
+			commnd = commnd +  " " + DESC_OPT + " " + '"' + page.getDescText().getText() + '"';
 
 		try {
-			result = OdenBroker.sendRequest(page.shellUrl, commnd);
+			OdenBroker.sendRequest(page.getShellUrl(), commnd);
  
-			DialogUtil.openMessageDialog("Task", OdenMessages.ODEN_CommonMessages_OperationSucceeded,  
+			DialogUtil.openMessageDialog("Task", CommonMessages.ODEN_CommonMessages_OperationSucceeded,  
 					MessageDialog.INFORMATION);
-			page.showTaskDetail(page.taskNameText.getText());
+			page.showTaskDetail(page.getTaskNameText().getText());
 			page.loadInitData();
-			page.taskNameText.setEnabled(false);
-			page.addTask.setEnabled(true);
+			page.getTaskNameText().setEnabled(false);
+			page.getAddTask().setEnabled(true);
 
-			page.newTask = false;
-			page.addTask.setEnabled(true);
-			page.showTaskDetail(page.taskNameText.getText());
+			page.setNewTask(false);
+			page.getAddTask().setEnabled(true);
+			page.showTaskDetail(page.getTaskNameText().getText());
 			
 		} catch (OdenException odenException) {
-//			OdenActivator.warning(OdenMessages.ODEN_CommonMessages_UnableToConnectServer);
 		} catch (Exception odenException) {
 			OdenActivator.error("Exception occured while saving task info.",odenException);
 		}

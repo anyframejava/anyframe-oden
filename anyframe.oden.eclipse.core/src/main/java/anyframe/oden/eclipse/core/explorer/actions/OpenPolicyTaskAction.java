@@ -16,17 +16,14 @@
  */
 package anyframe.oden.eclipse.core.explorer.actions;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.alias.Agent;
-import anyframe.oden.eclipse.core.alias.AgentEditorInput;
+import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.alias.ServerEditorInput;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
-import anyframe.oden.eclipse.core.utils.DialogUtil;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * Open task,policy in the Oden view. This class extends
@@ -44,9 +41,9 @@ public class OpenPolicyTaskAction extends AbstractExplorerViewAction {
 	 */
 	public OpenPolicyTaskAction() {
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditor,
-				OdenMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditorToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditorIcon);
+				UIMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditor,
+				UIMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditorToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_LinkEditorAction_LinkEditorIcon);
 	}
 
 	/**
@@ -54,26 +51,17 @@ public class OpenPolicyTaskAction extends AbstractExplorerViewAction {
 	 */
 	public void run() {
 
-		Agent agent = getView().getSelectedAgent(false);
-		if (agent != null) {
+		Server server = getView().getSelectedServer(false);
+		if (server != null) {
 
 			IWorkbenchPage Page = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
 			try {
-				IEditorPart[] editors = Page.getEditors();
-				if(editors.length < 1) {
-					AgentEditorInput editorInput = new AgentEditorInput(agent);
-					Page.openEditor(editorInput,"anyframe.oden.eclipse.core.editors.OdenEditor");
-//					getView().refresh();
-				} else {
-					// exist open Editor(need to modify ASP)
-					DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Information,
-					OdenMessages.ODEN_EXPLORER_Actions_OpenPolicyTaskAction_ExistEditor,
-					MessageDialog.INFORMATION);
-				}
+				ServerEditorInput editorInput = new ServerEditorInput(server);
+				Page.openEditor(editorInput,"anyframe.oden.eclipse.core.editors.OdenEditor");
 			} catch (Exception odenException) {
 				OdenActivator.error(
-						OdenMessages.ODEN_EXPLORER_Actions_OpenPolicyTaskAction_Exeption,
+						UIMessages.ODEN_EXPLORER_Actions_OpenPolicyTaskAction_Exception,
 						odenException);
 			}
 		}
@@ -82,7 +70,7 @@ public class OpenPolicyTaskAction extends AbstractExplorerViewAction {
 	public boolean isAvailable() {
 		if (getView() == null)
 			return false;
-		return getView().getSelectedAgents(false).size() == 1;
+		return getView().getSelectedServers(false).size() == 1;
 	}
 
 }

@@ -18,7 +18,6 @@ package anyframe.oden.eclipse.core.editors;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -67,24 +66,32 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.alias.Agent;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.alias.Repository;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.actions.DeleteDeployAction;
 import anyframe.oden.eclipse.core.editors.actions.DeletePolicyAction;
 import anyframe.oden.eclipse.core.editors.actions.NewDeployAction;
 import anyframe.oden.eclipse.core.editors.actions.NewPolicyAction;
 import anyframe.oden.eclipse.core.editors.actions.PolicyRefreshAction;
 import anyframe.oden.eclipse.core.editors.actions.SavePolicyAction;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.Cmd;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
+/**
+ * Implement Oden PolicyPage. This class implement
+ * Page class.
+ * 
+ * @author HONG JungHwan
+ * @version 1.0.0 RC2
+ * 
+ */
 public class PolicyPage implements Page {
-
-	public PolicyPage() {
-	}
 
 	private static PolicyPage instance;
 
@@ -96,66 +103,68 @@ public class PolicyPage implements Page {
 
 	private Table policyTable;
 	private Table DeployTable;
-	private static TableViewer policyViewer;
-	private static TableViewer deployViewer;
+	private TableViewer policyViewer;
+	private TableViewer deployViewer;
 
 	TableViewerColumn policyName, desc, targetUri, targetRoot, locvar;
 	// Command line
-	private final String MSG_POLICY_SHOW = OdenMessages.ODEN_EDITORS_PolicyPage_MsgPolicyShow;
-	private final String MSG_DETAIL_SHOW = OdenMessages.ODEN_EDITORS_PolicyPage_MsgDetailShow;
-	//	private final String MSG_AGENT_INFO = OdenMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
-	private String noUsernameRequiredName = OdenMessages.ODEN_EXPLORER_Dialogs_UserNameBooleanString;
-	private static String shellUrl;
-	//	private String agentUrl;
-	//	private String agentPort;
-	private static Agent agent;
+	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_EDITORS_PolicyPage_MsgPolicyShow;
+	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_EDITORS_PolicyPage_MsgDetailShow;
+	private String noUsernameRequiredName = UIMessages.ODEN_EXPLORER_Dialogs_UserNameBooleanString;
+	private String shellUrl;
+	private Server server;
 
-	public  static final String FTP_PROT = "ftp://";
-	private static final String HTTP_PROT = "http://";
+	private final String HTTP_PROT = "http://";
 
-	private static Button addPolicy;
-	private static Button removePolicy;
+	private Button addPolicy;
+	private Button removePolicy;
 	private Button savePolicy;
 	private Button addDeploy;
 	private Button removeDeploy;
-	private static Button noUsernameRequired;
-	private static Button updateOptionRequired;
+	private Button noUsernameRequired;
+	private Button updateOptionRequired;
 
 	// Label
-	private static Label policy;
-	private static Label repo;
-	private static Label repoPath;
-	private static Label include;
-	private static Label description;
-	private static Label userName;
-	private static Label userPassword;
+	private Label policy;
+	private Label repo;
+	private Label repoPath;
+	private Label include;
+	private Label description;
+	private Label userName;
+	private Label userPassword;
 
 	// Text Box
-	private static Text policyNameText;
-	private static  StyledText includeText;
-	private static  StyledText excludeText;
-	private Text urlText;
+	private Text policyNameText;
+	private StyledText includeText;
+	private StyledText excludeText;
+	//	private Text urlText;
 	private Text filterText;
-	private static Text buildRepoUriText;
-	private static Text buildRepoRootText;
-	private static Text descriptionText;
-	private static Text userField;
-	private static Text passwordField;
-	
+	private Text buildRepoUriText;
+	private Text buildRepoRootText;
+	private Text descriptionText;
+	private Text userField;
+	private Text passwordField;
+
 	// Combo box
-	private  static Combo repoNickname;
-	private static  Combo repoKind;
-	public Combo agentCombo;
-	public Combo locationVar;
-	public static ArrayList<String> originPolicy;
+	private Combo repoNickname;
+	private Combo repoKind;
+	private ArrayList<String> originPolicy;
 
-	private HashMap<String,String> hm;
+	private int lastNum;
 
-	public static int lastNum;
-
-	private static final int leftWidth = 200;
-	private static final int rightWidth = 150;
+	private final int leftWidth = 200;
+	private final int rightWidth = 150;
 	private Composite client;
+	public Composite getClient() {
+		return client;
+	}
+
+	//section
+	private Section repo_section;
+	private Section agent_section;
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	private String serverName;
+
 	ViewerFilter filter = new ViewerFilter() {
 		public boolean select(Viewer viewer1, Object parentElement,
 				Object element) {
@@ -172,19 +181,17 @@ public class PolicyPage implements Page {
 	};
 
 	public static PolicyPage getInstance() {
-		if (instance == null) {
-			instance = new PolicyPage();
-		}
-
+		instance = new PolicyPage();
 		return instance;
 	}
 
 	public Composite getPage(final Composite parent) {
-		//		get Agent object
-		agent = OdenEditor.agent;
+		//		get Server object
+		server = OdenEditor.server;
+		serverName = server.getNickname();
 
 		toolkit = new FormToolkit(parent.getDisplay());
-		
+
 		final ScrolledForm form = toolkit.createScrolledForm(parent);
 		// creation Head Section
 		createHeadSection(form, toolkit);
@@ -203,7 +210,7 @@ public class PolicyPage implements Page {
 
 		createRightSection(form, toolkit , whole);
 
-		setShellUrl(HTTP_PROT + agent.getUrl() + "/shell");
+		setShellUrl(HTTP_PROT + server.getUrl() + "/shell");
 
 		loadInitData(getShellUrl());
 
@@ -225,7 +232,7 @@ public class PolicyPage implements Page {
 
 		client_left.setLayoutData(gd);
 		createAllPolicySection(form, toolkit,
-				OdenMessages.ODEN_EDITORS_PolicyPage_Section , client_left);
+				UIMessages.ODEN_EDITORS_PolicyPage_Section , client_left);
 	}
 
 	private void createSpacer(FormToolkit toolkit, Composite parent, int span,
@@ -240,25 +247,21 @@ public class PolicyPage implements Page {
 	private void createHeadSection(final ScrolledForm form, FormToolkit toolkit) {
 		Image titleImage =
 			new Image(form.getDisplay(), getClass().getResourceAsStream(
-					OdenMessages.ODEN_EDITORS_PolicyPage_TitleImage));
-		form.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Title);
+					UIMessages.ODEN_EDITORS_PolicyPage_TitleImage));
+		form.setText(UIMessages.ODEN_EDITORS_PolicyPage_Title);
 		form.setBackgroundImage(_TitleImage);
 		form.setImage(titleImage);
-		form.setMessage(OdenMessages.ODEN_EDITORS_PolicyPage_Desc , SWT.NONE);
+		form.setMessage(UIMessages.ODEN_EDITORS_PolicyPage_Desc , SWT.NONE);
 
 		fillLocalToolBar(form.getForm().getToolBarManager());
 		form.getForm().getToolBarManager().update(true);
 		//		fillLocalPullDown(form.getForm().getMenuManager());
 		toolkit.decorateFormHeading(form.getForm());
-		
-	}
 
-	private void fillLocalPullDown(IMenuManager menuManager) {
-		menuManager.add(new PolicyRefreshAction());
 	}
 
 	private void fillLocalToolBar(IToolBarManager toolBarManager) {
-		toolBarManager.add(new PolicyRefreshAction());
+		toolBarManager.add(new PolicyRefreshAction(serverName));
 	}
 
 	private void createRightSection(final ScrolledForm form, FormToolkit toolkit , Composite parent) {
@@ -268,11 +271,11 @@ public class PolicyPage implements Page {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING);
 
 		client.setLayoutData(gd);
-		createDetailPolicySection(form, toolkit,OdenMessages.ODEN_EDITORS_PolicyPage_PolicyLabel , client);
+		createDetailPolicySection(form, toolkit,UIMessages.ODEN_EDITORS_PolicyPage_PolicyLabel , client);
 
-		createRepoSection(form, toolkit,OdenMessages.ODEN_EDITORS_PolicyPage_RepositoryLabel , client);
+		createRepoSection(form, toolkit,UIMessages.ODEN_EDITORS_PolicyPage_RepositoryLabel , client);
 
-		createDepolySection(form, toolkit,OdenMessages.ODEN_EDITORS_PolicyPage_DeployLabel , client);
+		createDepolySection(form, toolkit,UIMessages.ODEN_EDITORS_PolicyPage_DeployLabel , client);
 
 		createSaveButtonSection(form, toolkit , client);
 
@@ -305,13 +308,14 @@ public class PolicyPage implements Page {
 
 		filterText.setLayoutData(gd);
 		filterText.setText("type filter text");
-		
+
 		createSpacer(toolkit, client , 2, 1);
-		
-		GridData gridData = new GridData(GridData.FILL_BOTH);
+
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		gridData.verticalSpan = 2;
 		gridData.widthHint = 250;
+		gridData.heightHint = 200;
 		// Policy Table
 		policyTable = new Table(client, SWT.SINGLE | SWT.FULL_SELECTION
 				| SWT.BORDER | SWT.V_SCROLL);
@@ -323,20 +327,20 @@ public class PolicyPage implements Page {
 
 		policyName = new TableViewerColumn(getPolicyViewer(), SWT.None);
 		policyName.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_PolicyPage_PolicyTable_col1);
+				UIMessages.ODEN_EDITORS_PolicyPage_PolicyTable_col1);
 		policyName.getColumn().setWidth(150);
 		policyName.setLabelProvider(new PolicyNameColumnLabelProvider());
 
 		desc = new TableViewerColumn(getPolicyViewer(), SWT.None);
 		desc.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_PolicyPage_PolicyTable_col2);
+				UIMessages.ODEN_EDITORS_PolicyPage_PolicyTable_col2);
 		desc.getColumn().setWidth(250);
 		desc.setLabelProvider(new PolicyDescColumnLabelProvider());
 		policyTable.setLayoutData(gridData);
 
 		// policy add Button
 		setAddPolicy(toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_PolicyPage_PolicyAdd_Btn, SWT.PUSH));
+				UIMessages.ODEN_EDITORS_PolicyPage_PolicyAdd_Btn, SWT.PUSH));
 		getAddPolicy().addListener(SWT.Selection, listener);
 		gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd.widthHint = 90;
@@ -344,14 +348,14 @@ public class PolicyPage implements Page {
 
 		// policy remove Button
 		setRemovePolicy(toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_PolicyPage_PolicyRemove_Btn, SWT.PUSH));
+				UIMessages.ODEN_EDITORS_PolicyPage_PolicyRemove_Btn, SWT.PUSH));
 		getRemovePolicy().addListener(SWT.Selection, listener);
 		gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
 		gd.widthHint = 90;
 		getRemovePolicy().setLayoutData(gd);
 
 		section.setText(title);
-		section.setDescription(OdenMessages.ODEN_EDITORS_PolicyPage_SectionDesc);
+		section.setDescription(UIMessages.ODEN_EDITORS_PolicyPage_SectionDesc);
 		section.setClient(client);
 		section.setExpanded(true);
 
@@ -383,7 +387,7 @@ public class PolicyPage implements Page {
 
 		createSpacer(toolkit, client , 6, 1);
 		policy = new Label(client, SWT.LEFT);
-		policy.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_PolicyName );
+		policy.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_PolicyName );
 		policy.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
 		gd.horizontalSpan = 5;
@@ -396,7 +400,7 @@ public class PolicyPage implements Page {
 
 		// Description
 		description = new Label(client, SWT.LEFT);
-		description.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyDesc);
+		description.setText(UIMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyDesc);
 		description
 		.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
@@ -406,7 +410,7 @@ public class PolicyPage implements Page {
 		createSpacer(toolkit, client, 6, 1);
 		// item include
 		include = new Label(client, SWT.LEFT);
-		include.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_ItemInclude + " ");
+		include.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_ItemInclude + " ");
 		include.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
 		gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -421,7 +425,7 @@ public class PolicyPage implements Page {
 
 		// item exclude
 		Label exclude = new Label(client, SWT.LEFT);
-		exclude.setText(OdenMessages.ODEN_EDITORS_PolicyPage_ItemExclude);
+		exclude.setText(UIMessages.ODEN_EDITORS_PolicyPage_ItemExclude);
 		exclude.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
 		setExcludeText(new StyledText(client, SWT.LEFT | SWT.BORDER | SWT.MULTI
@@ -430,14 +434,14 @@ public class PolicyPage implements Page {
 
 		new Label(client,SWT.NONE);
 		setUpdateOptionRequired(new Button(client, SWT.CHECK));
-		getUpdateOptionRequired().setText(OdenMessages.ODEN_EDITORS_PolicyPage_Update_Option);
+		getUpdateOptionRequired().setText(UIMessages.ODEN_EDITORS_PolicyPage_Update_Option);
 		getUpdateOptionRequired().setLayoutData(gd);
 
 
 		// Section title & Description
 		section.setText(title);
 		section
-		.setDescription(OdenMessages.ODEN_EDITORS_PolicyPage_PolicyLabelDesc);
+		.setDescription(UIMessages.ODEN_EDITORS_PolicyPage_PolicyLabelDesc);
 		section.setClient(client);
 
 		gd = new GridData(GridData.FILL_HORIZONTAL
@@ -448,13 +452,13 @@ public class PolicyPage implements Page {
 
 	private void createRepoSection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent) {
-		Section section = toolkit.createSection(parent, Section.TWISTIE
+		repo_section = toolkit.createSection(parent, Section.TWISTIE
 				| Section.DESCRIPTION | Section.TITLE_BAR);
-		section.setActiveToggleColor(toolkit.getHyperlinkGroup()
+		repo_section.setActiveToggleColor(toolkit.getHyperlinkGroup()
 				.getActiveForeground());
-		section.setToggleColor(toolkit.getColors().getColor(
+		repo_section.setToggleColor(toolkit.getColors().getColor(
 				FormColors.SEPARATOR));
-		Composite client = toolkit.createComposite(section, SWT.WRAP);
+		Composite client = toolkit.createComposite(repo_section, SWT.WRAP);
 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 6;
@@ -471,7 +475,7 @@ public class PolicyPage implements Page {
 		client.setLayoutData(gd);
 		createSpacer(toolkit, client , 6, 1);
 		repo = new Label(client, SWT.LEFT);
-		repo.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_BuildRepo );
+		repo.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_BuildRepo );
 
 		repo.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 
@@ -499,7 +503,7 @@ public class PolicyPage implements Page {
 		setRepoKind(new Combo(client, SWT.SINGLE | SWT.BORDER | SWT.DROP_DOWN | SWT.LEFT));
 		getRepoKind().setLayoutData(gd);
 		getRepoKind().setEnabled(false);
-		getRepoKind().setToolTipText(OdenMessages.ODEN_EDITORS_PolicyPage_BuildRepositoryProtocol_Tooltip);
+		getRepoKind().setToolTipText(UIMessages.ODEN_EDITORS_PolicyPage_BuildRepositoryProtocol_Tooltip);
 
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.heightHint = 15;
@@ -507,7 +511,7 @@ public class PolicyPage implements Page {
 		setBuildRepoUriText(new Text(client, SWT.SINGLE | SWT.BORDER | SWT.LEFT));
 		getBuildRepoUriText().setLayoutData(gd);
 		getBuildRepoUriText().setEnabled(false);
-		getBuildRepoUriText().setToolTipText(OdenMessages.ODEN_EDITORS_PolicyPage_BuildRepositoryUrl_Tooltip);
+		getBuildRepoUriText().setToolTipText(UIMessages.ODEN_EDITORS_PolicyPage_BuildRepositoryUrl_Tooltip);
 
 		String[] protocolSet = OdenActivator.getDefault().getAliasManager()
 		.getRepositoryManager().getProtocolSet();
@@ -519,7 +523,7 @@ public class PolicyPage implements Page {
 		// Build Repository Path
 		gd = new GridData();
 		repoPath = new Label(client, SWT.LEFT | SWT.WRAP);
-		repoPath.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_BuildRoot);
+		repoPath.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_BuildRoot);
 		repoPath.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 		repoPath.setEnabled(false);
 		repoPath.setLayoutData(gd);
@@ -545,7 +549,7 @@ public class PolicyPage implements Page {
 		gd = new GridData();
 		// User name
 		userName = new Label(client, SWT.LEFT);
-		userName.setText(OdenMessages.ODEN_EXPLORER_Dialogs_UserNameFieldName
+		userName.setText(UIMessages.ODEN_EXPLORER_Dialogs_UserNameFieldName
 				+ " : ");
 		userName.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
 		userName.setEnabled(false);
@@ -561,7 +565,7 @@ public class PolicyPage implements Page {
 		gd.horizontalSpan = 1;
 		userPassword = new Label(client, SWT.CENTER);
 		userPassword
-		.setText("    " + OdenMessages.ODEN_EXPLORER_Dialogs_PasswordFieldName
+		.setText("    " + UIMessages.ODEN_EXPLORER_Dialogs_PasswordFieldName
 				+ " : ");
 		userPassword
 		.setForeground(new Color(Display.getCurrent(), 65, 105, 225));
@@ -577,19 +581,20 @@ public class PolicyPage implements Page {
 
 		client.setLayoutData(gd);
 
-		section.setText(title);
-		section
-		.setDescription(OdenMessages.ODEN_EDITORS_PolicyPage_RepositoryLabelDesc);
-		section.setClient(client);
-		section.setExpanded(true);
-		section.addExpansionListener(new ExpansionAdapter() {
+		repo_section.setText(title);
+		repo_section
+		.setDescription(UIMessages.ODEN_EDITORS_PolicyPage_RepositoryLabelDesc);
+		repo_section.setClient(client);
+		//		section.setExpanded(true);
+		repo_section.setExpanded(false);
+		repo_section.addExpansionListener(new ExpansionAdapter() {
 			public void expansionStateChanged(ExpansionEvent e) {
 
 			}
 		});
 		gd = new GridData(GridData.FILL_BOTH
 				| GridData.VERTICAL_ALIGN_BEGINNING);
-		section.setLayoutData(gd);
+		repo_section.setLayoutData(gd);
 
 		// check if "user name is required ..." check box is checked or not
 		getNoUsernameRequired().addSelectionListener(new SelectionAdapter() {
@@ -607,14 +612,14 @@ public class PolicyPage implements Page {
 
 	private void createDepolySection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent) {
-		Section section = toolkit.createSection(parent, Section.TWISTIE
+		agent_section = toolkit.createSection(parent, Section.TWISTIE
 				| Section.DESCRIPTION | Section.TITLE_BAR);
-		section.setActiveToggleColor(toolkit.getHyperlinkGroup()
+		agent_section.setActiveToggleColor(toolkit.getHyperlinkGroup()
 				.getActiveForeground());
-		section.setToggleColor(toolkit.getColors().getColor(
+		agent_section.setToggleColor(toolkit.getColors().getColor(
 				FormColors.SEPARATOR));
 
-		Composite client = toolkit.createComposite(section, SWT.WRAP);
+		Composite client = toolkit.createComposite(agent_section, SWT.WRAP);
 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 6;
@@ -647,13 +652,13 @@ public class PolicyPage implements Page {
 
 		targetUri = new TableViewerColumn(getDeployViewer(), SWT.None);
 		targetUri.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_PolicyPage_DeployTable_col1);
+				UIMessages.ODEN_EDITORS_PolicyPage_DeployTable_col1);
 		targetUri.getColumn().setWidth(150);
 		targetUri.setLabelProvider(new DeployUriColumnLabelProvider());
 
 		locvar = new TableViewerColumn(getDeployViewer(), SWT.None);
 		locvar.getColumn().setText(
-				OdenMessages.ODEN_EDITORS_PolicyPage_DeployTable_col2);
+				UIMessages.ODEN_EDITORS_PolicyPage_DeployTable_col2);
 		locvar.getColumn().setWidth(150);
 		locvar.setLabelProvider(new LocVarColumnLabelProvider());
 		DeployTable.setLayoutData(gd);
@@ -671,18 +676,18 @@ public class PolicyPage implements Page {
 		gd.widthHint = 90;
 		removeDeploy.setLayoutData(gd);
 
-		section.setText(title);
-		section
-		.setDescription(OdenMessages.ODEN_EDITORS_PolicyPage_DeployLabelDesc);
-		section.setClient(client);
-		section.setExpanded(true);
-		section.addExpansionListener(new ExpansionAdapter() {
+		agent_section.setText(title);
+		agent_section
+		.setDescription(UIMessages.ODEN_EDITORS_PolicyPage_DeployLabelDesc);
+		agent_section.setClient(client);
+		agent_section.setExpanded(false);
+		agent_section.addExpansionListener(new ExpansionAdapter() {
 			public void expansionStateChanged(ExpansionEvent e) {
 
 			}
 		});
 		gd = new GridData(GridData.FILL_BOTH);
-		section.setLayoutData(gd);
+		agent_section.setLayoutData(gd);
 
 	}
 
@@ -691,7 +696,7 @@ public class PolicyPage implements Page {
 
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 6;
-		//		layout.marginWidth = 10;
+
 		client.setLayout(layout);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.heightHint = 15;
@@ -700,7 +705,7 @@ public class PolicyPage implements Page {
 		gd = new GridData();
 		gd.widthHint = 120; 
 		savePolicy = toolkit.createButton(client,
-				OdenMessages.ODEN_EDITORS_PolicyPage_PolicySave_Btn, SWT.PUSH);
+				UIMessages.ODEN_EDITORS_PolicyPage_PolicySave_Btn, SWT.PUSH);
 		savePolicy.addListener(SWT.Selection, listener);
 		savePolicy.setLayoutData(gd);
 
@@ -737,7 +742,10 @@ public class PolicyPage implements Page {
 			return ((PolicyDetails) element).getLocationVar();
 		}
 	}
-
+	
+	/**
+	 * policy data loading
+	 */
 	public void loadInitData(String url) {
 		String commnd = "";
 		String result = "";
@@ -762,7 +770,7 @@ public class PolicyPage implements Page {
 								.get(o.toString()).toString());
 						String name = o.toString();
 						String desc = result_.getOptionArg(new String[] { "desc" });
-						if(!(name.matches(OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
+						if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
 							++index;
 							details = new PolicyDetails(name, desc, null, null, null);
 							policyList.add(details);
@@ -774,17 +782,20 @@ public class PolicyPage implements Page {
 					}
 				}
 				getPolicyViewer().setInput(policyList);
-				lastNum = getPolicyViewer().getTable().getItemCount() ;
-				getRepo();
+				setLastNum(getPolicyViewer().getTable().getItemCount());
 				policyViewer.getTable().select(selectIndex - 1);
 			}
 		} catch (OdenException e) {
 
 		} catch (Exception odenException) {
 			OdenActivator.error("Exception occured while loading policy data.",odenException);
-		} 
+		} finally {
+			getRepo();
+		}
 	}
-
+	/**
+	 * policy detail data loading
+	 */
 	public void showPolicyDetail(String policyName) {
 		String commnd = "";
 		String result = "";
@@ -827,7 +838,7 @@ public class PolicyPage implements Page {
 			if (protocol.equals("file")) {
 				// fileserver
 				getRepoKind().select(0);
-				getBuildRepoUriText().setText(agent.getUrl());
+				getBuildRepoUriText().setText(server.getUrl());
 				getBuildRepoRootText().setText(repo[0].substring(repo[0]
 				                                                      .lastIndexOf("://") + 3));
 				noUsernameRequired.setEnabled(false);
@@ -846,8 +857,14 @@ public class PolicyPage implements Page {
 			} else if ( repo.length == 4 ) {
 				getUserField().setText(repo[2]);
 				getPasswordField().setText(repo[3]);
-				getUserField().setEnabled(true);
-				getPasswordField().setEnabled(true);
+				if(repo[2].equals("anonymous")){
+					getNoUsernameRequired().setSelection(true);
+					getUserField().setEnabled(false);
+					getPasswordField().setEnabled(false);
+				} else {
+					getUserField().setEnabled(true);
+					getPasswordField().setEnabled(true);
+				}
 			} else {
 				// anonymous
 				getNoUsernameRequired().setSelection(true);
@@ -894,7 +911,7 @@ public class PolicyPage implements Page {
 		}
 	}
 	private String changeExcludeValue(String[] inputArr) {
-		ArrayList<String> exepts = arrToChange(OdenMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(","));
+		ArrayList<String> exepts = arrToChange(CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(","));
 		String returnVal="";
 		if(inputArr.length > 0) {
 			for(String exclude : inputArr)
@@ -915,7 +932,7 @@ public class PolicyPage implements Page {
 				return false;
 		return true;
 	}
-	@SuppressWarnings("null")
+	
 	private ArrayList<String> arrToChange(String[] inputArr) {
 		ArrayList<String> returnList = new ArrayList<String>();
 		for(String input : inputArr){
@@ -925,6 +942,9 @@ public class PolicyPage implements Page {
 		return returnList;
 	}
 	
+	/**
+	 * initialize policy detail data
+	 */
 	public void clearText() {
 
 		includeText.setText("");
@@ -968,28 +988,27 @@ public class PolicyPage implements Page {
 				details = (PolicyDetails) obj;
 
 				if (checkRemove(obj)) {
-					if (DialogUtil.confirmMessageDialog(OdenMessages.ODEN_CommonMessages_Title_ConfirmDelete,
-							OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_ConfirmDeletePolicy_MessagePre + details.getPolicyName() + OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf )) {
-						new DeletePolicyAction().run();
+					if (DialogUtil.confirmMessageDialog(CommonMessages.ODEN_CommonMessages_Title_ConfirmDelete,
+							UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_ConfirmDeletePolicy_MessagePre + details.getPolicyName() + CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf )) {
+						new DeletePolicyAction().run(serverName);
 						client.setVisible(false);
 					}
 				} else {
-					DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-							OdenMessages.ODEN_CommonMessages_SelectItemFirst,
+					DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+							CommonMessages.ODEN_CommonMessages_SelectItemFirst,
 							MessageDialog.WARNING);
 				}
 			} else if (event.widget == savePolicy) {
 				// validation check(save)
 				if (checkSave()){
-					new SavePolicyAction().run();
+					new SavePolicyAction().run(serverName);
 				}
 			} else if (event.widget == getAddPolicy()) {
 				// validation check(add)
 				client.setVisible(true);
-
-				new NewPolicyAction().run();
+				new NewPolicyAction().run(serverName);
 			} else if (event.widget == addDeploy) {
-				new NewDeployAction().run();
+				new NewDeployAction().run(serverName);
 
 			} else if (event.widget == removeDeploy) {
 				ISelection selection = getDeployViewer().getSelection();
@@ -997,12 +1016,12 @@ public class PolicyPage implements Page {
 				PolicyDetails detail = (PolicyDetails) obj;
 
 				if(checkRemoveDeploy()){
-					if (DialogUtil.confirmMessageDialog(OdenMessages.ODEN_CommonMessages_Title_ConfirmDelete,
-							OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_ConfirmDeleteDeploy_MessagePre + detail.getDeployUrl() + OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
-						new DeleteDeployAction().run();
+					if (DialogUtil.confirmMessageDialog(CommonMessages.ODEN_CommonMessages_Title_ConfirmDelete,
+							UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_ConfirmDeleteDeploy_MessagePre + detail.getDeployUrl() + CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
+						new DeleteDeployAction().run(serverName);
 					}
 				} else {
-					DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
+					DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
 							"Select Deployment Target",
 							MessageDialog.WARNING);
 				}
@@ -1012,23 +1031,26 @@ public class PolicyPage implements Page {
 
 	private void chageLabel() {
 		// change Label
-		policy.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyName);
-//		description.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyDesc);
-		repo.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo);
-//		include.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_ItemInclude);
+		policy.setText(UIMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyName);
+		repo.setText(UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo);
 	}
-
+	
+	/**
+	 * change Mandatory label
+	 */
 	public void chageMandaLabel() {
 		// change Label
-		policy.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_PolicyName);
-		description.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyDesc);
-		repo.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_BuildRepo);
-		include.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_ItemInclude);
+		policy.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_PolicyName);
+		description.setText(UIMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyDesc);
+		repo.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_BuildRepo);
+		include.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_ItemInclude);
 	}
-
+	
+	/**
+	 * Add deploy grid
+	 */
 	public void addDeploy(String agent , String location) {
 		// Deploy Text reset
-
 		PolicyDetails details = null;
 
 		details = new PolicyDetails(null, null, agent, null, location);
@@ -1037,145 +1059,79 @@ public class PolicyPage implements Page {
 
 	private Boolean checkSave() {
 		if (getPolicyNameText().getText().equals("")) {
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyName,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
+					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_PolicyName,
 					MessageDialog.INFORMATION);
 			getPolicyNameText().setFocus();
 			return false;
-		} else if (getPolicyNameText().getText().equals(OdenMessages.ODEN_EDITORS_PolicyPage_TempPolicyName)) {
+		} else if (getPolicyNameText().getText().equals(UIMessages.ODEN_EDITORS_PolicyPage_TempPolicyName)) {
 			// check temporary policyName
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_CommonMessages_NameShouldBeSpecified + '"' + OdenMessages.ODEN_EDITORS_PolicyPage_TempPolicyName + '"',
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					CommonMessages.ODEN_CommonMessages_NameShouldBeSpecified + '"' + UIMessages.ODEN_EDITORS_PolicyPage_TempPolicyName + '"',
 					MessageDialog.WARNING);
 			getPolicyNameText().setFocus();
 			return false;
 		} else if (includeText.getText().equals("")) {
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue  + " "
-					+ OdenMessages.ODEN_EDITORS_PolicyPage_Opt_ItemInclude,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue  + " "
+					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_ItemInclude,
 					MessageDialog.INFORMATION);
 			includeText.setFocus();
 			return false;
 		} else if (getRepoKind().getText().equals("")){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
+					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
 					MessageDialog.INFORMATION);
+			repo_section.setExpanded(true);
 			getRepoKind().setFocus();
 			return false;
 		} else if (getBuildRepoUriText().getText().equals("")){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
+					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
 					MessageDialog.INFORMATION);
+			repo_section.setExpanded(true);
 			getBuildRepoUriText().setFocus();
 			return false;		
 		} else if (getBuildRepoRootText().getText().equals("")){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRoot,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
+					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRoot,
 					MessageDialog.INFORMATION);
+			repo_section.setExpanded(true);
 			getBuildRepoRootText().setFocus();
 			return false;
-		} else if (!(getNoUsernameRequired().getSelection()) && getUserField().getText().equals("")){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EXPLORER_Dialogs_UserNameFieldName,
-					MessageDialog.INFORMATION);
-			getUserField().setFocus();
-			return false;
-		} else if (!(getNoUsernameRequired().getSelection()) && getPasswordField().getText().equals("")){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_EXPLORER_Dialogs_PasswordFieldName,
-					MessageDialog.INFORMATION);
-			getPasswordField().setFocus();
-			return false;		
-
 		} else if (getDeployViewer().getTable().getItemCount() == 0){
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
-					+ OdenMessages.ODEN_HISTORY_DeploymentHistoryView_LabelGridCol2,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
+					+ UIMessages.ODEN_HISTORY_DeploymentHistoryView_LabelGridCol2,
 					MessageDialog.INFORMATION);
+			agent_section.setExpanded(true);
 			return false;		
 		} else if (getPolicyNameText().getEnabled()  && dupPolicyNameCheck() ) {
-			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-					OdenMessages.ODEN_CommonMessages_NameAlreadyExists,
+			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+					CommonMessages.ODEN_CommonMessages_NameAlreadyExists,
 					MessageDialog.WARNING);
 			getPolicyNameText().setFocus();
 			return false;
-//		} else if (checkCludeValue(includeText)) {
-//			// include rule check
-//			DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-//					"check separate text",
-//					MessageDialog.WARNING);
-//			includeText.setFocus();
-//			return false;
-//		} else if (!(excludeText.getText().equals(""))) {
-//			if(checkCludeValue(excludeText)) {
-//				// exclude rule check
-//				DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-//						"check separate text",
-//						MessageDialog.WARNING);
-//				excludeText.setFocus();
-//				return false;
-//			}
 		} 
 
 		return true;
 	}
-
-//	private Boolean checkCludeValue(StyledText text) {
-//		String value = text.getText();
-//		// *.*/ , /**/ , /*/ not rule
-//		if(!(value.equals(""))) {
-//			if(value.indexOf(";") > 0) {
-//				// multi value
-//				String[] values = value.split(";");
-//				for(String val : values) {
-//					if(cludeValidate(val)){
-//						return true;
-//					}
-//				}
-//			} else {
-//				// single value
-//				if(cludeValidate(value))
-//					return true;
-//			}
-//		}
-//		return false;
-//	}
-//	private Boolean cludeValidate(String value) {
-//		String temp = "";
-//		if(value.indexOf("**") > 0){
-//			temp = value.substring(value.indexOf("**"), value.length());
-//		} else if (value.indexOf("*") > 0){
-//			temp = value.substring(value.indexOf("*"), value.length());
-//		} else if (value.indexOf(".") > 0){
-//			temp = value.substring(value.indexOf("."), value.length());
-//		}
-//		if(cludePathExist(temp)) 
-//			return true;
-//		return false;
-//	}
-//	private Boolean cludePathExist(String value) {
-//		if(value.indexOf("/") > 0) {
-//			return true;
-//		} else if(value.indexOf(File.separator) > 0) {
-//			return true;
-//		}
-//		return false;
-//	}
 	private Boolean checkRemove(Object obj) {
 		if (obj != null)
 			return true;
 		else
 			return false;
 	}
-
+	
+	/**
+	 * check when add agent information
+	 * @return duplicate server name and location variable
+	 */
 	public Boolean checkAddDeploy(String addAgent, String addLocation) {
-		// Check Duplicate testserver Lacation Variable
 		PolicyDetails details = new PolicyDetails();
 		int count = getDeployViewer().getTable().getItemCount();
 		if(count != 0){
@@ -1193,7 +1149,6 @@ public class PolicyPage implements Page {
 	}
 
 	private Boolean checkRemoveDeploy() {
-		// Check Selected Deployment Target
 		ISelection selection = getDeployViewer().getSelection();
 		Object obj = ((IStructuredSelection) selection).getFirstElement();
 
@@ -1224,8 +1179,8 @@ public class PolicyPage implements Page {
 
 	}
 	private void setUserAccount() {
-		if(getRepoKind().getText().equals(OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
-			// file system
+		if(getRepoKind().getText().equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+			// when file protocol use
 			getNoUsernameRequired().setEnabled(false);
 			getUserField().setEnabled(false);
 			userName.setEnabled(false);
@@ -1233,9 +1188,9 @@ public class PolicyPage implements Page {
 			getPasswordField().setEnabled(false);
 			getNoUsernameRequired().setSelection(true);
 			getBuildRepoUriText().setEnabled(false);
-			getBuildRepoUriText().setText(agent.getUrl());
+			getBuildRepoUriText().setText(server.getUrl());
 		} else {
-			// ftp
+			// when ftp protocol use
 			getNoUsernameRequired().setEnabled(true);
 			getNoUsernameRequired().setSelection(false);
 			getUserField().setEnabled(true);
@@ -1282,18 +1237,16 @@ public class PolicyPage implements Page {
 				getNoUsernameRequired().setSelection(false);
 				getUserField().setText(repo.getUser());
 				getPasswordField().setText(repo.getPassword());
-//				getUserField().setText("");
+				//				getUserField().setText("");
 			}
 			if (repo
 					.getProtocol()
 					.equals(
-							OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
-				// buildRepoUriText.setEnabled(false);
+							CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
 				getBuildRepoUriText().setText(repo.getUrl());
 				getBuildRepoRootText().setText(repo.getPath());
 				getRepoKind().select(0);
 			} else {
-				// buildRepoUriText.setEnabled(true);
 				getBuildRepoUriText().setText(repo.getUrl());
 				getBuildRepoRootText().setText(repo.getPath());
 				getRepoKind().select(1);
@@ -1334,7 +1287,7 @@ public class PolicyPage implements Page {
 						if(name.equals(policyNameText.getText())){
 							return true;
 						}
-						
+
 					}
 				}
 			}
@@ -1357,9 +1310,10 @@ public class PolicyPage implements Page {
 
 			public void keyReleased(KeyEvent ke) {
 				// filter.setSearchText(filterText.getText());
-				PolicyPage.this.getPolicyViewer().addFilter(PolicyPage.this.filter);
-				getPolicyViewer().refresh();
-
+				if(!(filterText.getText().equals("type filter text")) && !(filterText.getText().equals(""))){
+					PolicyPage.this.getPolicyViewer().addFilter(PolicyPage.this.filter);
+					getPolicyViewer().refresh();
+				}
 			}
 		});
 		filterText.addMouseListener(new MouseListener() {
@@ -1412,18 +1366,28 @@ public class PolicyPage implements Page {
 						else
 							getAddPolicy().setEnabled(true);
 					}
+				} else {
+					client.setVisible(false);
+					policyViewer.getTable().clearAll();
+					policyViewer.getTable().deselectAll();
+					loadInitData(shellUrl);
+					addPolicy.setEnabled(true);
+					policyViewer.refresh();
 				}
 
 			}
 		});
 	}
+	/**
+	 * Set information of server name at repoCombo
+	 */
 	public void getRepo(){
-		String agentNickname = agent.getNickname();
+		String serverNickname = server.getNickname();
 		repoNickname.removeAll();
 		Collection<Repository> repos = OdenActivator.getDefault()
 		.getAliasManager().getRepositoryManager().getRepositories();
 		for(Repository repo : repos){
-			if(agentNickname.equals(repo.getAgentToUse())){
+			if(serverNickname.equals(repo.getServerToUse())){
 				repoNickname.add(repo.getNickname());
 			}
 		}
@@ -1431,7 +1395,6 @@ public class PolicyPage implements Page {
 	}
 
 	private void temporaryEvent() {
-		// taskName , Desc Event
 		getPolicyNameText().addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent event) {
 			}
@@ -1451,7 +1414,7 @@ public class PolicyPage implements Page {
 	private void tempProcess () {
 		if(chkNewPolicy()) {
 			removeTempcell();
-			inputTempcell(lastNum);
+			inputTempcell(getLastNum());
 		} else {
 			int selected= getPolicyViewer().getTable().getSelectionIndex();
 			removeTempcell();
@@ -1461,6 +1424,9 @@ public class PolicyPage implements Page {
 		}
 
 	}
+	/**
+	 * Remove temporary cell
+	 */
 	public void removeTempcell() {
 		PolicyDetails details = null;
 		ISelection selection = getPolicyViewer().getSelection();
@@ -1481,6 +1447,10 @@ public class PolicyPage implements Page {
 		getPolicyViewer().insert(details, num );
 		getPolicyViewer().getTable().select(num );
 	}
+	/**
+	 * Returns the new policy exist or not exist
+	 * @return true/false , When a new Policy exist , return true.
+	 */
 	public boolean chkNewPolicyExist() {
 		int count = getPolicyViewer().getTable().getItemCount();
 		int originCount = originPolicy.size();
@@ -1489,15 +1459,21 @@ public class PolicyPage implements Page {
 
 		return true;
 	}
+	/**
+	 * Returns the selected policy of new policy or not
+	 * @return true/false
+	 */
 	public boolean chkNewPolicy() {
 		int selected= getPolicyViewer().getTable().getSelectionIndex();
-		if(selected != lastNum)
+		if(selected != getLastNum())
 			return false;
 		return true;
 	}
-	// Action constructor
+	/**
+	 * Constructor UI component
+	 */
 	public void setExcludeText(StyledText excludeText) {
-		PolicyPage.excludeText = excludeText;
+		this.excludeText = excludeText;
 	}
 
 	public StyledText getExcludeText() {
@@ -1505,7 +1481,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setIncludeText(StyledText includeText) {
-		PolicyPage.includeText = includeText;
+		this.includeText = includeText;
 	}
 
 	public StyledText getIncludeText() {
@@ -1513,7 +1489,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setRepoKind(Combo repoKind) {
-		PolicyPage.repoKind = repoKind;
+		this.repoKind = repoKind;
 	}
 
 	public Combo getRepoKind() {
@@ -1529,7 +1505,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setNoUsernameRequired(Button noUsernameRequired) {
-		PolicyPage.noUsernameRequired = noUsernameRequired;
+		this.noUsernameRequired = noUsernameRequired;
 	}
 
 	public Button getNoUsernameRequired() {
@@ -1537,7 +1513,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setPolicyNameText(Text policyNameText) {
-		PolicyPage.policyNameText = policyNameText;
+		this.policyNameText = policyNameText;
 	}
 
 	public Text getPolicyNameText() {
@@ -1545,7 +1521,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setBuildRepoUriText(Text buildRepoUriText) {
-		PolicyPage.buildRepoUriText = buildRepoUriText;
+		this.buildRepoUriText = buildRepoUriText;
 	}
 
 	public Text getBuildRepoUriText() {
@@ -1553,7 +1529,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setBuildRepoRootText(Text buildRepoRootText) {
-		PolicyPage.buildRepoRootText = buildRepoRootText;
+		this.buildRepoRootText = buildRepoRootText;
 	}
 
 	public Text getBuildRepoRootText() {
@@ -1561,7 +1537,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setUserField(Text userField) {
-		PolicyPage.userField = userField;
+		this.userField = userField;
 	}
 
 	public Text getUserField() {
@@ -1569,7 +1545,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setPasswordField(Text passwordField) {
-		PolicyPage.passwordField = passwordField;
+		this.passwordField = passwordField;
 	}
 
 	public Text getPasswordField() {
@@ -1577,7 +1553,7 @@ public class PolicyPage implements Page {
 	}
 
 	public void setDescriptionText(Text descriptionText) {
-		PolicyPage.descriptionText = descriptionText;
+		this.descriptionText = descriptionText;
 	}
 
 	public Text getDescriptionText() {
@@ -1585,7 +1561,7 @@ public class PolicyPage implements Page {
 	}
 
 	public  void setUpdateOptionRequired(Button updateOptionRequired) {
-		PolicyPage.updateOptionRequired = updateOptionRequired;
+		this.updateOptionRequired = updateOptionRequired;
 	}
 
 	public  Button getUpdateOptionRequired() {
@@ -1593,35 +1569,43 @@ public class PolicyPage implements Page {
 	}
 
 	public void setShellUrl(String shellUrl) {
-		PolicyPage.shellUrl = shellUrl;
+		this.shellUrl = shellUrl;
 	}
 
-	public static String getShellUrl() {
+	public String getShellUrl() {
 		return shellUrl;
 	}
 
 	public void setPolicyViewer(TableViewer policyViewer) {
-		PolicyPage.policyViewer = policyViewer;
+		this.policyViewer = policyViewer;
 	}
 
-	public static TableViewer getPolicyViewer() {
+	public TableViewer getPolicyViewer() {
 		return policyViewer;
 	}
 
 	public void setAddPolicy(Button addPolicy) {
-		PolicyPage.addPolicy = addPolicy;
+		this.addPolicy = addPolicy;
 	}
 
 	public Button getAddPolicy() {
 		return addPolicy;
 	}
 
-	public static void setRemovePolicy(Button removePolicy) {
-		PolicyPage.removePolicy = removePolicy;
+	public void setRemovePolicy(Button removePolicy) {
+		this.removePolicy = removePolicy;
 	}
 
 	public Button getRemovePolicy() {
 		return removePolicy;
+	}
+
+	public void setLastNum(int lastNum) {
+		this.lastNum = lastNum;
+	}
+
+	public int getLastNum() {
+		return lastNum;
 	}
 
 }

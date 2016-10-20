@@ -10,19 +10,19 @@
          policy="dynamic"
          bind="setDelegateService"
          unbind="unsetDelegateService"
-   />
-   <reference name="PERSISTENCE_SERVICE"
+	/>
+	<reference name="PERSISTENCE_SERVICE"
          interface="anyframe.oden.bundle.prefs.PrefsService"
          cardinality="0..1"
          policy="dynamic"
          bind="setPrefsService"
          unbind="unsetPrefsService"
-   />
-   <reference name="ODEN_CONFIG_SERVICE"
+	/>
+	<reference name="ODEN_CONFIG_SERVICE"
          interface="anyframe.oden.bundle.core.config.OdenConfigService"
          cardinality="0..1"
          policy="dynamic"
          bind="setConfigService"
          unbind="unsetConfigService"
-   />   
+	/> 
 </component>

@@ -1,1 +1,1 @@
-java -jar bin/oden-1.0.0.RC2.jar
+java -jar bin/oden-1.0.0.PRE1.jar

@@ -16,16 +16,17 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.editors.AbstractEditorsAction;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
 import anyframe.oden.eclipse.core.editors.TaskDetails;
 import anyframe.oden.eclipse.core.editors.TaskPage;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -35,42 +36,45 @@ public class NewTaskAction extends AbstractEditorsAction {
 	/**
 	 * 
 	 */
+	
+	
+	
 	public NewTaskAction() {
 		super(
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
-				OdenMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_MsgTaskPageTaskAddBtn,
+				UIMessages.ODEN_EDITORS_TaskPage_TaskPageTitleImage);
 	}
 
 	/**
 	 * 
 	 */
-	public void run() {
-		TaskPage page = new TaskPage();
-		page.taskNameText.setEnabled(true);
-		page.removeTask.setEnabled(false);
+	public void run(String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
+		
+		page.getTaskNameText().setEnabled(true);
+		page.getRemoveTask().setEnabled(false);
 		page.chageMandaLabel();
 		// initialize Text
 		page.clearText();
 		page.loadInitPolicyData();
 		// input temporary field
-		addTempTaskName();
-		page.newTask = true;
+		addTempTaskName(title);
+		page.setNewTask(true);
 	}
 	
-	private void addTempTaskName() {
-		TaskPage page = new TaskPage();
-		// create temp task 
-		String tempTaskName = OdenMessages.ODEN_EDITORS_TaskPage_TempTaskName;
-		String tempTaskDesc = OdenMessages.ODEN_EDITORS_TaskPage_TempTaskDesc;
-		page.taskNameText.setText(tempTaskName);
-		page.descText.setText(tempTaskDesc);
+	private void addTempTaskName(String title) {
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
+		String tempTaskName = UIMessages.ODEN_EDITORS_TaskPage_TempTaskName;
+		String tempTaskDesc = UIMessages.ODEN_EDITORS_TaskPage_TempTaskDesc;
+		page.getTaskNameText().setText(tempTaskName);
+		page.getDescText().setText(tempTaskDesc);
 		TaskDetails details = null;
 
 		details = new TaskDetails(tempTaskName, tempTaskDesc,  null, null);
-		page.taskViewer.add(details);
-		page.taskViewer.getTable().select(page.lastNum);
-		page.addTask.setEnabled(false);
-		page.removeTask.setEnabled(true);
+		page.getTaskViewer().add(details);
+		page.getTaskViewer().getTable().select(page.getLastNum());
+		page.getAddTask().setEnabled(false);
+		page.getRemoveTask().setEnabled(true);
 	}
 }

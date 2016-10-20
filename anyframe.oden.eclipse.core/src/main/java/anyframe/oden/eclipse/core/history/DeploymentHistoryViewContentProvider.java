@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.Viewer;
  * 
  * @author RHIE Jihwan
  * @version 1.0.0
- * @since 1.0.0 RC1
+ * @since 1.0.0 RC2
  *
  */
 public class DeploymentHistoryViewContentProvider implements IStructuredContentProvider {

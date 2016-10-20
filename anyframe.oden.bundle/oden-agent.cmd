@@ -1,1 +1,1 @@
-java -jar bin/oden-1.0.0.RC2.jar -port 9862
+java -jar bin/oden-1.0.0.PRE1.jar -port 9862

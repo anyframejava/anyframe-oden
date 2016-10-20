@@ -16,35 +16,52 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import anyframe.oden.eclipse.core.OdenMessages;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+
+import anyframe.oden.eclipse.core.editors.OdenEditor;
+import anyframe.oden.eclipse.core.editors.TaskDetails;
 import anyframe.oden.eclipse.core.editors.TaskPage;
 import anyframe.oden.eclipse.core.history.AbstractDeploymentHistoryViewAction;
-import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * The Implementation of RefreshAction,
  * for the Anyframe Oden Deployment History view.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  *
  */
 public class TaskRefreshAction extends AbstractDeploymentHistoryViewAction {
-
-	public TaskRefreshAction() {
+	private String title;
+	public TaskRefreshAction(String title) {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+		this.title = title;
+		
 	}
 
 	public void run() {
-		new TaskPage();
-		TaskPage.loadInitData();
-		TaskPage.loadInitPolicyData();
-		TaskPage.taskViewer.refresh();
-		TaskPage.runViewer.refresh();
+		TaskPage page = OdenEditor.getDefault(title).getTaskpage();
+		page.loadInitData();
+		page.loadInitPolicyData();
+		TaskDetails details = new TaskDetails();
+		ISelection selection = page.getTaskViewer().getSelection();
+		if(!(selection.isEmpty()) && ! page.chkNewTask()) {
+			Object obj = ((IStructuredSelection) selection).getFirstElement();
+			details = (TaskDetails) obj;
+			page.showTaskDetail(details.getTaskName());
+		} else {
+			page.clearText();
+			page.getClient().setVisible(false);
+		}
+		page.getTaskViewer().refresh();
+		page.getRunViewer().refresh();
+		page.getAddTask().setEnabled(true);
 	}
 
 }

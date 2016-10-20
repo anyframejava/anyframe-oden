@@ -34,9 +34,10 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.Cmd;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
@@ -54,11 +55,11 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 	private static String[] DATE_OPT = { "date" }; //$NON-NLS-1$
 
 	ImageDescriptor planImageDescriptor = ImageUtil
-			.getImageDescriptor(OdenMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_PlanIcon);
+			.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_PlanIcon);
 	Image planImage = ImageUtil.getImage(planImageDescriptor);
 
 	ImageDescriptor fileImageDescriptor = ImageUtil
-			.getImageDescriptor(OdenMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_SnpahotIcon);
+			.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_SnpahotIcon);
 	Image fileImage = ImageUtil.getImage(fileImageDescriptor);
 
 	/**
@@ -85,15 +86,16 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 		}
 	}
 
-	public void update(ViewerCell cell) {
+	@Override
+	public void update(ViewerCell cell) {  
 
 		Object element = cell.getElement();
 		if (element instanceof TreeParent) {
 			cell.setText(element.toString());
 		} else if (element instanceof TreeObject) {
+			String decoration = getFileInfo(element.toString());
 			StyledString styledString = new StyledString(element.toString(),
 					null);
-			String decoration = getFileInfo(element.toString());
 			styledString.append(decoration, StyledString.DECORATIONS_STYLER);
 
 			cell.setText(styledString.toString());
@@ -104,21 +106,20 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 		} else {
 			cell.setImage(fileImage);
 		}
-
-		// super.update(cell);
+		super.update(cell);
 	}
 
 	private String getFileInfo(String text) {
 		String result = ""; //$NON-NLS-1$
-
 		String fileInfo = ""; //$NON-NLS-1$
+		
 		try {
 			fileInfo = SnapshotViewContentProvider.getInfo(
 					SnapshotView.SHELL_URL,
-					OdenMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile + " " //$NON-NLS-1$
+					CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile + " " //$NON-NLS-1$
 							+ text + " -json"); //$NON-NLS-1$
 		} catch (OdenException e) {
-			OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo, e);
+			OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo, e);
 		}
 
 		String info = ""; //$NON-NLS-1$
@@ -128,7 +129,7 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 			JSONObject jo = ja.getJSONObject(0);
 			info = jo.getString(text);
 		} catch (JSONException e) {
-			OdenActivator.error(OdenMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotDetailInfo, e);
+			OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotDetailInfo, e);
 		}
 
 		Cmd cmd = new Cmd(text + " = " + info); //$NON-NLS-1$
@@ -158,24 +159,19 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 	 */
 	public void dispose() {
 		ImageUtil
-				.disposeImage(OdenMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_PlanIcon);
+				.disposeImage(UIMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_PlanIcon);
 		ImageUtil
-				.disposeImage(OdenMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_SnpahotIcon);
+				.disposeImage(UIMessages.ODEN_SNAPSHOT_SnapshotViewLabelProvider_SnpahotIcon);
 	}
 
 	public void addListener(ILabelProviderListener listener) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public boolean isLabelProperty(Object element, String property) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public void removeListener(ILabelProviderListener listener) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

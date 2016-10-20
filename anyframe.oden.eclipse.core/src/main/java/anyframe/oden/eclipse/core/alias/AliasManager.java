@@ -22,7 +22,7 @@ import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 
 /**
- * Manages the list of Agents and Repositories.
+ * Manages the list of Servers and Repositories.
  * 
  * @author RHIE Jihwan
  * @version 1.0.0
@@ -31,7 +31,7 @@ import anyframe.oden.eclipse.core.OdenException;
  */
 public class AliasManager {
 
-	private AgentManager agentManager;
+	private ServerManager serverManager;
 	private RepositoryManager repositoryManager;
 	//	private String aliasType;
 
@@ -39,54 +39,54 @@ public class AliasManager {
 	//	private AliasManager parent = null;
 
 	/**
-	 * Initializes list of Agents and Repositories.
+	 * Initializes list of Servers and Repositories.
 	 * @throws OdenException
 	 * @see anyframe.oden.eclipse.core.OdenActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void load() throws OdenException {
 		try {
-			agentManager = new AgentManager();
-			agentManager.loadAgents();
+			serverManager = new ServerManager();
+			serverManager.loadServers();
 
 			repositoryManager = new RepositoryManager();
 			repositoryManager.loadRepositories();
 		} catch (OdenException odenException) {
-			OdenActivator.error("Exception occured during loading Agents or Repositories", odenException);
+			OdenActivator.error("Exception occured during loading Servers or Repositories", odenException);
 			throw odenException;
 		}
 	}
 
 	/**
-	 * Saves modified list of Agents and Repositories when the plug-in closes
+	 * Saves modified list of Servers and Repositories when the plug-in closes
 	 * It occurs usually when quits Eclipse 
 	 * @throws OdenException
 	 * @see anyframe.oden.eclipse.core.OdenActivator#stop(BundleContext context)
 	 */
 	public void save() throws OdenException {
 		try {
-			if (agentManager != null) {
-				agentManager.saveAgents();
+			if (serverManager != null) {
+				serverManager.saveServers();
 			}
 			if (repositoryManager != null) {
 				repositoryManager.saveRepositories();
 			}		
 		} catch (OdenException odenException) {
-			OdenActivator.error("Exception occured while saving Agents or Repositories", odenException);
+			OdenActivator.error("Exception occured while saving Servers or Repositories", odenException);
 			throw odenException;
 		}
 	}
 
 	/**
-	 * Gets an AgentManager
-	 * @return list of Agents
+	 * Gets an ServerManager
+	 * @return list of Servers
 	 */
-	public AgentManager getAgentManager() {
-		return agentManager;
+	public ServerManager getServerManager() {
+		return serverManager;
 	}
 
-	// A setter for AgentManager is not required
-	//	public void setAgentManager(AgentManager agentManager) {
-	//		this.agentManager = agentManager;
+	// A setter for ServerManager is not required
+	//	public void setServerManager(ServerManager serverManager) {
+	//		this.serverManager = serverManager;
 	//	}
 
 	/**

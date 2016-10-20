@@ -22,7 +22,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotStatusProgress;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
@@ -44,9 +46,9 @@ public class RollbackSnapshotAction extends AbstractSnapshotViewAction {
 	 */
 	public RollbackSnapshotAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_Rollback,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_RollbackTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_RollbackIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_Rollback,
+				UIMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_RollbackTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_RollbackSnapshotAction_RollbackIcon);
 	}
 
 	/**
@@ -57,8 +59,8 @@ public class RollbackSnapshotAction extends AbstractSnapshotViewAction {
 				.getSelected();
 		if (selected == null) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-					OdenMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotRollback,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotRollback,
 					MessageDialog.INFORMATION);
 		} else {
 
@@ -67,10 +69,10 @@ public class RollbackSnapshotAction extends AbstractSnapshotViewAction {
 
 			if (DialogUtil
 					.confirmMessageDialog(
-							OdenMessages.ODEN_SNAPSHOT_SnapshotView_MsgDlgRollback,
-							OdenMessages.ODEN_SNAPSHOT_Actions_MsgDlgRollbackConfirm
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_MsgDlgRollback,
+							UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgRollbackConfirm
 									+ selection
-									+ OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
+									+ CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
 				SnapshotView.setStatusMessage(""); //$NON-NLS-1$
 
 				StringTokenizer token = new StringTokenizer(selection, " "); //$NON-NLS-1$
@@ -80,13 +82,13 @@ public class RollbackSnapshotAction extends AbstractSnapshotViewAction {
 
 				try {
 					SnapshotStatusProgress
-							.statusProgress(OdenMessages.ODEN_SNAPSHOT_Actions_MsgRollback
+							.statusProgress(CommandMessages.ODEN_SNAPSHOT_Actions_MsgRollback
 									+ fileName + " -json"); //$NON-NLS-1$
 
 				} catch (OdenException e) {
 					OdenActivator
 							.error(
-									OdenMessages.ODEN_SNAPSHOT_Actions_Exception_RollbackSnapshot,
+									UIMessages.ODEN_SNAPSHOT_Actions_Exception_RollbackSnapshot,
 									e);
 				}
 

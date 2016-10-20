@@ -23,13 +23,13 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.alias.Agent;
-import anyframe.oden.eclipse.core.alias.AgentManager;
 import anyframe.oden.eclipse.core.alias.AliasManager;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.alias.RepositoryManager;
+import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.alias.ServerManager;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * Tree content provider for Oden view outline.
@@ -41,33 +41,10 @@ import anyframe.oden.eclipse.core.alias.RepositoryManager;
  */
 public class ExplorerViewContentProvider implements ITreeContentProvider,IStructuredContentProvider{
 	private TreeParent invisibleRoot;
-	private static final String MSG_REPOSITORY_SHOW = OdenMessages.ODEN_EXPLORER_ExplorerViewContentProvider_MsgRepsitoryShow;
-
 	/**
 	 * Gets children of the element
 	 */
 	public Object[] getChildren(Object parentElement) {
-
-		//		ArrayList aliases = new ArrayList();
-		//
-		//		if (parentElement instanceof AliasManager) {
-		//			if (((AliasManager) parentElement).getAgentManager() instanceof AgentManager) {
-		//				AgentManager agents = ((AliasManager) parentElement).getAgentManager();
-		//				aliases.addAll(agents.getAgents());
-		//
-		//				if (((AliasManager) parentElement).getRepositoryManager() instanceof RepositoryManager) {
-		//					RepositoryManager repositories = ((AliasManager) parentElement).getRepositoryManager();
-		//					aliases.addAll(repositories.getRepositories());
-		//
-		//				}
-		//			}
-		//
-		//			Object[] children = aliases.toArray();
-		//			return children;
-		//		}
-		//
-		//		return null;
-
 		if (parentElement instanceof TreeParent) {
 			return ((TreeParent) parentElement).getChildren();
 		}
@@ -79,11 +56,11 @@ public class ExplorerViewContentProvider implements ITreeContentProvider,IStruct
 	 */
 	public Object getParent(Object element) {
 		if (element instanceof AliasManager) {
-			if (((AliasManager) element).getAgentManager() instanceof AgentManager) {
+			if (((AliasManager) element).getServerManager() instanceof ServerManager) {
 				return null;
 
-			} else if (element instanceof Agent) {
-				return OdenActivator.getDefault().getAliasManager().getAgentManager();
+			} else if (element instanceof Server) {
+				return OdenActivator.getDefault().getAliasManager().getServerManager();
 
 			} else if (((AliasManager) element).getRepositoryManager() instanceof RepositoryManager) {
 				return null;
@@ -133,18 +110,18 @@ public class ExplorerViewContentProvider implements ITreeContentProvider,IStruct
 
 	private void initialize(Object inputElement) {
 		// 1 Level TreeContents
-		String[] roots = {OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel, OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel};
+		String[] roots = {UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel, UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel};
 		invisibleRoot = new TreeParent("");
 		for(String rootnm : roots){
 			TreeParent root = new TreeParent(rootnm);
 			invisibleRoot.addChild(root);
 
-			if(rootnm.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel)){
-				// 2 Level Agents 
-				Collection<Agent> col = OdenActivator.getDefault().getAliasManager()
-				.getAgentManager().getAgents();
-				for (Agent agent : col){
-					TreeParent sub = new TreeParent(agent.getNickname());
+			if(rootnm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)){
+				// 2 Level Servers 
+				Collection<Server> col = OdenActivator.getDefault().getAliasManager()
+				.getServerManager().getServers();
+				for (Server server : col){
+					TreeParent sub = new TreeParent(server.getNickname());
 					root.addChild(sub);
 				}
 			} else {

@@ -22,7 +22,7 @@ import java.util.Vector;
  * AdvancedSearchInputAttribute,
  * for the Model AdvacedSearch parameter.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  *

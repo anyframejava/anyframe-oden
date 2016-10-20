@@ -1,0 +1,63 @@
+#header{position:absolute;z-index:900;top:36px;left:0px;right:0px;height:45px;}
+#header.noPrint{top:0px;}
+#header #title{height:25px;background:#29334F url("../images/common/title_background.png") repeat-x;border-bottom:1px solid #B6B6B6;overflow:hidden;}
+#header h1{margin:0px;padding:5px 0px 0px 10px;font-size:10pt;text-shadow:rgb(213,213,213) 0px 1px 0px;white-space:nowrap;}
+
+#PDF_link{float:right;margin:3px 10px 0px 0px;}
+#PDF_link a img{vertical-align:sub;margin:0px 2px 0px 2px;border:none;}
+#PDF_link a{color:black;padding:2px 5px 2px 5px;-webkit-border-radius:9px;text-decoration:none;}
+
+#headerButtons{position:absolute;list-style:none outside;top:26px;left:0px;right:0px;margin:0px;padding:0px;border-top:1px solid #2B334F;border-bottom:1px solid #EDEDED;height:20px;font-size:8pt;overflow:hidden;background-color:#D8D8D8;}
+#headerButtons li{display:inline;background-repeat:no-repeat;padding:0px;margin-top:0px;}
+#headerButtons button a.urlLink{color:black;}
+#headerButtons button a.urlLink:hover{text-decoration:none;}
+#headerButtons button,#headerButtons select{margin:0px;font-size:8pt;border:none;height:20px;background-color:#D8D8D8;}
+#headerButtons select{padding:2px;}
+#headerButtons button{border-left:1px solid #ACACAC;}
+#headerButtons button:hover{background-color:#787878;color:white;}
+#headerButtons button:active{background-color:#4F4F4F;color:white;}
+#headerButtons button:disabled{background-color:#D8D8D8;color:gray;}
+
+li#toc_button button{background:url("../images/common/triangle_closed.png") no-repeat;background-position:4px 4px;text-align:left;padding-left:15px;width:230px;border-right:1px solid #ACACAC;}
+li#toc_button button.open{background-image:url("../images/common/triangle_open.png");}
+li#jumpto_button{position:absolute;left:230px;margin-left:0em;}
+li#page_buttons{position:absolute;right:0px;}
+
+#toc ul{list-style:none;margin:0px 0px 0px 0px;padding:0px 5px 0px 5px;}
+#toc li{margin:0px 0px 0px 0px;padding:0px 0px 0px 20px;font-weight:normal;overflow:hidden;text-overflow:ellipsis;}
+#toc li.topic{margin-left:5px;padding:0px 0px 0px 0px;font-weight:bold;border-bottom:1px dotted gray}
+#toc span.sectionName div{margin:0px 0px 3px 0px;overflow:hidden;text-overflow:ellipsis;}
+#tocContainer{position:absolute;top:84px;bottom:0px;left:0px;width:229px;background-color:#D4DDE5;border-right:1px solid #ACACAC;border-top:1px solid #2B334F;overflow-x:hidden;overflow-y:auto;padding:0px 0px 0px 0px;}
+#toc{width:209px;margin:0px 0px 0px 0px;padding:12px 0px 18px 0px;font-size:11px;}
+#toc .currentLocation{text-decoration:underline;}
+#tocContainer.noPrint{top:48px;}
+#toc li.children{padding:0px 0px 3px 20px;background:url("../images/common/triangle_closed.png") no-repeat;background-position:5px 1px;}
+#toc li.children.open{background-image:url("../images/common/triangle_open.png");}
+#toc span.sectionName a,#toc .intro a,#toc li.topic a{font-weight:bold;color:#000;}
+#toc .collapsible{margin:2px 0px 2px 0px;padding:0px;}
+#toc .entry_2{padding:3.5px 0px 2.5px 0px;}
+#toc .list_3{padding-left:15px;}
+#toc li.entry_3{padding:2px 0px 2px 9px;}
+#toc li.entry_4{padding:2px 0px 2px 14px;}
+#toc .entry_2 a,#toc .topic a,#toc ul.docList li.section span.sectionName div a{font-weight:bold;color:#4F4F4F;}
+#toc .entry_3 a,#toc .entry_4 a{font-weight:normal;color:#4F4F4F;}
+
+#contents{border-top:1px solid #2B334F;position:absolute;top:84px;bottom:0px;overflow:auto;left:0px;right:0px;z-index:1;padding-left:2em;padding-right:2em;}
+#contents .centeredContent{margin-left:auto;margin-right:auto;width:680px;}
+#contents.noPrint{top:48px;}
+
+@media print{
+	.hideOnPrint,#toc{display:none !important;}
+	body{overflow:visible !important;}
+	#header,#contents{position:relative;border:none;overflow:visible;}
+	#header{height:25px;}
+	#contents.noPrint,#contents{top:0px;}
+	a:link{text-decoration:none;color:black;}
+	a:visited{text-decoration:none;color:black;}
+	a:active{text-decoration:none;color:black;}
+	a:hover{text-decoration:underline;color:black;}
+}
+
+@media only screen and (max-device-width:480px){
+	#header,#contents,#toc{position:relative;overflow:visible;}
+}

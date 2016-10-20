@@ -1,20 +1,18 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.core.record;
 
@@ -24,6 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
@@ -31,6 +30,7 @@ import org.osgi.service.component.ComponentContext;
 
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenStoreException;
+import anyframe.oden.bundle.common.PairValue;
 
 /**
  * @see anyframe.oden.bundle.core.record.DeployLogService
@@ -56,22 +56,27 @@ public class DeployLogImpl implements DeployLogService {
 	}
 
 	public void record(String host, String agent, String agentRootPath,
-			List<String> paths) throws OdenException {
-		record(new RecordElement(host, agent, agentRootPath, paths, 
-				System.currentTimeMillis()));		
+			List<PairValue<String, Boolean>> paths, long date, boolean fail) throws OdenException {
+		synchronized (latch) {	
+			record(new RecordElement(host, agent, agentRootPath, paths, date, true));
+		}
 	}
-
-	public void record(RecordElement log) throws OdenException {
+	
+	public void record(List<RecordElement> logs) throws OdenException {
+		synchronized (latch) {
+			for(RecordElement log : logs)
+				record(log);	
+		}
+	}
+	
+	private void record(RecordElement log) throws OdenException {
 		File historyf = deployLogFile(log.getDate());
 		File parent = historyf.getParentFile();
 		if(!parent.exists())
 			parent.mkdirs();
-		
-		synchronized (latch) {	
-			writeObject(historyf, log);	
-		}
+		writeObject(historyf, log);	
 	}
-	
+
 	private File deployLogFile(long date) {
 		final String cache = context.getProperty("felix.cache.rootdir");
 		final String fname = LOG_FILE_PREFIX + onlyDateForFile(date) + LOG_FILE_EXT;
@@ -95,24 +100,27 @@ public class DeployLogImpl implements DeployLogService {
 		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).format(date);
 	}
 	
-	public List<RecordElement> search(String host, String agent, String path,
-			String startdate, String enddate, String status) throws OdenException{
+	public List<RecordElement> search(String txid, String host, String agent, String path,
+			String startdate, String enddate, boolean failonly) throws OdenException{
 		
 		// if there's no valid args, return latest log only.
-		if(empty(host) && empty(agent) && empty(path) && empty(startdate) && empty(status)){
-			List<RecordElement> records = new ArrayList<RecordElement>();
-			RecordElement latest = latestRecord();
-			if(latest != null)
-				records.add(latest);
-			return records;
+		if(empty(txid) && empty(host) && empty(agent) && empty(path) 
+				&& empty(startdate)){
+			return latestRecords(failonly);
 		}
 		
 		// or convert date
 		try{
-			long start = empty(startdate) ? Long.MIN_VALUE : longTime(startdate + START_TIME);
-			long end = empty(enddate) ? Long.MAX_VALUE : longTime(enddate + END_TIME);
-			
-			List<RecordElement> records = getRecords(start, end);
+			List<RecordElement> records = Collections.EMPTY_LIST;
+			if(empty(txid)){
+				long start = empty(startdate) ? Long.MIN_VALUE : longTime(startdate + START_TIME);
+				long end = empty(enddate) ? Long.MAX_VALUE : longTime(enddate + END_TIME);			
+				records = getRecords(start, end);
+			} else {
+				records = getRecords(txid);
+				if(records.size() == 0)
+					throw new OdenException("Couldn't find that transaction log: " + txid);
+			}
 			
 			if(!empty(host))
 				records = searchByHost(host, records);
@@ -121,16 +129,18 @@ public class DeployLogImpl implements DeployLogService {
 				records = searchByAgent(agent, records);
 			
 			if(!empty(path))
-				records = searchByRootpath(path, records);
+				records = searchByPath(path, records);
 			
 			// TODO: search by status...
+			if(failonly)
+				records = refineFailonly(records);
 			
 			return records;
 		}catch(ParseException e){
 			throw new OdenException("Fail to convert to date: " + startdate + " & " + enddate);
 		}
 	}
-	
+
 	private long longDate(String s) throws ParseException {
 		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).parse(s).getTime();
 	}
@@ -160,56 +170,76 @@ public class DeployLogImpl implements DeployLogService {
 		return latestf;
 	}
 
-	private RecordElement latestRecord() throws OdenException {
+	private File[] logfiles(){
 		final String cache = context.getProperty("felix.cache.rootdir");
 		File parent = new File(cache);
-		File[] logfiles = parent.listFiles(new FilenameFilter(){
+		return parent.listFiles(new FilenameFilter(){
 			public boolean accept(File dir, String name) {
 				return name.startsWith(LOG_FILE_PREFIX) && name.endsWith(LOG_FILE_EXT);
 			}
 		});
-		
-		File latestf = latestFile(logfiles);
-		if(latestf.exists())
-			synchronized (latch) {
-				return latestRecord(latestf);	
+	}
+
+	private List<Long> _recordedDateList() {
+		List<Long> dates= new ArrayList<Long>();
+		for(File log : logfiles()){
+			try{
+				long d = getDateFromFile(log.getName());
+				dates.add(d);
+			}catch(ParseException e) {
+				// ignore
 			}
-		else
-			return null;
+		}
+		Collections.sort(dates);
+		return dates;
 	}
 	
-	private RecordElement latestRecord(File logfile) throws OdenException {
+	public List<String> recordedDateList() {
+		List<String> dates = new ArrayList<String>();
+		for(long date : _recordedDateList()){
+			dates.add(onlyDateForFile(date));
+		}
+		return dates;
+	}
+	
+	private List<RecordElement> latestRecords(boolean failonly) throws OdenException {
+		File latestf = latestFile(logfiles());
+		if(latestf != null && latestf.exists())
+			synchronized (latch) {
+				return latestRecords(latestf, failonly);	
+			}
+		else
+			return Collections.EMPTY_LIST;
+	}
+	
+	private List<RecordElement> latestRecords(File logfile, boolean failonly) throws OdenException {
 		FileObjectInputStream fin = null;
-		RecordElement latest = null;
+		List<RecordElement> latests = new ArrayList<RecordElement>();
 		try{
 			fin = new FileObjectInputStream(logfile);
 			
-			Object o = null;
-			while(fin.available() > 0)
-				o = fin.readObject();
-			
-			if(o != null)
-				latest = (RecordElement)o;
+			long date = -1;
+			while(fin.available() > 0){
+				RecordElement record = (RecordElement)fin.readObject();
+				long newdate = record.getDate();
+				if(date != newdate){
+					date = newdate;
+					latests = new ArrayList<RecordElement>();
+				}
+				latests.add(failonly ? refineFailonly(record) : record);	
+			}
 		}catch(ClassNotFoundException e){
-			e.printStackTrace();
 			throw new OdenException("Illegal format: " + logfile.getAbsolutePath());
 		}catch(IOException e) {
 			throw new OdenStoreException(logfile.getAbsolutePath());
 		}finally{
 			try { if(fin != null) fin.close(); } catch (IOException e) { }
 		}
-		return latest;
+		return latests;
 	}
 
 	private List<RecordElement> getRecords(long startdate, long enddate) throws OdenException {
-		final String cache = context.getProperty("felix.cache.rootdir");
-		File parent = new File(cache);
-		File[] logfiles = parent.listFiles(new FilenameFilter(){
-			public boolean accept(File dir, String name) {
-				return name.startsWith(LOG_FILE_PREFIX) && name.endsWith(LOG_FILE_EXT);
-			}
-		});
-		
+		File[] logfiles = logfiles();		
 		List<RecordElement> records = new ArrayList<RecordElement>();
 		File latest = latestFile(logfiles);
 		for(File logfile : logfiles){
@@ -224,6 +254,50 @@ public class DeployLogImpl implements DeployLogService {
 			}
 		}
 		return records;
+	}
+	
+	private File matchedFile(String txid) {
+		long txdate = -1;
+		try{
+			txdate = Long.parseLong(txid);
+		}catch(NumberFormatException e){
+			return null;
+		}
+		for(File logf : logfiles()) {
+			String fname = logf.getName();
+			String logdate = fname.substring(LOG_FILE_PREFIX.length(), 
+					fname.length() - LOG_FILE_EXT.length());
+			if(onlyDateForFile(txdate).equals(logdate))
+				return logf;
+		}
+		return null;
+	}
+	
+	private List<RecordElement> getRecords(String txid) throws OdenException{
+		FileObjectInputStream fin = null;
+		List<RecordElement> latests = new ArrayList<RecordElement>();
+		File logfile = matchedFile(txid);
+		if(logfile == null)
+			return latests;
+		try{
+			fin = new FileObjectInputStream(logfile);
+			long date = Long.parseLong(txid);	// NumberFormatException is already checked by matchedFile().
+			while(fin.available() > 0){
+				RecordElement record = (RecordElement)fin.readObject();
+				long rdate = record.getDate();
+				if(date == rdate)
+					latests.add(record);
+				else if(date < rdate)
+					break;
+			}
+		}catch(ClassNotFoundException e){
+			throw new OdenException("Illegal format: " + logfile.getAbsolutePath());
+		}catch(IOException e) {
+			throw new OdenStoreException(logfile.getAbsolutePath());
+		}finally{
+			try { if(fin != null) fin.close(); } catch (IOException e) { }
+		}
+		return latests;
 	}
 	
 	private void collectRecords(File logfile, List<RecordElement> records) throws OdenException {
@@ -275,7 +349,7 @@ public class DeployLogImpl implements DeployLogService {
 		return result;
 	}
 
-	private List<RecordElement> searchByRootpath(String path, List<RecordElement> records) {
+	private List<RecordElement> searchByPath(String path, List<RecordElement> records) {
 		List<RecordElement> result = new ArrayList<RecordElement>();
 		for(RecordElement record : records){
 			String root = record.getRootpath();
@@ -291,16 +365,38 @@ public class DeployLogImpl implements DeployLogService {
 	}
 	
 	private RecordElement refineMatchedPathOnly(RecordElement src, String path){
-		List<String> matched = new ArrayList<String>();
-		for(String srcPath : src.getPaths()){
-			if(srcPath.contains(path))
+		List<PairValue<String, Boolean>> matched = new ArrayList<PairValue<String, Boolean>>();
+		for(PairValue<String, Boolean> srcPath : src.getPaths()){
+			if(srcPath.value1().contains(path))
 				matched.add(srcPath);
 		}
 		
 		if(matched.size() > 0)
 			return new RecordElement(src.getHost(), src.getAgent(), 
-					src.getRootpath(), matched, src.getDate());
+					src.getRootpath(), matched, src.getDate(), src.isSuccess());
+		return null;
+	}
+	
+	private List<RecordElement> refineFailonly(List<RecordElement> records) {
+		List<RecordElement> result = new ArrayList<RecordElement>();
+		for(RecordElement record : records){
+			RecordElement refined = refineFailonly(record);
+			if(refined != null)
+				result.add(refined);
+		}
+		return result;
+	}
+	
+	private RecordElement refineFailonly(RecordElement src) {
+		List<PairValue<String, Boolean>> fails = new ArrayList<PairValue<String, Boolean>>();
+		for(PairValue<String, Boolean> srcPath : src.getPaths()){
+			if(!srcPath.value2())		// fail
+				fails.add(srcPath);
+		}
 		
+		if(fails.size() > 0)
+			return new RecordElement(src.getHost(), src.getAgent(), 
+					src.getRootpath(), fails, src.getDate(), src.isSuccess());
 		return null;
 	}
 		

@@ -18,6 +18,7 @@ package anyframe.oden.eclipse.core.explorer;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -52,25 +53,29 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.alias.Agent;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.alias.ModelListener;
 import anyframe.oden.eclipse.core.alias.Repository;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
-import anyframe.oden.eclipse.core.explorer.actions.NewAgentAction;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
+import anyframe.oden.eclipse.core.explorer.actions.ExplorerRefreshAction;
+import anyframe.oden.eclipse.core.explorer.actions.NewServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.NewRepositoryAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.CreateBuildRepositoryDialog;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.CommonUtil;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 
 /**
  * This class implements Oden Explorer view where users can manage profiles for
- * agents and repositories. Also, they can trigger Task/Policy editor within it.
+ * servers and repositories. Also, they can trigger Task/Policy editor within it.
  * 
  * @author RHIE Jihwan
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  * @since 1.0.0 RC1
  * 
@@ -82,12 +87,12 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	 */
 	public static final String ID = OdenActivator.PLUGIN_ID + ".explorer.ExplorerView";
 
-	private static final HashSet<Agent> EMPTY_AGENTS = new HashSet<Agent>();
+	private static final HashSet<Server> EMPTY_SERVERS = new HashSet<Server>();
 	private static final HashSet<Repository> EMPTY_REPOSITORIES = new HashSet<Repository>();
 
-	private static final String MSG_REPOSITORY_SHOW = OdenMessages.ODEN_EXPLORER_ExplorerView_Msg_RepoShow; 
+	private static final String MSG_REPOSITORY_SHOW = CommandMessages.ODEN_EXPLORER_ExplorerView_Msg_RepoShow; 
 
-	// Tree viewer for agents and repositories
+	// Tree viewer for servers and repositories
 	private TreeViewer treeViewer;
 
 	private Clipboard clipboard;
@@ -96,9 +101,11 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 	private Repository repo;
 
-	private String agentname;
+	private String servername;
 
-	private String[] hiddenFolder = OdenMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(",");
+	private String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(",");
+
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
 
 	/**
 	 * The constructor
@@ -113,7 +120,7 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	 */
 	public final void createPartControl(final Composite parent) {
 
-		OdenActivator.getDefault().getAliasManager().getAgentManager().addListener(this);
+		OdenActivator.getDefault().getAliasManager().getServerManager().addListener(this);
 		OdenActivator.getDefault().getAliasManager().getRepositoryManager().addListener(this);
 
 		// create outline
@@ -147,27 +154,27 @@ public class ExplorerView extends ViewPart implements ModelListener {
 					if (!(treeViewer.getExpandedState(obj))) {
 						String path = getFullpath(obj);
 						String[] paths = path.split("/");
-						if(!(paths[0].equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel)) &&
+						if(!(paths[0].equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)) &&
 								paths.length > 1) {
 							repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-							agentname = repo.getAgentToUse();
+							servername = repo.getServerToUse();
 						}
 						if (obj.getParent().toString().equals(
-								OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) {
+								UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) {
 							if(paths.length > 1) {
 								repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-								agentname = repo.getAgentToUse();
+								servername = repo.getServerToUse();
 							}
-							if (agentname == null) {
-								// not mapping agent: opens editing Dialog
-								if (DialogUtil.confirmMessageDialog(OdenMessages.ODEN_EXPLORER_ExplorerView_Msg_Title, OdenMessages.ODEN_EXPLORER_ExplorerView_Confirm_SelectAgent)) {
+							if(chkExistServer()) {
+								// not mapping server: opens editing Dialog
+								if (DialogUtil.confirmMessageDialog(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_Title, UIMessages.ODEN_EXPLORER_ExplorerView_Confirm_SelectServer)) {
 									CreateBuildRepositoryDialog dialog =
 										new CreateBuildRepositoryDialog(Display.getCurrent().getActiveShell(),CreateBuildRepositoryDialog.Type.CHANGE, repo);
 									dialog.open();
 								}
 							} else {
-								String agentUrl = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(agentname).getUrl();
-								shellurl = OdenMessages.ODEN_CommonMessages_ProtocolString_HTTP + agentUrl + OdenMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
+								String serverUrl = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(servername).getUrl();
+								shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverUrl + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
 								//								removeList(obj);
 								try {
 									if(obj.getChildren().length == 0)
@@ -175,26 +182,26 @@ public class ExplorerView extends ViewPart implements ModelListener {
 								} catch (OdenException odenException) {
 
 								} catch (Exception odenException) {
-									OdenActivator.error(OdenMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
+									OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
 								}
 
 								treeViewer.expandToLevel(obj, 1);
 								treeViewer.refresh();
 							}
 						} else if (!(obj.getParent().toString().equals(""))
-								&& !(obj.getParent().toString().equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel))) {
+								&& !(obj.getParent().toString().equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel))) {
 							//							removeList(obj);
 							if(paths.length > 1) {
-								String agentUrl = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(agentname).getUrl();
+								String serverUrl = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(servername).getUrl();
 								repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-								shellurl = OdenMessages.ODEN_CommonMessages_ProtocolString_HTTP + agentUrl + OdenMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
+								shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverUrl + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
 							}
 							try {
 								if(obj.getChildren().length == 0)
 									getChildList(obj);
 							} catch (OdenException odenException) {
 							} catch (Exception odenException) {
-								OdenActivator.error(OdenMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
+								OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
 							}
 
 							treeViewer.expandToLevel(obj, 1);
@@ -204,7 +211,6 @@ public class ExplorerView extends ViewPart implements ModelListener {
 							treeViewer.expandToLevel(obj, 1);
 						}
 					} else {
-						//						removeList(obj);
 						treeViewer.collapseToLevel(obj, 1);
 						treeViewer.refresh();
 					}
@@ -215,14 +221,12 @@ public class ExplorerView extends ViewPart implements ModelListener {
 		// Tree expansion event
 		treeViewer.addTreeListener(new ITreeViewerListener() {
 			public void treeCollapsed(final TreeExpansionEvent event) {
-				// TODO : treeCollpase
 				Object obj = ((TreeParent) event.getElement());
 				treeViewer.collapseToLevel(obj, 1);
 				treeViewer.refresh();
 			}
 
 			public void treeExpanded(final TreeExpansionEvent event) {
-				// TODO treeExpand
 			}
 		});
 
@@ -241,6 +245,18 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 	}
 
+	private boolean chkExistServer() {
+		Collection<Server> servers = OdenActivator.getDefault().getAliasManager().getServerManager().getServers();
+		if(servername == null)
+			return true;
+		else
+			for(Server server : servers){
+				if(servername.equals(server.getNickname())){
+					return false;
+				}
+			}
+		return true;
+	}
 	private void contributeToActionBars() {
 		IActionBars actionBars = getViewSite().getActionBars();
 		fillLocalToolBar(actionBars.getToolBarManager());
@@ -248,14 +264,17 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	}
 
 	private void fillLocalToolBar(final IToolBarManager toolBarManager) {
-		toolBarManager.add(new NewAgentAction());
+		toolBarManager.add(new NewServerAction());
 		toolBarManager.add(new NewRepositoryAction());
+		toolBarManager.add(new Separator());
+		toolBarManager.add(new ExplorerRefreshAction());
 	}
 
 	private void fillLocalPullDown(final IMenuManager menuManager) {
-		menuManager.add(new NewAgentAction());
+		menuManager.add(new NewServerAction());
 		menuManager.add(new NewRepositoryAction());
 		menuManager.add(new Separator());
+		menuManager.add(new ExplorerRefreshAction());
 	}
 
 	private void addContextMenu() {
@@ -294,7 +313,7 @@ public class ExplorerView extends ViewPart implements ModelListener {
 			clipboard.dispose();
 			clipboard = null;
 		}
-		OdenActivator.getDefault().getAliasManager().getAgentManager().removeListener(this);
+		OdenActivator.getDefault().getAliasManager().getServerManager().removeListener(this);
 		OdenActivator.getDefault().getAliasManager().getRepositoryManager().removeListener(this);
 		super.dispose();
 	}
@@ -345,7 +364,7 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	 * getSelectedXxxx() methods below for a structured API)
 	 * @return
 	 */
-	final /* package */Object[] getSelected() {
+	final Object[] getSelected() {
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (selection == null) {
 			return null;
@@ -358,23 +377,23 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	}
 
 	/**
-	 * Returns a list of the selected Agents. If recurse is true then the result
-	 * will include any agents associated with other objects;
+	 * Returns a list of the selected Servers. If recurse is true then the result
+	 * will include any servers associated with other objects;
 	 * @param recurse
-	 * @return Set of Agents, never returns null
+	 * @return Set of Servers, never returns null
 	 */
-	public final Set<Agent> getSelectedAgents(final boolean recurse) {
+	public final Set<Server> getSelectedServers(final boolean recurse) {
 		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 		if (selection == null) {
-			return EMPTY_AGENTS;
+			return EMPTY_SERVERS;
 		}
 
-		LinkedHashSet<Agent> result = new LinkedHashSet<Agent>();
+		LinkedHashSet<Server> result = new LinkedHashSet<Server>();
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
-			Agent obj = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(iter.next().toString());
-			if (obj instanceof Agent){
-				result.add((Agent) obj);
+			Server obj = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(iter.next().toString());
+			if (obj instanceof Server){
+				result.add((Server) obj);
 			}
 		}
 
@@ -382,18 +401,18 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	}
 
 	/**
-	 * Returns the first available selected Agent; if recurse is true, then
-	 * indirectly selected agents are included
+	 * Returns the first available selected Server; if recurse is true, then
+	 * indirectly selected servers are included
 	 * @param recurse
 	 * @return
 	 */
-	public Agent getSelectedAgent(boolean recurse) {
-		return (Agent) getFirstOf(getSelectedAgents(recurse));
+	public Server getSelectedServer(boolean recurse) {
+		return (Server) getFirstOf(getSelectedServers(recurse));
 	}
 
 	/**
 	 * Returns a list of the selected Build Repositories. If recurse is true
-	 * then the result will include any agents associated with other objects.
+	 * then the result will include any servers associated with other objects.
 	 * @param recurse
 	 * @return Set of Build Repositories, never returns null
 	 */
@@ -415,7 +434,7 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 	/**
 	 * Returns the first available selected Build Repository; if recurse is
-	 * true, then indirectly selected agents are included
+	 * true, then indirectly selected servers are included
 	 * @param recurse
 	 * @return
 	 */
@@ -465,50 +484,39 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	public final void setClipboard(final Clipboard clipboard) {
 		this.clipboard = clipboard;
 	}
-
-	private void removeList(final TreeParent parent) {
-
-		TreeObject[] tobj = parent.getChildren();
-		for (int i = 0; i < tobj.length; i++) {
-			parent.removeChild((TreeObject) tobj[i]);
-		}
-	}
-
+	
 	private void getChildList(final TreeParent parent) throws OdenException {
 		String repopath = ""; 
 		String command = ""; 
-		if (repo.getProtocol().equals(OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+		if (repo.getProtocol().equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
 			// when the protocol is Filesystem
-			repopath = OdenMessages.ODEN_CommonMessages_ProtocolString_File + repo.getPath();
+			repopath = CommonMessages.ODEN_CommonMessages_ProtocolString_File + repo.getPath();
 		} else {
 			// when the protocol is FTP
 			repopath = repo.getPath();
 		}
 
 		String url = CommonUtil.replaceIgnoreCase(getFullpath((TreeParent) parent),
-				OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel + "/" + repo.getNickname(), repopath); 
+				UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel + "/" + repo.getNickname(), repopath); 
 
 		if (repo.getProtocol().equals(
-				OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+				CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
 			// when the protocol is Filesystem
 			command = MSG_REPOSITORY_SHOW + '"' + url + '"'; 
 		} else {
 			// when the protocol is FTP
-			//			command = MSG_REPOSITORY_SHOW + url + " " + repo.getPath() + " -a " + repo.getUser() + " " + repo.getPassword();
-			command = MSG_REPOSITORY_SHOW + OdenMessages.ODEN_CommonMessages_ProtocolString_FTP + repo.getUrl() + " " + '"' + url + '"' + " " + repo.getUser() + " " + repo.getPassword();  
+			command = MSG_REPOSITORY_SHOW + CommonMessages.ODEN_CommonMessages_ProtocolString_FTP + repo.getUrl() + " " + '"' + url + '"' + " " + repo.getUser() + " " + repo.getPassword();  
 		}
 		ArrayList<String> FileList = getRepoShowList(shellurl, command);
 
 		for (String file : FileList) {
-			if (file.indexOf(OdenMessages.ODEN_EXPLORER_ExplorerView_Index_Directory) == 0) {
+			if (file.indexOf(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Directory) == 0) {
 				// Directory
-				TreeParent sub = new TreeParent(CommonUtil.replaceIgnoreCase(file, OdenMessages.ODEN_EXPLORER_ExplorerView_Index_Directory, ""));  
-				//					
-				// sub.addChild(new TreeObject("Leaf 1"));
+				TreeParent sub = new TreeParent(CommonUtil.replaceIgnoreCase(file, UIMessages.ODEN_EXPLORER_ExplorerView_Index_Directory, ""));  
 				parent.addChild(sub);
 			} else {
 				// File
-				parent.addChild(new TreeObject(CommonUtil.replaceIgnoreCase(file, OdenMessages.ODEN_EXPLORER_ExplorerView_Index_File, ""))); 
+				parent.addChild(new TreeObject(CommonUtil.replaceIgnoreCase(file, UIMessages.ODEN_EXPLORER_ExplorerView_Index_File, ""))); 
 			}
 		}
 	}
@@ -539,8 +547,8 @@ public class ExplorerView extends ViewPart implements ModelListener {
 				JSONArray array = new JSONArray(result);
 
 				for (int i = 0; i < array.length(); i++) {
-					String type = (String) ((JSONObject) array.get(i)).get(OdenMessages.ODEN_EXPLORER_ExplorerView_Index_Type);
-					String name = (String) ((JSONObject) array.get(i)).get(OdenMessages.ODEN_EXPLORER_ExplorerView_Index_Name);
+					String type = (String) ((JSONObject) array.get(i)).get(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Type);
+					String name = (String) ((JSONObject) array.get(i)).get(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Name);
 					if(this.checkFolderVisible(name)){
 						if (name.lastIndexOf(File.separator) > 0) {
 							// when the separator follows Microsoft Windows or equivalent operating system conventions
@@ -550,18 +558,15 @@ public class ExplorerView extends ViewPart implements ModelListener {
 							name = name.substring(name.lastIndexOf("/") + 1); 
 						}
 
-						String date = (String) ((JSONObject) array.get(i)).get(OdenMessages.ODEN_EXPLORER_ExplorerView_Index_Date);
-						child = type + name + (type.equals(OdenMessages.ODEN_EXPLORER_ExplorerView_Index_File) ? "[" + date + "]" : "");   
+						String date = (String) ((JSONObject) array.get(i)).get(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Date);
+						child = type + name + (type.equals(UIMessages.ODEN_EXPLORER_ExplorerView_Index_File) ? "[" + date + "]" : "");   
 						repoList.add(child);
 					}
 				}
-//			} else {
-//				// no connection
-//				OdenActivator.warning(OdenMessages.ODEN_CommonMessages_UnableToConnectServer);
 			}
 		} catch (OdenException odenException) {
 		} catch (Exception odenException) {
-			OdenActivator.error(OdenMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionRepoList, odenException);
+			OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionRepoList, odenException);
 			odenException.printStackTrace();
 		}
 

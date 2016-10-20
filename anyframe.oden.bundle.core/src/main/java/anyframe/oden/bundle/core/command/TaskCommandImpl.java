@@ -1,24 +1,24 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +35,7 @@ import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
 import anyframe.oden.bundle.core.FileMap;
 import anyframe.oden.bundle.core.Logger;
+import anyframe.oden.bundle.core.Policy;
 import anyframe.oden.bundle.prefs.Prefs;
 
 /**
@@ -76,7 +77,7 @@ public class TaskCommandImpl extends OdenCommand {
 			
 			if(Cmd.INFO_ACTION.equals(action)){
 				String task = cmd.getActionArg();
-				if(task.length() < 1){
+				if(task.length() == 0){
 					ja = doListActionJ();
 				}else { 
 					ja = doInfoActionJ(task);
@@ -119,8 +120,11 @@ public class TaskCommandImpl extends OdenCommand {
 				if(doInfoAction(task).length() == 0) 
 					throw new OdenException("Couldn't find a task: " + cmd.getActionArg());
 				
-				doRunAction(task, extractUserName(cmd), isJSON ? new PrintStream(System.out) : out);
-				consoleResult = "Task is finished.";
+				String txid = doRunAction(task, extractUserName(cmd), isJSON ? new PrintStream(System.out) : out);
+				if(isJSON)
+					ja.put(new JSONObject().put("txid", txid));
+				else
+					consoleResult = "Task is finished. Transaction id: " + txid;
 			}else if(TEST_ACTION.equals(action)){
 				if(cmd.getActionArg().length() < 1)
 					throw new OdenException("Couldn't execute command.");
@@ -212,24 +216,20 @@ public class TaskCommandImpl extends OdenCommand {
 		return arr;
 	}	
 	
-	private void doRunAction(String taskName, String user, PrintStream out) 
+	private String doRunAction(String taskName, String user, PrintStream out) 
 			throws OdenException {
 		Map<List<String>, FileMap> repomap = preview(taskName);
 		
-		// repo arguments 를 얻어온 뒤  repo에 해당하는  preview 결과를 배
+		// check update. To deploy as update mode, all policies should have update option.
+		boolean update = true;
 		Cmd cmd = infoCmd(taskName);
 		Opt op = cmd.getOption(POLICY_OPT);
-		if(op == null) 
-			throw new OdenParseException(cmd.toString());
-		
-		String[] policies = op.getArgArray();
-		for(String policy : policies){
-			if(!existPolicy(policy))
-				throw new OdenException("Couldn't find a policy: " + policy);
-			
+		for(String policy : op.getArgArray()){
 			Cmd policyInfo = policyCommand.infoCmd(policy);
-			policyCommand.deploy(repomap, policyInfo, user, out);
+			boolean pUpdate = policyInfo.getOption(PolicyCommandImpl.UPDATE_OPT) != null;
+			update = update & pUpdate; 
 		}
+		return delegateService.deployAll(repomap, update, user, out);
 	}
 
 	private Map<List<String>, FileMap> preview(String taskName) throws OdenException{

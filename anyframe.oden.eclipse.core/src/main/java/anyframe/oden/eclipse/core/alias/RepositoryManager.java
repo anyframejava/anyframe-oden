@@ -28,7 +28,7 @@ import org.dom4j.tree.DefaultElement;
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.OdenFiles;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
 import anyframe.oden.eclipse.core.utils.XMLUtil;
 
 /**
@@ -43,7 +43,7 @@ public class RepositoryManager implements ModelListener {
 
 	private TreeMap<String, Repository> repositories = new TreeMap<String, Repository>();
 	private LinkedList<ModelListener> modelListners = new LinkedList<ModelListener>();
-	private String[] protocolSet = {OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem, OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FTP};
+	private String[] protocolSet = {CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem, CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FTP};
 
 	/**
 	 * Loads Build Repositories from the user preference XML file

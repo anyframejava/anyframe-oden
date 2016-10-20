@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IAdaptable;
  * Tree objects and parents for Anyframe Oden Eclipse plug-in's tree type views.
  * 
  * @author RHIE Jihwan
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @author LEE Sujeong
  * @version 1.0.0 RC1
  *

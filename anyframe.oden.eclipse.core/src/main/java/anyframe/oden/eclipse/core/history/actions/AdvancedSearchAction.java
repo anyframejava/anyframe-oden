@@ -18,10 +18,9 @@ package anyframe.oden.eclipse.core.history.actions;
 
 import org.eclipse.ui.PlatformUI;
 
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.history.AbstractDeploymentHistoryViewAction;
 import anyframe.oden.eclipse.core.history.dialogs.AdvancedSearchDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * The Implementation of Advanced Search,
@@ -35,7 +34,7 @@ import anyframe.oden.eclipse.core.history.dialogs.AdvancedSearchDialog;
 public class AdvancedSearchAction extends AbstractDeploymentHistoryViewAction {
 
 	public AdvancedSearchAction() {
-		super(OdenMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearch, OdenMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchToolTip, OdenMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchIcon);
+		super(UIMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearch, UIMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchToolTip, UIMessages.ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchIcon);
 	}
 
 	public void run() {

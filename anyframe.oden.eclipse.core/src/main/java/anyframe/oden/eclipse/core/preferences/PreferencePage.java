@@ -20,7 +20,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * This class represents an <strong>Oden</strong> preference page,
@@ -42,12 +42,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 		super(GRID);
 		//		setPreferenceStore(OdenActivator.getDefault().getPreferenceStore());
 		noDefaultAndApplyButton(); //Suppresses creation of the standard Default and Apply buttons for this page.
-		setDescription(OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_1 +
-				OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_2 +
-				OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_3 +
-				OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_4 +
-				OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_5 +
-				OdenMessages.ODEN_PREFERENCES_PreferencePage_Description_6);
+		setDescription(UIMessages.ODEN_PREFERENCES_PreferencePage_Description_1 +
+				UIMessages.ODEN_PREFERENCES_PreferencePage_Description_2 +
+				UIMessages.ODEN_PREFERENCES_PreferencePage_Description_3 +
+				UIMessages.ODEN_PREFERENCES_PreferencePage_Description_4 +
+				UIMessages.ODEN_PREFERENCES_PreferencePage_Description_5 +
+				UIMessages.ODEN_PREFERENCES_PreferencePage_Description_6);
 	}
 
 	/**

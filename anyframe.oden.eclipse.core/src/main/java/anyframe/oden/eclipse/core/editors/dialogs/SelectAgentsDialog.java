@@ -40,30 +40,27 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.brokers.OdenBroker;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
+import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.PolicyPage;
-import anyframe.oden.eclipse.core.utils.CommonUtil;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.DialogUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
 /**
- * Select Deployment Target Agent. This class extends TitleAreaDialog class.
+ * Select Deployment Target Server. This class extends TitleAreaDialog class.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0 RC3
  * 
  */
 public class SelectAgentsDialog extends TitleAreaDialog {
 
-	// Strings and messages from message properties
-	//	private String title = "Select the deployment target agents";
-	//	private String subtitle = "Select the deployment target agents and location variables";
-
-	// Oden dialog image which appears on the upper right of the panel
 	private ImageDescriptor odenImageDescriptor = ImageUtil
-	.getImageDescriptor(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
-	private static final String MSG_AGENT_INFO = OdenMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
+	.getImageDescriptor(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+	private static final String MSG_AGENT_INFO = CommandMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
 	private String shellurl;
 	private HashMap<String, String> hm;
 	private HashMap<String, String> locVariable;
@@ -73,17 +70,21 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 
 	private Label targetUrl;
 	private Label targetStatement;
-
-	public SelectAgentsDialog(Shell parentShell, String shellUrl)
+	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	private PolicyPage page;
+	private String root;
+	public SelectAgentsDialog(Shell parentShell, String shellUrl , PolicyPage page)
 	throws Exception {
 		super(parentShell);
 		shellurl = shellUrl;
+		this.page = page;
+		
 	}
 
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 
-		shell.setText(OdenMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_Title);
+		shell.setText(UIMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_Title);
 
 	}
 
@@ -94,8 +95,8 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 
 	protected Control createContents(Composite parent) {
 		Control contents = super.createContents(parent);
-		setTitle(OdenMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_Title);
-		setMessage(OdenMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_SubTitle);
+		setTitle(UIMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_Title);
+		setMessage(UIMessages.ODEN_EXPLORER_Dialogs_SelectAgentsDialog_SubTitle);
 
 		Image odenImage = ImageUtil.getImage(odenImageDescriptor);
 		if (odenImage != null) {
@@ -105,7 +106,7 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 
 			public void widgetDisposed(DisposeEvent disposeEvent) {
 				ImageUtil
-				.disposeImage(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+				.disposeImage(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 			}
 		});
 		// TODO 도움말 만든 후 아래 내용을 확인할 것
@@ -141,9 +142,9 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 		GridData data = new GridData(GridData.FILL_BOTH);
 		nameGroup.setLayoutData(data);
 
-		// TODO : select agent and location variable
+		// TODO : select server and location variable
 		Label deploy = new Label(nameGroup, SWT.NONE);
-		deploy.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_DeployTarget);
+		deploy.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_DeployTarget);
 
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
 				| GridData.GRAB_HORIZONTAL);
@@ -158,7 +159,7 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 
 		createSpacer( nameGroup , 3, 1);
 		Label location = new Label(nameGroup, SWT.LEFT | SWT.WRAP);
-		location.setText(OdenMessages.ODEN_EDITORS_PolicyPage_Man_LocationVar);
+		location.setText(UIMessages.ODEN_EDITORS_PolicyPage_Man_LocationVar);
 
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
 				| GridData.GRAB_HORIZONTAL);
@@ -197,10 +198,11 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 		locationVar.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 
-				if(!(locationVar.getText().equals("")))
+				if(!(locationVar.getText().equals(""))){
 					setagentUrl();
-				else
+				} else {
 					targetUrl.setText("");
+				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
@@ -209,13 +211,15 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 		});
 		agentCombo.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
-				setagentUrl();
 				setLocationVar();
+				setagentUrl();
+				
+				
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
-				setagentUrl();
 				setLocationVar();
+				setagentUrl();
 			}
 		});
 
@@ -223,18 +227,17 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 	}
 
 	protected void okPressed() {
-		// input agent information
-		PolicyPage page = new PolicyPage();
+		// input server information
 		if(!(agentCombo.getText().equals("")) && !(locationVar.getText().equals(""))){
-			if(locationVar.getText().equals(OdenMessages.ODEN_EDITORS_PolicyPage_DialogBotAgent_ComboDefault)){
+			if(locationVar.getText().equals(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault)){
 				locationVar.setText("");
 			}
 			if (page.checkAddDeploy(agentCombo.getText(), locationVar.getText())) {
 				page.addDeploy(agentCombo.getText(), locationVar.getText());
 				close();
 			} else {
-				DialogUtil.openMessageDialog(OdenMessages.ODEN_CommonMessages_Title_Warning,
-						OdenMessages.ODEN_CommonMessages_NameAlreadyExists,
+				DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
+						CommonMessages.ODEN_CommonMessages_NameAlreadyExists,
 						MessageDialog.INFORMATION);
 				agentCombo.select(0);
 				agentCombo.setFocus();
@@ -270,8 +273,8 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 						.get("host")
 						+ "/"
 						+ (String) ((JSONObject) array.get(i)).get("loc");
-						JSONObject locs = (JSONObject) ((JSONObject) array.get(i))
-						.get("locs");
+//						JSONObject locs = (JSONObject) ((JSONObject) array.get(i))
+//						.get("locs");
 						agentCombo.add(name);
 						hm.put(name, urlRoot);
 					}
@@ -279,16 +282,16 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 					locationVar.removeAll();
 					setLocationVar();
 				} else {
-					OdenActivator.warning(OdenMessages.ODEN_CommonMessages_SetConfigXML);
+					OdenActivator.warning(CommonMessages.ODEN_CommonMessages_SetConfigXML);
 				}
 			} else {
 				// no connection
-				OdenActivator.warning(OdenMessages.ODEN_CommonMessages_UnableToConnectServer);
+				OdenActivator.warning(CommonMessages.ODEN_CommonMessages_UnableToConnectServer);
 			}
 		} catch (Exception odenException) {
 			OdenActivator
 			.error(
-					OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
+					UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
 					odenException);
 			odenException.printStackTrace();
 		}
@@ -300,7 +303,7 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 		locVariable = new HashMap<String, String>();
 		try {
 			locationVar.removeAll();
-			locationVar.add(OdenMessages.ODEN_EDITORS_PolicyPage_DialogBotAgent_ComboDefault);
+			locationVar.add(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault);
 			result = OdenBroker.sendRequest(shellurl, commnd);
 			if (result != null) {
 				JSONArray array = new JSONArray(result);
@@ -314,12 +317,14 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 							Iterator it = locs.keys();
 							while (it.hasNext()) {
 								Object o = it.next();
-								String locUri = CommonUtil.replaceIgnoreCase(locs.getString(o.toString()), (String) ((JSONObject) array.get(i)).get("loc"), "");
+								String locUri = locs.getString(o.toString());
 								locationVar.add(o.toString());
 								locVariable.put(o.toString(), locUri);
 							}
+							root = (String) ((JSONObject) array.get(i)).get("host") + "/";
 						}
 					}
+					
 					locationVar.redraw();
 					locationVar.select(0);
 					setagentUrl();
@@ -328,19 +333,20 @@ public class SelectAgentsDialog extends TitleAreaDialog {
 		} catch (Exception odenException) {
 			OdenActivator
 			.error(
-					OdenMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
+					UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem,
 					odenException);
 			odenException.printStackTrace();
 		}
 	}
 
 	private void setagentUrl() {
-		String preStatement = OdenMessages.ODEN_EDITORS_PolicyPage_DialogBotAgent_Statement;
+		String preStatement = UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_Statement;
 		targetStatement.setText(preStatement);
-		if(locationVar.getText().equals(OdenMessages.ODEN_EDITORS_PolicyPage_DialogBotAgent_ComboDefault)){
+		if(locationVar.getText().equals(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault)){
 			targetUrl.setText(hm.get(agentCombo.getText())) ;
 		} else {
-			targetUrl.setText(hm.get(agentCombo.getText()) + locVariable.get(locationVar.getText()));
+//			targetUrl.setText(hm.get(agentCombo.getText()) + locVariable.get(locationVar.getText()));
+			targetUrl.setText(root + locVariable.get(locationVar.getText()));
 		}
 	}
 }

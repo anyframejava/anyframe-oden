@@ -16,35 +16,35 @@
  */
 package anyframe.oden.eclipse.core.history.actions;
 
-import org.eclipse.ui.PlatformUI;
-
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.history.AbstractDeploymentHistoryViewAction;
-import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
-import anyframe.oden.eclipse.core.history.dialogs.AdvancedSearchDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * The Implementation of RefreshAction,
  * for the Anyframe Oden Deployment History view.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
- * @since 1.0.0 RC1
+ * @since 1.0.0 RC2
  *
  */
+
 public class HistoryRefreshAction extends AbstractDeploymentHistoryViewAction {
 
+	/**
+	 * 
+	 */
 	public HistoryRefreshAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
 	}
-
+	/**
+	 * 
+	 */
 	public void run() {
-		new DeploymentHistoryView();
-		DeploymentHistoryView.refreshAgentCombo();
+		getView().refreshAgentCombo();
 	}
 
 }

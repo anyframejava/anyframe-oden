@@ -16,38 +16,52 @@
  */
 package anyframe.oden.eclipse.core.editors.actions;
 
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 
-import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.editors.OdenEditor;
+import anyframe.oden.eclipse.core.editors.PolicyDetails;
 import anyframe.oden.eclipse.core.editors.PolicyPage;
 import anyframe.oden.eclipse.core.history.AbstractDeploymentHistoryViewAction;
-import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
-import anyframe.oden.eclipse.core.history.dialogs.AdvancedSearchDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
+
 
 /**
  * The Implementation of RefreshAction,
  * for the Anyframe Oden Deployment History view.
  * 
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
- * @since 1.0.0 RC1
+ * @since 1.0.0 RC2
  *
  */
 public class PolicyRefreshAction extends AbstractDeploymentHistoryViewAction {
-
-	public PolicyRefreshAction() {
+	private String title;
+	public PolicyRefreshAction(String title) {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+		this.title = title;
 	}
 
 	public void run() {
-		PolicyPage page = new PolicyPage();
-		page.loadInitData(PolicyPage.getShellUrl());
+		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
+		page.loadInitData(page.getShellUrl());
 		page.getRepo();
-		PolicyPage.getPolicyViewer().refresh();
+		PolicyDetails details = new PolicyDetails();
+		ISelection selection = page.getPolicyViewer().getSelection();
+		if(!(selection.isEmpty()) && ! page.chkNewPolicy()) {
+			Object obj = ((IStructuredSelection) selection).getFirstElement();
+			details = (PolicyDetails) obj;
+			page.showPolicyDetail(details.getPolicyName());
+		} else {
+			page.clearText();
+			page.getClient().setVisible(false);
+		}
+		page.getPolicyViewer().refresh();
+		page.getDeployViewer().refresh();
+		page.getAddPolicy().setEnabled(true);
 	}
 
 }

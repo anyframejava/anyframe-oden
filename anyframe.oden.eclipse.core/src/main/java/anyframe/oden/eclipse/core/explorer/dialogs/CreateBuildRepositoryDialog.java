@@ -42,9 +42,10 @@ import org.eclipse.ui.PlatformUI;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
-import anyframe.oden.eclipse.core.alias.Agent;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.alias.Repository;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
 /**
@@ -66,30 +67,30 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 	}
 
 	// Strings and messages from message properties
-	private String titleCreate = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_AddTitle;
-	private String subtitleCreate = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_AddSubtitle;
+	private String titleCreate = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_AddTitle;
+	private String subtitleCreate = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_AddSubtitle;
 
-	private String titleChange = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_EditTitle;
-	private String subtitleChange = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_EditSubtitle;
+	private String titleChange = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_EditTitle;
+	private String subtitleChange = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_EditSubtitle;
 
-	private String titleCopy = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_DuplicateTitle;
-	private String subtitleCopy = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_DuplicateSubtitle;
+	private String titleCopy = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_DuplicateTitle;
+	private String subtitleCopy = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_DuplicateSubtitle;
 
 	// Oden dialog image which appears on the upper right of the panel
-	private ImageDescriptor odenImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+	private ImageDescriptor odenImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 
 	private Type type;
 	public Repository repository;
 
 	// Define field names
-	private String nicknameFieldName = OdenMessages.ODEN_EXPLORER_Dialogs_NicknameFieldName;
-	private String urlFieldName = OdenMessages.ODEN_EXPLORER_Dialogs_ServerFieldName;
-	private String noUsernameRequiredName = OdenMessages.ODEN_EXPLORER_Dialogs_UserNameBooleanString;
-	private String userFieldName = OdenMessages.ODEN_EXPLORER_Dialogs_UserNameFieldName;
-	private String passwordFieldName = OdenMessages.ODEN_EXPLORER_Dialogs_PasswordFieldName;
-	private String agentComboName = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_AgentComboName;
-	private String protocolComboName = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_ProtocolComboName;
-	private String pathFieldName = OdenMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_PathFieldName;
+	private String nicknameFieldName = UIMessages.ODEN_EXPLORER_Dialogs_NicknameFieldName;
+	private String urlFieldName = UIMessages.ODEN_EXPLORER_Dialogs_ServerFieldName;
+	private String noUsernameRequiredName = UIMessages.ODEN_EXPLORER_Dialogs_UserNameBooleanString;
+	private String userFieldName = UIMessages.ODEN_EXPLORER_Dialogs_UserNameFieldName;
+	private String passwordFieldName = UIMessages.ODEN_EXPLORER_Dialogs_PasswordFieldName;
+	private String serverComboName = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_ServerComboName;
+	private String protocolComboName = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_ProtocolComboName;
+	private String pathFieldName = UIMessages.ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_PathFieldName;
 
 	// Define field attributes
 	private Text nicknameField;
@@ -98,8 +99,8 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 	private Text userField;
 	private Text passwordField;
 
-	private Combo agentCombo;
-	private String agentChosen;
+	private Combo serverCombo;
+	private String serverChosen;
 	private Combo protocolCombo;
 	private String protocolChosen;
 	private Text pathField;
@@ -147,7 +148,7 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 		contents.addDisposeListener(new DisposeListener() {
 
 			public void widgetDisposed(DisposeEvent disposeEvent) {
-				ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
+				ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 			}
 		});
 		// TODO 도움말 만든 후 아래 내용을 확인할 것
@@ -203,29 +204,12 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 			};
 		});
 
-		// Server field
-		Label serverLabel = new Label(nameGroup, SWT.WRAP);
-		serverLabel.setText(urlFieldName);
-		urlField = new Text(nameGroup, SWT.BORDER);
-		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
-		data.horizontalSpan = 2;
-		data.widthHint = SIZING_URL_FIELD_WIDTH;
-		urlField.setLayoutData(data);
-		urlField.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent arg0) {
-				CreateBuildRepositoryDialog.this.validate();
-			};
-			public void keyReleased(KeyEvent arg0) {
-				CreateBuildRepositoryDialog.this.validate();
-			};
-		});
-
 		// Protocol combo
 		Label protocolChoiceLabel = new Label(nameGroup, SWT.WRAP);
 		protocolChoiceLabel.setText(protocolComboName);
 		protocolCombo = new Combo(nameGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
-		//		data.horizontalSpan = 2;
+		data.horizontalSpan = 2;
 		data.widthHint = SIZING_PROTOCOL_COMBO_WIDTH;
 		protocolCombo.setLayoutData(data);
 		populateProtocolCombo(protocolCombo);
@@ -233,7 +217,7 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 			public void widgetSelected(final SelectionEvent e) {
 				protocolChosen = protocolCombo.getText();
 				CreateBuildRepositoryDialog.this.validate();
-				if (protocolChosen.equals(OdenMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+				if (protocolChosen.equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
 					urlField.setText("localhost");
 					urlField.setEnabled(false);
 					CreateBuildRepositoryDialog.this.validate();
@@ -243,6 +227,23 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 					CreateBuildRepositoryDialog.this.validate();
 				}
 			}
+		});
+
+		// Server field
+		Label serverLabel = new Label(nameGroup, SWT.WRAP);
+		serverLabel.setText(urlFieldName);
+		urlField = new Text(nameGroup, SWT.BORDER);
+		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
+		//		data.horizontalSpan = 2;
+		data.widthHint = SIZING_URL_FIELD_WIDTH;
+		urlField.setLayoutData(data);
+		urlField.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent arg0) {
+				CreateBuildRepositoryDialog.this.validate();
+			};
+			public void keyReleased(KeyEvent arg0) {
+				CreateBuildRepositoryDialog.this.validate();
+			};
 		});
 
 		// Path field
@@ -322,37 +323,44 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 			passwordField.setEnabled(true);		
 		}
 
-		// Create agent-to-use group
-		Composite agentChoiceGroup = new Composite(composite, SWT.NONE);
+		// Create server-to-use group
+		Composite serverChoiceGroup = new Composite(composite, SWT.NONE);
 		layout = new GridLayout();
 		layout.numColumns = 3;
 		layout.marginWidth = 10;
-		agentChoiceGroup.setLayout(layout);
-		GridData dataAgentComboGroup = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		agentChoiceGroup.setLayoutData(dataAgentComboGroup);
+		serverChoiceGroup.setLayout(layout);
+		GridData dataServerComboGroup = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		serverChoiceGroup.setLayoutData(dataServerComboGroup);
 
-		// Agent-To-Use combo
-		Label agentChoiceLabel = new Label(agentChoiceGroup, SWT.WRAP);
-		agentChoiceLabel.setText(agentComboName);
-		agentCombo = new Combo(agentChoiceGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
-		final GridData agentGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
-		agentGridData.widthHint = SIZING_TEXT_FIELD_WIDTH;
-		agentCombo.setLayoutData(agentGridData);
-		populateAgentCombo(agentCombo);
-		agentCombo.addSelectionListener(new SelectionAdapter() {
+		// Server-To-Use combo
+		Label serverChoiceLabel = new Label(serverChoiceGroup, SWT.WRAP);
+		serverChoiceLabel.setText(serverComboName);
+		serverCombo = new Combo(serverChoiceGroup, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
+		final GridData serverGridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
+		serverGridData.widthHint = SIZING_TEXT_FIELD_WIDTH;
+		serverCombo.setLayoutData(serverGridData);
+		populateServerCombo(serverCombo);
+		serverCombo.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(final SelectionEvent e) {
-				agentChosen = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(agentCombo.getText()).getNickname();
+				serverChosen = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverCombo.getText()).getNickname();
 			}
 		});
 
-		// display the existing data for url, user name, password, and Agent to use in the case of CHANGE or COPY
+		// display the existing data for url, user name, password, and Server to use in the case of CHANGE or COPY
 		if (type != Type.CREATE) {
-			if (repository.getUrl() != null) {
-				urlField.setText(repository.getUrl());
-			}
 			if (repository.getProtocol() != null) {
 				protocolCombo.select(protocolCombo.indexOf(repository.getProtocol()));
 				protocolChosen = repository.getProtocol();
+			}
+			if (repository.getUrl() != null) {
+				// if the protocol is taken and it is "file system", then the address field would be disabled.
+				if (protocolChosen.equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+					urlField.setText("localhost");
+					urlField.setEnabled(false);
+				} else {
+					urlField.setEnabled(true);
+					urlField.setText(repository.getUrl());
+				}
 			}
 			if (repository.getPath() != null) {
 				pathField.setText(repository.getPath());
@@ -363,13 +371,13 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 			if (repository.getPassword() != null) {
 				passwordField.setText(repository.getPassword());
 			}
-			if (repository.getAgentToUse() != null) {
-				agentCombo.select(agentCombo.indexOf(repository.getAgentToUse()));
-				// if the pre-chosen Agent does not exist, the choice will be removed (but it won't be saved until press "OK")
-				if (agentCombo.indexOf(repository.getAgentToUse()) != -1) {
-					agentChosen = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(agentCombo.getText()).getNickname();
+			if (repository.getServerToUse() != null) {
+				serverCombo.select(serverCombo.indexOf(repository.getServerToUse()));
+				// if the pre-chosen Server does not exist, the choice will be removed (but it won't be saved until press "OK")
+				if (serverCombo.indexOf(repository.getServerToUse()) != -1) {
+					serverChosen = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverCombo.getText()).getNickname();
 				} else {
-					agentChosen = null;
+					serverChosen = null;
 				}
 			}
 		}
@@ -392,19 +400,19 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 		//		protocolCombo.select(0);
 	}
 
-	private void populateAgentCombo(Combo agentCombo) {
-		String previous = agentCombo.getText();
+	private void populateServerCombo(Combo serverCombo) {
+		String previous = serverCombo.getText();
 		if (previous != null) {
 			previous = previous.trim();
 			if (previous.length() == 0) {
 				previous = null;
 			}
 		}
-		Collection<Agent> agentCollection = OdenActivator.getDefault().getAliasManager().getAgentManager().getAgents();
-		for (Agent combo : agentCollection) {
-			agentCombo.add(combo.getNickname());
+		Collection<Server> serverCollection = OdenActivator.getDefault().getAliasManager().getServerManager().getServers();
+		for (Server combo : serverCollection) {
+			serverCombo.add(combo.getNickname());
 		}
-		//		agentCombo.select(0);
+		//		serverCombo.select(0);
 	}
 
 	protected void okPressed() {
@@ -421,7 +429,7 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 				repository.setPassword(passwordField.getText().trim());
 			}
 		}
-		repository.setAgentToUse(agentChosen);
+		repository.setServerToUse(serverChosen);
 
 		if (type != Type.CHANGE) {
 			OdenActivator.getDefault().getAliasManager().getRepositoryManager().addRepository(repository);
@@ -443,7 +451,7 @@ public class CreateBuildRepositoryDialog extends TitleAreaDialog {
 
 		close();
 	}
-	
+
 	private void validate() {
 		if((urlField.getText().trim().length() > 0)
 				&& (nicknameField.getText().trim().length() > 0)

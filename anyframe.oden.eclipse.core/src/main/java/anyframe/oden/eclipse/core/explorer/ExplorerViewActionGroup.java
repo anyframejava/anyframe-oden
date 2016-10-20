@@ -16,8 +16,6 @@
  */
 package anyframe.oden.eclipse.core.explorer;
 
-import java.awt.PageAttributes.OriginType;
-
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IEditorPart;
@@ -27,21 +25,21 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.alias.Agent;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.alias.Repository;
-import anyframe.oden.eclipse.core.explorer.actions.DeleteAgentAction;
+import anyframe.oden.eclipse.core.explorer.actions.DeleteServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.DeleteRepositoryAction;
-import anyframe.oden.eclipse.core.explorer.actions.DuplicateAgentAction;
+import anyframe.oden.eclipse.core.explorer.actions.DuplicateServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.DuplicateRepositoryAction;
-import anyframe.oden.eclipse.core.explorer.actions.EditAgentAction;
+import anyframe.oden.eclipse.core.explorer.actions.EditServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.EditRepositoryAction;
-import anyframe.oden.eclipse.core.explorer.actions.NewAgentAction;
+import anyframe.oden.eclipse.core.explorer.actions.NewServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.NewRepositoryAction;
 import anyframe.oden.eclipse.core.explorer.actions.OpenPolicyTaskAction;
 import anyframe.oden.eclipse.core.explorer.actions.RunDeployTaskAction;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * Constructs an Action group for Oden Explorer view of
@@ -77,7 +75,7 @@ public class ExplorerViewActionGroup extends ActionGroup {
 					}
 				} else {
 					// If nothing is selected, show default context menu
-					addAction(contextmenu, new NewAgentAction());
+					addAction(contextmenu, new NewServerAction());
 					addAction(contextmenu, new NewRepositoryAction());
 					return;
 				}
@@ -91,7 +89,7 @@ public class ExplorerViewActionGroup extends ActionGroup {
 			parentNm = parent.getName();
 		} else {
 			// If nothing is selected, show default context menu
-			addAction(contextmenu, new NewAgentAction());
+			addAction(contextmenu, new NewServerAction());
 			addAction(contextmenu, new NewRepositoryAction());
 			return;
 		}
@@ -99,8 +97,8 @@ public class ExplorerViewActionGroup extends ActionGroup {
 		// If multi folder and file selected , show deploy now menu
 		if (selection == null || selection.length != 1) {
 			if(chekckSameRepo(selection))
-				if (!(parentNm.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)
-						|| ((TreeObject) selection[0]).getName().equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel))) {
+				if (!(parentNm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)
+						|| ((TreeObject) selection[0]).getName().equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel))) {
 					addAction(contextmenu, new RunDeployTaskAction(selection));
 				}
 			return;
@@ -109,13 +107,13 @@ public class ExplorerViewActionGroup extends ActionGroup {
 
 
 
-		if (parentNm.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel)
-				|| ((TreeObject) selection[0]).getName().equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel)) {
+		if (parentNm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)
+				|| ((TreeObject) selection[0]).getName().equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)) {
 
-			if (OdenActivator.getDefault().getAliasManager().getAgentManager().getAgent(selection[0].toString()) instanceof Agent) {
-				addAction(contextmenu, new EditAgentAction());
-				addAction(contextmenu, new DuplicateAgentAction());
-				addAction(contextmenu, new DeleteAgentAction());
+			if (OdenActivator.getDefault().getAliasManager().getServerManager().getServer(selection[0].toString()) instanceof Server) {
+				addAction(contextmenu, new EditServerAction());
+				addAction(contextmenu, new DuplicateServerAction());
+				addAction(contextmenu, new DeleteServerAction());
 				if(!chk){
 					// add seperator
 					contextmenu.add(new Separator());
@@ -124,10 +122,10 @@ public class ExplorerViewActionGroup extends ActionGroup {
 				}
 			} else {
 				// Root
-				addAction(contextmenu, new NewAgentAction());
+				addAction(contextmenu, new NewServerAction());
 			}
-		} else if (parentNm.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)
-				|| ((TreeObject) selection[0]).getName().equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) {
+		} else if (parentNm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)
+				|| ((TreeObject) selection[0]).getName().equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) {
 			if (OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(selection[0].toString()) instanceof Repository) {
 				addAction(contextmenu, new EditRepositoryAction());
 				addAction(contextmenu, new DuplicateRepositoryAction());
@@ -177,7 +175,7 @@ public class ExplorerViewActionGroup extends ActionGroup {
 		TreeObject obj = ((TreeObject) selection);
 		StringBuffer full = new StringBuffer(obj.getName());
 		TreeParent parent = obj.getParent();
-		String fullpath = "";
+
 		while (parent != null) {
 			full.insert(0, parent.getName() + "/"); 
 			parent = parent.getParent();

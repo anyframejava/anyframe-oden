@@ -90,7 +90,7 @@ public class OdenActivator extends AbstractUIPlugin {
 				}
 			});
 
-			// Creates aliasManager and initialize it with stored AgentManager and RepositoryManager in each XML file
+			// Creates aliasManager and initialize it with stored ServerManager and RepositoryManager in each XML file
 			aliasManager = new AliasManager();
 			aliasManager.load();
 
@@ -106,7 +106,7 @@ public class OdenActivator extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 
-		// Termination process, which stores working configuration of AgentManager and RepositoryManager in each XML file
+		// Termination process, which stores working configuration of ServerManager and RepositoryManager in each XML file
 		aliasManager.save();
 
 		// Set current plugin to null
@@ -124,7 +124,7 @@ public class OdenActivator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Gets AliasManager which has AgentManager and RepositoryManager
+	 * Gets AliasManager which has ServerManager and RepositoryManager
 	 * @return aliasManager
 	 */
 	public AliasManager getAliasManager() {

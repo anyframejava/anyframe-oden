@@ -18,13 +18,13 @@ package anyframe.oden.eclipse.core.explorer.actions;
 
 import org.eclipse.swt.widgets.Display;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.CreateBuildRepositoryDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
- * Add a new agent action in the Oden view. This class extends
+ * Add a new server action in the Oden view. This class extends
  * AbstractExplorerViewAction class.
  * 
  * @author RHIE Jihwan
@@ -39,9 +39,9 @@ public class DuplicateRepositoryAction extends AbstractExplorerViewAction {
 	 */
 	public DuplicateRepositoryAction() {
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepository,
-				OdenMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepositoryToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepositoryIcon);
+				UIMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepository,
+				UIMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepositoryToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_DuplicateRepositoryAction_DuplicateRepositoryIcon);
 	}
 
 	/**

@@ -19,9 +19,9 @@ package anyframe.oden.eclipse.core.explorer.actions;
 import org.eclipse.swt.widgets.Display;
 
 import anyframe.oden.eclipse.core.OdenActivator;
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.explorer.AbstractExplorerViewAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.DeployNowDialog;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * Run task action in the Oden view. This class extends
@@ -37,14 +37,13 @@ public class RunDeployTaskAction extends AbstractExplorerViewAction {
 	 * 
 	 */
 	private Object[] obj;
-	private String reponame;
 
 	public RunDeployTaskAction(Object[] obj) {
 
 		super(
-				OdenMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNow,
-				OdenMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNowToolTip,
-				OdenMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNowIcon);
+				UIMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNow,
+				UIMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNowToolTip,
+				UIMessages.ODEN_EXPLORER_Actions_RunDeployAction_DeployNowIcon);
 
 		this.obj = obj;
 	}

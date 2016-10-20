@@ -20,7 +20,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotStatusProgress;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
@@ -42,9 +44,9 @@ public class DeleteSnapshotAction extends AbstractSnapshotViewAction {
 	 */
 	public DeleteSnapshotAction() {
 		super(
-				OdenMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshot,
-				OdenMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshotTooltip,
-				OdenMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshotIcon);
+				UIMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshot,
+				UIMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshotTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_DeleteSnapshotAction_DeleteSnapshotIcon);
 	}
 
 	/**
@@ -55,8 +57,8 @@ public class DeleteSnapshotAction extends AbstractSnapshotViewAction {
 				.getSelected();
 		if (selected == null) {
 			DialogUtil.openMessageDialog(
-					OdenMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-					OdenMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotDelete,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
+					UIMessages.ODEN_SNAPSHOT_Actions_SelectSnapshotDelete,
 					MessageDialog.INFORMATION);
 		} else {
 			String selection = OdenActivator.getDefault().getSnapshotView()
@@ -64,23 +66,24 @@ public class DeleteSnapshotAction extends AbstractSnapshotViewAction {
 
 			if (DialogUtil
 					.confirmMessageDialog(
-							OdenMessages.ODEN_CommonMessages_Title_ConfirmDelete,
-							OdenMessages.ODEN_SNAPSHOT_Actions_MsgDlgDelSnapshot
+							CommonMessages.ODEN_CommonMessages_Title_ConfirmDelete,
+							UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgDelSnapshot
 									+ selection
-									+ OdenMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
+									+ CommonMessages.ODEN_CommonMessages_Confirm_MessageSuf)) {
 
 				try {
 					SnapshotStatusProgress
-							.statusProgress(OdenMessages.ODEN_SNAPSHOT_Actions_MsgDelFile
+							.statusProgress(CommandMessages.ODEN_SNAPSHOT_Actions_MsgDelFile
 									+ selection + " -json"); //$NON-NLS-1$
 				} catch (OdenException e) {
 					OdenActivator
 							.error(
-									OdenMessages.ODEN_SNAPSHOT_Actions_Exception_DeleteSnapshot,
+									UIMessages.ODEN_SNAPSHOT_Actions_Exception_DeleteSnapshot,
 									e);
 				}
 
 				SnapshotView.clearComposite();
+				SnapshotView.refreshTree();
 			}
 		}
 

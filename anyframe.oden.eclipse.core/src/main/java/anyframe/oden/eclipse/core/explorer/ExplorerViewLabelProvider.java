@@ -24,9 +24,9 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 
-import anyframe.oden.eclipse.core.OdenMessages;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.CommonUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
 
@@ -40,47 +40,43 @@ import anyframe.oden.eclipse.core.utils.ImageUtil;
  */
 public  class ExplorerViewLabelProvider extends StyledCellLabelProvider implements ILabelProvider{
 
-	// Icon for the "Agents" root
-	private ImageDescriptor _agentRootImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootIcon);
-	private Image _agentRootImage = ImageUtil.getImage(_agentRootImageDescriptor);
+	// Icon for the "Servers" root
+	private ImageDescriptor _serverRootImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootIcon);
+	private Image _serverRootImage = ImageUtil.getImage(_serverRootImageDescriptor);
 
-	// Icon for the agents
-	private ImageDescriptor _agentImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentIcon);
-	private Image _agentImage = ImageUtil.getImage(_agentImageDescriptor);
-
-	// Icon for the default agent
-	//	private ImageDescriptor _defaultAgentImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_DefaultAgentIcon);
-	//	private Image _defaultAgentImage = ImageUtil.getImage(_defaultAgentImageDescriptor);
+	// Icon for the servers
+	private ImageDescriptor _serverImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServerIcon);
+	private Image _serverImage = ImageUtil.getImage(_serverImageDescriptor);
 
 	// Icon for the "Build Repositories" root
-	private ImageDescriptor _repositoryRootImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootIcon);
+	private ImageDescriptor _repositoryRootImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootIcon);
 	private Image _repositoryRootImage = ImageUtil.getImage(_repositoryRootImageDescriptor);
 
 	// Icon for the build repositories
-	private ImageDescriptor _repositoryImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoryIcon);
+	private ImageDescriptor _repositoryImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoryIcon);
 	private Image _repositoryImage = ImageUtil.getImage(_repositoryImageDescriptor);
 
 	// Icon for the folder
-	private ImageDescriptor _folderImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_FolderIcon);
+	private ImageDescriptor _folderImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_FolderIcon);
 	private Image _folderImage = ImageUtil.getImage(_folderImageDescriptor);
 
 	// Icon for the file
-	private ImageDescriptor _fileImageDescriptor = ImageUtil.getImageDescriptor(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_FileIcon);
+	private ImageDescriptor _fileImageDescriptor = ImageUtil.getImageDescriptor(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_FileIcon);
 	private Image _fileImage = ImageUtil.getImage(_fileImageDescriptor);
 
 	public ExplorerViewLabelProvider() {
-		
+
 	}
 	/**
 	 * Disposes all the images
 	 */
 	public void dispose() {
-//		super.dispose();
-		ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentIcon);
-		ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_DefaultAgentIcon);
-		ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoryIcon);
-		ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootIcon);
-		ImageUtil.disposeImage(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootIcon);
+		//		super.dispose();
+		ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServerIcon);
+		ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_DefaultServerIcon);
+		ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoryIcon);
+		ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootIcon);
+		ImageUtil.disposeImage(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootIcon);
 	}
 
 	/**
@@ -89,18 +85,18 @@ public  class ExplorerViewLabelProvider extends StyledCellLabelProvider implemen
 	public Image getImage(Object element) {
 		TreeParent parent = ((TreeObject) element).getParent();
 		String parentName = parent.getName();
-		
+
 		String elementName = ((TreeObject) element).getName();
-		if (parentName.equals("") && elementName.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_AgentsRootLabel)) { //$NON-NLS-1$
-			// root folder image for "Agents"
-			return _agentRootImage;
-		} else if (parentName.equals("") && elementName.equals(OdenMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) { //$NON-NLS-1$
+		if (parentName.equals("") && elementName.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)) { //$NON-NLS-1$
+			// root folder image for "Servers"
+			return _serverRootImage;
+		} else if (parentName.equals("") && elementName.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) { //$NON-NLS-1$
 			// root folder image for "Build Repositories"
 			return _repositoryRootImage;
-		} else if (parentName.equals("Agents")){ //$NON-NLS-1$
-			// agent Icon image
-			return _agentImage;
-		} else if (parentName.equals("Build Repositories")){ //$NON-NLS-1$
+		} else if (parentName.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)){ //$NON-NLS-1$
+			// server Icon image
+			return _serverImage;
+		} else if (parentName.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)){ //$NON-NLS-1$
 			// repository Icon image
 			return _repositoryImage;
 		} else if(element instanceof TreeParent){
@@ -115,12 +111,12 @@ public  class ExplorerViewLabelProvider extends StyledCellLabelProvider implemen
 	 * Gets a visible text upon the nickname of the element
 	 */
 	public String getText(Object element) {
-		
+
 		return element.toString();
 	}
 	public void addListener(ILabelProviderListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 	public boolean isLabelProperty(Object element, String property) {
 		// TODO Auto-generated method stub
@@ -128,7 +124,7 @@ public  class ExplorerViewLabelProvider extends StyledCellLabelProvider implemen
 	}
 	public void removeListener(ILabelProviderListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 	@Override
 	public void update(ViewerCell cell) {
@@ -137,20 +133,20 @@ public  class ExplorerViewLabelProvider extends StyledCellLabelProvider implemen
 		if(element instanceof TreeParent){
 			cell.setText(element.toString());
 		}else if(element instanceof TreeObject){
-			
+
 			String decoration = getFileInfo(element.toString());
 			StyledString styledString= new StyledString(CommonUtil.replaceIgnoreCase(element.toString(), decoration, ""), null);
 			styledString.append(" " + decoration, StyledString.DECORATIONS_STYLER);
-			
+
 			cell.setText(styledString.toString());
 			cell.setStyleRanges(styledString.getStyleRanges());
 		}
-		
+
 		cell.setImage(getImage(element));
-		
+
 		super.update(cell);
 	}
-	
+
 	private String getFileInfo(String text) {
 		return text.substring(text.indexOf("[20") ) ;
 	}

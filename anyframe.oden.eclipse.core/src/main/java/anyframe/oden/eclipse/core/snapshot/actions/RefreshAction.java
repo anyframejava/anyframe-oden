@@ -18,12 +18,12 @@ package anyframe.oden.eclipse.core.snapshot.actions;
 
 import org.eclipse.jface.viewers.ViewerSorter;
 
-import anyframe.oden.eclipse.core.OdenMessages;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 
 /**
- * Refresh Snapshot view's tree, detail information, agent combo'x data.
+ * Refresh Snapshot view's tree, detail information, server combo'x data.
  * This class extends AbstractSnapshotViewAction class.
  * 
  * @author LEE Sujeong
@@ -37,7 +37,7 @@ public class RefreshAction  extends AbstractSnapshotViewAction {
 	 * forward actionId, actionTooltipText, actionIconId to AbstractSnapshotViewAction
 	 */
 	public RefreshAction() {
-		super(OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh, OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip, OdenMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+		super(UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh, UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip, UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
 	}
 	
 	/**
@@ -45,9 +45,9 @@ public class RefreshAction  extends AbstractSnapshotViewAction {
 	 */
 	public void run(){
 		new SnapshotView();
-		SnapshotView.setStatusMessage(OdenMessages.ODEN_SNAPSHOT_Actions_MsgRefreshTree);
+		SnapshotView.setStatusMessage(UIMessages.ODEN_SNAPSHOT_Actions_MsgRefreshTree);
 		SnapshotView.clearComposite();
-		SnapshotView.refreshAgentList();
+		SnapshotView.refreshServerList();
 		SnapshotView.invisibleRoot = null;
 		SnapshotView.refreshTree();
 	}

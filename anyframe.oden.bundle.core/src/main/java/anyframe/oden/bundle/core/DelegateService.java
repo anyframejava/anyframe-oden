@@ -1,20 +1,18 @@
-/* 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+/*
+ * Copyright 2009 SAMSUNG SDS Co., Ltd.
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 package anyframe.oden.bundle.core;
 
@@ -25,6 +23,7 @@ import java.util.Map;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.command.AgentLoc;
+import anyframe.oden.bundle.core.record.RecordElement;
 
 /**
  * The kind of Oden Dispatcher. Oden commands are access the Oden Services
@@ -61,13 +60,6 @@ public interface DelegateService {
 			String[] repoArgs, List<String> includes, List<String> excludes,
 			boolean update, List<AgentLoc> agents) throws OdenException;
 
-
-	/** 
-	 * @deprecated
-	 */
-	public void deploy(String policyName, String[] repoArgs, List<String> includes, List<String> excludes,
-			boolean update, List<AgentLoc> agents, String user, PrintStream out) throws OdenException;
-	
 	/**
 	 * Fetches files from repository(repoargs) and Deploy files to the apporopriate agent 
 	 * which can be retrieved from files object. By calling preview function, you can get the 
@@ -80,9 +72,23 @@ public interface DelegateService {
 	 * @param out
 	 * @throws OdenException
 	 */
-	public void deploy(String[] repoargs, FileMap files, 
-			boolean update, String user, PrintStream out) throws OdenException;
-
+//	public void deploy(String[] repoargs, FileMap files, 
+//			boolean update, String user, PrintStream out) throws OdenException;
+	
+	/**
+	 * @deprecated
+	 */
+	public List<RecordElement> deploy(Policy policy, long date, PrintStream out) 
+			throws OdenException;
+	
+	/**
+	 * @deprecated
+	 */
+	public String deployAll(List<Policy> policies, PrintStream out) throws OdenException;
+	
+	public String deployAll(Map<List<String>, FileMap> repomap, boolean update, 
+			String user, PrintStream out) throws OdenException;
+	
 	/**
 	 * Get available repository protocols
 	 * @return
@@ -96,7 +102,7 @@ public interface DelegateService {
 	public FileInfo snapshot(String targetLoc, String agentUri, String agentPath,
 			String user) throws OdenException;
 
-	public void rollback(String agentUri, String agentPath, String snapshot,
+	public String rollback(String agentUri, String agentPath, String snapshot,
 			String dest, String user) throws OdenException;
 	
 	/**
