@@ -27,7 +27,7 @@ import org.anyframe.oden.bundle.build.config.CfgPmdReturnVO;
 import org.anyframe.oden.bundle.build.config.CfgRunJob;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -48,7 +48,7 @@ public class HudsonRemoteAPI {
 
 	private static String hudsonURL;
 
-	// private Element jobConfigElement;
+	private Element jobConfigElement;
 
 	// public static final String ID = CodeGeneratorActivator.PLUGIN_ID;
 
@@ -80,11 +80,37 @@ public class HudsonRemoteAPI {
 		return rtnList;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String> getJobListWithAuth() throws Exception {
 		List<String> rtnList = new ArrayList<String>();
 
-		Document dom = getDocument(hudsonURL + "api/xml");
+		HttpClient client = new HttpClient();
+		SAXBuilder builder = new SAXBuilder(false);
+		Document dom = null;
+
+		client.getParams().setAuthenticationPreemptive(true);
+		Credentials defaultcreds = new UsernamePasswordCredentials("admin",
+				"admin0");
+
+		client.getState().setCredentials(
+				new AuthScope("localhost", 9090, AuthScope.ANY_REALM),
+				defaultcreds);
+
+		// GetMethod get = new GetMethod("http://70.121.244.11:38080/" +
+		// "api/xml");
+		GetMethod get = new GetMethod("http://localhost:9090/" + "api/xml");
+		get.setDoAuthentication(true);
+
+		try {
+			// execute the GET
+			int status = client.executeMethod(get);
+
+			if (status == 200) {
+				dom = builder.build(get.getResponseBodyAsStream());
+			}
+		} finally {
+			// release any connection resources used by the method
+			get.releaseConnection();
+		}
 
 		if (dom != null) {
 			List<Element> elements = dom.getRootElement().getChildren("job");
@@ -94,19 +120,21 @@ public class HudsonRemoteAPI {
 			}
 		}
 		return rtnList;
+
 	}
 
-	@SuppressWarnings("unchecked")
 	public static List<Element> getJobDetail(String jobName)
-			throws Exception {
-		List<Element> elements = new ArrayList<Element>();
+			throws JDOMException, IOException {
+
 		if (!jobName.endsWith("/")) {
 			jobName += "/";
 		}
-		Document dom = getDocument(hudsonURL + "job/" + jobName + "api/xml");
-		if (dom != null) {
-			elements = dom.getRootElement().getChildren("lastBuild");
-		}
+
+		URL url = new URL(hudsonURL + "job/" + jobName + "api/xml");
+		SAXBuilder builder = new SAXBuilder(false);
+
+		Document dom = builder.build(url);
+		List<Element> elements = dom.getRootElement().getChildren("lastBuild");
 
 		return elements;
 	}
@@ -114,7 +142,7 @@ public class HudsonRemoteAPI {
 	public List<CfgRunJob> getStatus(String jobName) throws Exception {
 		List<String> jobs = new ArrayList<String>();
 		if ("".equals(jobName)) {
-			jobs = getJobListWithAuth();
+			jobs = getJobList();
 		} else {
 			jobs.add(jobName);
 		}
@@ -125,24 +153,16 @@ public class HudsonRemoteAPI {
 			CfgRunJob runJob = new CfgRunJob();
 			// job
 			runJob.setName(job);
-
+			
 			job = URLEncoder.encode(job).replace("+", "%20");
+			URL url = new URL(hudsonURL + "job/" + job + "/lastBuild/api/xml");
+
+			SAXBuilder builder = new SAXBuilder(false);
 			Document dom = null;
 			try {
-				dom = getDocument(hudsonURL + "job/" + job + "/lastBuild/api/xml");
+				dom = builder.build(url);
 			} catch (IOException e) {
 				// build job은 존재하나 구동 정보가 없을 경우
-				runJob.setName(job);
-				// 빌드 상태 None
-				runJob.setStatus("N");
-				runJob.setBuildNo("");
-				runJob.setConsoleUrl("");
-				runJob.setTimeStamp("");
-				rtnList.add(runJob);
-				continue;
-			}
-			// build job은 존재하나 구동 정보가 없을 경우, dom값이 exception이 아닌 null로 리턴
-			if(dom == null) {
 				runJob.setName(job);
 				// 빌드 상태 None
 				runJob.setStatus("N");
@@ -179,10 +199,14 @@ public class HudsonRemoteAPI {
 	public static int getStatusWithArg(String address, String buildName,
 			String buildNo) throws Exception {
 		buildName = URLEncoder.encode(buildName).replace("+", "%20");
+		URL url = new URL(address + "/job/" + buildName + "/" + buildNo
+				+ "/api/xml");
+
+		SAXBuilder builder = new SAXBuilder(false);
+
 		Document dom = null;
-		
 		try {
-			dom = getDocument(address + "/job/" + buildName + "/" + buildNo	+ "/api/xml");
+			dom = builder.build(url);
 		} catch (IOException e) {
 			// build job은 존재하나 구동 정보가 없을 경우
 			return 0;
@@ -238,27 +262,30 @@ public class HudsonRemoteAPI {
 		return job;
 	}
 
-	public Element getJobConfigXml(String jobName) throws Exception {
+	public Element getJobConfigXml(String jobName) throws JDOMException,
+			IOException {
 
-		return getDocument(hudsonURL
-				+ "anyframe/api?service=getJobConfig&jobName=" + jobName).getRootElement();
+		URL url = new URL(hudsonURL
+				+ "anyframe/api?service=getJobConfig&jobName=" + jobName);
+		SAXBuilder builder = new SAXBuilder(false);
+
+		return builder.build(url).getRootElement();
 	}
 
 	public CfgRunJob executeBuild(String jobName) throws Exception {
 		CfgRunJob runJob = new CfgRunJob();
 		runJob.setName(jobName);
-
+		
 		jobName = URLEncoder.encode(jobName).replace("+", "%20");
 		String uri = hudsonURL + "job/" + jobName + "/build";
+
+//		GetMethod method = new GetMethod(uri.replaceAll(" ", "%20"));
+		GetMethod method = new GetMethod(uri);
+		method.setRequestHeader("Content-Type",
+				"application/x-www-form-urlencoded; charset=UTF-8");
 		
-		HttpClient httpClient = getClient();
-		// GetMethod method = new GetMethod(uri.replaceAll(" ", "%20"));
-		PostMethod method = new PostMethod(uri);
-		//GetMethod method = new GetMethod(hudsonURL);
-		method.setRequestHeader("Content-Type",	"application/x-www-form-urlencoded; charset=UTF-8");
-		method.setDoAuthentication(true);
 		try {
-			
+			HttpClient httpClient = new HttpClient();
 			int statusCode = httpClient.executeMethod(method);
 
 			// if (statusCode == HttpStatus.SC_OK || statusCode == 201) {
@@ -273,11 +300,11 @@ public class HudsonRemoteAPI {
 		}
 		// get last build(number, url)
 		List<Element> elements = getJobDetail(jobName);
-
+		
 		if (elements.size() == 0) {
 			runJob.setBuildNo("1");
-			runJob.setConsoleUrl(hudsonURL + "job/" + jobName + "/" + "1"
-					+ "/console");
+			runJob.setConsoleUrl(hudsonURL + "job/"
+					+ jobName + "/" + "1" + "/console");
 			return runJob;
 		}
 
@@ -292,25 +319,21 @@ public class HudsonRemoteAPI {
 		return runJob;
 	}
 
-	public CfgRunJob executeBuildWithArg(String address, String userId,
+	public static CfgRunJob executeBuildWithArg(String address, String userId,
 			String pwd, String dbName, String dbConnection, String server,
 			String productName, String projectName, String buildName,
-			String request, String repoPath, boolean isPmd, String packageType,
-			String packageName) throws Exception {
+			String request, String repoPath, boolean isPmd) throws Exception {
 
 		CfgRunJob runJob = new CfgRunJob();
 		runJob.setName(buildName);
-
+		
 		// String url = URLEncoder.encode(address + "/job/" + buildName
 		// + "/buildWithParameters");
-		HttpClient httpClient = getClient();
-		
 		buildName = URLEncoder.encode(buildName).replace("+", "%20");
-		PostMethod method = new PostMethod(address + "/job/" + buildName + "/buildWithParameters");
+		PostMethod method = new PostMethod(address + "/job/"
+				+ buildName + "/buildWithParameters");
 		method.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=UTF-8");
-		method.setDoAuthentication(true);
-		
 		method.addParameter("USER.ID", userId);
 		method.addParameter("PWD", pwd);
 		method.addParameter("DM.DB.NAME", dbName);
@@ -320,18 +343,16 @@ public class HudsonRemoteAPI {
 		method.addParameter("DM.PROJECT.NAME", projectName);
 		method.addParameter("REQUEST", request);
 		method.addParameter("REPOSITORY.PATH", repoPath);
-		method.addParameter("PACKAGETYPE", packageType);
-		method.addParameter("PACKAGENAME", packageName);
-
+		
 		if (isPmd) {
 			method.addParameter("TARGET", "pmd.run");
 		}
 		hudsonURL = address + "/";
-		
 
 		String buildNo = getLastBuildNo(buildName);
 
-		try {
+		 try {
+			HttpClient httpClient = new HttpClient();
 			int statusCode = httpClient.executeMethod(method);
 
 			// if (statusCode == HttpStatus.SC_OK || statusCode == 201) {
@@ -356,41 +377,6 @@ public class HudsonRemoteAPI {
 
 	}
 
-	public boolean checkBuildServer() throws Exception {
-		boolean isServer = true;
-
-		if ("".equals(hudsonURL)) {
-			// build.url is empty
-			return false;
-		} else {
-			HttpClient client = getClient();
-			GetMethod method = new GetMethod(hudsonURL);
-			method.setRequestHeader("Content-Type",
-					"application/x-www-form-urlencoded; charset=UTF-8");
-			method.setDoAuthentication(true);
-
-			int statusCode = 0;
-			try {
-				statusCode = client.executeMethod(method);
-			} catch (Exception e) {
-				return false;
-			}
-
-			if (statusCode == HttpStatus.SC_OK || statusCode == 201) {
-
-			} else {
-				return false;
-			}
-		}
-
-		try {
-			getJobListWithAuth();
-		} catch (IOException e) {
-			return false;
-		}
-		return isServer;
-	}
-
 	private static String getLastBuildNo(String buildName) throws Exception {
 		List<Element> elements = getJobDetail(buildName);
 		// 처음 빌드시 1
@@ -409,11 +395,15 @@ public class HudsonRemoteAPI {
 
 	private static String getBuildNo(String buildNo, String buildName)
 			throws Exception {
+		URL url = new URL(hudsonURL + "job/" + buildName + "/lastBuild/api/xml");
+
+		SAXBuilder builder = new SAXBuilder(false);
+
 		Document dom = null;
 
 		for (int i = 0; i < 100; i++) {
 			try {
-				dom = getDocument(hudsonURL + "job/" + buildName + "/lastBuild/api/xml");
+				dom = builder.build(url);
 			} catch (IOException e) {
 				// 처음 구동
 				continue;
@@ -432,17 +422,16 @@ public class HudsonRemoteAPI {
 
 		CfgRunJob runJob = new CfgRunJob();
 		runJob.setName(buildName);
-		HttpClient httpClient = getClient();
+		
 		buildName = URLEncoder.encode(buildName).replace("+", "%20");
-
+		
 		PostMethod method = new PostMethod(address + "/job/" + buildName
 				+ "/buildWithParameters");
 
 		method.addParameter("TARGET", "rollback.run");
 		method.addParameter("REQUEST", build);
-		method.setDoAuthentication(true);
 		try {
-			
+			HttpClient httpClient = new HttpClient();
 			int statusCode = httpClient.executeMethod(method);
 
 		} catch (Exception e) {
@@ -455,7 +444,7 @@ public class HudsonRemoteAPI {
 
 		// get last build(number, url)
 		List<Element> elements = getJobDetail(buildName);
-
+		
 		for (Element element : elements) {
 			String buildNo = String.valueOf(Integer.parseInt(element
 					.getChildText("number")) + 1);
@@ -472,13 +461,16 @@ public class HudsonRemoteAPI {
 	public static CfgPmdReturnVO returnPmd(String address, String buildName,
 			String buildNo) throws Exception {
 		buildName = URLEncoder.encode(buildName).replace("+", "%20");
-
+		
 		if (!buildName.endsWith("/")) {
 			buildName += "/";
 		}
 
-		Document dom = getDocument(address + "/job/" + buildName + buildNo
+		URL url = new URL(address + "/job/" + buildName + buildNo
 				+ "/pmdResult/api/xml?depth=1");
+		SAXBuilder builder = new SAXBuilder(false);
+
+		Document dom = builder.build(url);
 		List<Element> elements = dom.getRootElement().getChildren("warning");
 
 		List<CfgPmdDetail> highDetail = new ArrayList<CfgPmdDetail>();
@@ -600,57 +592,6 @@ public class HudsonRemoteAPI {
 		}
 
 		return "";
-	}
-
-	public static Document getDocument(String url) throws Exception {
-		HttpClient client = new HttpClient();
-		SAXBuilder builder = new SAXBuilder(false);
-		Document dom = null;
-
-		String[] buildUrlArr = hudsonURL.split(":");
-		String buildIp = buildUrlArr[1].substring(2);
-		String buildPort = buildUrlArr[2].substring(0, 4);
-
-		client.getParams().setAuthenticationPreemptive(true);
-		Credentials defaultcreds = new UsernamePasswordCredentials("admin",
-				"admin0");
-
-		client.getState().setCredentials(
-				new AuthScope(buildIp, Integer.parseInt(buildPort),
-						AuthScope.ANY_REALM), defaultcreds);
-
-		GetMethod get = new GetMethod(url);
-		get.setDoAuthentication(true);
-
-		try {
-			// execute the GET
-			int status = client.executeMethod(get);
-
-			if (status == 200) {
-				dom = builder.build(get.getResponseBodyAsStream());
-			}
-		} finally {
-			// release any connection resources used by the method
-			get.releaseConnection();
-		}
-
-		return dom;
-	}
-
-	public static HttpClient getClient() {
-		HttpClient client = new HttpClient();
-		String[] buildUrlArr = hudsonURL.split(":");
-		String buildIp = buildUrlArr[1].substring(2);
-		String buildPort = buildUrlArr[2].substring(0, 4);
-		client.getParams().setAuthenticationPreemptive(true);
-		Credentials defaultcreds = new UsernamePasswordCredentials("admin",
-				"admin0");
-
-		client.getState().setCredentials(
-				new AuthScope(buildIp, Integer.parseInt(buildPort),
-						AuthScope.ANY_REALM), defaultcreds);
-
-		return client;
 	}
 
 }

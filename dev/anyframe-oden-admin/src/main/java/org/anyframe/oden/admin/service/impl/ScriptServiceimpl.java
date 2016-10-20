@@ -89,50 +89,6 @@ public class ScriptServiceimpl implements ScriptService {
 			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
-	
-	/**
-	 * Method for getting script list in certain job.
-	 * 
-	 * @param param, opt, objectArray
-	 * @param opt
-	 */
-	public Page findListByPk(String param, String opt, List<JSONObject> objectArray) throws Exception {
-		List<Command> list = new ArrayList<Command>();
-
-		if (!StringUtil.isEmpty(param)) {
-//			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
-//			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
-
-			for (JSONObject object : objectArray) {
-				JSONArray commands = (JSONArray) object.get("commands");
-
-				for (int num = 0; num < commands.length(); num++) {
-					JSONObject cmdObject = (JSONObject) commands.get(num);
-					Command c = JsonConverter.jsonToCommand(cmdObject);
-
-					String event = "";
-					event = event.concat(OdenConstants.A_HREF_HEAD + "javascript:runScript('" + c.getName() + "');" + OdenConstants.A_HREF_MID);
-					if ("run".equals(opt)) {
-						event = event.concat(OdenConstants.IMG_TAG_RUN);
-					}
-					if ("del".equals(opt)) {
-						event = event.concat(OdenConstants.IMG_TAG_DEL);
-					}
-
-					event = event.concat(OdenConstants.A_HREF_TAIL);
-
-					c.setHidden(event);
-					list.add(c);
-				}
-			}
-		}
-
-		if (list.isEmpty()) {
-			return new Page(list, 1, list.size(), 1, 1);
-		} else {
-			return new Page(list, 1, list.size(), list.size(), list.size());
-		}
-	}
 
 	/**
 	 * Method for running script in some targets.

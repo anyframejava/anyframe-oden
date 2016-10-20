@@ -1,0 +1,66 @@
+<project name="bookrental" default="all" basedir=".">
+	<property name="dist" location="${basedir}/dist"/>
+	<property name="build" location="${basedir}/build"/>
+	<property name="workspace" location="${basedir}/dist"/>
+	<property name="srcRoot" value="src/main/java"/>
+	<property name="webRoot" value="webapps"/>
+	<property name="reference" value="${basedir}/reference/classes"/>
+
+	<path id="classpath">
+		<fileset dir="../../lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="dm.init">
+		<delete dir="${dist}"/>
+		<delete dir="${build}"/>
+	</target>
+
+	<target name="pmd.init">
+		<delete dir="${basedir}/pmd"/>
+		<mkdir dir="${basedir}/pmd"/>
+	</target>
+
+	<target name="dm.checkout">
+		<taskdef name="checkout" classname="org.anyframe.oden.dimmension.DimensionAdapter" classpathref="classpath" />
+		<checkout userId="${USER.ID}" password="${PWD}" dbName="${DM.DB.NAME}" dbConnection="${DB.CONNECTION}" server="${DM.SERVER}" productName="${PRODUCT.NAME}" projectName="${DM.PROJECT.NAME}" requestId="${REQUEST}" targetPath="${workspace}" />
+	</target>
+
+	<target name="dm.compile">
+		<taskdef name="compile" classname="org.anyframe.oden.dimmension.compile.CompileBroker" classpathref="classpath" />
+		<compile projectName="${DM.PROJECT.NAME}" requestId="${REQUEST}" srcRoot="${srcRoot}" webRoot="${webRoot}" />
+	</target>
+
+	<target name="dm.copyrepo">
+		<copy todir="${REPOSITORY.PATH}">
+			<fileset dir="${basedir}/build"/>
+		</copy>
+	</target>
+
+	<target name="dm.clean">
+		<delete dir="${dist}"/>
+		<delete dir="${build}"/>
+	</target>
+	
+	<target name="pmd">
+		<mkdir dir="build"/>
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="classpath"/>
+		<pmd rulesetfiles="pmd-ruleset.xml">
+			<formatter type="xml" toFile="pmd/pmd.xml"/>
+			<fileset dir="dist">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+	
+	<target name="all" depends="dm.init, dm.checkout, dm.compile, dm.copyrepo, dm.clean"/>
+
+	<target name="pmd.run" depends="pmd.init, dm.checkout, pmd, dm.clean"/>
+
+	<target name="build.rollback">
+		<taskdef name="rollback" classname="org.anyframe.oden.dimmension.rollback.RollbackBroker" classpathref="classpath" />
+		<rollback requestId="${REQUEST}"/>
+	</target>
+
+</project>

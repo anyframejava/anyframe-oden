@@ -970,30 +970,19 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		// CfgBuild Logging
 		inputParamLogging(build);
 
-		// set buildUrl
-		HudsonRemoteAPI api = new HudsonRemoteAPI();
-		api.setHudsonURL(build.getAddress());
-		
 		// call build Parameter
-		CfgRunJob run = api.executeBuildWithArg(build.getAddress(),
+		CfgRunJob run = HudsonRemoteAPI.executeBuildWithArg(build.getAddress(),
 				build.getUserId(), build.getPwd(), build.getDbName(), build
 						.getDbConnection(), build.getServer(), build
 						.getProductName(), build.getProjectName(), build
 						.getBuildName(), toJSONArray(build.getRequest())
 						.toString().replace("\"", ""), build.getRepoPath(),
-				false, build.getPackageType(), build.getPackageName());
+				false);
 
 		return new CfgBuildReturnVO(run.getName(), run.getBuildNo(),
 				run.getConsoleUrl());
 	}
-	
-	public boolean CheckBuildServer(String address) throws Exception {
-		HudsonRemoteAPI api = new HudsonRemoteAPI();
-		api.setHudsonURL(address);
 
-		return api.checkBuildServer();
-	}
-	
 	public CfgBuildReturnVO rollbackBuild(String address, String buildName,
 			List<String> build) throws Exception {
 		CfgRunJob run = HudsonRemoteAPI.rollbackBuildWithArg(address,
@@ -1051,18 +1040,14 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	}
 
 	public CfgBuildReturnVO executePmd(CfgBuild build) throws Exception {
-		// set buildUrl
-		HudsonRemoteAPI api = new HudsonRemoteAPI();
-		api.setHudsonURL(build.getAddress());
-		
 		// call build Parameter & run pmd
-		CfgRunJob run = api.executeBuildWithArg(build.getAddress(),
+		CfgRunJob run = HudsonRemoteAPI.executeBuildWithArg(build.getAddress(),
 				build.getUserId(), build.getPwd(), build.getDbName(), build
 						.getDbConnection(), build.getServer(), build
 						.getProductName(), build.getProjectName(), build
 						.getBuildName(), toJSONArray(build.getRequest())
 						.toString().replace("\"", ""), build.getRepoPath(),
-				true, build.getPackageType(), build.getPackageName());
+				true);
 		return new CfgBuildReturnVO(run.getName(), run.getBuildNo(),
 				run.getConsoleUrl());
 	}
@@ -1071,5 +1056,4 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			String buildNo) throws Exception {
 		return HudsonRemoteAPI.returnPmd(address, buildName, buildNo);
 	}
-	
 }

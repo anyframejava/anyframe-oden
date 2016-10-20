@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="InternalBuildCommand" immediate="true" >
+	<implementation class="org.anyframe.oden.bundle.build.InternalBuildCommandImpl"/>
+	<service>
+		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
+	</service>
+	<reference name="BUILD_LOGGER_SERVICE"
+         interface="org.anyframe.oden.bundle.build.log.BuildLogService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setBuildLogService"
+	/>
+</component>

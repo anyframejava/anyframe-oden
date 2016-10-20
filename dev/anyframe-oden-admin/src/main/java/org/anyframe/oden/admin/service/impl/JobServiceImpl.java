@@ -33,7 +33,6 @@ import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.convert.JsonConverter;
 import org.anyframe.oden.admin.dao.JobDao;
 import org.anyframe.oden.admin.domain.BuildHistory;
-import org.anyframe.oden.admin.domain.Command;
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Mapping;
 import org.anyframe.oden.admin.service.BuildService;
@@ -311,7 +310,6 @@ public class JobServiceImpl implements JobService {
 	 * @param cmd
 	 * @throws Exception
 	 */
-	@SuppressWarnings("null")
 	public Page findList(String cmd, String buildName, String group) throws Exception {
 		List<String> roles = CommonUtil.getRoleList(cmd);
 
@@ -325,11 +323,7 @@ public class JobServiceImpl implements JobService {
 
 		init();
 		boolean isRunning = runningStatus();
-		boolean buildCheck = getBuildCheck();
-		boolean isBuilding = false;
-		if(buildCheck != false) {
-			isBuilding = runningBuildStatus(buildName);
-		}
+		boolean isBuilding = runningBuildStatus(buildName);
 
 		for (int i = 0; i < jobNameList.size(); i++) {
 			String jobStatus = "";
@@ -337,12 +331,8 @@ public class JobServiceImpl implements JobService {
 			String jobName = jobNameList.get(i) + "";
 			String jobBuild = "";
 
-			Job job = new Job();
-			// 2014.11.19 job info를 한번만 날리도록 수정
-			String buildCmd = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
-			List<JSONObject> objectArr = odenCommonDao.jsonObjectArrays(buildCmd);
-			job.setBuild(getBuildByobjectArray(objectArr));
-			
+			Job job = findByName(jobName);
+
 			if (jobName.indexOf("\\") != -1) {
 				jobName = jobName.replaceAll("\\\\", "/");
 			}
@@ -410,10 +400,7 @@ public class JobServiceImpl implements JobService {
 					}
 
 					if (job.getBuild() != "All") {
-						BuildHistory buildHistory = null;
-						if(buildCheck != false) {
-							buildHistory = buildservice.findByName(job.getBuild());
-						}
+						BuildHistory buildHistory = buildservice.findByName(job.getBuild());
 
 						if (buildHistory != null && buildHistory.getDate() > 0) {
 							if (buildHistory.isSuccess()) {
@@ -433,7 +420,7 @@ public class JobServiceImpl implements JobService {
 
 					job.setTxId(jobTxid);
 					job.setDate(jobStatus);
-					job.setMode(stoppingJobAction(jobName, jobTxid, jobStatus, jobBuild, isRunning, isBuilding, job, objectArr, buildCheck));
+					job.setMode(stoppingJobAction(jobName, jobTxid, jobStatus, jobBuild, isRunning, isBuilding));
 				}
 				list.add(job);
 			}
@@ -592,16 +579,11 @@ public class JobServiceImpl implements JobService {
 	 * @return String
 	 * @throws Exception
 	 */
-	private String stoppingJobAction(String jobName, String txId, String gStatus, String gBuild, boolean isRunning, boolean isBuilding, Job jobInfo, List<JSONObject> objectArr, boolean buildCheck)
+	private String stoppingJobAction(String jobName, String txId, String gStatus, String gBuild, boolean isRunning, boolean isBuilding)
 			throws Exception {
 
-		//String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
-		//List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
-		//List<JSONObject> objectArray1 = odenCommonDao.jsonObjectArrays(command);
-		//List<JSONObject> objectArray2 = odenCommonDao.jsonObjectArrays(command);
-		
-		Page g = serverService.findListByPk(jobName, objectArr);
-		Page c = scriptService.findListByPk(jobName, "del", objectArr);
+		Page g = serverService.findListByPk(jobName);
+		Page c = scriptService.findListByPk(jobName, "del");
 
 		String result = "";
 		List<Integer> permList = new ArrayList<Integer>();
@@ -609,7 +591,7 @@ public class JobServiceImpl implements JobService {
 
 		boolean access = viewResourceAccessService.isGranted("addUser", permList);
 
-		//Job jobInfo = findByName(jobName);
+		Job jobInfo = findByName(jobName);
 
 		/**
 		 * <pre>
@@ -632,7 +614,7 @@ public class JobServiceImpl implements JobService {
 			switch (optCount) {
 			case 0:
 				link = "javascript:runBuild('" + jobInfo.getBuild() + "');";
-				if (gBuild == null || gBuild.equals("") || gBuild.equals("None") || isBuilding == true || isRunning == true || buildCheck == false) {
+				if (gBuild == null || gBuild.equals("") || gBuild.equals("None") || isBuilding == true || isRunning == true) {
 					action = OdenConstants.IMG_TAG_BUILD_UNABLE;
 					activeLink = false;
 				} else {
@@ -1138,39 +1120,5 @@ public class JobServiceImpl implements JobService {
 		List<String> roles = new ArrayList<String>();
 		roles.add("ROLE_ADMIN");
 		return odenCommonDao.findJob("job", "info", roles);
-	}
-	
-	/**
-	 * Get build Name
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	
-	public String getBuildByobjectArray(List<JSONObject> objectArray) throws Exception {
-		String buildName = null;
-		for (JSONObject object : objectArray) {
-			buildName = (String) object.get("build");
-
-		}
-		return buildName;
-	}
-	
-	/**
-	 * Get build Check
-	 * 
-	 * @return
-	 * @throws Exception
-	 */
-	
-	public boolean getBuildCheck() throws Exception {
-		boolean buildCheck = false;
-		String buildCmd = CommandUtil.getBasicCommand("build", "check");
-		List<JSONObject> objectArr = odenCommonDao.jsonObjectArrays(buildCmd);
-		for (JSONObject object : objectArr) {
-			buildCheck = (Boolean) object.get("serverStatus");
-
-		}
-		return buildCheck;
 	}
 }

@@ -18,6 +18,7 @@ package org.anyframe.oden.bundle.build;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.anyframe.oden.bundle.build.config.BrecordElement;
 import org.anyframe.oden.bundle.build.config.CfgBuildJob;
 import org.anyframe.oden.bundle.build.config.CfgRunJob;
 import org.anyframe.oden.bundle.build.log.BuildLogService;
@@ -104,7 +105,7 @@ public class BuildCommandImpl implements CustomCommand {
 		if ("info".equals(action)) {
 			if (StringUtil.empty(cmd.getActionArg())) {
 				// 계정이 필요하면, 기능 추가가 필요
-				List<String> elements = hudson.getJobListWithAuth();
+				List<String> elements = hudson.getJobList();
 
 				if (isJSON) {
 					return new JSONArray(elements).toString();
@@ -296,24 +297,7 @@ public class BuildCommandImpl implements CustomCommand {
 //			addBuildHistory(builds);
 
 			return buf.toString();
-		} else if ("check".equals(action)) {
-			// build.url 이 oden.ini에 존재하는지 check 또는 build server가 구동중인지 확인해서
-			// true, false를 리턴
-			boolean status = hudson.checkBuildServer();
-			
-			if (isJSON) {
-				JSONObject jo = new JSONObject();
-				jo.put("serverStatus", status);
-				
-				return new JSONArray().put(jo).toString();
-			}
 
-			StringBuffer buf = new StringBuffer();
-			
-			buf.append("serverStatus: " +status + "\n");
-			
-			return buf.toString();
-			
 		} else {
 			throw new OdenException("Invalid Action: " + action);
 		}
@@ -383,6 +367,6 @@ public class BuildCommandImpl implements CustomCommand {
 
 	public String getFullUsage() {
 		return "build info [ <job> ]" + "\nbuild run <job>"
-				+ "\nbuild log <job>" + "\nbuild status [ <job> ]" + "\nbuild check";
+				+ "\nbuild log <job>" + "\nbuild status [ <job> ]";
 	}
 }

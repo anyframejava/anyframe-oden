@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.anyframe.oden.admin.domain.Command;
 import org.anyframe.pagination.Page;
-import org.json.JSONObject;
 
 /**
  * This is ScriptService Interface
@@ -35,8 +34,6 @@ public interface ScriptService {
 	 */
 	public Page findListByPk(String domain, String opt) throws Exception;
 
-	public Page findListByPk(String domain, String opt, List<JSONObject> objectArray) throws Exception;
-	
 	public String run(String[] param, String name, String script)
 			throws Exception;
 

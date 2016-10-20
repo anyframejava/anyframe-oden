@@ -448,14 +448,12 @@ public class ExtJobDeployJob extends DeployJob {
 							throw new IOException("Diffrent size: "
 									+ info.size() + "/" + originalFileSz);
 						f.setSuccess(true);
-						f.setSize(info.size());
 						synchronized (nSuccess) {
 							nSuccess++;
 						}
 						f.setMode(info.isUpdate() ? Mode.UPDATE : Mode.ADD);
 					} catch (Exception e) {
 						f.setSuccess(false);
-						f.setSize(0L);
 						if (StringUtil.empty(f.errorLog()))
 							f.setErrorLog(e.getMessage());
 						Logger.error(e);

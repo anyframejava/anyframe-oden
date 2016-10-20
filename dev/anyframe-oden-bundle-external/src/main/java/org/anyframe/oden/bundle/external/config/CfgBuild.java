@@ -51,15 +51,11 @@ public class CfgBuild implements Serializable {
 	List<CfgBuildDetail> request;
 
 	String repoPath;
-	
-	String packageType;
-	
-	String packageName;
 
 	public CfgBuild(String address, String userId, String pwd, String dbName,
 			String dbConnection, String server, String productName,
 			String projectName, String buildName, List<CfgBuildDetail> request,
-			String repoPath, String packageType, String packageName) {
+			String repoPath) {
 		this.address = address;
 		this.userId = userId;
 		this.pwd = pwd;
@@ -71,8 +67,6 @@ public class CfgBuild implements Serializable {
 		this.buildName = buildName;
 		this.request = request;
 		this.repoPath = repoPath;
-		this.packageType = packageType;
-		this.packageName = packageName;
 	}
 
 	public String getAddress() {
@@ -118,12 +112,5 @@ public class CfgBuild implements Serializable {
 	public String getRepoPath() {
 		return repoPath;
 	}
-	
-	public String getPackageType() {
-		return packageType;
-	}
-	
-	public String getPackageName() {
-		return packageName;
-	}
+
 }

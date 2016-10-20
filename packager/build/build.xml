@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="ODEN Packaging" default="default" basedir=".">
-	<property name="version" value="2.6.0"/>
+	<property name="version" value="2.6.0.RC1"/>
 	<!--property name="manual.dir" location="../../../manual/manual/target/oden"/-->
 	<!--property name="manual.dir" location="../../../manual/manual/target"/-->
 	<property name="manual.dir" location="../../../manual/Release/target"/>

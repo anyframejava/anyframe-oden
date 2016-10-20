@@ -180,16 +180,6 @@ public interface ExtDeployerService {
 	public CfgBuildReturnVO executeBuild(CfgBuild build) throws Exception;
 	
 	/**
-	 * External API method , which check available build server or not
-	 * 
-	 * @param address
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean CheckBuildServer(String address) throws Exception;
-
-	
-	/**
 	 * External API method , which rollback build item (run jenkins job)
 	 * 
 	 * @param build

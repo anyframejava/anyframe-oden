@@ -17,7 +17,6 @@ var unGroups = '${groupUngroups.unGroups}';
 var currentSelectedTab = '<%=currentSelectedTab%>';
 var groupId = encodeURI('<%=groupid%>');
 var deleteTabId; //deleteTab Id
-var disableTab;
 
 jQuery(document).ready(function() {
 	jQuery("#grid_job").jqGrid( {
@@ -31,10 +30,10 @@ jQuery(document).ready(function() {
 			group : currentSelectedTab
 		},		
 		datatype : "json",
-		colNames : [ '<spring:message code="job.grid.job"/>',
+		colNames : [ '<spring:message code="job.grid.job"/>', 
 		     		 '<spring:message code="job.grid.action"/>',
-		     		 '<spring:message code="job.grid.buildstatus"/>',
-		     		 '<spring:message code="job.grid.status"/>',
+		     		 '<spring:message code="job.grid.buildstatus"/>', 
+		     		 '<spring:message code="job.grid.status"/>', 
 		     		 '<spring:message code="job.grid.id"/>'],
 		jsonReader : {
 			repeatitems : false
@@ -66,8 +65,7 @@ jQuery(document).ready(function() {
 		}, {
 			key : true, 
 			name : 'txId', 
-			hidden : true
-		}
+			hidden : true}
 		 ],
 		width : 888,
 		height : 375,
@@ -86,13 +84,6 @@ jQuery(document).ready(function() {
 			alert('<spring:message code="job.load.error"/>');
 		},
 		gridComplete: function() {
-			// 2014.11.21 Tab disable 처리 Start
-			for(var i=0; i<tabCount; i++) {
-				$("#jobTabs").tabs("enable", i);
-			}
-			$("a[href='" +disableTab+ "']").parent().addClass('ui-state-default').removeClass('ui-state-disabled');
-			// 2014.11.21 End
-			
 			$.ajax( {
 				url : "<c:url value='/simplejson.do?layout=jsonLayout&service=statusService.checkRunning(cmd)&viewName=jsonView'/>",
 				dataType : "json",
@@ -104,7 +95,7 @@ jQuery(document).ready(function() {
 						startTimer();
 					}
 				}
-			});
+			});	
 		}
 	});
 	
@@ -136,46 +127,25 @@ jQuery(document).ready(function() {
 				$('.ui-dialog-buttonpane button:contains("Update")').hide();
 				$( "#tabDialog" ).dialog( "open" );
 			}
-		},
-		
+		},		
 		select: function(event, ui) {
 			if($(ui.tab).text() != '+'){
 				currentSelectedTab = trim($(ui.tab).text());
-				
-				// 2014.11.21 Tab disable 처리 Start
-				var activeTab = $('#jobTabs').tabs('option', 'selected');
-				for(var i=0; i<tabCount; i++) {
-					$("#jobTabs").tabs( "disable", i);
-				}
-				// ALL Tab Disable
-				if(activeTab == 0) {
-					disableTab = "#a";
-					$("a[href='" +disableTab+ "']").parent().removeClass('ui-tabs-selected ui-state-active').addClass('ui-state-disabled');
-				// Another Tab Disable	
-				} else {
-					var disableTabNum = activeTab+1;
-					disableTab = "#tabs-"+disableTabNum;
-					$("a[href='" +disableTab+ "']").parent().removeClass('ui-tabs-selected ui-state-active').addClass('ui-state-disabled');		
-				}
-				// 2014.11.21 End
-				
 				jQuery("#grid_job").jqGrid("setGridParam", { 
-					aysnc : false,
 	    			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findList(cmd, buildName, group)&viewName=jsonView'/>",
 	    			
 	    			mtype : 'POST',
 	    			postData : {
 	    				cmd : 	encodeURI('<%=roles%>'),
 	    				buildName : '',
-	    				group : $(ui.tab).text()
-	    			}
+	    				group : $(ui.tab).text(),
+	    			},		 
 				}).trigger("reloadGrid");
-				
 			}
 		}
 	});
 	
-	// Admin role login 
+	//Admin role login 
 	// gear icon: udating the tab on click
     $( "#jobTabs" ).delegate( "span.ui-icon-gear", "click", function() {
     	$('.ui-dialog-buttonpane button:contains("Update")').show();
@@ -184,7 +154,7 @@ jQuery(document).ready(function() {
 		
 		$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=groupService.findByName(tabname)&viewName=jsonView'/>",
 				{
-					tabname  : tabName
+					tabname  : tabName,
 			
 				}, function(data) {
 					var retList = data.autoData;
@@ -211,12 +181,12 @@ jQuery(document).ready(function() {
     	var tabName = $(this).closest("li").text();
     	var result = confirm('<spring:message code="job.confirm.delete"/>');
     	if(result){
-    		/* var panelId = $(this).closest("li").remove().attr( "aria-controls" );
-    		$( "#" + panelId ).remove(); */
+    		var panelId = $(this).closest("li").remove().attr( "aria-controls" );
+    		$( "#" + panelId ).remove();
     		$( "#jobTabs" ).tabs("refresh");
     		$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=groupService.remove(tabName)&viewName=jsonView'/>",
     				{
-    				tabName  : tabName
+    				tabName  : tabName,
     				}, function(data) {
     				fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', 'ALL');
     			}); 
@@ -230,7 +200,7 @@ jQuery(document).ready(function() {
 			var tabTitle = trim(groups[i]);
 			var tabTemplate = '';
 			if(groupId == 'GRP-0001') {
-				tabTemplate = "<li class='ui-corner-top'><a href='<%='#'%>{href}'><%='#'%>{label}</a><span class='ui-icon ui-icon-gear' role='presentation' style='float:left; margin-right:-3px'></span><span class='ui-icon ui-icon-close' role='presentation'></span></li>";
+				tabTemplate = "<li class='ui-corner-top'><a href='<%='#'%>{href}'><%='#'%>{label}</a><span class='ui-icon ui-icon-gear' role='presentation' style='float:inherit; margin-right:-3px'></span><span class='ui-icon ui-icon-close' role='presentation'></span></li>";
 			} else {
 				tabTemplate = "<li class='ui-corner-top'><a href='<%='#'%>{href}'><%='#'%>{label}</a></li>";
 			}
@@ -246,16 +216,11 @@ jQuery(document).ready(function() {
 		    $("#jobTabs").tabs("add", "#c", "+");
 		    $("#jobTabs").tabs("refresh");
 		    $("#jobTabs").tabs('select', tabCount-1);
-		    
+		    $("#jobTabs").tabs('select', 0);
 		    if(groupId != 'GRP-0001') {
 		    	$("#jobTabs").tabs("remove", tabCount-1);
 		    }
 		}
-		// 2014.11.25 Start
-		// 모든 탭 최초 로딩 후 ALL탭에서 시작하도록 초기화
-		$("a[href='#a']").parent().addClass('ui-state-default').removeClass('ui-state-disabled');
-		$("#jobTabs").tabs('select', 0);
-		// 2014.11.25 End
 	}
 	currentSelectedTab = currSelectedTab;
 	// modal dialog init: custom buttons and a "close" callback resetting the form inside
@@ -263,7 +228,7 @@ jQuery(document).ready(function() {
 		autoOpen: false,
 		modal: true,
 		resizable:false,
-		height:230,
+		height:280,
 		buttons: {
 			Cancel: function() {
 				$(this).dialog( "close" );
@@ -276,7 +241,7 @@ jQuery(document).ready(function() {
 			
 			Update: function() {
 			 	updateTab();
-			}
+			},	
 		},
 	 
 		close: function() {
@@ -299,6 +264,7 @@ jQuery(document).ready(function() {
 	});
 	
 	// 이전 tab select
+	//alert(currentSelectedTab);
 	var tab = $('#jobTabs a').filter(function(){
         return $(this).text() == currentSelectedTab;
     }).parent();
@@ -357,17 +323,11 @@ function addTab() {
 	    			unCheckeds.push("");
 	    		}
 	    		
-	    		var tabTitle = $( "#tab_title" );
-	    		if(tabTitle.val() == "" || tabTitle.val() == null) {
-	    			alert('<spring:message code="job.alert.entertitle"/>');
-	    			return;
-	    		}
-	    		
 	    	 	//add Tab 영역 화면
 	    	 	$("#jobTabs").tabs("remove", tabCount-1);
-	    		//var tabTitle = $( "#tab_title" ),
+	    		var tabTitle = $( "#tab_title" ),
 	    	    tabContent = $( "#tab_content" );
-	    	    tabTemplate = "<li class='ui-corner-top'><a href='<%='#'%>{href}'><%='#'%>{label}</a><span class='ui-icon ui-icon-gear' role='presentation' style='float:left; margin-right:-3px'></span><span class='ui-icon ui-icon-close' role='presentation'></span></li>";
+	    	    tabTemplate = "<li class='ui-corner-top'><a href='<%='#'%>{href}'><%='#'%>{label}</a><span class='ui-icon ui-icon-gear' role='presentation' style='float:inherit; margin-right:-3px'></span><span class='ui-icon ui-icon-close' role='presentation'></span></li>";
 	    		var tabs = $( "#jobTabs" ).tabs(),
 	    	    label = tabTitle.val() || "Tab " + tabCount,
 	    	    id = "tabs-" + tabCount,
@@ -386,7 +346,7 @@ function addTab() {
 	    			{
 	    			groupName  : groupName,
 	    			checkeds   : checkeds,
-	    			unCheckeds : unCheckeds
+	    			unCheckeds : unCheckeds,
 	    		
 	    			}, function(data) {
 	    			fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', 'ALL');
@@ -423,7 +383,7 @@ function updateTab() {
 			{
 			groupName  : groupName,
 			checkeds   : checkeds,
-			unCheckeds : unCheckeds
+			unCheckeds : unCheckeds,
 		
 			}, function(data) {
 			fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', 'ALL');
@@ -502,7 +462,7 @@ function runBuild(buildName) {
 	
 	
   	$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=buildService.runBuild(buildName)&viewName=jsonView'/>",
-		{buildName : buildName}, function(data) {});
+		{buildName : buildName,}, function(data) {});
   	
   	jQuery("#grid_job").jqGrid("setGridParam", {
  		mtype : "POST",
@@ -561,16 +521,15 @@ function popupOpen(popURL){
 	
 	var ml=(cw-sw)/2;        //가운데 띄우기위한 창의 x위치
 	var mt=(ch-sh)/2;         //가운데 띄우기위한 창의 y위치
-	var popOption = "resizable=no, scrollbars=yes, status=no width="+sw+",height="+sh+",top="+mt+",left="+ml;    //팝업창 옵션(optoin)
+	var popOption = "resizable=no, scrollbars=no, status=no width="+sw+",height="+sh+",top="+mt+",left="+ml;    //팝업창 옵션(optoin)
 		window.open(popURL,"",popOption);
 }
 </script>
 <div id="jobTabs">
 	<ul>
-		<li><a href="#a">ALL</a></li>
+		<li><a href="#c">ALL</a></li>
 		<li><a href="#c">+</a></li>
 	</ul>
-	<div id="a" style="display: none;">blank</div>
 	<div id="c" style="display: none;">blank</div>
 </div>
 
@@ -623,7 +582,7 @@ function popupOpen(popURL){
 					<tr>
 						<th scope="row"><label for="tab_title"><spring:message code="job.tab.title" /></label></th>
 						<td><input type="text" name="tab_title" id="tab_title"
-							value="Tab Title" class="ui-widget-content ui-corner-all" maxLength='30'></td>
+							value="Tab Title" class="ui-widget-content ui-corner-all"></td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="tab_title"><spring:message code="job.tab.jobs" /></label></th>
@@ -635,5 +594,5 @@ function popupOpen(popURL){
 			</table>
 		</fieldset>
 	</form>
-	</div>
+</div>
 </div>

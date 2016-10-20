@@ -8,6 +8,7 @@
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
+
 	jQuery("#grid_script1").jqGrid(	{
 		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 		mtype : 'POST',

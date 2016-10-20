@@ -2,39 +2,6 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
-Changes in version 2.6.0 (2015-12-02)
--------------------------------------
-* Anyframe ODEN과 Jenkins 연동 기능 추가
-* Anyframe Admin 화면 개선 (Job Grouping, Jenkins 연동)
-* ODEN 서버 구동 시 bundle 로딩 순서에 따른 이슈 조치
-* Command로 스크립트 실행을 정상수행하였을 때 결과값처리 로직 추가
-
-
-* 소스 코드 변경
-  - anyframe-oden-bundle-build 추가, anyframe-oden-bundle, anyframe-oden-bundle-http, anyframe-oden-bundle-external, anyframe-oden-admin 변경 
-
-* 참조 라이브러리 변경
-  - N/A.
-
-* 추가된 기능 
-  - 새 명령어 추가
-    . build info, build run, build log, build status, build check
-
-* 해결된 이슈 목록
-ODEN-30	Job grouping ODEN Command 추가
-ODEN-31 Jenkins job ODEN Command 추가
-ODEN-36	ODEN Job 그룹핑, 빌드자동화 서비스레이어 구현
-ODEN-37	ODEN job 그룹핑(목록) 화면 구현
-ODEN-38	배포 Job 등록/조회(빌드Job 매핑,group 매핑) 화면 구현
-ODEN-48	빌드 관련 명령어 중 빌드 서버 기동여부를 확인하는 명령어 추가
-ODEN-49	Admin IE에서 실행 시 스크립트 오류
-ODEN-50	Admin Tab 이동간 sync 오류
-ODEN-51	Admin Agent Check 최소화
-ODEN-65	Jenkins 접속관련 security로직 추가
-SP-168 [BDA Lab] paas 환경 ODEN 문의 대응
-
-
-
 Changes in version 2.5.0 (2013-04-05)
 -------------------------------------
 * PMD RuleSet 검증 결과 조치.
@@ -45,7 +12,7 @@ Changes in version 2.5.0 (2013-04-05)
 
 
 * 소스 코드 변경
-  - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-job 변경 
+    - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-job 변경 
 
 * 참조 라이브러리 변경
   - 기존의 org.apache.felix.eventadmin-1.0.0.jar 파일을 org.apache.felix.eventadmin-1.2.4.jar로 버전 변경.
@@ -67,7 +34,7 @@ Changes in version 2.4.0 (2012-12-28)
 
 
 * 소스 코드 변경
-  - anyframe-oden-bundle-common 변경,  anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
+    - anyframe-oden-bundle-common 변경,  anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
 
 * 참조 라이브러리 변경
   - icu4j-4.6.1.jar 추가.
@@ -88,7 +55,7 @@ Changes in version 2.3.1 (2012-06-15)
 * 매뉴얼에 배포 옵션 등에 관한 내용 추가.
 
 * 소스 코드 변경
-  - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
+    - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
 
 * 참조 라이브러리 변경
   - 기존의 fellix(2.0.2).jar 파일을 fellix(4.0.2).jar로 버전 변경 
@@ -96,8 +63,8 @@ Changes in version 2.3.1 (2012-06-15)
 * 해결된 이슈 목록
 ODEN-10	Shell Script 를 이용한 배포 개선
 ODEN-11	로그 메세지 개선
-ODEN-12  JDK 7 환경 이슈
-ODEN-13  매뉴얼 수정
+ODEN-12 JDK 7 환경 이슈
+ODEN-13 매뉴얼 수정
 
 
 
@@ -108,13 +75,13 @@ Changes in version 2.3.0 (2012-04-10)
 * 시스템 간 연계를 위한 Interface 구현.
 
 * 소스 코드 변경
-  - anyframe-oden-bundle-job 변경,  anyframe-oden-bundle 변경,  anyframe-oden-bundle-hessiancli 변경,  anyframe-oden-bundle-core 변경 
+    - anyframe-oden-bundle-job 변경,  anyframe-oden-bundle 변경,  anyframe-oden-bundle-hessiancli 변경,  anyframe-oden-bundle-core 변경 
 
 * 참조 라이브러리 변경
   - N/A.
 
 * 해결된 이슈 목록
-ODEN-		ODEN ID 중복 발생 문제
+ODEN-7	ODEN ID 중복 발생 문제
 ODEN-8	배포 원복 시 속도 저하 문제
 
 
@@ -126,7 +93,7 @@ Changes in version 2.2.0 (2011-06-30)
 * 패키지 구조 변경(anyframe- --> org.anyframe.-).
 
 * 소스 코드 변경
-  - anyframe-oden-admin,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-hessiansvr 변경 
+    - anyframe-oden-admin,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-hessiansvr 변경 
 
 * 참조 라이브러리 변경
   - N/A.
@@ -144,7 +111,7 @@ Changes in version 2.1.0 (2010-12-21)
 * 사용 계정에 따른 배포 이력 추적 기능 구현.
 
 * 소스 코드 변경
-  - anyframe.oden.bundle.ent.http,  anyframe.oden.admin 변경 
+    - anyframe.oden.bundle.ent.http,  anyframe.oden.admin 변경 
 
 * 참조 라이브러리 변경
   - spring-3.0.4. 관련 jar 추가.
@@ -152,7 +119,7 @@ Changes in version 2.1.0 (2010-12-21)
   - Anyframe.query-4.5.2.jar 추가.
 
 * 해결된 이슈 목록
-ODEN-41		Bug fix 한글 encoding 문제
+ODEN-412	Bug fix 한글 encoding 문제
 ODEN-413	IAM을 적용하여 계정관리와 권한 관리가 가능하도록 조치
 ODEN-414	배포 후 스크립트 동작
 ODEN-415	Histoy 및 Job 관리 화면 권한 관리 조치
@@ -186,7 +153,7 @@ Changes in version 2.0.0 (2010-09-29)
   	. exec run
   	 
 * 해결된 이슈 목록
-ODEN-3		incremental build없는 update기능
+ODEN-397	incremental build없는 update기능
 ODEN-388	group compare 스케쥴링 없이 바로
 ODEN-384	exec 명령어 추가
 ODEN-380	log조회 명령어 추가
