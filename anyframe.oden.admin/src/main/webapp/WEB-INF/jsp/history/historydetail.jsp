@@ -3,6 +3,7 @@
 <% String param = (String) request.getParameter("para");
    String param1 = ((String) request.getParameter("para1")).equals("undefined")? "" : (String) request.getParameter("para1");
    String opt = " " + "-path" + " " + param1;
+   String roles = (String) session.getAttribute("userrole");
  %>
 
 <script type="text/javascript">
@@ -14,8 +15,8 @@
 	
 	jQuery(document).ready(function() {
 		jQuery("#history_detail").jqGrid( {
-			url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=historyService.show(page,cmd,opt)&viewName=jsonView&cmd='/>" +'<%=param%>' + "&opt=" + '<%=opt%>',
-			mtype : 'POST',
+			url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=historyService.show(page,cmd,opt)&viewName=jsonView&cmd='/>" + '<%=param%>' + "&opt=" + encodeURI('<%=opt%>'),
+			mtype : 'GET',
 			datatype : "json",
 			colNames : [ '<anyframe:message code="historydetail.grid.no"/>',
 						 '<anyframe:message code="historydetail.grid.status"/>',
@@ -79,8 +80,9 @@
 		jQuery("#history_detail").jqGrid('navGrid','#pager_historydetail',{edit:false,add:false,del:false,search:false});
 	});
 
-	$('[name=cancellink]').click(function() {
-		fn_addTab('04history', 'History','',"&initdataService=historyService.findJob()&initdataResult=jobs");
+	$('[name=historycancellink]').click(function() {
+		var role = '<%=roles%>';
+		fn_addTab('04history', 'History','',"&initdataService=historyService.findJob(role)&initdataResult=jobs&role=" + role);
 	});
 
 	var file = '<%=param1%>';
@@ -96,31 +98,35 @@
 		var search = "";
 		var x;
 
-		if(trim($("#filename").val()) !== "") {
-			searchs.push("-path" +" " + $("#filename").val() + " ");
-		}
+		if(isValidString(trim($("#filename").val())) && trim($("#filename").val()) !== ""){
+			alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+		}else{
+			if(trim($("#filename").val()) !== "") {
+				searchs.push("-path" +" " + $("#filename").val() + " ");
+			}
+				
+			if(trim($("#mode").val()) !== "" && trim($("#mode").val()) !== "all") {
+				searchs.push("-mode" +" " + $("#mode").val() + " ");
+			}
 			
-		if(trim($("#mode").val()) !== "" && trim($("#mode").val()) !== "all") {
-			searchs.push("-mode" +" " + $("#mode").val() + " ");
+			if($("#failed:checked").val() != undefined) {
+				searchs.push("-failonly");
+			}
+			
+			for(x in searchs) {
+				search = search + searchs[x];
+			}
+			cmd = search;
+	
+			jQuery("#history_detail")
+					.jqGrid(
+							'setGridParam',
+							{
+								page:1,
+								url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=historyService.show(page,cmd,opt)&viewName=jsonView&cmd='/>" + encodeURI('<%=param%>')
+										+ "&opt=" + encodeURI(search)
+							}).trigger("reloadGrid");
 		}
-		
-		if($("#failed:checked").val() != undefined) {
-			searchs.push("-failonly");
-		}
-		
-		for(x in searchs) {
-			search = search + searchs[x];
-		}
-		cmd = search;
-
-		jQuery("#history_detail")
-				.jqGrid(
-						'setGridParam',
-						{
-							page:1,
-							url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=historyService.show(page,cmd,opt)&viewName=jsonView&cmd='/>" + '<%=param%>'
-									+ "&opt=" + search
-						}).trigger("reloadGrid");
 	}
 	function getDetailDownload() {
 		document.detailForm.txid.value='<%=param%>';
@@ -175,7 +181,8 @@
 	<div id="button" style="padding-top:5px;">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr>
-				<td align=right><a href="javascript:getDetailDownload();"><img src="<c:url value='/images/btn_exceldown.gif'/>" alt="download" /></a> <a name="cancellink" href="#"><img src="<c:url value='/images/btn_back.gif'/>" alt="back" /></a></td>
+				<td align=right><a href="javascript:getDetailDownload();"><img src="<c:url value='/images/btn_exceldown.gif'/>" alt="download" /></a> 
+				<a name="historycancellink" href="#"><img src="<c:url value='/images/btn_back.gif'/>" alt="back" /></a></td>
 			</tr>
 		</table>
 	</div>

@@ -2,6 +2,30 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.1.0 (2010-12-21)
+-------------------------------------
+* 사용자 관리 및 권한관리 구현.
+* 배포 후 특정 스크립트를 구동할 수 있음.
+* Anyframe IAM 기반 으로 Secutiry 관련 설정.
+* 사용 계정에 따른 배포 이력 추적 기능 구현.
+
+* 소스 코드 변경
+    - anyframe.oden.bundle.ent.http,  anyframe.oden.admin 변경 
+
+* 참조 라이브러리 변경
+  - spring-3.0.4. 관련 jar 추가.
+  - Anyframe IAM 관련 jar 추가.
+  - Anyframe.query-4.5.2.jar 추가.
+
+* 해결된 이슈 목록
+ODEN-412	Bug fix 한글 encoding 문제
+ODEN-413	IAM을 적용하여 계정관리와 권한 관리가 가능하도록 조치
+ODEN-414	배포 후 스크립트 동작
+ODEN-415	Histoy 및 Job 관리 화면 권한 관리 조치
+ODEN-416	User 권한 제어 화면 구현
+
+
+
 Changes in version 2.0.0 (2010-09-29)
 -------------------------------------
 * 배포 설정이 task와 policy가 아닌 job이라는 형태로 xml에 저장됨.

@@ -40,4 +40,5 @@
          policy="dynamic"
          bind="setPageHandler"
 	/>
+ <reference bind="setExecCommand" cardinality="1..n" interface="anyframe.common.bundle.gate.CustomCommand" name="EXEC_COMMAND" policy="dynamic"/>
 </component>

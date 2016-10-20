@@ -52,7 +52,7 @@ public class Cmd {
 	}
 
 	private void parse(String line) {
-		String[] args = CommandUtil.split(line);
+		String[] args = CommonUtil.split(line);
 		if(args.length == 0 || isOption(args[0]))
 			System.out.println("Syntax Error command");
 

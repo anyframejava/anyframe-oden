@@ -1,13 +1,13 @@
 <%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-<% String jobName = (String)request.getParameter("para"); %>
+<%String jobName = (String)request.getParameter("para");%>
 
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
 
 	jQuery("#grid_script1").jqGrid(	{
-		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 		mtype : 'POST',
 		datatype : "json",
 		colNames : [ '<anyframe:message code="script.grid.target"/>'],
@@ -34,7 +34,7 @@ jQuery(document).ready(function() {
 		pager : jQuery('#pager_script1'),
 
 		loadError : function(xhr, st, err) {
-			alert('<anyframe:message code="script.load.error"/>');
+			alert('<anyframe:message code="script.load.server.error"/>');
 		},
 
 		gridComplete: function() { 
@@ -45,7 +45,7 @@ jQuery(document).ready(function() {
 	$("#grid_script1").closest(".ui-jqgrid-bdiv").css({ 'overflow-y' : 'scroll' });
 
 	jQuery("#grid_script2").jqGrid(	{
-		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+'<%=jobName%>'+"&opt=run",
+		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=run",
 		mtype : 'POST',
 		datatype : "json",
 		colNames : [ '<anyframe:message code="script.grid.name"/>',

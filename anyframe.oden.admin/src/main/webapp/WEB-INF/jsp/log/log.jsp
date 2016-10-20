@@ -2,19 +2,19 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
+	var filename;
 	jQuery(document).ready(function() {
 		$("#date").datepicker({dateFormat: "yy-mm-dd", autoSize:true});
-		var filename = '${logs.filename}';
+		filename = '${logs.filename}';
 		$("#date").val(chgDate(filename));
 	});	
 	function search() {
-		var filename = trim($("#date").val()).replaceAll("-","");
+		filename = trim($("#date").val()).replaceAll("-","");
 		$.ajax( {
 			url : "<c:url value='/simplejson.do?layout=jsonLayout&initdataService=logService.findList(cmd)&initdataResult=logs&viewName=jsonView&cmd='/>"+filename ,
 			dataType : "json",
 			async : true,
 			success : function(result) {
-				$("#date").val(chgDate(result.autoData.filename));
 				$("#contents").val(result.autoData.contents);
 			},
 			error : function() {
@@ -48,6 +48,6 @@
 	</fieldset>	
 	<!--END: input table-->
 	<div style="padding-top:10px;" id="scrollarea">
-		<textarea id="contents" name="contents" class="textarea" cols="40" rows="5" style="width:888px; height:370px;">${logs.contents}</textarea>
+		<textarea id="contents" name="contents" class="textarea" cols="40" rows="5" style="width:888px; height:370px;" readonly="readonly">${logs.contents}</textarea>
 	</div>
 </div>

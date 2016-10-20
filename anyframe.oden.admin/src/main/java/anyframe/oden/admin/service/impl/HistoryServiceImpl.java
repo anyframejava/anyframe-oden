@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import anyframe.common.Page;
+import anyframe.oden.admin.common.CommonUtil;
 import anyframe.oden.admin.common.OdenCommonDao;
 import anyframe.oden.admin.domain.Job;
 import anyframe.oden.admin.domain.History;
@@ -46,6 +47,10 @@ public class HistoryServiceImpl implements HistoryService {
 	
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
+	
+	private String ahref_pre = "<a href=\"";
+	private String ahref_mid = "\">";
+	private String ahref_post = "</a>";
 	
 	/**
 	 * Method for showing history detail information.
@@ -159,8 +164,9 @@ public class HistoryServiceImpl implements HistoryService {
 	 * 
 	 * @throws Exception
 	 */
-	public Page findByPk(Object objPage, String param) throws Exception {
+	public Page findByPk(Object objPage, String param ) throws Exception {
 		ArrayList list = new ArrayList();
+		
 		int page = Integer.parseInt(objPage + "");
 		int totalNum = 0;
 		String option = "";
@@ -187,7 +193,8 @@ public class HistoryServiceImpl implements HistoryService {
 					if (!(data.length() == 0)) {
 						for (int j = 0; j < data.length(); j++) {
 							JSONObject dataObj = (JSONObject) data.get(j);
-
+							
+							
 							int total = dataObj.getInt("total");
 							int nsuccess = dataObj.getInt("nsuccess");
 							String status = dataObj.getString("status");
@@ -198,9 +205,11 @@ public class HistoryServiceImpl implements HistoryService {
 
 							String txidAndStatus = "";
 							if (status.equalsIgnoreCase("S")) {
-								txidAndStatus = imgSuccess + "(" + txid + ")";
+								txidAndStatus = imgSuccess + "(" + ahref_pre
+								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "+txid+", $('#itemname').val());" + ahref_mid + txid + ahref_post + ")";
 							} else if (status.equalsIgnoreCase("F")) {
-								txidAndStatus = imgFail + "(" + txid + ")";
+								txidAndStatus = imgFail + "(" + ahref_pre
+								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "+txid+", $('#itemname').val());" + ahref_mid + txid + ahref_post + ")";
 							}
 
 							Log l = new Log();
@@ -227,10 +236,10 @@ public class HistoryServiceImpl implements HistoryService {
 	 * 
 	 * @throws Exception
 	 */
-	public List<Job> findJob() throws Exception {
-		return odenCommonDao.findJob("job", "info");
+	public List<Job> findJob(String role) throws Exception {
+		return odenCommonDao.findJob("job", "info",CommonUtil.getRoleList(role));
 	}
-
+	
 	/**
 	 * 
 	 * @param param

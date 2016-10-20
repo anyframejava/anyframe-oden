@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="TimeChecker" immediate="true">
-   <implementation class="anyframe.oden.bundle.deploy.TimeCheckerImpl"/>
-   <service>
-      <provide interface="anyframe.oden.bundle.deploy.TimeChecker"/>
-   </service>
-</component>

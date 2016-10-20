@@ -18,11 +18,26 @@
  */
 package anyframe.oden.admin.service.impl;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import anyframe.common.Page;
+import anyframe.iam.core.reload.IResourceReloadService;
+import anyframe.oden.admin.common.CommonUtil;
 import anyframe.oden.admin.common.OdenBrokerImpl;
 import anyframe.oden.admin.common.OdenBrokerService;
+import anyframe.oden.admin.common.OdenCommonDao;
+import anyframe.oden.admin.common.OdenUserDao;
+import anyframe.oden.admin.domain.Status;
+import anyframe.oden.admin.domain.User;
 import anyframe.oden.admin.service.Credential;
 import anyframe.oden.admin.service.UserService;
 
@@ -32,6 +47,7 @@ import anyframe.oden.admin.service.UserService;
  * @author HONG JungHwan
  */
 @Service("userService")
+@Transactional(rollbackFor = { Exception.class })
 public class UserServiceImpl implements UserService {
 
 	private static OdenBrokerService OdenBroker = new OdenBrokerImpl();
@@ -42,6 +58,15 @@ public class UserServiceImpl implements UserService {
 	@Value("#{contextProperties['oden.port'] ?: '9860'}")
 	private String port;
 	
+	private OdenCommonDao odenCommonDao = new OdenCommonDao<Status>();
+	
+	@Inject
+    @Named("odenUserDao")
+	private OdenUserDao odenUserDao;
+	
+	@Inject
+	@Named("resourceReloadService")
+	private IResourceReloadService resourceReloadService;
 	/**
 	 * 
 	 * @param password
@@ -59,6 +84,56 @@ public class UserServiceImpl implements UserService {
 	 */
 	private boolean request(String userid, String password) throws Exception {
 		return OdenBroker.checkUser("http://" + server + ":" + port+ "/shell" , userid, password);
+	}
+
+	public Page findList(String domain) throws Exception {
+		return odenUserDao.getUserList();
+	}
+	
+	public User findUser(String id) throws Exception {
+		return odenUserDao.getUser(id);
+	}
+
+	public void createUser(String role, String id, String pw, String[] jobs)
+			throws Exception {
+		odenUserDao.createUser(id, pw);
+		String groupId = ((HashMap)((ArrayList)odenUserDao.findGroupByName(role)).get(0)).get("groupId")+"";
+		odenUserDao.createGroupUser(groupId, id);
+		for(int i=0; i<jobs.length; i++){
+			if(jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")){
+				break;
+			}
+			String jobName = jobs[i];
+			odenUserDao.createAuthorities(jobName, id);
+		}
+		roleReloading();
+	}
+
+	public void updateUser(String role, String id, String pw, String[] jobs)
+			throws Exception {
+		odenUserDao.updateUser(id, pw);
+		String groupId = ((HashMap)((ArrayList)odenUserDao.findGroupByName(role)).get(0)).get("groupId")+"";
+		odenUserDao.updateGroupUser(groupId, id);
+		odenUserDao.removeAuthorities(id);
+		for(int i=0; i<jobs.length; i++){
+			if(jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")){
+				break;
+			}
+			String jobName = jobs[i];
+			odenUserDao.createAuthorities(jobName, id);
+		}
+		roleReloading();
+	}
+
+	public void removeUser(String id) throws Exception {
+		odenUserDao.removeAuthorities(id);
+		odenUserDao.removeGroupUser(id);
+		odenUserDao.removeUser(id);
+		roleReloading();
+	}
+	
+	private void roleReloading() throws Exception{
+		resourceReloadService.resourceReload("maps", "times");
 	}
 
 }

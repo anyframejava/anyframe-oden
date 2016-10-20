@@ -40,4 +40,8 @@
 		<property name="defaultLocale" value="ko_KR" />
 	</bean>
 	
+	<bean name="/common/login.do" class="org.springframework.web.servlet.mvc.ParameterizableViewController">
+		<property name="viewName" value="login" />
+	</bean>
+	 
 </beans>

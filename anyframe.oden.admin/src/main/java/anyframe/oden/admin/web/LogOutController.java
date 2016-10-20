@@ -36,11 +36,11 @@ public class LogOutController  {
     @RequestMapping("/logout.do")
     public ModelAndView process(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
-        HttpSession session = request.getSession();
+    	        HttpSession session = request.getSession();
 
         session.removeAttribute("userid");
         session.removeAttribute("password");
+        session.invalidate();
         
         return new ModelAndView("login");
     }

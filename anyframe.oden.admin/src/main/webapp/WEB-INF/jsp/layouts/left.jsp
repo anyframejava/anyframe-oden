@@ -1,5 +1,9 @@
 <%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
+<%
+	String roles = (String) session.getAttribute("userrole");
+%>
+	
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -28,7 +32,7 @@ margin:0;
 					</tr>
 					<tr>
 						<td valign="top" bgcolor="#eeeeee" class="depth02">
-						   <a href="javascript:fn_addTab('04history', 'History','','&amp;initdataService=historyService.findJob()&amp;initdataResult=jobs');"></a>
+						   <a href="javascript:fn_addTab('04history', 'History','','&amp;initdataService=historyService.findJob(role)&amp;initdataResult=jobs&amp;role=<%= session.getAttribute("userrole") %>');"></a>
 						</td>
 					</tr>
 					<tr>
@@ -36,11 +40,18 @@ margin:0;
 						   <a href="javascript:fn_addTab('06status', 'Status');"></a>
 						</td>
 					</tr>
-					<tr>
-						<td valign="top" bgcolor="#eeeeee" class="depth04">
-						   <a href="javascript:fn_addTab('05log', 'Log','','&amp;initdataService=logService.findList(cmd)&amp;initdataResult=logs');"></a>
-						</td>
-					</tr>
+					<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
+						<tr>
+							<td valign="top" bgcolor="#eeeeee" class="depth04">
+							   <a href="javascript:fn_addTab('05log', 'Log','','&amp;initdataService=logService.findList(cmd)&amp;initdataResult=logs');"></a>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top" bgcolor="#eeeeee" class="depth05">
+							   <a href="javascript:fn_addTab('07user', 'User');"></a>
+							</td>
+						</tr>
+					</iam:access>
 				</table>
 			</td>
 		</tr>

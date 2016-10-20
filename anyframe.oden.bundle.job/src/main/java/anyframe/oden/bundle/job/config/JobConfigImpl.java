@@ -259,13 +259,19 @@ public class JobConfigImpl implements JobConfigService{
 	private void createNewFile() throws IOException {
 		CONFIG_FILE.createNewFile();
 		
-		PrintWriter writer = null;
+//		PrintWriter writer = null;
+		OutputStreamWriter writer = null;
 		try {
-			writer = new PrintWriter(new FileOutputStream(CONFIG_FILE));
+			  
+//			writer = new PrintWriter(new FileOutputStream(CONFIG_FILE));
+//			writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+//			writer.println("<oden>");
+//			writer.println("</oden>");
 			
-			writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-			writer.println("<oden>");
-			writer.println("</oden>");
+			writer = new OutputStreamWriter(new FileOutputStream(CONFIG_FILE), "UTF-8");
+			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			writer.write("<oden>");
+			writer.write("</oden>");
 		} finally {
 			if(writer != null) writer.close();
 		}

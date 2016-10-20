@@ -20,6 +20,7 @@ package anyframe.oden.admin.common;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -29,7 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Hong JungHwan
  *
  */
-public class BrokerHandler {
+public class BrokerHandler implements InitializingBean {
 
 	private static OdenBrokerService OdenBroker = new OdenBrokerImpl();
 	
@@ -42,19 +43,18 @@ public class BrokerHandler {
 	/**
 	 * initializing
 	 */
-	private static void setup() {
+	private void setup() {
 		context = new ClassPathXmlApplicationContext("classpath:spring/context-property.xml");
+		Map key = (Map) context.getBean("contextProperties");
+		
+		server = (String) key.get("oden.server");
+		port = (String) key.get("oden.port");
 	}
 	
 	
 	
 	public static String cmdConnect(String cmd) throws Exception{
-		setup();
-		
-		Map key = (Map) context.getBean("contextProperties");
-		
-		server = (String) key.get("oden.server");
-		port = (String) key.get("oden.port");
+		//setup();
 		
 		String result = "";
 		
@@ -62,6 +62,13 @@ public class BrokerHandler {
 				+ "/shell", cmd);
 		
 		return result;
+	}
+
+
+
+	public void afterPropertiesSet() throws Exception {
+		// TODO Auto-generated method stub
+		setup();
 	}
 	
 }

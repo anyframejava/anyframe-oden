@@ -89,6 +89,12 @@ public class DeployCommandImpl implements CustomCommand {
 		this.pageHandler = pageHandler;
 	}
 
+	ExecCommandImpl execCommand;
+	protected void setExecCommand(CustomCommand cmd){
+		if(cmd instanceof ExecCommandImpl)
+			this.execCommand = (ExecCommandImpl) cmd;
+	}
+	
 	public void execute(String line, PrintStream out, PrintStream err) {
 		boolean isJSON = false;
 		try {
@@ -101,10 +107,36 @@ public class DeployCommandImpl implements CustomCommand {
 			}
 
 			out.println(execute(cmd, isJSON));
+			
+			if(cmd.getOption("after") != null){
+				executeExec(cmd, out, err);
+			}
 		} catch (Exception e) {
 			err.println(isJSON ? JSONUtil.jsonizedException(e) : e.getMessage());
 			Logger.error(e);
 		}
+	}
+
+	private void executeExec(Cmd cmd, PrintStream out, PrintStream err) throws Exception {
+		CfgJob job = jobConfig.getJob(cmd.getActionArg());
+		
+		String c_script = "exec run";
+		c_script += " "+ "\"" + job.getName()+ "\"";
+		
+		c_script += " " + "-t";
+		List<String> targets = cmd.getOptionArgList(new String[] { "t" });
+		List<CfgTarget> activeTargets  = getActiveTargets(job.getAllTargets(targets));
+		for(CfgTarget t : activeTargets){
+			c_script += " " + "\"" + t.getName()+ "\"";
+		}
+		
+		c_script += " " + "-c";
+		List<String> commands = cmd.getOptionArgList(new String[] { "after" });
+		for(String c : commands){
+			c_script += " "+ "\""+ c+ "\"";
+		}
+		
+		execCommand.execute(c_script, out, err);
 	}
 
 	private String execute(final Cmd cmd, boolean isJSON) throws Exception {
@@ -153,7 +185,7 @@ public class DeployCommandImpl implements CustomCommand {
 							preview(job, isUpdate, hasInclude, deployCandidates, isDelete, deleteCandidates, targets));
 				}
 			});
-			jobManager.syncRun(j);			
+			jobManager.syncRun(j);
 			ShortenRecord r = jobLogger.search(j.id());
 			Assert.check(r != null, "Fail to get log: " + j.id());
 			

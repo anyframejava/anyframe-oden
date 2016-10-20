@@ -31,6 +31,7 @@
 		<property name="location" value="/WEB-INF/oden-json-views.xml"/>
 	</bean>	
 	
+	<!-- 
 	<mvc:interceptors>
 		<bean class="anyframe.oden.admin.web.LoginInterceptor"/>
 		<mvc:interceptor>
@@ -38,4 +39,5 @@
 			<bean class="anyframe.web.springmvc.interceptor.TilesInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>
+	 -->
 </beans>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+
 <% String resId = (String)request.getParameter("tabId"); 
    String resNm = (String)request.getParameter("tabName");
    String resPara = (String)request.getParameter("keyParam"); %>
@@ -188,6 +189,19 @@ jQuery(document).ready(function() {
 	function chgDate(tgt) {
 		if(arguments.length != 1) return this;
 		return tgt.substr(0,4) + "-" + tgt.substr(4,2) + "-" + tgt.substr(6,2);
+	}
+
+	function isValidString(str){
+
+		var strArray = new Array("\"","<",">","!","`","@","#","%","^","&",";","'","+","$");
+		
+		for(var i=0; i<strArray.length; i++){
+			if(str.indexOf(strArray[i]) != -1){
+				return true;
+			}else{
+			}
+		}
+		return false;
 	}
   </script>
   

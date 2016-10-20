@@ -1,13 +1,18 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-
+<%
+	String roles = (String) session.getAttribute("userrole");
+	String[] roleArr = roles.split(",");
+	String role = roleArr[0];
+	String cmd = role.equals("ROLE_ADMIN") ? "-failonly" : "-job" + " " + role + " "+"-failonly";
+%>
 <script type="text/javascript">
-	var cmd = "-failonly";
+	var cmd = '<%=cmd%>';
 	jQuery(document).ready(function() {
 		
 		jQuery("#grid_history").jqGrid( {
-			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=historyService.findByPk(page,cmd)&viewName=jsonView&cmd='/>"+"-failonly",
-			mtype : 'POST',
+			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=historyService.findByPk(page,cmd)&viewName=jsonView&cmd='/>" + cmd  ,
+			mtype : 'GET',
 			datatype : "json",
 			colNames : [ '<anyframe:message code="history.grid.statustxid"/>', 
 			 			 '<anyframe:message code="history.grid.job"/>', 
@@ -59,20 +64,11 @@
 			
 			loadError : function(xhr, st, err) {
 				alert('<anyframe:message code="history.load.error"/>');
-			},
-			ondblClickRow: function(data){ 
-				rowData = jQuery("#grid_history").getRowData(data);
-				if(trim($("#itemname").val()) !== "") {
-					fn_addTab('04History', 'Historydetail', 'historydetail', rowData.txid , $("#itemname").val());
-				} else {
-					fn_addTab('04History', 'Historydetail', 'historydetail', rowData.txid);
-				}
 			}
 		});
 
 		jQuery("#grid_history").jqGrid('navGrid','#npager_history',{edit:false,add:false,del:false,search:false});
 	});
-
 
 	$("#searchHistory").click( function() {
 		search();
@@ -83,35 +79,41 @@
 		var params = new Array();
 		var param = "";
 		var x;
-		
-		if(trim($("#itemname").val()) !== "") {
-			params.push("-path" +" " + $("#itemname").val() + " "); 
-		}
 
-		if(trim($("#userid").val()) !== "") {
-			params.push("-user" +" " + $("#userid").val() + " ");
+		if(isValidString(trim($("#itemname").val())) && trim($("#itemname").val()) !== ""
+			|| isValidString(trim($("#userid").val())) && trim($("#userid").val()) !== ""
+				){
+			alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+		}else{
+			if(trim($("#itemname").val()) !== "") {
+				params.push("-path" +" " + $("#itemname").val() + " "); 
+			}
+	
+			if(trim($("#userid").val()) !== "") {
+				params.push("-user" +" " + $("#userid").val() + " ");
+			}
+			
+			if(trim($("#jobname").val()) !== "" && trim($("#jobname").val()) !== "all") {
+				params.push("-job" +" " + $("#jobname").val() + " ");
+			}
+			// must undefined check
+			if($("#failed:checked").val() != undefined) {
+				params.push("-failonly");
+			}
+	
+			for(x in params) {
+				param = param + params[x];
+			}
+			cmd = param;
+	
+			jQuery("#grid_history")
+					.jqGrid(
+							'setGridParam',
+							{
+								page:1,
+								url : "<c:url value='/simplejson.do?layout=jsonLayout&service=historyService.findByPk(page,cmd)&viewName=jsonView&cmd='/>" + encodeURI(param)
+							}).trigger("reloadGrid");
 		}
-		
-		if(trim($("#jobname").val()) !== "" && trim($("#jobname").val()) !== "all") {
-			params.push("-job" +" " + $("#jobname").val() + " ");
-		}
-		// must undefined check
-		if($("#failed:checked").val() != undefined) {
-			params.push("-failonly");
-		}
-
-		for(x in params) {
-			param = param + params[x];
-		}
-		cmd = param;
-
-		jQuery("#grid_history")
-				.jqGrid(
-						'setGridParam',
-						{
-							page:1,
-							url : "<c:url value='/simplejson.do?layout=jsonLayout&service=historyService.findByPk(page,cmd)&viewName=jsonView&cmd='/>" + param
-						}).trigger("reloadGrid");
 		
 	}
 
@@ -143,7 +145,9 @@
 						<th scope="row"><label for="jobname"><anyframe:message code="history.label.jobname"/></label></th>
 						<td>
 							<select name="jobname" id="jobname" class="selectbox" style='width:150'>
-								<option value="all"><anyframe:message code="history.select.all"/></option>
+								<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
+									<option value="all"><anyframe:message code="history.select.all"/></option>
+								</iam:access>
 								<c:forEach var="job" items="${jobs}" varStatus="status">
 									<option value="${job.jobname}"><c:out value="${job.jobname}"></c:out>
 								</c:forEach>

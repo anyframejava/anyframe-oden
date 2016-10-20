@@ -8,7 +8,8 @@
 function fncLogOut() {
 	if(confirm('<anyframe:message code="top.confirm.logout"/>')) {
 		document.logoutForm.target="_top";
-	    document.logoutForm.action="<c:url value='/logout.do'/>";
+	    //document.logoutForm.action="<c:url value='/logout.do'/>";
+	    document.logoutForm.action="<c:url value='/j_spring_security_logout'/>";
 	    document.logoutForm.submit();	
     }
 }
@@ -34,7 +35,7 @@ margin:0;
 		</tr>
 		<tr> 
 			<td height="30" colspan="2" align="right">
-				<table width="245" border="0" cellpadding="0" cellspacing="0">
+				<table width="400" border="0" cellpadding="0" cellspacing="0">
 					<tr> 
 						<td align="right" style="padding-right:8px">Welcome to <%= session.getAttribute("userid") %> ~ !!!</td>
 						<td width="62" colspan="2" align="right" style="padding-right:18px">

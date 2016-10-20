@@ -18,7 +18,10 @@
  */
 package anyframe.oden.admin.service;
 
+import java.util.List;
+
 import anyframe.common.Page;
+import anyframe.oden.admin.domain.Command;
 
 
 
@@ -37,5 +40,7 @@ public interface ScriptService {
 	public Page findListByPk(String domain, String opt) throws Exception;
 	
 	public String run(String[]param, String name, String script) throws Exception;
+	
+	public List<Command> getCommandList(String jobName) throws Exception;
 
 }

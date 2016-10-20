@@ -33,9 +33,9 @@ public interface HistoryService {
 
 	public Page show(Object objPage, String param, String opt) throws Exception;
 
-	public Page findByPk(Object objPage, String param) throws Exception;
+	public Page findByPk(Object objPage, String param ) throws Exception;
 
-	public List<Job> findJob() throws Exception;
+	public List<Job> findJob(String role) throws Exception;
 
 	public String undo(String param) throws Exception;
 

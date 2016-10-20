@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
 	.jqGrid(
 			{
 				url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=statusService.findList(cmd)&viewName=jsonView'/>",
-				mtype : 'post',
+				mtype : 'GET',
 				datatype : "json",
 				colNames : [ '<anyframe:message code="status.grid.job"/>',
 							 '<anyframe:message code="status.grid.date"/>', 
@@ -120,7 +120,7 @@ jQuery(document).ready(function() {
 </div><!-- end pageSubtitle -->
 
 <div id="body_policy">
-<form method="post" id="searchForm" name="searchForm">
+<form method="get" id="searchForm" name="searchForm">
 	<div class="listbox" style="padding-top:2px;">
 		<table id="grid_status" class="scroll" cellpadding="0" cellspacing="0">
 			<tr>

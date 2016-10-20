@@ -46,8 +46,9 @@ public class Job implements Serializable {
 	private String file = "";
 	private String destination = "";
 	private String txId = "";
-	private String hidden = ""; //checked option hidden property
+	private String hidden = ""; // checked option hidden property
 	private String toggle = "";
+	private List<Command> command = null;
 
 	public String getId() {
 		return id;
@@ -199,6 +200,17 @@ public class Job implements Serializable {
 
 	public String getToggle() {
 		return toggle;
+	}
+
+	public List<Command> getCommand() {
+		return command;
+	}
+
+	/**
+	 * @param command
+	 */
+	public void setCommand(List<Command> command) {
+		this.command = command;
 	}
 
 }

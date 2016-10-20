@@ -5,17 +5,4 @@
 						http://www.anyframejava.org/schema/service http://www.anyframejava.org/schema/service/anyframe-core-service-2.0.xsd">
 	<!-- bean method repository -->
 	<bean id="jsonBeanMethodsRepo" class="anyframe.web.beans.support.BeanMethodRepository"/>
-	
-	<!-- for simpleweb -->
-	<!--bean name="jsonUuidGenerationService" class="anyframe.core.idgen.impl.UUIdGenerationService">
-		<config:configuration>
-			<address>00:00:F0:79:19:5B</address>
-		</config:configuration>
-	</bean>
-	
-	<bean name="idGenerationServiceJsonMovie" class="anyframe.core.idgen.impl.TableIdGenerationService" destroy-method="destroy">
-		<property name="dataSource" ref="dataSource" />
-		<property name="strategy" ref="mixPrefixMovie" />
-		<config:configuration block-size="1" table="JSON_IDS" key-table="JSON_MOVIE" />
-	</bean-->
 </beans>

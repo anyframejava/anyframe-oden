@@ -491,7 +491,6 @@ input, select, textarea {
 .hidden {position:absolute;visibility:hidden; top:-10000px; left:-10000px;}
 .clear {clear: both;}
 .btn {display:block;text-indent:-1000em; overflow:hidden;}
-button {text-indent: -9999px; font-size: 0px; cursor: pointer; border:none;}
 
 #login_wrap	{height:430px; margin:0 auto; text-align:center;}
 #login_content {width:674px; margin:0 auto; text-align:center;}
@@ -607,3 +606,14 @@ span.ui-tabs-close{ float : left; }
 /* job detail validator INPUT text box */
 .tundra .dijitTextBox{padding-top:0px;}
 #repository,#job_name,#source_dir,#source_checkout,#server_name,#server_url,#server_path,#script_name,#script_path,#script_script{height:18px; padding:0px;}
+
+/* user's job list select list */
+.user_job_list{height:100px; width:380px;}
+
+/* for button */
+.btn_pad{padding-top:10px; padding-left:2px; text-align:right; background-position:right;}
+.btn_pad TABLE{padding-top:10px; padding-left:0px; text-align:right; background-position:right; border:0px; width:0px;}
+.btn_pad TABLE TD{height:18px; padding-top:0px; padding-bottom:0px;}
+.btn_pad .btn_bul_left{background:url(../images/btn_bul_left.png); padding-left:0px; padding-right:0px; height:18px; width:6px;}
+.btn_pad .btn_bul{background:url(../images/btn_bul_bg.png); padding:0px 0px 0 2px; text-align:enter; vertical-align:middle; letter-spacing:-1px; height:18px; font-family:dotum; font-size:11px; color:#333333;} 
+.btn_pad .btn_bul_right{background:url(../images/btn_bul_right.png); height:18px; width:6px; padding-left:0px; padding-right:0px;}

@@ -24,8 +24,6 @@ import java.util.List;
 import anyframe.common.Page;
 import anyframe.oden.admin.domain.Job;
 
-
-
 /**
  * @version 1.0
  * @created 14-7-2010 占쏙옙占쏙옙 10:13:31
@@ -36,40 +34,50 @@ public interface JobService {
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public Page test(Object page, String param, String opt) throws Exception;
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public String run(String[] param, String opt, String job, Object objPage) throws Exception;
+	public String run(String[] param, String opt, String job, Object objPage,
+			String cmd, String userid) throws Exception;
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public Page compare(Object objPage, String param, String flag) throws Exception;
-	
+	public Page compare(Object objPage, String param, String flag)
+			throws Exception;
+
 	public void stop(String param) throws Exception;
-	
+
 	public HashMap compareHeader(String param) throws Exception;
-	
+
 	public Page findList(String param) throws Exception;
-	
+
 	public Job findByName(String param) throws Exception;
+
+	public void update(String[] param, String[] cmd, String[] mappings,
+			String jobname, String repository, String excludes)
+			throws Exception;
 	
-	public void update(String[] param, String[] cmd, String[] mappings, String jobname, String repository, String excludes) throws Exception;
-	
+	public void insert(String[] param, String[] cmd, String[] mappings,
+			String jobname, String repository, String excludes)
+			throws Exception;
+
 	public void remove(String name) throws Exception;
-	
+
 	public List<HashMap> excel(String param) throws Exception;
-	
+
 	public Page loadMappings(String param) throws Exception;
 
 	public Page findMappings(String param) throws Exception;
 	
+	public List<Job> findJob() throws Exception;
+
 }

@@ -7,7 +7,7 @@
 	var headerVar;
 	
 	$.ajax( {
-		url :  "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compareHeader(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+		url :  "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compareHeader(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 		dataType : "json",
 		async : true,
 		success : function(result) {
@@ -25,7 +25,7 @@
 		$("#grid_compare")
 		.jqGrid(
 				{
-					url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compare(page,cmd,opt)&viewName=jsonView&cmd='/>"+'<%=jobName%>'+"&opt=-failonly",
+					url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compare(page,cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=-failonly",
 					datatype : "json",
 					colNames : headerVar.autoData.header,
 					colModel : headerVar.autoData.model,
@@ -170,7 +170,7 @@
 						'setGridParam',
 						{
 							page:1,
-							url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compare(page,cmd,opt)&viewName=jsonView&cmd='/>"+'<%=jobName%>'+"&opt="+search
+							url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.compare(page,cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt="+search
 						}).trigger("reloadGrid");
 	}
 	

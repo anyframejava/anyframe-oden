@@ -18,52 +18,85 @@
  */
 package anyframe.oden.admin.web;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import anyframe.iam.core.userdetails.jdbc.CustomUserDetailsHelper;
 import anyframe.oden.admin.exception.BrokerException;
 import anyframe.oden.admin.service.Credential;
 import anyframe.oden.admin.service.UserService;
 
 /**
  * controller class for create user.
+ * 
  * @author Hong JungHwan
  */
 @Controller
 public class LogInController {
 
-    @Resource
-    private UserService userService = null;
+	@Resource
+	private UserService userService = null;
 
-    @RequestMapping("/login.do")
-    public ModelAndView checkUser(HttpServletRequest request ,@RequestParam("userid") String userid, @RequestParam("password") String password) throws Exception {
-    	ModelAndView mav = null;
-    	HttpSession session = request.getSession();
-    	
-    	Credential c = new Credential();
-    	c.setProperty("userid", userid);
-    	c.setProperty("password", password);
-    	
-    	try {
-    		boolean auth = userService.checkuser(c);
-    		if(auth) {
-	    		mav = new ModelAndView("jsonLayout");
-	    		session.setAttribute("userid", userid);
-	    		session.setAttribute("password", password);
-    		}
-    	} catch(BrokerException e) {
-    	    mav = new ModelAndView("login");
-    		mav.addObject("exception" , e);
-    		
-    		return mav;
-    	} 
-    	
-        return mav;
-    }
+	protected static ApplicationContext context;
+
+	private Connection connection;
+
+	private String userid;
+
+	@RequestMapping("/login.do")
+	public ModelAndView checkUser(HttpServletRequest request) throws Exception {
+		ModelAndView mav = null;
+		HttpSession session = request.getSession();
+		userid = CustomUserDetailsHelper.getAuthenticatedUser().getUsername();
+		
+		Credential c = new Credential();
+		c.setProperty("userid", "oden");
+		c.setProperty("password", "oden0");
+
+		try {
+			boolean auth = userService.checkuser(c);
+			if (auth) {
+				mav = new ModelAndView("jsonLayout");
+				session.setAttribute("userid", userid);
+				session.setAttribute("userrole", getRole());
+				
+			}
+		} catch (BrokerException e) {
+			mav = new ModelAndView("login");
+			mav.addObject("exception", e);
+
+			return mav;
+		}
+
+		return mav;
+	}
+
+	private String getRole() throws Exception {
+		String roles = "";
+		if(! userid.equals("") || userid != null) {
+			Class.forName("org.hsqldb.jdbcDriver");
+			connection = DriverManager.getConnection(
+					"jdbc:hsqldb:hsql://localhost/odendb", "sa", "");
+			ResultSet rs = connection.prepareStatement(
+					"SELECT ROLE_ID FROM AUTHORITIES WHERE SUBJECT_ID ='" + userid
+							+ "'").executeQuery();
+			while(rs.next()) {
+				roles = roles + rs.getString(1)+ ",";
+			}
+		}
+		return roles;
+	}
 }

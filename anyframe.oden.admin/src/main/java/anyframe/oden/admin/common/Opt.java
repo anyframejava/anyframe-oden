@@ -31,7 +31,7 @@ public class Opt {
 	 * @param sOpt option name and its args. option name hasn't '-'.
 	 */
 	public Opt(String sOpt) {
-		String[] sArgs = CommandUtil.split(sOpt);
+		String[] sArgs = CommonUtil.split(sOpt);
 		name = sArgs[0];
 		for(int i=1; i < sArgs.length; i++)
 			args.add(sArgs[i]);

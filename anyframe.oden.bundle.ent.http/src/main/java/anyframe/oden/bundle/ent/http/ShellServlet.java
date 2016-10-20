@@ -22,6 +22,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -103,33 +104,29 @@ public class ShellServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		PrintStream out = null;
-//		PrintStream err = null;
-
+		
 		req.setCharacterEncoding("utf-8");
 		res.setContentType("charset=utf-8");
 		res.setCharacterEncoding("utf-8");
 		try {
-//			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-//			ByteArrayOutputStream bErr = new ByteArrayOutputStream();
 			out = new PrintStream(new BufferedOutputStream(
 					res.getOutputStream()));
-//			err = new PrintStream(bErr);
-			
 			// execute command & its results are already written to the out or err.
 			BufferedReader reader = null;
 			try {
+				
 				reader = req.getReader();
 				String cmd = readCmdLine(reader);
 				if(cmd == null) throw new Exception();
 				if(cmd.trim().endsWith(";")) {		// for osgi original commands
 					cmd = cmd.substring(0, cmd.lastIndexOf(";"));
-				} else {	// for oden commands
+				} else if( ! cmd.trim().contains("_user")){	// for oden commands in user attribute
 					cmd+= " -_user " + userName(req);
-				}
+				} 
 				
 				long t = System.currentTimeMillis();
-				Logger.info("Command Launched: " + cmd + "\n");
-				shellService.executeCommand(cmd, out, out);
+				Logger.info("Command Launched: " + URLDecoder.decode(cmd,"utf-8") + "\n");
+				shellService.executeCommand(URLDecoder.decode(cmd,"utf-8"), out, out);
 				Logger.info("Command Finished in " 
 						+ (System.currentTimeMillis() - t) + "ms\n");
 			} catch (Exception e) {
@@ -137,28 +134,10 @@ public class ShellServlet extends HttpServlet {
 			} finally {
 				if(reader != null) reader.close();
 			}
-		
-//			String sOut = bOut.toString();
-//			String sErr = bErr.toString();			
-//			PrintWriter writer = null; 
-//			
-//			try{
-//				writer = res.getWriter();
-//				if(sErr.length() > 0){	// has error
-//					sOut = sErr;
-//				}
-//				writer.print(sOut);
-//			}finally {
-//				if(writer != null)
-//					writer.close();
-//			}
+
 		} finally {
 			if(out != null)
 				out.close();
-			
-//			if(err != null)
-//				err.close();
-			
 		}
 	}
 	

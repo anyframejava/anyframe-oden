@@ -24,38 +24,6 @@ public class Main {
 		runWinstone(args);
 	}
 
-	private static void runJetty(String[] args) throws Exception {
-		final File war = getHome();
-
-		List<URL> urls = new ArrayList<URL>();
-		String[] jars = new String[] { "jetty-6.1.25.jar",
-				"jetty-util-6.1.25.jar", "servlet-api-2.5.jar" };
-		for (String s : jars) {
-			File jar = new File(war.getParent(), ".oden/" + s);
-			urls.add(jar.toURL());
-			jar.getParentFile().mkdirs();
-			extractZip(war, s, jar);
-		}
-
-		ClassLoader loader = new URLClassLoader(urls.toArray(new URL[urls
-				.size()]));
-		Class webCtxCl = loader
-				.loadClass("org.mortbay.jetty.webapp.WebAppContext");
-		Object webCtx = webCtxCl.getDeclaredConstructor(String.class,
-				String.class).newInstance(war.toURL().toExternalForm(), "/");
-
-		Class svrCl = loader.loadClass("org.mortbay.jetty.Server");
-		Object svr = svrCl.getDeclaredConstructor(int.class).newInstance(
-				new Integer(9880));
-
-		Class handlerCl = loader.loadClass("org.mortbay.jetty.Handler");
-		Method setHandler = svrCl.getMethod("setHandler", handlerCl);
-		setHandler.invoke(svr, webCtx);
-
-		Method start = svrCl.getMethod("start");
-		start.invoke(svr);
-	}
-
 	private static void runWinstone(String[] args) throws Exception {
 		final File war = getHome();
 		// setup options
@@ -63,7 +31,8 @@ public class Main {
 		arguments.add("--warfile=" + war.getAbsolutePath());
 		arguments.add("--commonLibFolder=.oden");
 		arguments.add("--useJasper");
-		arguments.add("--debug=3");
+		arguments.add("--debug=1");
+		arguments.add("--directoryListings=false");
 
 		// extract libs
 		URL url = null;
@@ -142,7 +111,7 @@ public class Main {
 				.println(oden
 						+ dateFormat.format(new Date())
 						+ "] - Winstone Servlet Engine v0.9.10 running: controlPort=disabled");
-		
+
 		if (args.length == 0)
 			portNo = "9880";
 		System.out.println(oden + dateFormat.format(new Date())

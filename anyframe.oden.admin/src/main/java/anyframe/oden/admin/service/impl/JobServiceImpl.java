@@ -28,13 +28,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import anyframe.common.Page;
+import anyframe.iam.core.acl.ExtBasePermission;
+import anyframe.iam.core.acl.IViewResourceAccessService;
+import anyframe.iam.core.reload.IResourceReloadService;
+import anyframe.oden.admin.common.CommonUtil;
 import anyframe.oden.admin.common.OdenCommonDao;
+import anyframe.oden.admin.dao.JobDao;
 import anyframe.oden.admin.domain.Job;
 import anyframe.oden.admin.domain.Mapping;
 import anyframe.oden.admin.service.JobService;
@@ -45,6 +54,7 @@ import anyframe.oden.admin.service.JobService;
  * @author LEE Sujeong
  */
 @Service("jobService")
+@Transactional(rollbackFor = { Exception.class })
 public class JobServiceImpl implements JobService {
 
 	private OdenCommonDao<Job> odenCommonDao = new OdenCommonDao<Job>();
@@ -57,12 +67,24 @@ public class JobServiceImpl implements JobService {
 
 	private HashMap runningMap;
 	private HashMap waitMap;
-	
+
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
-	
+
 	@Value("#{contextProperties['previewPageUnit'] ?: 100}")
 	int previewPageUnit;
+
+	@Inject
+	@Named("jobDao")
+	private JobDao jobDao;
+
+	@Inject
+	@Named("resourceReloadService")
+	IResourceReloadService service;
+	
+	@Inject
+	@Named("viewResourceAccessService")
+	IViewResourceAccessService viewResourceAccessService;
 
 	/**
 	 * Method for Job Deploy Preveiw page.
@@ -88,17 +110,20 @@ public class JobServiceImpl implements JobService {
 		}
 
 		option += "-page" + " " + (page - 1) + " ";
-		
+
 		option += "-pgscale" + " " + previewPageUnit;
 
 		String result = odenCommonDao.getResultString("deploy", "test",
 				doubleQuotation + param + doubleQuotation + " " + option);
 
 		String imgSuccess = "<img src='images/cross.png' style='vertical-align:middle;'/>";
-		
-//		String toggle = "<input type='button' onClick='javascript:toggleRemoveList();'>"+ imgSuccess +"</input>";
-		String toggle = ahref_pre + "javascript:toggleRemoveList();"+ ahref_mid + imgSuccess + ahref_post;
-		
+
+		// String toggle =
+		// "<input type='button' onClick='javascript:toggleRemoveList();'>"+
+		// imgSuccess +"</input>";
+		String toggle = ahref_pre + "javascript:toggleRemoveList();"
+				+ ahref_mid + imgSuccess + ahref_post;
+
 		List list = new ArrayList();
 
 		int totalNum = 0;
@@ -152,12 +177,14 @@ public class JobServiceImpl implements JobService {
 	 * @param objPage
 	 * @throws Exception
 	 */
-	public String run(String[] param, String opt, String job, Object objPage)
-			throws Exception {
+	public String run(String[] param, String opt, String job, Object objPage,
+			String cmd, String userid) throws Exception {
 
 		String option_result = "";
 		String option_iu = "";
 		String option_d = "";
+		String option_script = "";
+		String option_user = "";
 
 		if (opt.indexOf("i") != -1) {
 			option_iu += "-i ";
@@ -169,77 +196,88 @@ public class JobServiceImpl implements JobService {
 		}
 
 		List paramList = new ArrayList();
-		
+
 		boolean boolDeployAll = false;
-		
+
 		for (int i = 0; i < param.length; i++) {
 			String[] values = param[i].split("@oden@");
 
 			String mode = values[0];
 			String file = values[1];
-			
+
 			String temp = mode + "@oden@" + file;
 
 			if (i == 0 && mode.equalsIgnoreCase(".")) {
-				//deploy all one page
+				// deploy all one page
 				break;
 			}
-			
+
 			if (i == 0 && mode.equalsIgnoreCase("..")) {
-				//deploy all whole page
+				// deploy all whole page
 				boolDeployAll = true;
 				break;
 			}
 
 			paramList.add(temp);
 		}
-		
-		
-		if(boolDeployAll){
-			//deploy all whole page
-		}else{
+
+		if (boolDeployAll) {
+			// deploy all whole page
+		} else {
 			Set wholeList = getListByPage(job, option_iu + option_d, objPage);
 
 			option_iu = option_iu.replaceAll("u", "i");
 			// mode + "@oden@" + file
 			Iterator itr = wholeList.iterator();
-			while(itr.hasNext()){
-				String strList = itr.next()+"";
-				if(paramList.contains(strList)){
-				}else{
+			while (itr.hasNext()) {
+				String strList = itr.next() + "";
+				if (paramList.contains(strList)) {
+				} else {
 					String[] values = strList.split("@oden@");
 
 					String mode = values[0];
 					String file = values[1];
-					
-					if(mode.equalsIgnoreCase("add")){
-						option_iu += doubleQuotation + file + doubleQuotation + " ";
-					}else if(mode.equalsIgnoreCase("update")){
-						option_iu += doubleQuotation + file + doubleQuotation + " ";
-					}else if(mode.equalsIgnoreCase("delete")){
-						option_d += doubleQuotation + file + doubleQuotation + " ";
+
+					if (mode.equalsIgnoreCase("add")) {
+						option_iu += doubleQuotation + file + doubleQuotation
+								+ " ";
+					} else if (mode.equalsIgnoreCase("update")) {
+						option_iu += doubleQuotation + file + doubleQuotation
+								+ " ";
+					} else if (mode.equalsIgnoreCase("delete")) {
+						option_d += doubleQuotation + file + doubleQuotation
+								+ " ";
 					}
 				}
 			}
 		}
-		
-		option_result = option_iu + option_d;
-		
+		// 배포 후 스크립트 구동 옵션
+		if (!(cmd.equals(null) || cmd.equals("")))
+			option_script = "-after" + " " + cmd + " ";
+
+		// 배포 실행 계정
+		if (!(userid.equals(null) || userid.equals("")))
+			option_user = "-_user" + " " + userid + " ";
+
+		option_result = option_iu + option_d + option_script + option_user;
+
 		return odenCommonDao.getResultString("deploy", "run", doubleQuotation
 				+ job + doubleQuotation + " " + option_result);
 	}
 
-	private Set getListByPage(String job, String opt, Object objPage) throws Exception {
+	private Set getListByPage(String job, String opt, Object objPage)
+			throws Exception {
 		Set result = new HashSet();
-		
-		int page = Integer.parseInt(objPage + "")-1;
-		
+
+		int page = Integer.parseInt(objPage + "") - 1;
+
 		String pageOpt = "-page" + " " + page;
 		pageOpt += " " + "-pgscale" + " " + previewPageUnit;
-		
+
 		String strWhole = odenCommonDao.getResultString("deploy", "test",
-				doubleQuotation + job + doubleQuotation + " " + opt + " " + pageOpt);
-		
+				doubleQuotation + job + doubleQuotation + " " + opt + " "
+						+ pageOpt);
+
 		if (!(strWhole == null) && !strWhole.equals("")) {
 			JSONArray array = new JSONArray(strWhole);
 			if (!(array.length() == 0)) {
@@ -251,7 +289,7 @@ public class JobServiceImpl implements JobService {
 							JSONObject dataObj = (JSONObject) data.get(j);
 							String path = dataObj.getString("path");
 							String mode = dataObj.getString("mode");
-							
+
 							String temp = mode + "@oden@" + path;
 							result.add(temp);
 						}
@@ -259,7 +297,7 @@ public class JobServiceImpl implements JobService {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -270,6 +308,8 @@ public class JobServiceImpl implements JobService {
 	 * @throws Exception
 	 */
 	public Page findList(String cmd) throws Exception {
+		ArrayList<String> roles = CommonUtil.getRoleList(cmd);
+
 		runningMap = new HashMap();
 		waitMap = new HashMap();
 		List _list = odenCommonDao.getListByList("job", "info");
@@ -290,96 +330,100 @@ public class JobServiceImpl implements JobService {
 			String gStatus = "";
 			String gTxid = "";
 			String gName = _list.get(i) + "";
-			if(gName.indexOf("\\") != -1){
+			if (gName.indexOf("\\") != -1) {
 				gName = gName.replaceAll("\\\\", "/");
 			}
 
-			g
-					.setJobname(ahref_pre
-							+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
-							+ gName + "');" + ahref_mid + gName + ahref_post);
+			if (roles.contains(gName) || roles.get(0).equals("ROLE_ADMIN")) {
+				g
+						.setJobname(ahref_pre
+								+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
+								+ gName + "');" + ahref_mid + gName
+								+ ahref_post);
 
-			if (runningJob.contains(gName)) {
-				Iterator itr = runningMap.keySet().iterator();
-				String id = "";
-				while (itr.hasNext()) {
-					id = itr.next() + "";
-					String name = runningMap.get(id) + "";
-					if (name.equalsIgnoreCase(gName)) {
-						break;
-					} else {
-						id = "";
-					}
-				}
-
-				gStatus = imgRunning;
-				g.setTxId(id);
-				g.setDate(gStatus);
-				g.setMode(runningJobAction(id));
-			} else if (waitJob.contains(gName)) {
-				Iterator itr = waitMap.keySet().iterator();
-				String id = "";
-				while (itr.hasNext()) {
-					id = itr.next() + "";
-					String name = waitMap.get(id) + "";
-					if (name.equalsIgnoreCase(gName)) {
-						break;
-					} else {
-						id = "";
-					}
-				}
-
-				gStatus = imgWait;
-				g.setTxId(id);
-				g.setDate(gStatus);
-				g.setMode(runningJobAction(id));
-			} else {
-				String para = "-job " + doubleQuotation + gName
-						+ doubleQuotation;
-				String result = odenCommonDao.getResultString("log", "search",
-						para);
-
-				if (!(result == null) && !result.equals("")) {
-					JSONArray array = new JSONArray(result);
-					if (!(array.length() == 0)) {
-						int n = array.length() - 1; // latest history
-						JSONObject object = (JSONObject) array.get(n);
-						String total = object.getString("total");
-						JSONArray data = (JSONArray) object.get("data");
-						if (!(data.length() == 0)) {
-							JSONObject dataObj = (JSONObject) data.get(0);
-
-							gTxid = dataObj.getString("txid");
-							String status = dataObj.getString("status");
-							String date = dataObj.getString("date");
-
-							if (status.equalsIgnoreCase("S")) {
-								gStatus = ahref_pre
-										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahref_mid
-										+ imgSuccess + "(" + date + ")"
-										+ ahref_post;
-								;
-							} else if (status.equalsIgnoreCase("F")) {
-								gStatus = ahref_pre
-										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahref_mid + imgFail
-										+ "(" + date + ")" + ahref_post;
-								;
-							} else {
-								gStatus = "";
-							}
-						}else{
-							gTxid = gName;
+				if (runningJob.contains(gName)) {
+					Iterator itr = runningMap.keySet().iterator();
+					String id = "";
+					while (itr.hasNext()) {
+						id = itr.next() + "";
+						String name = runningMap.get(id) + "";
+						if (name.equalsIgnoreCase(gName)) {
+							break;
+						} else {
+							id = "";
 						}
 					}
-				}
 
-				g.setTxId(gTxid);
-				g.setDate(gStatus);
-				g.setMode(stoppingJobAction(gName, gTxid));
+					gStatus = imgRunning;
+					g.setTxId(id);
+					g.setDate(gStatus);
+					g.setMode(runningJobAction(id));
+				} else if (waitJob.contains(gName)) {
+					Iterator itr = waitMap.keySet().iterator();
+					String id = "";
+					while (itr.hasNext()) {
+						id = itr.next() + "";
+						String name = waitMap.get(id) + "";
+						if (name.equalsIgnoreCase(gName)) {
+							break;
+						} else {
+							id = "";
+						}
+					}
+
+					gStatus = imgWait;
+					g.setTxId(id);
+					g.setDate(gStatus);
+					g.setMode(runningJobAction(id));
+				} else {
+					String para = "-job " + doubleQuotation + gName
+							+ doubleQuotation;
+					String result = odenCommonDao.getResultString("log",
+							"search", para);
+
+					if (!(result == null) && !result.equals("")) {
+						JSONArray array = new JSONArray(result);
+						if (!(array.length() == 0)) {
+							int n = array.length() - 1; // latest history
+							JSONObject object = (JSONObject) array.get(n);
+							String total = object.getString("total");
+							JSONArray data = (JSONArray) object.get("data");
+							if (!(data.length() == 0)) {
+								JSONObject dataObj = (JSONObject) data.get(0);
+
+								gTxid = dataObj.getString("txid");
+								String status = dataObj.getString("status");
+								String date = dataObj.getString("date");
+
+								if (status.equalsIgnoreCase("S")) {
+									gStatus = ahref_pre
+											+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+											+ gTxid + "');" + ahref_mid
+											+ imgSuccess + "(" + date + ")"
+											+ ahref_post;
+									;
+								} else if (status.equalsIgnoreCase("F")) {
+									gStatus = ahref_pre
+											+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+											+ gTxid + "');" + ahref_mid
+											+ imgFail + "(" + date + ")"
+											+ ahref_post;
+									;
+								} else {
+									gStatus = "";
+								}
+							} else {
+								gTxid = gName;
+							}
+						}
+					}
+
+					g.setTxId(gTxid);
+					g.setDate(gStatus);
+					g.setMode(stoppingJobAction(gName, gTxid));
+				}
+				list.add(g);
 			}
-			list.add(g);
 		}
 
 		if (list.size() == 0) {
@@ -444,28 +488,34 @@ public class JobServiceImpl implements JobService {
 			throws Exception {
 
 		String imgDeploy = "<img src='images/ico_deploy.gif' alt='Job Deploy' title='Job Deploy' style='vertical-align:middle;'/>";
-		String imgCleanDeploy = "<img src='images/ico_celandeploy.gif' alt='Job Clean Deploy' title='Job Clean Deploy' style='vertical-align:middle;'/>";
+		String imgCleanDeploy = "<img src='images/ico_celandeploy.gif' alt='Clean Deploy' title='Clean Deploy' style='vertical-align:middle;'/>";
 		String imgCompare = "<img src='images/ico_compare.gif' alt='Compare Targets' title='Compare Targets' style='vertical-align:middle;'/>";
 		String imgCompareUnable = "<img src='images/ico_compare_d.gif' alt='Compare Targets(Unable)' title='Compare Targets(Unable)' style='vertical-align:middle;'/>";
 		String imgScript = "<img src='images/ico_runscript.gif' alt='Run Script' title='Run Script' style='vertical-align:middle;'/>";
 		String imgScriptUnable = "<img src='images/ico_runscript_d.gif' alt='Run Script(Unable)' title='Run Script(Unable)' style='vertical-align:middle;'/>";
 		String imgDel = "<img src='images/ico_del.gif' alt='Delete Job' title='Delete Job' style='vertical-align:middle;'/>";
+		String imgDelUnable = "<img src='images/ico_del_d.gif' alt='Delete Job' title='Delete Job' style='vertical-align:middle;'/>";
 
 		Page g = new ServerServiceImpl().findListByPk(jobName);
 		Page c = new ScriptServiceimpl().findListByPk(jobName, "del");
 
 		String result = "";
+		List<Integer> permList = new ArrayList<Integer>();
+		permList.add(4);
+		
+		boolean access = viewResourceAccessService.isGranted("addUser", permList);
 
 		int optCount = 0;
 		while (optCount < 5) {
 			String link = "";
 			String action = "";
 			boolean b = true;
-
+			String deploy_init = "&initdataService=scriptService.getCommandList(param)&initdataResult=cmds&param="
+					+ jobName;
 			switch (optCount) {
 			case 0:
 				link = "javascript:fn_addTab('03job', 'Deploy', 'deploy', '"
-						+ jobName + "');";
+						+ jobName + "','" + deploy_init + "');";
 				action = imgDeploy;
 				break;
 			case 1:
@@ -494,7 +544,12 @@ public class JobServiceImpl implements JobService {
 				break;
 			case 4:
 				link = "javascript:delJob('" + jobName + "');";
-				action = imgDel;
+				if(access) {
+					action = imgDel;
+				} else {
+					action = imgDelUnable;
+					b = false;
+				}
 				break;
 			default:
 				break;
@@ -541,12 +596,12 @@ public class JobServiceImpl implements JobService {
 						JSONObject sources = (JSONObject) object.get("sources");
 
 						String repo = sources.getString("dir");
-//						JSONArray mappings = (JSONArray) sources
-//								.get("mappings");
-//
+						// JSONArray mappings = (JSONArray) sources
+						// .get("mappings");
+						//
 
 						JSONArray excludes = (JSONArray) sources
-						.get("excludes");
+								.get("excludes");
 						String strExcludes = "";
 						for (int num = 0; num < excludes.length(); num++) {
 							strExcludes += excludes.get(num) + ", ";
@@ -569,7 +624,7 @@ public class JobServiceImpl implements JobService {
 	}
 
 	/**
-	 * Method for Job info update or save new one.
+	 * Method for Job info save new one.
 	 * 
 	 * @param params
 	 * @param cmds
@@ -579,9 +634,40 @@ public class JobServiceImpl implements JobService {
 	 * @param excludes
 	 * @throws Exception
 	 */
-	public void update(String[] param, String[] cmds, String[] mappings, String jobname, String repository, String excludes)
+	public void insert(String[] param, String[] cmds, String[] mappings,
+			String jobname, String repository, String excludes)
 			throws Exception {
+		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes);
+		// DB Role Insert
+		try {
+			this.createRole(jobname);
+		} catch (Exception e) {
+			// 추가 된 job add rollback
+			this.remove(jobname);
+			throw e;
+		}
+	}
 
+	/**
+	 * Method for Job info update one.
+	 * 
+	 * @param params
+	 * @param cmds
+	 * @param mappings
+	 * @param jobname
+	 * @param repository
+	 * @param excludes
+	 * @throws Exception
+	 */
+	public void update(String[] param, String[] cmds, String[] mappings,
+			String jobname, String repository, String excludes)
+			throws Exception {
+		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes);
+	}
+
+	private void insertToOdenServer(String[] param, String[] cmds,
+			String[] mappings, String jobname, String repository,
+			String excludes) throws Exception {
 		JSONObject jo = new JSONObject();
 		jo.put("name", jobname);
 
@@ -598,25 +684,26 @@ public class JobServiceImpl implements JobService {
 			exclu = exclu.substring(0, exclu.length() - 1);
 		}
 		joSource.put("excludes", exclu);
-		
+
 		JSONArray mappingArray = new JSONArray();
-		for(int i=0; i<mappings.length; i++){
+		for (int i = 0; i < mappings.length; i++) {
 			String key = mappings[i];
 			String[] values = key.split("@oden@");
 			String dir = values[0];
 			String checkout = values[1];
-			
-			if (i == 0 && dir.equalsIgnoreCase(".") && checkout.equalsIgnoreCase(".")) {
+
+			if (i == 0 && dir.equalsIgnoreCase(".")
+					&& checkout.equalsIgnoreCase(".")) {
 				break;
 			}
-			
+
 			JSONObject mapping = new JSONObject();
 			mapping.put("dir", dir);
 			mapping.put("checkout-dir", checkout);
-			
+
 			mappingArray.put(mapping);
 		}
-		
+
 		joSource.put("mappings", mappingArray);
 		jo.put("source", joSource);
 
@@ -663,22 +750,54 @@ public class JobServiceImpl implements JobService {
 	}
 
 	/**
+	 * Method for creating role info.
+	 * 
+	 * @param jobname
+	 * @throws Exception
+	 */
+	private void createRole(String jobname) throws Exception {
+		// insertRoles
+		jobDao.insertRoles(jobname);
+		// insertSecuredResRoles(2 roles)
+		jobDao.insertSecuredResRoles("WEB-000001", jobname);
+		jobDao.insertSecuredResRoles("WEB-000002", jobname);
+
+	}
+
+	/**
+	 * Method for deleting role info.
+	 * 
+	 * @param jobname
+	 * @throws Exception
+	 */
+	private void removeRole(String jobname) throws Exception {
+		// removeSecuredResRoles
+		jobDao.removeSecuredResRoles(jobname);
+		// removeAuthorities
+		jobDao.removeAuthorities(jobname);
+		// removeRoles
+		jobDao.removeRoles(jobname);
+
+	}
+
+	/**
 	 * Method for getting Job mapping info in Job Detail page.
 	 * 
 	 * @param param
 	 * @throws Exception
 	 */
-	public Page loadMappings(String param) throws Exception{
+	public Page loadMappings(String param) throws Exception {
 		if (param.equals("")) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
 			List list = new ArrayList();
-			
-			String result = odenCommonDao.getResultString("job", "info", doubleQuotation + param + doubleQuotation);
-			
+
+			String result = odenCommonDao.getResultString("job", "info",
+					doubleQuotation + param + doubleQuotation);
+
 			String imgDel = "<img src='images/ico_del.gif'/>";
-			
+
 			if (!(result == null) && !result.equals("")) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
@@ -691,30 +810,33 @@ public class JobServiceImpl implements JobService {
 								.get("mappings");
 						if (!(mappings == null) && !mappings.equals("")) {
 							for (int n = 0; n < mappings.length(); n++) {
-								JSONObject mapping = (JSONObject) mappings.get(n);
+								JSONObject mapping = (JSONObject) mappings
+										.get(n);
 								String dir = mapping.getString("dir");
-								String checkout = mapping.getString("checkout-dir");
-								
+								String checkout = mapping
+										.getString("checkout-dir");
+
 								String key = dir + "@oden@" + checkout;
-								
-								String event = ahref_pre + "javascript:delSource('"
-								+ key + "');" + ahref_mid + imgDel
-								+ ahref_post ;
-								
+
+								String event = ahref_pre
+										+ "javascript:delSource('" + key
+										+ "');" + ahref_mid + imgDel
+										+ ahref_post;
+
 								Mapping m = new Mapping();
 								m.setDir(dir);
 								m.setCheckout(checkout);
 								m.setHidden(event);
 								m.setHiddenname(key);
-								
+
 								list.add(m);
 							}
 						}
-						
+
 					}
 				}
 			}
-			
+
 			if (list.size() == 0) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
@@ -722,47 +844,47 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 	}
-	
-	public Page findMappings(String param) throws Exception{
+
+	public Page findMappings(String param) throws Exception {
 		if (param.equals("")) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
 			List list = new ArrayList();
-			
+
 			String opt = doubleQuotation + param + doubleQuotation;
-			
-			String result = odenCommonDao.getResultString("job", "mapping-scan", opt);
-			
+
+			String result = odenCommonDao.getResultString("job",
+					"mapping-scan", opt);
+
 			String imgDel = "<img src='images/ico_del.gif'/>";
-			
+
 			if (!(result == null) && !result.equals("")) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
 					int recordSize = array.length();
 					for (int i = 0; i < recordSize; i++) {
 						JSONObject object = (JSONObject) array.get(i);
-						
+
 						String dir = object.getString("dir");
 						String checkout = object.getString("checkout-dir");
-						
+
 						String key = dir + "@oden@" + checkout;
-						
+
 						String event = ahref_pre + "javascript:delSource('"
-						+ key + "');" + ahref_mid + imgDel
-						+ ahref_post ;
-						
+								+ key + "');" + ahref_mid + imgDel + ahref_post;
+
 						Mapping m = new Mapping();
 						m.setDir(dir);
 						m.setCheckout(checkout);
 						m.setHidden(event);
 						m.setHiddenname(key);
-						
+
 						list.add(m);
 					}
 				}
 			}
-			
+
 			if (list.size() == 0) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
@@ -770,7 +892,7 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method to compare targets in same Job.
 	 * 
@@ -885,7 +1007,7 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 		ArrayList model = new ArrayList();
-		
+
 		// status
 		HashMap map_model_status = new HashMap();
 		map_model_status.put("name", ((String) header.get(0)).toLowerCase());
@@ -924,7 +1046,6 @@ public class JobServiceImpl implements JobService {
 		return map_result;
 	}
 
-	
 	/**
 	 * Method to remove job
 	 * 
@@ -932,6 +1053,7 @@ public class JobServiceImpl implements JobService {
 	 */
 	public void remove(String name) throws Exception {
 		odenCommonDao.remove("_job", name);
+		this.removeRole(name);
 	}
 
 	/**
@@ -955,8 +1077,7 @@ public class JobServiceImpl implements JobService {
 	 */
 	public List<HashMap> excel(String param) throws Exception {
 
-		String result = odenCommonDao
-				.getResultString("job", "compare", param);
+		String result = odenCommonDao.getResultString("job", "compare", param);
 
 		List list = new ArrayList();
 
@@ -999,5 +1120,17 @@ public class JobServiceImpl implements JobService {
 		}
 
 		return list;
+	}
+
+	/**
+	 * Job list for User page.(Fixed role is ROLE_ADMIN)
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Job> findJob() throws Exception {
+		ArrayList roles = new ArrayList();
+		roles.add("ROLE_ADMIN");
+		return odenCommonDao.findJob("job", "info", roles);
 	}
 }

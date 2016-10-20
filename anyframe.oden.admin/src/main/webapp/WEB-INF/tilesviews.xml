@@ -5,7 +5,7 @@
 <tiles-definitions>
 <!-- oden web admin-tiles-definition-START -->
 	<!-- login -->
-	<definition name="login" template="/login.jsp"/>
+	<definition name="login" template="/common/login.jsp"/>
 	<!-- deploy -->
 	<definition name="jobLayout" template="/WEB-INF/jsp/deploy/job.jsp"/>
 	<definition name="jobdetailLayout" template="/WEB-INF/jsp/deploy/jobdetail.jsp"/>
@@ -19,7 +19,9 @@
 	<definition name="logLayout" template="/WEB-INF/jsp/log/log.jsp"/>
 	<!-- status -->
 	<definition name="statusLayout" template="/WEB-INF/jsp/status/status.jsp"/>
-	
+	<!-- users -->
+	<definition name="userLayout" template="/WEB-INF/jsp/user/user.jsp"/>
+		
     <definition name="error" extends="jsonLayout">
         <put-attribute name="body" value="/common/error.jsp" />
     </definition>

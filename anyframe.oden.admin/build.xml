@@ -1,7 +1,7 @@
 <project name="Oden Admin" default="package" basedir=".">
 	
 	<property name="pack.name" value="anyframe.oden.admin" />
-	<property name="version" value="1.0.0"/>
+	<property name="version" value="2.1.0"/>
 			
 	<property name="dist" location="dist"/>
 	

@@ -1,10 +1,59 @@
 <%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-<% String para = (String)request.getParameter("para");%>
-
+<%  request.setCharacterEncoding("UTF-8");
+	String jobName = (String)request.getParameter("para");
+	String userid = (String) session.getAttribute("userid");
+%>
 <script type="text/javascript">
 	var toggleID = "";
+	var cmd = "";		
+	// Dialog setting
+	$(function() {
+		$( "#dialog:ui-dialog" ).dialog( "destroy" );
 
+		cmd = $("#command"), allFields = $( [] ).add( cmd );
+				
+		jQuery.fn.orderDialogButtons = function() {
+			var $buttonPane=this.next();
+		    var $buttons=$buttonPane.children();
+		    $('<div style="float:'+$buttons.css('float')+'">').appendTo($buttonPane).append($buttons);
+		    $buttons.css('float','left');
+		    return this;
+		};
+			
+		$( "#dialog-form" ).dialog({
+			autoOpen: false,
+			//height: 200,
+			width: 400,
+			modal: true,
+			resizable:false,
+			buttons: {
+				'Deploy all': function() {
+					
+					allFields.removeClass( "ui-state-error" );
+					
+					// deploy all option 실행
+					deployAll(cmd.val());
+
+					$( this ).dialog( "close" ).remove();
+
+					$( "#dialog-form" ).dialog( "destroy" );
+
+					
+					setTimeout('fn_addTab("03job", "Job", "job")', 500);
+					//fn_addTab("03job", "Job", "job")
+				},
+				Cancel: function() {
+					$( this ).dialog( "close" );
+				}
+			},
+			close: function() {
+				allFields.val( "" ).removeClass( "ui-state-error" );
+			}
+		});
+			
+	});
+		
 function drawGrid() {
 	$("#grid_deploy").GridUnload(); 
 
@@ -27,8 +76,8 @@ function drawGrid() {
 	jQuery("#grid_deploy")
 			.jqGrid(
 					{
-						url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.test(page,cmd,opt)&viewName=jsonView&cmd='/>"+'<%=para%>'+"&opt="+option,
-						mtype : 'post',
+						url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.test(page,cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt="+option,
+						mtype : 'GET',
 						datatype : "json",
 						colNames : ['<anyframe:message code="deploy.grid.mode"/>', 
 									'<anyframe:message code="deploy.grid.file"/>', 
@@ -159,12 +208,14 @@ function drawGrid() {
 			var page = $("#grid_deploy").getGridParam("page");
 			
 			if(confirm('<anyframe:message code="deploy.confirm.deployitem"/>')){
-				$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page)&viewName=jsonView'/>",
+				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page,cmd,userid)&viewName=jsonView'/>",
 					       {
 				       		items : rowArray,
 				       		opt : option,
-				       		job : '<%=para%>',
-				       		page : page
+				       		job : '<%=jobName%>',
+				       		page : page,
+				       		cmd : "",
+				       		userid : '<%=userid%>'
 				       		}, function(data) {
 				       			jQuery("#grid_deploy").jqGrid('setGridParam',{page:1}).trigger("reloadGrid");
 				     });
@@ -175,9 +226,8 @@ function drawGrid() {
 		}
 
 	}
-	
-	$('[name=deployalllink]').click( function(){
 
+	function deployAll(cmd) {
 		var mode = $("#deploy_mode").val();
 		var del = $("#checkbox_d").attr("checked");
 
@@ -192,36 +242,46 @@ function drawGrid() {
 			option += "d";
 		}
 
+		if(cmd == "none") {
+			script = "";
+		}
 		var rowArray = new Array();
 		rowArray[0] = ".."+"@oden@"+".."+"@oden@"+"..";
 		
-		var page = $("#grid_deploy").getGridParam("page");
-		
-		if(confirm('<anyframe:message code="deploy.confirm.deployallitem"/>')){
-			$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page)&viewName=jsonView'/>",
-			       {
-		       		items : rowArray,
-		       		opt : option,
-		       		job : '<%=para%>',
-		       		page : page
-		       		}, function(data) {
-		     });
-			setTimeout('fn_addTab("03job", "Job", "job")', 500);
-		}
-		
-		
-	});
+		var page = 1;
+
+		$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page,cmd,userid)&viewName=jsonView'/>",
+		       {
+	       		items : rowArray,
+	       		opt : option,
+	       		job : '<%=jobName%>',
+	       		page : page,
+	      		cmd : cmd,
+	       		userid : '<%=userid%>'
+	      		}, function(data) {
+	    });
+	}
 	
-	$('[name=cancellink]').click(function() {
+	$('[name=deployall]').click( function(){
+		// deploy all form dialog open
+		$('#dialog-form').orderDialogButtons();
+		
+		$( "#dialog-form" ).dialog( "open" );
+	});	
+	
+	$('[name=deploycancellink]').click(function() {
 		fn_addTab('03job', 'Job', 'job');
 	});
 
+	
+	 
+	
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h4"><anyframe:message code="deploy.page.subtitle"/><%=para %></h3>
+	<h3 class="subtitle_h4"><anyframe:message code="deploy.page.subtitle"/><%=jobName %></h3>
 </div><!-- end pageSubtitle --> 
 <div id="body_deploy">
-<form method="post" id="detailDeployForm" name="detailDeployForm">
+<form method="get" id="detailDeployForm" name="detailDeployForm">
 	<div id="hiddenDiv"></div>
 	<!--START: input table-->
 	<fieldset>
@@ -231,11 +291,11 @@ function drawGrid() {
 				<caption>deploy select</caption>
 				<tbody>
 					<tr>
-						<th scope="row"><label for="deploy"><anyframe:message code="deploy.text.select"/></label></th>
+						<th><label for="deploy"><anyframe:message code="deploy.text.select"/></label></th>
 						<td>
 							<select name="deploy_mode" id="deploy_mode" class="selectbox" style="width:120">
-								<option value="include"><anyframe:message code="deploy.text.include"/></option>
-								<option value="update" selected="selected"><anyframe:message code="deploy.text.update"/></option>
+								<option value="include" selected="selected"><anyframe:message code="deploy.text.include"/></option>
+								<option value="update"><anyframe:message code="deploy.text.update"/></option>
 							</select>
 						</td>
 						<td width="500"></td>
@@ -255,25 +315,39 @@ function drawGrid() {
 	<div id="pager_deploy" class="scroll" style="text-align: center;"></div>
 	<a id="getLink" name="getLink"></a>
 	<br/>
-<!--	<div style="width:888" align="right">-->
-<!--		<table summary="deploy">-->
-<!--			<tbody>-->
-<!--				<tr>-->
-<!--					<th scope="row" style="color:#4675A9; background-color:fff; text-align:right; white-space:nowrap; font-weight:bold"><label for="fail">Deploy All : </label></th>-->
-<!--					<td><input type="checkbox" id="check_deploy_all" name="check_deploy_all" class="checkbox" checked></td>-->
-<!--				</tr>-->
-<!--			</tbody>-->
-<!--		</table>-->
-<!--	</div>-->
 	<div id="button" style="padding-top:5px;">
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<td align=right>
 					<a name="deploylink" href="#"><img src="<c:url value='/images/btn_deploy.gif'/>" alt="deploy" /></a> 
-					<a name="deployalllink" href="#"><img src="<c:url value='/images/btn_deploy_all.gif'/>" alt="deployall" /></a>
-					<a name="cancellink" href="#"><img src="<c:url value='/images/btn_cancel.gif'/>" width="69" height="22" alt="cancel" /></a>
+					<a name="deployall" href="#"><img src="<c:url value='/images/btn_deploy_all.gif'/>" alt="deployall" /></a>
+					<a name="deploycancellink" href="#"><img src="<c:url value='/images/btn_cancel.gif'/>" width="69" height="22" alt="cancel" /></a>
 				</td>
 			</tr>
 		</table>
 	</div>
+	
+	<!-- dialog form start -->
+	<div id="dialog-form" title='<anyframe:message code="deploy.confirm.deployalltitle"/>'>
+		<fieldset>
+			<table summary="deploy">
+				<caption>running script select</caption>
+				<tbody>
+					<tr>
+						<td><label for="deploy"><anyframe:message code="deploy.confirm.label"/></label></td>
+						<td>
+							<select name="command" id="command" class="selectbox" style='width:100'>
+								<option value="none" selected="selected">None</option>
+								<c:forEach var="cmd" items="${cmds}" varStatus="status">
+									<option value="${cmd.name}"><c:out value="${cmd.name}"></c:out></option>
+								</c:forEach>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<p><anyframe:message code="deploy.confirm.deployallitem"/></p>
+	</div>
+	<!-- dialog form end -->
 </form></div>

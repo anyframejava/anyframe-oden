@@ -1,6 +1,9 @@
 <%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-
+<%
+	String roles = (String) session.getAttribute("userrole");
+	String userid = (String) session.getAttribute("userid");
+%>
 <script type="text/javascript">
 
 var t; //timer
@@ -8,8 +11,8 @@ var t; //timer
 jQuery(document).ready(function() {
 	jQuery("#grid_job").jqGrid( {
 
-		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findList(cmd)&viewName=jsonView'/>",
-		mtype : 'POST',
+		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findList(cmd)&viewName=jsonView&cmd='/>"+ encodeURI('<%=roles%>'),
+		mtype : 'GET',
 		datatype : "json",
 		colNames : [ '<anyframe:message code="job.grid.job"/>', 
 		     		 '<anyframe:message code="job.grid.action"/>',
@@ -87,12 +90,14 @@ function cleanDeploy(job){
 	rowArray[0] = "."+"@oden@"+"."+"@oden@"+".";
 	
 	if(confirm('<anyframe:message code="job.confirm.cleandeploy"/>')){
-		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page)&viewName=jsonView'/>",
+		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page,cmd,user)&viewName=jsonView'/>",
 		       {
 	       		items : rowArray,
 	       		opt : "id",
 	       		job : job,
-	       		page : '0'
+	       		page : '0',
+	       		cmd: "",
+	       		user: '<%=userid%>'
 	       		}, function(data) {
 	     });
 		jQuery("#grid_job").trigger("reloadGrid");
@@ -142,9 +147,11 @@ function stopTimer(){
 					<h3 class="subtitle_h3"><anyframe:message code="job.page.subtitle"/></h3>
 				</div><!-- end pageSubtitle -->
 			</td>
-			<td align=right style="padding-top: 10px;">
-				<a name="addlink" href="#"><img src="<c:url value='/images/btn_job.gif'/>" alt="add" /></a>
-			</td>
+			<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
+				<td align=right style="padding-top: 10px;">
+					<a name="addlink" href="#"><img src="<c:url value='/images/btn_job.gif'/>" alt="add" /></a>
+				</td>
+			</iam:access>
 		</tr>
 	</table>
 </div>

@@ -5,6 +5,7 @@
 			<list>
 				<value>message/message-service</value>
 				<value>message/message-ui</value>
+				<value>anyframe/iam/core/messages/security</value>
 			</list>
 		</property>
 		<property name="defaultEncoding">

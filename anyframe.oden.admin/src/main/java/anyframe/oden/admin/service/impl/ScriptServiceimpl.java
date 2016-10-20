@@ -40,13 +40,13 @@ import anyframe.oden.admin.service.ScriptService;
 public class ScriptServiceimpl implements ScriptService {
 
 	private OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
-	
+
 	private String ahref_pre = "<a href=\"";
 	private String ahref_mid = "\">";
 	private String ahref_post = "</a>";
-	
+
 	private String doubleQuotation = "\"";
-	
+
 	/**
 	 * Method for getting script list in certain job.
 	 * 
@@ -54,7 +54,7 @@ public class ScriptServiceimpl implements ScriptService {
 	 * @param opt
 	 */
 	public Page findListByPk(String param, String opt) throws Exception {
-		
+
 		if (param.equals("")) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
@@ -66,7 +66,7 @@ public class ScriptServiceimpl implements ScriptService {
 
 			String imgRun = "<img src='images/play.png'/>";
 			String imgDel = "<img src='images/ico_del.gif'/>";
-			
+
 			if (!(result == null) && !result.equals("")) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
@@ -85,16 +85,16 @@ public class ScriptServiceimpl implements ScriptService {
 							String cmd = command.getString("command");
 
 							String event = "";
-							if(opt.equalsIgnoreCase("run")){
+							if (opt.equalsIgnoreCase("run")) {
 								event = ahref_pre + "javascript:runScript('"
-								+ name + "');" + ahref_mid + imgRun
-								+ ahref_post ;
-							}else if(opt.equalsIgnoreCase("del")){
+										+ name + "');" + ahref_mid + imgRun
+										+ ahref_post;
+							} else if (opt.equalsIgnoreCase("del")) {
 								event = ahref_pre + "javascript:delScript('"
-								+ name + "');" + ahref_mid + imgDel
-								+ ahref_post ;
+										+ name + "');" + ahref_mid + imgDel
+										+ ahref_post;
 							}
-							
+
 							c.setName(name);
 							c.setPath(path);
 							c.setCmd(cmd);
@@ -121,19 +121,20 @@ public class ScriptServiceimpl implements ScriptService {
 	 * @param jobName
 	 * @param scriptName
 	 */
-	public String run(String[] targets, String jobName, String scriptName) throws Exception {
+	public String run(String[] targets, String jobName, String scriptName)
+			throws Exception {
 		String returnString = "";
-		
-		String options = "\""+jobName + "\" " + "-t" + " " ;
-		
-		for(int i=0; i<targets.length; i++){
-			options += "\""+targets[i] + "\" ";
+
+		String options = "\"" + jobName + "\" " + "-t" + " ";
+
+		for (int i = 0; i < targets.length; i++) {
+			options += "\"" + targets[i] + "\" ";
 		}
-		
+
 		options += "-c" + " \"" + scriptName + "\"";
-		
+
 		String result = odenCommonDao.getResultString("exec", "run", options);
-		
+
 		if (!(result == null) && !result.equals("")) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
@@ -141,13 +142,52 @@ public class ScriptServiceimpl implements ScriptService {
 					JSONObject object = (JSONObject) array.get(i);
 					String target = object.getString("target");
 					String resultScript = object.getString("result");
-					
-					returnString += "[" + target + "]\r" + resultScript + "\r\r\r";
+
+					returnString += "[" + target + "]\r" + resultScript
+							+ "\r\r\r";
+				}
+			}
+		}
+
+		return returnString;
+	}
+
+	/**
+	 * Method for running script , Before(After) Deploying.
+	 * 
+	 * @param jobName
+	 * 
+	 * 
+	 */
+	public List<Command> getCommandList(String jobName) throws Exception {
+		List<Command> cmds = new ArrayList<Command>();
+
+		String result = odenCommonDao.getResultString("job", "info",
+				doubleQuotation + jobName + doubleQuotation);
+
+		if (!(result == null) && !result.equals("")) {
+			JSONArray array = new JSONArray(result);
+			if (!(array.length() == 0)) {
+				int recordSize = array.length();
+				for (int i = 0; i < recordSize; i++) {
+
+					JSONObject object = (JSONObject) array.get(i);
+					JSONArray commands = (JSONArray) object.get("commands");
+
+					for (int num = 0; num < commands.length(); num++) {
+						Command c = new Command();
+
+						JSONObject command = (JSONObject) commands.get(num);
+						String name = command.getString("name");
+
+						c.setName(name);
+						cmds.add(c);
+					}
 				}
 			}
 		}
 		
-		return returnString;
+		return cmds;
 	}
 
 }

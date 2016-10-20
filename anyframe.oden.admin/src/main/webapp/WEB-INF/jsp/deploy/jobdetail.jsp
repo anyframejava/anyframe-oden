@@ -1,6 +1,8 @@
-<%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=UTF-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-<% String jobName = (String)request.getParameter("para"); 
+<%  request.setCharacterEncoding("UTF-8");
+	String jobName = (String)request.getParameter("para");
+	
 	boolean isNew = false; 
 	if(jobName.charAt(0)=='"'){
 		isNew = true; 
@@ -8,8 +10,9 @@
 	}
 %>
 
-<script type="text/javascript">
 
+<script type="text/javascript">
+	var boolSourceReload = false;
 	var grid_source_data;
 	var grid_table_data;
 	var grid_script_data;
@@ -19,12 +22,13 @@
 	var lastselCmd = '0';
 	
 	$(function(){
-		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findByName(id)&viewName=jsonView'/>",
+		$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findByName(id)&viewName=jsonView'/>",
 		       {id : "<%=jobName%>"}, function(data) {
 		    	   jQuery("#job_name").val(data.autoData.jobname);
 		    	   jQuery("#repository").val(data.autoData.repo);
 		    	   jQuery("#excludes").val(data.autoData.excludes);
 	     });
+
 		drawGrid();
 
 
@@ -43,10 +47,11 @@
 	function drawSources(){
 		lastselSources = '0';
 		var sourceGridSelectEdit = true;
+		//var param = encodeURI('<%=jobName%>');
 		
 		grid_source_data = jQuery("#grid_sourcedetail").jqGrid( {
 
-			mtype : 'POST',
+			mtype : 'GET',
 			datatype : "json",
 			colNames : [ '<anyframe:message code="jobdetail.grid.dir"/>',
 			 			 '<anyframe:message code="jobdetail.grid.mapping"/>', 
@@ -55,7 +60,7 @@
 			jsonReader : {
 				repeatitems : false
 			},
-			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.loadMappings(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.loadMappings(cmd)&viewName=jsonView&cmd='/>"+ encodeURI('<%=jobName%>'),
 			colModel : [ {
 				name : 'dir',
 				index : 'dir',
@@ -91,7 +96,7 @@
 			viewrecords : true,
 			rowNum : -1,
 			sortable : false,
-			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.loadMappings(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.loadMappings(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 			loadError : function(xhr, st, err) {
 				alert('<anyframe:message code="jobdetail.mappingload.error"/>');
 			},
@@ -113,7 +118,15 @@
 						sourceGridSelectEdit = true;
 					}
 				}
-			}
+			},
+			loadComplete: function(data) { 
+				if(boolSourceReload){
+					alert('<anyframe:message code="jobdetail.alert.mappingcomplete"/>');
+					boolSourceReload = false;	
+				}else{
+					boolSourceReload = false;	
+				}
+		    } 
 		});
 		jQuery("#grid_sourcedetail").jqGrid('navGrid','#pager_sourcedetail',{edit:false,del:false,add:false,search:false});
 	}
@@ -124,7 +137,7 @@
 		
 		grid_table_data = jQuery("#grid_jobdetail").jqGrid( {
 
-			mtype : 'POST',
+			mtype : 'GET',
 			datatype : "json",
 			colNames : [ '<anyframe:message code="jobdetail.grid.status"/>',
 						 '<anyframe:message code="jobdetail.grid.name"/>',
@@ -136,7 +149,7 @@
 			jsonReader : {
 				repeatitems : false
 			},
-			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 			colModel : [ {
 				name : 'status',
 				index : 'status',
@@ -186,7 +199,7 @@
 			viewrecords : true,
 			rowNum : -1,
 			sortable : true,
-			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>',
+			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 			loadError : function(xhr, st, err) {
 				alert('<anyframe:message code="jobdetail.load.error"/>');
 			},
@@ -220,7 +233,7 @@
 		
 		grid_script_data = jQuery("#grid_cmddetail").jqGrid( {
 
-			mtype : 'POST',
+			mtype : 'GET',
 			datatype : "json",
 			colNames : [ '<anyframe:message code="jobdetail.grid.name"/>',
 			 			 '<anyframe:message code="jobdetail.grid.path"/>', 
@@ -230,7 +243,7 @@
 			jsonReader : {
 				repeatitems : false
 			},
-			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+'<%=jobName%>'+"&opt=del",
+			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=del",
 			colModel : [ {
 				name : 'name',
 				index : 'name',
@@ -274,7 +287,7 @@
 			viewrecords : true,
 			rowNum : -1,
 			sortable : false,
-			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+'<%=jobName%>'+"&opt=del",
+			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=del",
 			loadError : function(xhr, st, err) {
 				alert('<anyframe:message code="jobdetail.scriptload.error"/>');
 			},
@@ -315,17 +328,21 @@
 		if(paraDir == null || paraDir.length == 0 || paraCheckout == null || paraCheckout.length == 0){
 			alert('<anyframe:message code="jobdetail.alert.insertmapping"/>');
 		}else{
-			if(idOfSource(key) == ""){
-				var su=$("#grid_sourcedetail").jqGrid('addRowData',num+1,datarow);
-				if(su){
+			if(isValidString(paraDir) || isValidString(paraCheckout)){
+				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			}else{
+				if(idOfSource(key) == ""){
+					var su=$("#grid_sourcedetail").jqGrid('addRowData',num+1,datarow);
+					if(su){
+						$("#source_dir").val('');
+						$("#source_checkout").val('');
+					} else 
+						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+				}else{
 					$("#source_dir").val('');
 					$("#source_checkout").val('');
-				} else 
-					alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
-			}else{
-				$("#source_dir").val('');
-				$("#source_checkout").val('');
-				alert('duplicate');
+					alert('duplicate');
+				}
 			}
 		}
 	}
@@ -353,19 +370,23 @@
 		if(paraName == null || paraName.length == 0 || paraUrl == null || paraUrl.length == 0 || paraPath == null || paraPath.length == 0){
 			alert('<anyframe:message code="jobdetail.alert.inserttarget"/>');
 		}else{
-			if(idOfServer(paraName) == ""){
-				var su=$("#grid_jobdetail").jqGrid('addRowData',num+1,datarow);
-				if(su){
+			if(isValidStringNames(paraName) || isValidString(paraUrl) || isValidString(paraPath)){
+				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			}else{
+				if(idOfServer(paraName) == ""){
+					var su=$("#grid_jobdetail").jqGrid('addRowData',num+1,datarow);
+					if(su){
+						$("#server_name").val('');
+						$("#server_url").val('');
+						$("#server_path").val('');
+					} else 
+						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+				}else{
 					$("#server_name").val('');
 					$("#server_url").val('');
 					$("#server_path").val('');
-				} else 
-					alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
-			}else{
-				$("#server_name").val('');
-				$("#server_url").val('');
-				$("#server_path").val('');
-				alert('<anyframe:message code="jobdetail.alert.duplicate"/>');
+					alert('<anyframe:message code="jobdetail.alert.duplicate"/>');
+				}
 			}
 		}
 	}
@@ -393,19 +414,23 @@
 		if(paraName == null || paraName.length == 0 || paraCmd == null || paraCmd.length == 0 || paraPath == null || paraPath.length == 0){
 			alert('<anyframe:message code="jobdetail.alert.insertscript"/>');
 		}else{
-			if(idOfScript(paraName) == ""){
-				var su=$("#grid_cmddetail").jqGrid('addRowData',num+1,datarow);
-				if(su){
+			if(isValidStringNames(paraName) || isValidString(paraPath) || isValidString(paraCmd)){
+				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			}else{
+				if(idOfScript(paraName) == ""){
+					var su=$("#grid_cmddetail").jqGrid('addRowData',num+1,datarow);
+					if(su){
+						$("#script_name").val('');
+						$("#script_path").val('');
+						$("#script_script").val('');
+					} else 
+						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+				}else{
 					$("#script_name").val('');
 					$("#script_path").val('');
 					$("#script_script").val('');
-				} else 
-					alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
-			}else{
-				$("#script_name").val('');
-				$("#script_path").val('');
-				$("#script_script").val('');
-				alert('<anyframe:message code="jobdetail.alert.scriptduplicate"/>');
+					alert('<anyframe:message code="jobdetail.alert.scriptduplicate"/>');
+				}
 			}
 		}
 	}
@@ -509,10 +534,21 @@
 		rowCmdNumList = rowCmd.split(",");
 		var rowCmdArray = new Array();
 
-		if(rowTargetNumList!=""){
+		if($("#job_name").val()==""){
+			alert('<anyframe:message code="jobdetail.alert.nameempty"/>');
+		}else if($("#repository").val()==""){
+			alert('<anyframe:message code="jobdetail.alert.directoryempty"/>');
+		}else if(rowTargetNumList==""){
+			alert('<anyframe:message code="jobdetail.alert.targetempty"/>');
+		}else{
 			for(var i = 0 ; i < rowTargetNumList.length ; i++){
 				var rowTargetData = jQuery("#grid_jobdetail").getRowData(rowTargetNumList[i]);
-				rowTargetArray[i] = rowTargetData.name+"@oden@"+rowTargetData.url+"@oden@"+rowTargetData.path;
+				if(isValidStringNames(rowTargetData.name)) {
+					alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>' + rowTargetData.name);
+					return;
+				} else {
+					rowTargetArray[i] = rowTargetData.name+"@oden@"+rowTargetData.url+"@oden@"+rowTargetData.path;
+				}
 			}
 
 			if(rowMappingNumList!=""){
@@ -536,20 +572,36 @@
 			var job_n = replacePath($("#job_name").val());
 			var job_r = replacePath($("#repository").val());
 			var job_e = replacePath($("#excludes").val());
-			
-			$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.update(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
-			       {
-			       list : rowTargetArray,
-			       cmd : rowCmdArray,
-			       mapping : rowMappingArray,
-			       jobname : job_n,
-			       repo : job_r,
-			       excludes :  job_e
-			       }, function(data) {
-			    	fn_addTab('03job', 'Job', 'job');   
-		     });
-		}else{
-			alert('<anyframe:message code="jobdetail.alert.targetempty"/>');
+
+			if(isValidStringJobName(job_n) || isValidString(job_r) || isValidString(job_e)){
+				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			}else{
+				<%if(isNew){ %>
+				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.insert(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
+					       {
+					       list : rowTargetArray,
+					       cmd : rowCmdArray,
+					       mapping : rowMappingArray,
+					       jobname : job_n,
+					       repo : job_r,
+					       excludes :  job_e
+					       }, function(data) {
+					    	fn_addTab('03job', 'Job', 'job');   
+				     });
+				<%}else{%>
+				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.update(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
+					       {
+					       list : rowTargetArray,
+					       cmd : rowCmdArray,
+					       mapping : rowMappingArray,
+					       jobname : job_n,
+					       repo : job_r,
+					       excludes :  job_e
+					       }, function(data) {
+					    	fn_addTab('03job', 'Job', 'job');   
+				     });
+				<%}%>
+			}
 		}
 	}
 	
@@ -573,13 +625,40 @@
 	
 	function getAutoMappings(){
 		if(confirm('<anyframe:message code="jobdetail.confirm.loadmapping"/>')){
+			boolSourceReload = true;	
 			jQuery("#grid_sourcedetail")
 			.jqGrid(
 					'setGridParam',
 					{
-						url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findMappings(cmd)&viewName=jsonView&cmd='/>"+'<%=jobName%>'
+						url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findMappings(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')
 					}).trigger("reloadGrid");
 		}
+	}
+
+	function isValidStringJobName(str){
+
+		var strArray = new Array("\"","&","<",">","!","`","@","%","^","&","*",":",";","\'","~","$","+","=","|","{","}",",",".","/","?"," ");
+		
+		for(var i=0; i<strArray.length; i++){
+			if(str.indexOf(strArray[i]) != -1){
+				return true;
+			}else{
+			}
+		}
+		return false;
+	}
+
+	function isValidStringNames(str){
+
+		var strArray = new Array("\"","&","<",">","!","`","@","#","%","^","&",";","\'"," ");
+		
+		for(var i=0; i<strArray.length; i++){
+			if(str.indexOf(strArray[i]) != -1){
+				return true;
+			}else{
+			}
+		}
+		return false;
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">

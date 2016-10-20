@@ -26,6 +26,7 @@ import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +49,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	public final String UNKNOWN_EXCEPTION = "UnknownException";
 	private static String userid = "";
 	private static String password = "";
+	
 	/**
 	 * Send request and get response, Interface server with http protocol
 	 */
@@ -61,7 +63,8 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				
 				// send
 				writer = new PrintWriter(conn.getOutputStream());
-				writer.println(msg);
+				writer.println(URLEncoder.encode(msg, "utf-8"));
+				
 				writer.flush();
 				
 				// receive
@@ -195,14 +198,16 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			IOException {
 		User user;
 		URLConnection con = new URL(url).openConnection();
+		
 		con.setUseCaches(false);
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
 		
+		// 우선 Oden Server 계정 상수로 세팅
 		if(url != null)
 			con.addRequestProperty("Authorization", "Basic "
-				+ encode(userid, password));
+				+ encode("oden", "oden0"));
 		
 		return con;
 	}
