@@ -1,1 +1,17 @@
-java -jar bin/oden-1.1.0.jar -port 9872 &
+PRG="$0"
+
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+ 
+PRGDIR=`dirname "$PRG"`
+ARGS="-Xmx32m -XX:NewRatio=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=25"
+
+ODENF=`ls $PRGDIR | grep jar`
+java $ARGS -jar ${PRGDIR}/${ODENF} -port 9872 &

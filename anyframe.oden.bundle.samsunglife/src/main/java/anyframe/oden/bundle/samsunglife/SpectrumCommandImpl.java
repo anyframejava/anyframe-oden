@@ -25,7 +25,6 @@ import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.BundleUtil;
 import anyframe.oden.bundle.common.FileUtil;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentFile;
@@ -34,12 +33,13 @@ import anyframe.oden.bundle.core.DeployFileUtil;
 import anyframe.oden.bundle.core.FileMap;
 import anyframe.oden.bundle.core.RepositoryProviderService;
 import anyframe.oden.bundle.core.command.Cmd;
+import anyframe.oden.bundle.core.command.JSONUtil;
 import anyframe.oden.bundle.core.config.OdenConfigService;
 import anyframe.oden.bundle.core.job.CompareAgentsJob;
+import anyframe.oden.bundle.core.job.DeployFileResolver;
 import anyframe.oden.bundle.core.job.Job;
 import anyframe.oden.bundle.core.job.JobManager;
-import anyframe.oden.bundle.core.job.DeployFileResolver;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
 import anyframe.oden.bundle.core.record.RecordElement2;
 import anyframe.oden.bundle.core.repository.RepositoryService;
 
@@ -85,9 +85,9 @@ public class SpectrumCommandImpl implements CustomCommand {
 		this.configService = configService;
 	}
 
-	private DeployLogService2 deploylog;
+	private DeployLogService deploylog;
 
-	protected void setDeployLogService(DeployLogService2 recordsvc) {
+	protected void setDeployLogService(DeployLogService recordsvc) {
 		this.deploylog = recordsvc;
 	}
 
@@ -147,11 +147,8 @@ public class SpectrumCommandImpl implements CustomCommand {
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = run(fs, isSync, user, inc);
 				if (isSync) {
-					List<RecordElement2> list = deploylog.search(txid, null,
-							null, null, null, null, false);
-					Assert.check(list.size() == 1, "Couldn't find a log: "
-							+ txid);
-					RecordElement2 r = list.get(0);
+					RecordElement2 r = deploylog.search(txid, null, null, null, false);
+					Assert.check(r != null, "Couldn't find a log: " + txid);
 					ja.put(new JSONObject().put("txid", txid).put("status",
 							r.isSuccess() ? "S" : "F").put("count",
 							r.getDeployFiles().size()));
@@ -163,11 +160,8 @@ public class SpectrumCommandImpl implements CustomCommand {
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = redeploy(id, isSync, user);
 				if (isSync) {
-					List<RecordElement2> list = deploylog.search(txid, null,
-							null, null, null, null, false);
-					Assert.check(list.size() == 1, "Couldn't find a log: "
-							+ txid);
-					RecordElement2 r = list.get(0);
+					RecordElement2 r = deploylog.search(txid, null, null, null, false);
+					Assert.check(r != null, "Couldn't find a log: " + txid);
 					ja.put(new JSONObject().put("txid", txid).put("status",
 							r.isSuccess() ? "S" : "F").put("count",
 							r.getDeployFiles().size()));
@@ -245,14 +239,11 @@ public class SpectrumCommandImpl implements CustomCommand {
 					@Override
 					public Set<DeployFile> resolveDeployFiles() throws OdenException {
 						// get deployfiles from the history regarding the specified id.
-						List<RecordElement2> list = deploylog.search(id, null, null, null,
-								null, null, false);
-						if (list.size() != 1)
-							throw new OdenException("Fail to find a history for " + id);
+						RecordElement2 r = deploylog.search(id, null, null, null, false);
+						Assert.check(r != null, "Couldn't find a log: " + id);
 
 						// filter deployfiles to get the failed files & their related files.
-						return DeployFileUtil.filterToRedeploy(list.get(0)
-								.getDeployFiles());
+						return DeployFileUtil.filterToRedeploy(r.getDeployFiles());
 					}
 				});
 		if (isSync)
@@ -322,7 +313,7 @@ public class SpectrumCommandImpl implements CustomCommand {
 	}
 
 	public String getShortDescription() {
-		return "";
+		return "test / run / send logs / file equivalence check for Spectrum";
 	}
 
 	public String getUsage() {

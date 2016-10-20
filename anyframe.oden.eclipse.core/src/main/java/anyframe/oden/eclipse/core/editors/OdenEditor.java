@@ -21,7 +21,6 @@ package anyframe.oden.eclipse.core.editors;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;

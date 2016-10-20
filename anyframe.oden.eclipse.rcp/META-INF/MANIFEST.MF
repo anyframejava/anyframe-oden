@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Anyframe Oden RCP
 Bundle-SymbolicName: anyframe.oden.eclipse.rcp;singleton:=true
-Bundle-Version: 1.1.0
+Bundle-Version: 1.2.0
 Bundle-Activator: anyframe.oden.eclipse.rcp.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.help.webapp,
  org.eclipse.core.runtime.compatibility,
  org.eclipse.ui.views.log,
- anyframe.oden.eclipse.core
+ anyframe.oden.eclipse.core;bundle-version="1.2.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: SAMSUNG SDS

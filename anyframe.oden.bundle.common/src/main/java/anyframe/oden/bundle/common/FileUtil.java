@@ -121,10 +121,6 @@ public class FileUtil {
 					
 					total += copy(in, out);
 					entry.setTime(file.lastModified());
-					
-//					System.out.println("[DEBUG] file: " + String.valueOf(file.lastModified())
-//							+ " entry: " + String.valueOf(entry.getTime()));
-//					System.out.println("[DEBUG] compressed: " + file.getPath());
 				} finally {
 					try { out.closeEntry(); } catch (IOException e) {}
 					try{ if(in != null) in.close(); } catch(IOException e) {}
@@ -246,8 +242,6 @@ public class FileUtil {
 					time = entry.getTime();
 					updatedfiles.add(entry.getName());
 				}
-			}catch(Exception ex) {
-				ex.printStackTrace();
 			}finally {
 				try{ if(out != null) out.close(); }catch(IOException x){}
 				try{ if(in != null) in.close(); }catch(IOException x){}
@@ -375,7 +369,8 @@ public class FileUtil {
 	 */
 	public static String parentPath(String path){
 		path = normalize(path);
-		return path.substring(0, path.lastIndexOf('/'));
+		int i = path.lastIndexOf('/');
+		return i == -1 ? "" : path.substring(0, i);
 	}
 	
 	/**
@@ -438,7 +433,7 @@ public class FileUtil {
 	public static long copy(File src, File dest) throws IOException{
 		if(!src.exists() || 
 				(dest.exists() && (dest.isDirectory() || !dest.canWrite())) )
-			throw new IOException();
+			throw new IOException("Fail to copy: " + src.getPath() + " to " + dest.getPath());
 		
 		long size = 0;
 		InputStream in = null;

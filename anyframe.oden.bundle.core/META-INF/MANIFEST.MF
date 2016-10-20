@@ -2,13 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Oden Core
 Bundle-SymbolicName: anyframe.oden.bundle.core
-Bundle-Version: 1.1.0
+Bundle-Version: 1.2.0
 Bundle-Vendor: SAMSUNG SDS
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: anyframe.common.bundle.gate,
  anyframe.oden.bundle.common,
- anyframe.oden.bundle.deploy,
- ch.ethz.iks.r_osgi,
  org.apache.felix.prefs,
  org.json,
  org.kxml2.io,
@@ -25,7 +23,8 @@ Export-Package: anyframe.oden.bundle.core,
  anyframe.oden.bundle.core.prefs,
  anyframe.oden.bundle.core.record,
  anyframe.oden.bundle.core.repository,
- anyframe.oden.bundle.core.txmitter
+ anyframe.oden.bundle.core.txmitter,
+ anyframe.oden.bundle.deploy
 Service-Component: OSGI-INF/transmitter.xml, 
  OSGI-INF/repository_provider.xml, 
  OSGI-INF/history_command.xml, 

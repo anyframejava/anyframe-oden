@@ -16,12 +16,17 @@
  */
 package anyframe.oden.bundle.core.txmitter;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.deploy.DeployerFactory;
 import anyframe.oden.bundle.deploy.DeployerService;
-import ch.ethz.iks.r_osgi.RemoteOSGiService;
-import ch.ethz.iks.r_osgi.RemoteServiceReference;
-import ch.ethz.iks.r_osgi.URI;
 
 /**
  * @see anyframe.oden.bundle.core.txmitter.TransmitterService
@@ -30,13 +35,20 @@ import ch.ethz.iks.r_osgi.URI;
  *
  */
 public class TransmitterImpl implements TransmitterService {
-	private RemoteOSGiService remoteService;
+	private BundleContext context;
 	
-	protected void setRemoteOSGiService(RemoteOSGiService remote){
-		this.remoteService = remote;
+	protected void activate(ComponentContext context){
+		this.context = context.getBundleContext();
 	}
 	
-	public TransmitterImpl() {
+	private List<DeployerFactory> deployfactories = new ArrayList<DeployerFactory>();
+	
+	protected void addDeployerFactory(DeployerFactory df){
+		deployfactories.add(df);
+	}
+	
+	protected void removeDeployerFactory(DeployerFactory df){
+		deployfactories.remove(df);
 	}
 	
 	/**
@@ -49,20 +61,18 @@ public class TransmitterImpl implements TransmitterService {
 	 * @throws Exception 
 	 */
 	public DeployerService getDeployer(String addr){
-		URI uri = new URI("r-osgi://" + addr);
-		
 		// check if connection is available really
 		DeployerService ds = null;
 		try{
-			ds = getDeployer(uri);
-			if(ds == null) return null;
-			ds.alive();
+			ds = _getDeployer(addr);
+			if(ds == null)
+				throw new IOException();
 		}catch(Exception e){
 			// try one more
 			try{
-				ds = getDeployer(uri);
-				if(ds == null) return null;
-				ds.alive();
+				ds = _getDeployer(addr);
+				if(ds == null)
+					throw new IOException("Fail to access: " + addr);
 			}catch(Exception e2){
 				Logger.error(e2);
 				return null;
@@ -70,24 +80,17 @@ public class TransmitterImpl implements TransmitterService {
 		}
 		return ds;
 	}
-	
-//	private DeployerService getDeployer(URI uri) throws Exception{
-//		return new DeployerImpl();
-//	}
-	
-	private DeployerService getDeployer(URI uri) throws Exception{
-		if(remoteService != null){
-			final RemoteServiceReference[] refs = 
-				remoteService.getRemoteServiceReferences(uri, DeployerService.class.getName(), null);
-	
-			if(refs != null && refs.length > 0)
-				return (DeployerService) remoteService.getRemoteService(refs[0]);
+		
+	private DeployerService _getDeployer(String addr) throws Exception{
+		final int idx = addr.indexOf("://");
+		final String protocol = addr.substring(0, idx < 0 ? 0 : idx+3);
+		for(DeployerFactory factory : deployfactories){
+			if(factory.getProtocol().equals(protocol))
+				return factory.newInstance(addr);
 		}
 		return null;
 	}
 	
 	public void disconnect(String addr) throws Exception{
-		if(remoteService != null)
-			remoteService.disconnect(new URI("r-osgi://" + addr));
 	}
 }

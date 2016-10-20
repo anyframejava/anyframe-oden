@@ -1,6 +1,6 @@
 <project name="Oden Enterprise Auth" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe.oden.bundle.ent.auth" />
-	<property name="version" value="1.0.0"/>
+	<property name="version" value="1.0.1"/>
 	
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -18,8 +18,11 @@
 	</target>
 	
 	<target name="compile.bundle" depends="init">
+		<condition property="dbg" value="off">
+			<not><isset property="dbg"/></not>
+		</condition>
 		<javac srcdir="${src}" destdir="${build}"
-				debug="on" debuglevel="lines,vars,source" encoding="utf-8">
+				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
 			<classpath>
 				<fileset dir="${bundle.loc}"/>
 			</classpath>
@@ -66,6 +69,11 @@
 		</copy>
 	</target>
 	
+	<target name="all.dbg">
+		<property name="dbg" value="on"/>
+		<antcall target="all-local"/>
+	</target>
+			
 	<target name="all">
 		<property name="bundle.loc" value="${bundle.dir}"/>
 		<property name="dist" location="${artifactsDir}"/>

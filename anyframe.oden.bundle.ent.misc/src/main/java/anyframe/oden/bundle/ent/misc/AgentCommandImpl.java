@@ -31,12 +31,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import anyframe.common.bundle.gate.CustomCommand;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentFile;
 import anyframe.oden.bundle.core.FileMap;
 import anyframe.oden.bundle.core.command.Cmd;
+import anyframe.oden.bundle.core.command.JSONUtil;
 import anyframe.oden.bundle.core.config.AgentElement;
 import anyframe.oden.bundle.core.config.OdenConfigService;
 import anyframe.oden.bundle.core.job.CompareAgentsJob;
@@ -220,7 +220,13 @@ public class AgentCommandImpl implements CustomCommand {
 			jagent.put("loc", agent.getDefaultLoc().getValue());
 			jagent.put("backup", agent.getBackupLoc().getValue());
 			jagent.put("locs", getLocs(agent));
-			boolean alive = txmitterService.getDeployer(agent.getAddr()) != null;
+			DeployerService ds = txmitterService.getDeployer(agent.getAddr());
+			boolean alive = false;
+			try{
+				alive = ds != null && ds.alive();
+			}catch(Exception e){
+				Logger.error(e);
+			}
 			jagent.put("status", String.valueOf(alive));
 		} catch (JSONException e) {
 			throw new OdenException("Fail to jsonize. " + e.getMessage());
@@ -232,6 +238,7 @@ public class AgentCommandImpl implements CustomCommand {
 		CompareAgentsJob j = new CompareAgentsJob(context, agentNames, "agent compare");
 		jobManager.syncRun(j);
 		FileMap m = j.result();
+		final long spanmilli = j.spanMilli();
 		
 		Map<PathObj, List<AgentFile>> result = new TreeMap<PathObj, List<AgentFile>>();
 		for(String path : m.keySet()){
@@ -240,10 +247,12 @@ public class AgentCommandImpl implements CustomCommand {
 			boolean success = agentNames.size() == fs.size();
 			for(AgentFile f : fs){
 				if(success){
-					if(prev == null)
+					if(prev == null){
 						prev = f;
-					else
-						success = prev.size() == f.size() && prev.date() == f.date();	
+					} else {
+						final long diff = Math.abs(prev.date() - f.date());
+						success = prev.size() == f.size() && diff <= spanmilli;
+					}
 				}
 			}
 			result.put(new PathObj(path, success), fs);
@@ -303,7 +312,7 @@ public class AgentCommandImpl implements CustomCommand {
 	}
 
 	public String getShortDescription() {
-		return "inquiry agent information.";
+		return "list Agents / file equivalence check";
 	}
 
 	public String getUsage() {
@@ -311,7 +320,7 @@ public class AgentCommandImpl implements CustomCommand {
 	}
 	
 	private String getFullUsage() {
-		return "agent info [<agent-name>]\n" +
+		return "agent info [<agent-name> | -detail]\n" +
 				"agent compare -t[arget] <agent-name> ...";
 	}
 

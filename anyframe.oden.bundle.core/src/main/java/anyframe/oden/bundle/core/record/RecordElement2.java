@@ -108,4 +108,5 @@ public class RecordElement2 implements Serializable{
 	public void setLog(String s){
 		this.log = s;
 	}
+
 }

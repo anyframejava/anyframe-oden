@@ -49,6 +49,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import anyframe.oden.eclipse.core.CommandNotFoundException;
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
@@ -59,6 +60,7 @@ import anyframe.oden.eclipse.core.jobmanager.actions.JobManagerRefreshAction;
 import anyframe.oden.eclipse.core.jobmanager.actions.DeployByFileReqAction;
 import anyframe.oden.eclipse.core.jobmanager.actions.DeployByTaskAction;
 import anyframe.oden.eclipse.core.jobmanager.actions.SetFileReqPathAction;
+import anyframe.oden.eclipse.core.messages.CommandMessages;
 import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.CommonUtil;
 
@@ -76,6 +78,9 @@ public class JobManagerView extends ViewPart {
 	 */
 	public static final String ID = OdenActivator.PLUGIN_ID + ".jobmanager.JobManagerView";
 
+	boolean boolSSL;
+	private OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	
 	ArrayList<Object> historyList;
 
 	private TreeViewer treeViewer;
@@ -142,6 +147,18 @@ public class JobManagerView extends ViewPart {
 			
 			treeViewer = new TreeViewer(composite, SWT.V_SCROLL | SWT.H_SCROLL);
 			treeViewer.getTree().setLayoutData(gridData1);
+			
+			String cmd = CommandMessages.ODEN_CLI_COMMAND_spectrum_fetchlist + " "//$NON-NLS-1$
+			+ CommandMessages.ODEN_CLI_OPTION_json;
+			
+			String result = "";
+			try {
+				result = OdenBroker.sendRequest(util.getSHELL_URL(), cmd);
+				boolSSL = true;
+			} catch (CommandNotFoundException e) {
+				OdenActivator.error("Anyframe Oden command not found.", e);
+				boolSSL = false;
+			}
 			
 			// create action bar
 			contributeToActionBars();
@@ -292,16 +309,34 @@ public class JobManagerView extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager toolBarManager) {
 		toolBarManager.add(new DeployByTaskAction(shellUrl));
-		toolBarManager.add(new DeployByFileReqAction());
+		DeployByFileReqAction action = new DeployByFileReqAction();
+		toolBarManager.add(action);
+		if(boolSSL){
+			action.setEnabled(true);
+		}else{
+			action.setEnabled(false);
+		}
 		toolBarManager.add(new Separator());
 		toolBarManager.add(new JobManagerRefreshAction());
 	}
 
 	private void fillLocalPullDown(IMenuManager menuManager) {
 		menuManager.add(new DeployByTaskAction(shellUrl));
-		menuManager.add(new DeployByFileReqAction());
+		DeployByFileReqAction deployNoteAction = new DeployByFileReqAction();
+		SetFileReqPathAction fileReqAction = new SetFileReqPathAction();
+		menuManager.add(deployNoteAction);
 		menuManager.add(new Separator());
-		menuManager.add(new SetFileReqPathAction());
+		menuManager.add(fileReqAction);
+		if(boolSSL){
+			deployNoteAction.setEnabled(true);
+			fileReqAction.setEnabled(true);
+		}else{
+			deployNoteAction.setEnabled(false);
+			fileReqAction.setEnabled(false);
+		}
+//		menuManager.add(new DeployByFileReqAction());
+//		menuManager.add(new Separator());
+//		menuManager.add(new SetFileReqPathAction());
 		menuManager.add(new Separator());
 		menuManager.add(new JobManagerRefreshAction());
 	}

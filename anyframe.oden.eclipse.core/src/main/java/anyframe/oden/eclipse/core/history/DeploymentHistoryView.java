@@ -584,16 +584,25 @@ public class DeploymentHistoryView extends ViewPart {
 					
 					for(int i = 0 ; i < detailInfo.length() ; i++) {
 						JSONObject full = (JSONObject) detailInfo.get(i);
+						
+						JSONObject agents = new JSONObject(full.getString(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Agent));
+						deployerServerPath = agents.getString("loc");
+						deployerServer = agents.getString("name");
+						
+						// undo info-> absolute-path
+						absolutePath = agents.getString("loc");
+						
 						for(Iterator<String> it = full.keys() ; it.hasNext();) {
 							String keys = it.next();
-							if(keys.equals(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Agent)) {
-								JSONObject agents = new JSONObject(full.getString(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Agent));
-								deployerServerPath = agents.getString("loc");
-								deployerServer = agents.getString("name");
-								
-								// undo info-> absolute-path
-								absolutePath = agents.getString("loc");
-							} else if(keys.equals("mode")) {
+//							if(keys.equals(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Agent)) {
+//								JSONObject agents = new JSONObject(full.getString(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Agent));
+//								deployerServerPath = agents.getString("loc");
+//								deployerServer = agents.getString("name");
+//								
+//								// undo info-> absolute-path
+//								absolutePath = agents.getString("loc");
+//							} else if(keys.equals("mode")) {
+							if(keys.equals("mode")) {
 								// new Add
 								deployItemMode = full.getString("mode");
 								if(deployItemMode.equals("A"))

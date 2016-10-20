@@ -33,6 +33,9 @@ import anyframe.oden.bundle.deploy.DeployerService;
 /**
  * 
  * This class control connection pool for server and agents.
+ * 이 클래스를 사용함으로 써, 중간에  agent 와 연결이 실패하더라도  다음번에
+ * 연결을 시도하지 않음.  connection timeout 시 시간이 너무 오래 걸리기 때문에
+ * 매번 재 시도를 할 경우 배포가 너무 지연되게 됨. 
  * 
  * @author joon1k
  *
@@ -88,6 +91,8 @@ public class DeployerManager{
 	public DeployerService getDeployer(String addr){
 		if(!pool.containsKey(addr)){
 			DeployerService ds = transmitter.getDeployer(addr);
+			// Althoght ds is null, it is saved. afterall, at first time it couldn' t connect to the agent,
+			// it doesn't try to connect to it again. 
 			pool.put(addr, ds);
 			return ds;
 		}
@@ -100,21 +105,17 @@ public class DeployerManager{
 	 * @param f
 	 * @return
 	 */
-	public String backupLocation(DeployFile f){
+	public String backupLocation(DeployFile f) throws OdenException{
 		if(!undo)
 			return null;
 		return backupLocation(f.getAgent().agentName());
 	}
 	
-	private String backupLocation(String agent) {
+	private String backupLocation(String agent) throws OdenException {
 		String result = bakLocs.get(agent);
 		if(result == null){
-			try {
-				bakLocs.put(agent, result = FileUtil.combinePath(
-						cfg.getBackupLocation(agent), id));
-			} catch (OdenException e) {
-				return null;
-			}			
+			bakLocs.put(agent, result = FileUtil.combinePath(
+					cfg.getBackupLocation(agent), id));	
 		}
 		return result;
 

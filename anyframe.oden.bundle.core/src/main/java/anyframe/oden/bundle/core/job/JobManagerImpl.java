@@ -44,17 +44,14 @@ public class JobManagerImpl implements JobManager{
 					while(true){
 						Job j = null;
 						synchronized (jobQueue) {
-							if(jobQueue.isEmpty())
+							while(jobQueue.isEmpty())
 								jobQueue.wait();
-							else
-								j = jobQueue.get(0); 
+							j = jobQueue.get(0); 
 						}
 						if(j != null){
-							System.gc();
 							try{ j.start(); } catch (RuntimeException re){}
 							try { j.dispose(); } catch (RuntimeException re){}
 							jobQueue.remove(j);
-							System.gc();		// to prohibit the increase of the jvm's system memory.
 						}
 					}
 				}catch(InterruptedException e){
@@ -81,6 +78,12 @@ public class JobManagerImpl implements JobManager{
 		}
 	}
 	
+	public Job job(){
+		synchronized (jobQueue) {
+			return jobQueue.get(0);
+		}
+	}
+	
 	// invoked by Job
 	public void cancel(final Job j) {
 		if(j.status() == Job.RUNNING){
@@ -96,7 +99,7 @@ public class JobManagerImpl implements JobManager{
 	public void schedule(Job j) {
 		synchronized (jobQueue) {
 			jobQueue.add(j);		
-			jobQueue.notify();
+			jobQueue.notifyAll();
 		}
 	}
 	
@@ -104,7 +107,8 @@ public class JobManagerImpl implements JobManager{
 		schedule(j);
 		try {
 			synchronized (j) {
-				j.wait();
+				while(j.status() != Job.NONE)
+					j.wait();
 			}
 		} catch (InterruptedException e) {
 		}

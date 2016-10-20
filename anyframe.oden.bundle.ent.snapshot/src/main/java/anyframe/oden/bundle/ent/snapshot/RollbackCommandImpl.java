@@ -29,7 +29,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
 import anyframe.oden.bundle.common.ArraySet;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.Utils;
@@ -38,6 +37,7 @@ import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.Repository;
 import anyframe.oden.bundle.core.DeployFile.Mode;
 import anyframe.oden.bundle.core.command.Cmd;
+import anyframe.oden.bundle.core.command.JSONUtil;
 import anyframe.oden.bundle.core.command.OdenCommand;
 import anyframe.oden.bundle.core.job.DeployFileResolver;
 import anyframe.oden.bundle.core.job.DeployJob;
@@ -139,8 +139,6 @@ public class RollbackCommandImpl extends OdenCommand {
 		// Because this is rollback action, dest is src & src is dest.
 		AgentLoc dest = new AgentLoc(srcArgs, configService);
 		String bak = configService.getBackupLocation(dest.agentName()); 
-		if(bak == null)
-			throw new OdenException("Couldn't fina a backup location from config.xml.");
 		AgentLoc src = new AgentLoc(dest.agentName(), dest.agentAddr(), bak);
 		
 		return rollback(src, fname, dest, user);
@@ -223,7 +221,7 @@ public class RollbackCommandImpl extends OdenCommand {
 	}
 
 	public String getShortDescription() {
-		return "rollback files from snapshot-files.";
+		return "restore files from backup";
 	}
 
 	public String getUsage() {

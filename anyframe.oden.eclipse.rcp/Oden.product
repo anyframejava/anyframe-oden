@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Anyframe Oden" uid="anyframe.oden.eclipse.core.rcp.product" id="anyframe.oden.eclipse.rcp.product" application="anyframe.oden.eclipse.rcp.application" version="1.1.0" useFeatures="false" includeLaunchers="true">
+<product name="Anyframe Oden" uid="anyframe.oden.eclipse.core.rcp.product" id="anyframe.oden.eclipse.rcp.product" application="anyframe.oden.eclipse.rcp.application" version="1.2.0" useFeatures="false" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/anyframe.oden.eclipse.rcp/icons/oden_about.gif"/>

@@ -25,7 +25,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Map;
@@ -145,18 +144,19 @@ public class Oden {
         configMap.put("osgi.shell.telnet", "on");
         configMap.put("obr.repository.url", "http://felix.apache.org/obr/releases.xml");
         configMap.put("org.osgi.framework.storage.clean", "onFirstInit");
+        configMap.put("org.osgi.framework.system.packages.extra", 
+        		"javax.naming, javax.naming.spi");
         
         Properties thirdProp = loadINI(config);
         if(thirdProp != null){
         	configMap.putAll(thirdProp);
-        	if(thirdProp.getProperty("agent.port") == null)
-        		configMap.put("agent.port", String.valueOf(AGENT_PORT));
-        }else {
-        	// get port from args or 9862
-            configMap.put("agent.port", String.valueOf(getPort(args)));
+        	if(thirdProp.getProperty("http.port") == null)	// if there's no http.port
+        		configMap.put("http.port", String.valueOf(AGENT_PORT) );		
         }
         
-        replaceKey(configMap, "agent.port", "ch.ethz.iks.r_osgi.port");
+        // override properties from program's arguments
+        args2map(configMap, args);
+        
         replaceKey(configMap, "log.level", "felix.log.level");
         replaceKey(configMap, "http.port", "org.osgi.service.http.port");
         replaceKey(configMap, "shell.ip", "osgi.shell.telnet.ip");
@@ -177,6 +177,17 @@ public class Oden {
     	}
     	return AGENT_PORT;
 	}
+    
+    private static void args2map(Map m, String[] args) {
+    	for(int i=0; i<args.length-1; i++){		// args form: -name value
+    		if(args[i].startsWith("-") && !args[i+1].startsWith("-")){
+    			String k = args[i].substring(1);		// remove -
+    			m.put(k.equals("port") ? "http.port" : k, args[i+1]);
+    			i++;	// skip next because it is arg's value.
+    		}
+    	}
+    	
+    }
 	
 	/**
      * replace map's key
@@ -193,6 +204,7 @@ public class Oden {
     }
     
     private static void installBundles(File loc) throws IOException, BundleException{
+    	// install all bundles in loc folder
     	File[] files =loc.listFiles(new FilenameFilter(){
 			public boolean accept(File dir, String name) {
 				return name.endsWith(".jar");
@@ -204,20 +216,16 @@ public class Oden {
     			framework.getBundleContext().installBundle("file:"+loc.getPath()+"/"+name);
     		}	
     	}
-
+    	
     	String[] libraries = libBundles();
-    	if(libraries == null){		// start all bundles if not defined.
-    		for(Bundle bnd : framework.getBundleContext().getBundles()) {
-    			bnd.start();
-    		}
-    	}else { 	// start bundles which are not belonging to lib
-    		for(Bundle bnd : framework.getBundleContext().getBundles()) {
-    			if(contains(libraries, bnd))
-    				continue;
-    			bnd.start();
-	    	}
-    	}
-
+    	// start bundles which are not belonging to lib
+		for(Bundle bnd : framework.getBundleContext().getBundles()) {
+			if(contains(libraries, bnd))
+				continue;
+			bnd.start();
+		}
+    	
+		// if remote shell is loaded, show some guides.
     	for(Bundle bnd : framework.getBundleContext().getBundles()) {
     		if(SHELL_PORT != null &&
     				bnd.getSymbolicName().equals("org.apache.felix.org.apache.felix.shell.remote") &&
@@ -229,7 +237,7 @@ public class Oden {
     	}
     }
     
-    private static boolean contains(String[] list, Bundle b){
+	private static boolean contains(String[] list, Bundle b){
     	for(String s : list){
 			if(b.getLocation().endsWith(s))
 				return true;
@@ -239,7 +247,7 @@ public class Oden {
 
     private static String[] libBundles() {
     	String bnds = framework.getBundleContext().getProperty("bundle.libs");
-    	if(bnds == null) return null;
+    	if(bnds == null) return new String[0];
     	return bnds.split("\\s");
     }
     

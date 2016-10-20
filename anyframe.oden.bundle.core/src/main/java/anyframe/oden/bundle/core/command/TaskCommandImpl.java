@@ -17,7 +17,6 @@
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
-import java.util.List;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -30,7 +29,6 @@ import org.osgi.service.log.LogService;
 import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
@@ -38,11 +36,11 @@ import anyframe.oden.bundle.common.StringUtil;
 import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.DeployFileUtil;
 import anyframe.oden.bundle.core.RepositoryProviderService;
+import anyframe.oden.bundle.core.job.DeployFileResolver;
 import anyframe.oden.bundle.core.job.Job;
 import anyframe.oden.bundle.core.job.JobManager;
-import anyframe.oden.bundle.core.job.DeployFileResolver;
 import anyframe.oden.bundle.core.prefs.Prefs;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
 import anyframe.oden.bundle.core.record.RecordElement2;
 
 /**
@@ -88,12 +86,11 @@ public class TaskCommandImpl extends OdenCommand {
 		this.repositoryProvider = r;
 	}
 	
-	private DeployLogService2 deploylog;
+	private DeployLogService deploylog;
 	
-	protected void setDeployLogService(DeployLogService2 deploylog) {
+	protected void setDeployLogService(DeployLogService deploylog) {
 		this.deploylog = deploylog;
 	}
-	
 	
 	public void execute(String line, PrintStream out, PrintStream err) {
 		String consoleResult = "";
@@ -130,7 +127,7 @@ public class TaskCommandImpl extends OdenCommand {
 				}
 
 				addTask(cmd.getActionArg(), cmd.getOptionString());
-				consoleResult = cmd.getActionArg() + " is added.";
+				consoleResult = "Task " + cmd.getActionArg() + " is added.";
 			}else if(Cmd.REMOVE_ACTION.equals(action)){
 				if(cmd.getActionArg().length() < 1)
 					throw new OdenException("Couldn't execute command.");
@@ -155,10 +152,9 @@ public class TaskCommandImpl extends OdenCommand {
 				
 				String txid = deploy(task, isSync, extractUserName(cmd));
 				if(isSync){
-					List<RecordElement2> list = deploylog.search(txid,
-							null, null, null, null, null, false);
-					Assert.check(list.size() == 1, "Couldn't find a log: " + txid);
-					RecordElement2 r = list.get(0);
+					RecordElement2 r = deploylog.search(txid,
+							null, null, null, false);
+					Assert.check(r!=null, "Couldn't find a log: " + txid);
 					if(isJSON)
 						ja.put(new JSONObject()
 								.put("txid", txid)
@@ -258,7 +254,7 @@ public class TaskCommandImpl extends OdenCommand {
 	}	
 		
 	private String deploy(final String taskName,boolean isSync, final String user) throws OdenException {
-		Job j = new TaskDeployJob2(context, user, "task run " + taskName,
+		Job j = new TaskDeployJob(context, user, "task run " + taskName,
 				new DeployFileResolver() {
 					public Set<DeployFile> resolveDeployFiles() throws OdenException {
 						return preview(taskName);
@@ -302,7 +298,7 @@ public class TaskCommandImpl extends OdenCommand {
 	}
 
 	public String getShortDescription() {
-		return "manipulate tasks consisted of policies.";
+		return "add / remove / test / run Tasks";
 	}
 
 	public String getUsage() {

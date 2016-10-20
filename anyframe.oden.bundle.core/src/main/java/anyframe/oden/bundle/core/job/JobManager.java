@@ -39,6 +39,8 @@ public interface JobManager {
 	 */
 	public Job job(String id);
 	
+	public Job job();
+	
 	/**
 	 * canceling the job which are running or waiting
 	 * @param j

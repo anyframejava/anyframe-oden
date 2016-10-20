@@ -27,7 +27,6 @@ import org.json.JSONObject;
 import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.DateUtil;
 import anyframe.oden.bundle.common.FileInfo;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.RepositoryProviderService;
 
@@ -141,7 +140,7 @@ public class RepositoryCommandImpl implements CustomCommand {
 	}
 
 	public String getShortDescription() {
-		return "access to the repository";
+		return "list files in the Repository";
 	}
 
 }

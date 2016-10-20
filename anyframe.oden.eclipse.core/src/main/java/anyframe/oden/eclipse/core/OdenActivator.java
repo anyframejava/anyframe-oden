@@ -18,10 +18,6 @@
  */
 package anyframe.oden.eclipse.core;
 
-import java.io.File;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -56,8 +52,8 @@ public class OdenActivator extends AbstractUIPlugin {
 	// The shared instance
 	private static OdenActivator plugin;
 
-	private static final Log odenLogger = LogFactory
-			.getLog(OdenActivator.class);
+//	private static final Log odenLogger = LogFactory
+//			.getLog(OdenActivator.class);
 
 	// Cached views
 	private ExplorerView explorerView;
@@ -382,7 +378,7 @@ public class OdenActivator extends AbstractUIPlugin {
 		getDefault().getLog().log(
 				new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, String
 						.valueOf(message), throwable));
-		odenLogger.error(message, throwable);
+//		odenLogger.error(message, throwable);
 	}
 
 	/**
@@ -396,7 +392,7 @@ public class OdenActivator extends AbstractUIPlugin {
 				.log(
 						new Status(IStatus.WARNING, PLUGIN_ID, String
 								.valueOf(message)));
-		odenLogger.warn(message);
+//		odenLogger.warn(message);
 	}
 
 	/**

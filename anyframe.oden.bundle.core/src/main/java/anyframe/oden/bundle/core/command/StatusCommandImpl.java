@@ -23,7 +23,6 @@ import org.json.JSONObject;
 
 import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.DateUtil;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.Utils;
 import anyframe.oden.bundle.core.job.Job;
@@ -84,9 +83,7 @@ public class StatusCommandImpl implements CustomCommand {
 				}
 			}else if("stop".equals(action)){
 				String id = cmd.getActionArg();
-				if(id.length() == 0)
-					throw new OdenException("Transaction id is required.");
-				Job j = jobManager.job(id);
+				Job j = id.length() == 0 ? jobManager.job() : jobManager.job(id);
 				if(j == null)
 					throw new OdenException("Couldn't find that job: " + id);
 				jobManager.cancel(j);
@@ -107,7 +104,7 @@ public class StatusCommandImpl implements CustomCommand {
 	}
 
 	public String getShortDescription() {
-		return "retreive the Oden status";
+		return "list / stop Running Tasks";
 	}
 
 	private String getFullUsage() {

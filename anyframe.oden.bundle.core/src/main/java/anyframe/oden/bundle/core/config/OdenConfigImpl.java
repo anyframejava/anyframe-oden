@@ -38,12 +38,18 @@ import anyframe.oden.bundle.common.StringUtil;
 /**
  * @see anyframe.oden.bundle.core.config.OdenConfigService
  * 
+ * 
+ * 
  * @author joon1k
  *
  */
 public class OdenConfigImpl implements OdenConfigService {
 
 	protected File CONFIG = null;
+	
+	protected List<AgentElement> agents = new ArrayList<AgentElement>();
+	
+	protected long lastload;
 	
 	public OdenConfigImpl() {
 		CONFIG = new File(BundleUtil.odenHome(), "conf/config.xml");
@@ -80,12 +86,17 @@ public class OdenConfigImpl implements OdenConfigService {
 
 	public String getBackupLocation(String agentName) throws OdenException {
 		AgentElement a = getAgent(agentName);
-		if(a != null){
-			AgentLocation l = a.getBackupLoc();
-			if(l != null)
-				return l.getValue();
-		}
-		throw new OdenException("Couldn't find any backup location from config.xml.");
+		if(a == null)
+			throw new OdenException("Couldn't find any backup location from config.xml.");
+		
+		AgentLocation l = a.getBackupLoc();
+		if(l == null)
+			throw new OdenException("Couldn't find any backup location from config.xml.");
+			
+		AgentLocation def = a.getDefaultLoc();
+		if(def == null || def.getValue().contains(l.getValue()))
+			throw new OdenException("Default location should not include the backup location.");
+		return l.getValue();
 	}
 
 	public List<String> getAgentNames() throws OdenException {
@@ -108,7 +119,16 @@ public class OdenConfigImpl implements OdenConfigService {
 	}
 	
 	protected List<AgentElement> loadAgentList() throws OdenException{
-		List<AgentElement> agents = new ArrayList<AgentElement>();
+		long thistime = CONFIG.lastModified();
+		if(thistime == lastload){
+			return agents;
+		}
+		lastload = thistime;
+		agents = new ArrayList<AgentElement>();
+		return _loadAgentList();
+	}
+	
+	protected synchronized List<AgentElement> _loadAgentList() throws OdenException{
 		InputStream in = null;
 		
 		try{
@@ -180,7 +200,7 @@ public class OdenConfigImpl implements OdenConfigService {
 		return name;
 	}
 	
-	protected void storeAgentList(List<AgentElement> agents) 
+	protected synchronized void storeAgentList(List<AgentElement> agents) 
 			throws OdenException {
 		PrintWriter writer = null;
 		try {
@@ -194,9 +214,10 @@ public class OdenConfigImpl implements OdenConfigService {
 			for(AgentElement agent : agents){
 				writer.println("\t\t<agent name=\"" + agent.getName() + "\">");
 				writer.println("\t\t\t<address host=\"" + agent.getHost() + "\" port=\"" + agent.getPort() + "\"/>");
-				writer.println("\t\t\t<default-location value=\"" + agent.getDefaultLoc() + "\"/>");
+				writer.println("\t\t\t<default-location value=\"" + agent.getDefaultLoc().getValue() + "\"/>");
+				writer.println("\t\t\t<default-location value=\"" + agent.getBackupLoc().getValue() + "\"/>");
 				for(String locName : agent.getLocNames()){
-					writer.println("\t\t\t<location name=\"" + locName + "\" value=\"" + agent.getLoc(locName) + "\"/>");
+					writer.println("\t\t\t<location name=\"" + locName + "\" value=\"" + agent.getLoc(locName).getValue() + "\"/>");
 				}
 				writer.println("\t\t</agent>");
 			}

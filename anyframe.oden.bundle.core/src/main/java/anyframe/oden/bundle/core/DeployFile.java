@@ -21,7 +21,8 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import anyframe.oden.bundle.common.JSONizable;
+import anyframe.oden.bundle.common.Utils;
+import anyframe.oden.bundle.core.command.JSONizable;
 
 
 /**
@@ -143,7 +144,7 @@ public class DeployFile implements JSONizable, Serializable{
 	}
 	
 	public void setErrorLog(String s) {
-		this.errorLog = s;
+		this.errorLog = s.trim();
 		this.success = false;
 	}
 	
@@ -153,6 +154,11 @@ public class DeployFile implements JSONizable, Serializable{
 			return false;
 		DeployFile d = (DeployFile)o;
 		return repo.equals(d.repo) && path.equals(d.path) && agent.equals(d.agent); 
+	}
+	
+	@Override
+	public int hashCode() {
+		return Utils.hashCode(repo, path, agent);
 	}
 
 	public Object jsonize() {

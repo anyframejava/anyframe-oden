@@ -29,7 +29,7 @@
          bind="setPolicyCommand"
    />
    <reference name="DEPLOY_LOG_SERVICE"
-         interface="anyframe.oden.bundle.core.record.DeployLogService2"
+         interface="anyframe.oden.bundle.core.record.DeployLogService"
          cardinality="1..1"
          policy="dynamic"
          bind="setDeployLogService"

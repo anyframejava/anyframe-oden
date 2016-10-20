@@ -1,6 +1,6 @@
 <project name="Oden" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe.oden.bundle" />
-	<property name="version" value="1.1.0"/>
+	<property name="version" value="1.2.0"/>
 	
 	<property name="service.src" location="${basedir}/src/main/java"/>
 	<property name="service.build" location="${basedir}/build"/>		
@@ -17,8 +17,11 @@
 	</target>
 	
 	<target name="compile.service" depends="init">
+		<condition property="dbg" value="off">
+			<not><isset property="dbg"/></not>
+		</condition>
 		<javac srcdir="${service.src}" destdir="${service.build}"
-			debug="on" debuglevel="lines,vars,source">
+			debug="${dbg}" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${basedir}/bundle"/>
 			</classpath>
@@ -55,6 +58,11 @@
 		<property name="bundle.loc" value="../anyframe.oden.bundle/bundle"/>
 		<property name="dist" location="${basedir}/dist"/>
 		<antcall target="dist.bundle"/>
+	</target>
+	
+	<target name="all.dbg">
+		<property name="dbg" value="on"/>
+		<antcall target="all-local"/>
 	</target>
 	
 	<target name="all">

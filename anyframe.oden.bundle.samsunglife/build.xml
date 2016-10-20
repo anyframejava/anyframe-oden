@@ -1,7 +1,7 @@
 <project name="Oden SamsungLife" default="all-local" basedir=".">
 	
 	<property name="bundle.name" value="anyframe.oden.bundle.samsunglife" />
-	<property name="version" value="1.0.0"/>
+	<property name="version" value="1.0.1"/>
 			
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -21,7 +21,8 @@
 	
 	<target name="compile.bundle" depends="init">
 		<javac srcdir="${src}" destdir="${build}"
-				debug="on" debuglevel="lines,vars,source" encoding="utf-8">
+				debug="on" debuglevel="lines,vars,source" encoding="utf-8"
+				fork="yes" executable="/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Commands/javac">
 			<classpath>
 				<fileset dir="${bundle.loc}"/>
 				<fileset dir="rscs"/>
@@ -58,6 +59,11 @@
 		<copy todir="${bundle.loc}">
 			<fileset dir="${dist}"/>
 		</copy>
+	</target>
+	
+	<target name="all.dbg">
+		<property name="dbg" value="on"/>
+		<antcall target="all-local"/>
 	</target>
 	
 	<target name="all">

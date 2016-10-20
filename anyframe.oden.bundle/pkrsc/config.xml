@@ -2,9 +2,9 @@
 <oden>
 	<agents>
 		<agent name="app0">
-			<address host="localhost" port="9862"/>
-			<default-location value="%agentLoc%"/>
-			<backup-location value="%backupLoc%"/>
+			<address host="localhost" port="9872"/>
+			<default-location value="C:/was/webapps/myapp"/>
+			<backup-location value="C:/was/bak/myapp"/>
 		</agent>
 		<!--  
 		<agent name="%agentName2%">

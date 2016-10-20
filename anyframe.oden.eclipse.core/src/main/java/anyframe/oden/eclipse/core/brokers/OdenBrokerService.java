@@ -18,6 +18,7 @@
  */
 package anyframe.oden.eclipse.core.brokers;
 
+import anyframe.oden.eclipse.core.CommandNotFoundException;
 import anyframe.oden.eclipse.core.OdenException;
 
 /**
@@ -34,8 +35,9 @@ public interface OdenBrokerService {
      * @param msg
      * @return response
      * @throws OdenException
+	 * @throws CommandNotFoundException 
      */
 	
-	public String sendRequest(String shellUrl, String msg) throws OdenException; 	
+	public String sendRequest(String shellUrl, String msg) throws OdenException, CommandNotFoundException; 	
 	
 }

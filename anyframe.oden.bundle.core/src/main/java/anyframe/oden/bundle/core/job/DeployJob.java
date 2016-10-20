@@ -27,7 +27,7 @@ import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.command.DeployerManager;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
 import anyframe.oden.bundle.core.record.RecordElement2;
 import anyframe.oden.bundle.core.txmitter.TransmitterService;
 
@@ -40,7 +40,7 @@ import anyframe.oden.bundle.core.txmitter.TransmitterService;
 public abstract class DeployJob extends Job{
 	protected TransmitterService txmitterService;
 	
-	protected DeployLogService2 deploylog;
+	protected DeployLogService deploylog;
 	
 	protected DeployerManager deployerManager;
 
@@ -59,7 +59,7 @@ public abstract class DeployJob extends Job{
 		super(context, desc);
 		this.resolver = resolver;
 		txmitterService = (TransmitterService) BundleUtil.getService(context, TransmitterService.class);
-		deploylog = (DeployLogService2) BundleUtil.getService(context, DeployLogService2.class);
+		deploylog = (DeployLogService) BundleUtil.getService(context, DeployLogService.class);
 		Assert.check(txmitterService != null && deploylog != null, "Fail to load service.");
 		
 		String undo = context.getProperty("deploy.undo");

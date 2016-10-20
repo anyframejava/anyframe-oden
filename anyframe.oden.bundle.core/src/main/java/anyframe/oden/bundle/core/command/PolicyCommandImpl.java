@@ -33,7 +33,6 @@ import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
@@ -123,7 +122,7 @@ public class PolicyCommandImpl extends OdenCommand {
 			}else if(Cmd.ADD_ACTION.equals(action)){
 				if(cmd.getActionArg().length() > 0 && cmd.getOptions().size() > 0){
 					addPolicy(cmd.getActionArg(), cmd.getOptionString());
-					consoleResult = cmd.getActionArg() + " is added.";
+					consoleResult = "Policy " + cmd.getActionArg() + " is added.";
 				}else {
 					throw new OdenException("Couldn't execute command.");
 				}
@@ -195,8 +194,10 @@ public class PolicyCommandImpl extends OdenCommand {
 		
 		// dests is defined in config.xml ?
 		String[] destargs = policyInfo.getOptionArgArray(PolicyCommandImpl.DEST_OPT);
-		for(String destarg : destargs){
-			new AgentLoc(destarg, configService);
+		if(destargs.length != 1 && !destargs[0].startsWith("*:")){
+			for(String destarg : destargs){
+				new AgentLoc(destarg, configService);
+			}
 		}
 		
 		String[] repos = policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT);
@@ -262,6 +263,7 @@ public class PolicyCommandImpl extends OdenCommand {
 		if(includes.size() <1 || dests.size() <1)
 			throw new OdenParseException(policyInfo.toString());
 					
+		resolveDests(dests);
 		Set<AgentLoc> agents = new ArraySet<AgentLoc>();
 		for(String destargs : dests){
 			AgentLoc ra = new AgentLoc(destargs, configService);
@@ -278,6 +280,16 @@ public class PolicyCommandImpl extends OdenCommand {
 		}
 	}
 	
+	private void resolveDests(List<String> dests) throws OdenException {
+		if(dests.size() != 1 || !dests.get(0).startsWith("*:"))
+			return;
+		
+		final String loc = dests.remove(0).substring(2);
+		for(String agent : configService.getAgentNames()){
+			dests.add(agent + ":" + loc);
+		}
+	}
+
 	private void previewToRemove(Set<DeployFile> dfiles, List<String> includes, 
 			List<String> excludes, Set<AgentLoc> agents) throws OdenException {
 		for(AgentLoc agent : agents) {		
@@ -328,7 +340,7 @@ public class PolicyCommandImpl extends OdenCommand {
 					try{
 						DeployerService ds = deployerMgr.getDeployer(agent.agentAddr());
 						if(ds == null)
-							throw new OdenException("Couldn't connect to the agent: " + 
+							throw new OdenException("Couldn't connect to the agent or access denied: " + 
 									agent.agentName() + "(" + agent.agentAddr() + ")");
 						Mode m = Mode.NA;
 						if(ds.exist(agent.location(), in.getPath()) ) {
@@ -348,7 +360,7 @@ public class PolicyCommandImpl extends OdenCommand {
 								DeployFileUtil.notBeDeployedFile(repo, in.getPath(), agent, e) );
 					}
 				}
-			}catch(OdenException e){
+			}catch(Exception e){
 				for(AgentLoc agent : agents) {	
 					DeployFileUtil.updateDeployFiles(dfiles, 
 							DeployFileUtil.notBeDeployedFile(repo, file, agent, e) );
@@ -388,7 +400,7 @@ public class PolicyCommandImpl extends OdenCommand {
 	}
 
 	public String getShortDescription() {
-		return "manipulate policies having deploy information.";
+		return "add / remove / test Policies";
 	}
 
 	public String getUsage() {

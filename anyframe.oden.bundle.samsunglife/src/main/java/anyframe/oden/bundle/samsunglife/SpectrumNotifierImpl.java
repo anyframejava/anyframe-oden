@@ -15,7 +15,7 @@ import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.DeployFile;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
 import anyframe.oden.bundle.core.record.RecordElement2;
 
 import com.caucho.hessian.client.HessianProxyFactory;
@@ -36,9 +36,9 @@ public class SpectrumNotifierImpl implements SpectrumNotifier {
 	
 	private ITrncCiTrtRsltService svc;
 	
-	private DeployLogService2 deploylog;
+	private DeployLogService deploylog;
 	
-	protected void setDeployLogService(DeployLogService2 svc) {
+	protected void setDeployLogService(DeployLogService svc) {
 		this.deploylog = svc;
 	}
 	
@@ -80,12 +80,11 @@ public class SpectrumNotifierImpl implements SpectrumNotifier {
 	public boolean notifyResult(String txid) {
 		try {
 			Assert.check(txid != null && txid.length() > 0, "Transaction Id is required.");
-			List<RecordElement2> logs = deploylog.search(
-					txid, null, null, null, null, null, false);
-			if(logs.size() == 0)
+			RecordElement2 r = deploylog.search(txid, null, null, null, false);
+			if(r == null)
 				return false;
 			
-			return notifyResult(logs.get(0));
+			return notifyResult(r);
 		} catch (OdenException e) {
 			Logger.error(e);
 		}

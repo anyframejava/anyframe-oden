@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="bundle/felix.jar"/>
+	<classpathentry kind="lib" path="bundle/felix.jar" sourcepath="/Users/joon1k/dev_rscs/works/oden/org.apache.felix.framework-2.0.2"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

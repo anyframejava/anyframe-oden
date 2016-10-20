@@ -17,7 +17,7 @@
 package anyframe.oden.bundle.common;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,9 +66,10 @@ public class BundleUtil {
 	 */
 	public static File odenHome() {
 		try{
-			return new File(BundleUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile();
-		}catch(URISyntaxException e){
-			return new File(".");
+			URL url = new URL(BundleUtil.class.getProtectionDomain().getCodeSource().getLocation().toString());
+			return new File(url.getPath()).getParentFile().getParentFile();
+		}catch(Exception e){
+			return new File("..");
 		}
 	}
 }

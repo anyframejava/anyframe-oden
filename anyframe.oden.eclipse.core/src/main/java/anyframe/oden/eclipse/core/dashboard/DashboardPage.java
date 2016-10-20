@@ -67,6 +67,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import anyframe.oden.eclipse.core.CommandNotFoundException;
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.alias.Server;
@@ -105,10 +106,10 @@ public class DashboardPage implements Page {
 
 	public Text dateFrom;
 	public Text dateTo;
-	
+
 	private CalendarCombo fromCombo;
 	private CalendarCombo toCombo;
-	
+
 	private Label dateDash;
 	private Button dateSearch;
 
@@ -133,12 +134,16 @@ public class DashboardPage implements Page {
 	private String selectedID;
 	private String transferResult;
 
+	private boolean boolSSL;
+
 	private TableItem[] selection;
-	
+
 	private boolean isFail;
-	
+
+	private SelectionListener trensferListener;
+
 	private CommonUtil util = new CommonUtil();
-	
+
 	public void setSelection(TableItem[] selection) {
 		this.selection = selection;
 	}
@@ -240,6 +245,7 @@ public class DashboardPage implements Page {
 
 		createDashBoardSection(form, toolkit, whole);
 
+		checkSSLValid();
 		loadInitData();
 		fillResultData();
 		setListener();
@@ -247,6 +253,25 @@ public class DashboardPage implements Page {
 		addContextMenu();
 
 		return form;
+	}
+
+	private void checkSSLValid() {
+		String cmd = CommandMessages.ODEN_CLI_COMMAND_spectrum_fetchlist + " "//$NON-NLS-1$
+				+ CommandMessages.ODEN_CLI_OPTION_json;
+		try {
+			String spectrum = OdenBroker.sendRequest(getShellURL(), cmd);
+			boolSSL = true;
+		} catch (OdenException e) {
+			OdenActivator.error(
+					"Exception occured while check command is valid.", e);
+		} catch (CommandNotFoundException e) {
+			// TODO
+			OdenActivator.error("Anyframe Oden command not found.", e);
+			checkTrasferResult.setEnabled(false);
+			columnResultTransferSuccess.getColumn().removeSelectionListener(
+					trensferListener);
+			boolSSL = false;
+		}
 	}
 
 	private void createDashBoardSection(final ScrolledForm form,
@@ -351,23 +376,23 @@ public class DashboardPage implements Page {
 		// add calendar by HONG 10.01.20
 		fromCombo = new CalendarCombo(client, SWT.READ_ONLY);
 		fromCombo.setDate(util.getWeekDate());
-		
+
 		fromCombo.addCalendarListener(new ICalendarListener() {
-			
+
 			public void popupClosed() {
 				// TODO Auto-generated method stub
 			}
-			
+
 			public void dateRangeChanged(Calendar start, Calendar end) {
 				// TODO Auto-generated method stub
 			}
-			
+
 			public void dateChanged(Calendar date) {
 				// TODO Auto-generated method stub
 			}
 		});
 		// end from date calendar
-		
+
 		dateDash = new Label(client, SWT.NONE);
 		dateDash.setText("-"); //$NON-NLS-1$
 
@@ -375,23 +400,21 @@ public class DashboardPage implements Page {
 		toCombo = new CalendarCombo(client, SWT.READ_ONLY);
 		toCombo.setDate(new Date());
 		toCombo.addCalendarListener(new ICalendarListener() {
-			
+
 			public void popupClosed() {
 				// TODO Auto-generated method stub
 			}
-			
+
 			public void dateRangeChanged(Calendar start, Calendar end) {
 				// TODO Auto-generated method stub
 			}
-			
+
 			public void dateChanged(Calendar date) {
 				// TODO Auto-generated method stub
 			}
 		});
 		// end from date calendar
 
-		
-		
 		dateSearch = new Button(client, SWT.PUSH);
 		dateSearch
 				.setText(UIMessages.ODEN_DASHBOARD_DashboardPage_ButtonDateSearch);
@@ -648,29 +671,29 @@ public class DashboardPage implements Page {
 					}
 				});
 
+		trensferListener = new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				((DashboardSorter) dashboardViewer.getSorter()).setColumn(6);
+				int dir = dashboardViewer.getTable().getSortDirection();
+				if (dashboardViewer.getTable().getSortColumn() == columnResultTransferSuccess
+						.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+					dir = SWT.DOWN;
+				}
+				dashboardViewer.getTable().setSortDirection(dir);
+				dashboardViewer.getTable().setSortColumn(
+						columnResultTransferSuccess.getColumn());
+				dashboardViewer.refresh();
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				widgetSelected(e);
+			}
+		};
+
 		columnResultTransferSuccess.getColumn().addSelectionListener(
-				new SelectionListener() {
-					public void widgetSelected(SelectionEvent e) {
-						((DashboardSorter) dashboardViewer.getSorter())
-								.setColumn(6);
-						int dir = dashboardViewer.getTable().getSortDirection();
-						if (dashboardViewer.getTable().getSortColumn() == columnResultTransferSuccess
-								.getColumn()) {
-							dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
-						} else {
-							dir = SWT.DOWN;
-						}
-						dashboardViewer.getTable().setSortDirection(dir);
-						dashboardViewer.getTable().setSortColumn(
-								columnResultTransferSuccess.getColumn());
-						dashboardViewer.refresh();
-					}
-
-					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetSelected(e);
-					}
-				});
-
+				trensferListener);
 	}
 
 	private class TxIDColumnLabelProvider extends ColumnLabelProvider {
@@ -805,7 +828,7 @@ public class DashboardPage implements Page {
 				String to = CommonUtil.replaceIgnoreCase(CommonUtil
 						.replaceIgnoreCase(toCombo.getDateAsString().trim(),
 								".", ""), " ", "");
-				
+
 				if (from == null || from.equals("")) { //$NON-NLS-1$
 					from = UIMessages.ODEN_DASHBOARD_DashboardPage_DateFrom;
 				}
@@ -840,7 +863,7 @@ public class DashboardPage implements Page {
 				}
 			}
 		});
-		
+
 		infoTable.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				TableItem item = (TableItem) e.item;
@@ -889,6 +912,23 @@ public class DashboardPage implements Page {
 	}
 
 	public void loadInitData() {
+		//		String cmd = CommandMessages.ODEN_CLI_COMMAND_spectrum_fetchlist + " "//$NON-NLS-1$
+		// + CommandMessages.ODEN_CLI_OPTION_json;
+		// try {
+		// String spectrum = OdenBroker.sendRequest(getShellURL(), cmd);
+		// boolSSL = true;
+		// } catch (OdenException e) {
+		// OdenActivator.error(
+		// "Exception occured while check command is valid.", e);
+		// } catch (CommandNotFoundException e) {
+		// //TODO
+		// OdenActivator.error("Anyframe Oden command not found.", e);
+		// checkTrasferResult.setEnabled(false);
+		// columnResultTransferSuccess.getColumn()
+		// .removeSelectionListener(trensferListener);
+		// boolSSL = false;
+		// }
+
 		ArrayList<DashboardData> dashboardDataList = new ArrayList<DashboardData>();
 		dashboardDataList = getDataList();
 
@@ -951,7 +991,11 @@ public class DashboardPage implements Page {
 		try {
 			String result = OdenBroker.sendRequest(getShellURL(), commnd);
 
-			String spectrum = OdenBroker.sendRequest(getShellURL(), cmd);
+			String spectrum = "";
+			if (boolSSL) {
+				spectrum = OdenBroker.sendRequest(getShellURL(), cmd);
+			} else {
+			}
 
 			if (result != null && !(result.equals(""))) { //$NON-NLS-1$
 				JSONArray array = new JSONArray(result);
@@ -1009,19 +1053,22 @@ public class DashboardPage implements Page {
 
 					String tempDate = object.get("date") + ""; //$NON-NLS-1$ //$NON-NLS-2$
 					String date = chgDateFormat(tempDate);
-					
+
 					String strFrom = CommonUtil.replaceIgnoreCase(CommonUtil
 							.replaceIgnoreCase(fromCombo.getDateAsString()
 									.trim(), ".", ""), " ", "");
 					String strTo = CommonUtil.replaceIgnoreCase(CommonUtil
-							.replaceIgnoreCase(toCombo.getDateAsString()
-									.trim(), ".", ""), " ", "");
-					
+							.replaceIgnoreCase(
+									toCombo.getDateAsString().trim(), ".", ""),
+							" ", "");
+
 					int intData = Integer.parseInt(date);
-					
-					int intFrom = strFrom.equals("") ? 0 : Integer.parseInt(strFrom);
-					int intTo = strTo.equals("") ? 99999999 : Integer.parseInt(strTo); 
-					
+
+					int intFrom = strFrom.equals("") ? 0 : Integer
+							.parseInt(strFrom);
+					int intTo = strTo.equals("") ? 99999999 : Integer
+							.parseInt(strTo);
+
 					if (deployFail && transferFail) {
 						// deploy fail, transfer fail 동시
 						String transfer = dashboard.getTransferSuccess();
@@ -1063,7 +1110,6 @@ public class DashboardPage implements Page {
 					}
 				}
 			}
-
 		} catch (OdenException e) {
 		} catch (Exception odenException) {
 			OdenActivator
@@ -1119,7 +1165,7 @@ public class DashboardPage implements Page {
 			historyview.refreshAgentCombo();
 			historyview.getAgentNameCombo().setText(serverNickName);
 			isFail = historyview.getOnlyFail().getSelection();
-			
+
 			try {
 				historyview
 						.getUtil()
@@ -1192,4 +1238,3 @@ public class DashboardPage implements Page {
 		gettingQueryIdsJob.schedule();
 	}
 }
-

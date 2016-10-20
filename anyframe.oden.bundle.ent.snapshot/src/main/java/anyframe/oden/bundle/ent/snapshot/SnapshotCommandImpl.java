@@ -35,7 +35,6 @@ import org.osgi.service.log.LogService;
 import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.DateUtil;
 import anyframe.oden.bundle.common.FileUtil;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenStoreException;
@@ -45,6 +44,7 @@ import anyframe.oden.bundle.core.DeployFile;
 import anyframe.oden.bundle.core.Repository;
 import anyframe.oden.bundle.core.DeployFile.Mode;
 import anyframe.oden.bundle.core.command.Cmd;
+import anyframe.oden.bundle.core.command.JSONUtil;
 import anyframe.oden.bundle.core.command.OdenCommand;
 import anyframe.oden.bundle.core.command.Opt;
 import anyframe.oden.bundle.core.job.DeployFileResolver;
@@ -53,7 +53,7 @@ import anyframe.oden.bundle.core.job.Job;
 import anyframe.oden.bundle.core.job.JobManager;
 import anyframe.oden.bundle.core.keygen.KeyGenerator;
 import anyframe.oden.bundle.core.prefs.Prefs;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
 import anyframe.oden.bundle.core.record.RecordElement2;
 import anyframe.oden.bundle.core.txmitter.TransmitterService;
 import anyframe.oden.bundle.deploy.DeployerService;
@@ -98,9 +98,9 @@ public class SnapshotCommandImpl extends OdenCommand {
 		this.txmitterService = tx;
 	}
 	
-	private DeployLogService2 deploylog;
+	private DeployLogService deploylog;
 	
-	protected void setDeployLogService(DeployLogService2 deploylog) {
+	protected void setDeployLogService(DeployLogService deploylog) {
 		this.deploylog = deploylog;
 	}
 	
@@ -378,8 +378,6 @@ public class SnapshotCommandImpl extends OdenCommand {
 		String srcArgs = planCmd.getOptionArg(SOURCE_OPT);
 		final AgentLoc srcloc = new AgentLoc(srcArgs, configService);
 		final String bak = configService.getBackupLocation(srcloc.agentName());
-		if(bak == null)
-			throw new OdenException("Couldn't find any backup location from config.xml");
 		
 		DeployFileResolver resolver = new DeployFileResolver() {
 			public Set<DeployFile> resolveDeployFiles() throws OdenException {
@@ -472,7 +470,7 @@ public class SnapshotCommandImpl extends OdenCommand {
 	}
 
 	public String getShortDescription() {
-		return "manipulate snapshot-plans and snapshot-files";
+		return "backup files";
 	}
 
 	public String getUsage() {

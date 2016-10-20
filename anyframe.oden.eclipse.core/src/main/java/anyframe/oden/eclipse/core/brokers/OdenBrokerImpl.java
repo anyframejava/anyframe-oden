@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import anyframe.oden.eclipse.core.CommandNotFoundException;
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.alias.Server;
@@ -57,7 +58,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	/**
 	 * Send request and get response, Interface server with http protocol
 	 */
-	public String sendRequest(String shellUrl, String msg) throws OdenException {
+	public String sendRequest(String shellUrl, String msg) throws CommandNotFoundException, OdenException {
 		PrintWriter writer = null;
 		String result = null;
 		
@@ -73,6 +74,8 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				
 				// receive
 				result = handleResult(conn);
+			} catch (CommandNotFoundException e){
+				throw new CommandNotFoundException(e.getMessage());	
 			} catch (OdenException e) {
 					throw new OdenException(e.getMessage());	
 			} catch (ConnectException e) {
@@ -91,7 +94,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		}
 	}
 
-	private String handleResult(URLConnection conn) throws OdenException, IOException {
+	private String handleResult(URLConnection conn) throws CommandNotFoundException, OdenException, IOException {
 		String result = null;
 		BufferedReader reader = null;
 		try {
@@ -104,6 +107,12 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			JSONArray array = new JSONArray(result);
 			determineException(array);
 
+		}catch (JSONException e){
+			if(result.contains("Command not found")){
+				throw new CommandNotFoundException(e.getMessage());
+			}else{
+				throw new OdenException(e.getMessage());
+			}
 		} catch (Exception e) {
 			throw new OdenException(e.getMessage());
 		} finally {

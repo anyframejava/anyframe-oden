@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import anyframe.oden.bundle.common.ArraySet;
-import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentLoc;
 import anyframe.oden.bundle.core.DeployFile;
@@ -37,10 +36,7 @@ import anyframe.oden.bundle.deploy.DoneFileInfo;
  *
  */
 public class DeployerHelper {
-	public static boolean readyToDeploy(DeployerService ds, DeployFile f) {
-		if(ds == null)
-			return false;
-			
+	public static void readyToDeploy(DeployerService ds, DeployFile f) throws Exception{
 		try {		
 			String parent = f.getAgent().location();
 			String child = f.getPath();
@@ -48,13 +44,9 @@ public class DeployerHelper {
 			try { ds.close(null, null); } catch (Exception ee){}
 			ds.init(f.getAgent().location(), f.getPath(), f.getDate());
 		}catch(Exception e){
-			Logger.error(e);
-			try { ds.close(null, null); } catch (Exception e1) {
-				Logger.error(e1);
-			}
-			return false;
+			try { ds.close(null, null); } catch (Exception e1) {}
+			throw e;
 		} 
-		return true;
 	}
 	
 	public static boolean isNewFile(DeployerService ds,

@@ -51,7 +51,6 @@ public class DashboardRefreshAction extends AbstractDashboardAction {
 	public void run() {
 		String weekAgo = util.getWeekDateFormat(UIMessages.ODEN_DASHBOARD_DashboardPage_DateFormat);
 		
-		
 		SimpleDateFormat df = new SimpleDateFormat(
 				UIMessages.ODEN_DASHBOARD_DashboardPage_DateFormat);
 		String test = df.format(new Date());
@@ -59,8 +58,8 @@ public class DashboardRefreshAction extends AbstractDashboardAction {
 		DashboardPage page = Dashboard.getDefault(
 				server + UIMessages.ODEN_DASHBOARD_DashboardPage_DashboardSuf)
 				.getDashboardPage();
-		page.dateFrom.setText(weekAgo);
-		page.dateTo.setText(test);
+//		page.dateFrom.setText(weekAgo);
+//		page.dateTo.setText(test);
 		page.loadInitData();
 		page.fillResultData();
 		page.getDashboardViewer().refresh();

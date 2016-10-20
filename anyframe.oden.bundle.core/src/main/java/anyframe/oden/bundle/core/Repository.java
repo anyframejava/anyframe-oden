@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import org.json.JSONArray;
 
-import anyframe.oden.bundle.common.JSONizable;
+import anyframe.oden.bundle.core.command.JSONizable;
 /**
  * 
  * This class contain Repository's whole information.
@@ -64,6 +64,11 @@ public class Repository implements JSONizable, Serializable{
 		return toString().equals(o.toString());
 	}
 
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	
 	public Object jsonize() {
 		return new JSONArray(Arrays.asList(args));
 	}

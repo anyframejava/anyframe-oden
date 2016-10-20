@@ -1,28 +1,38 @@
-<project name="_Oden Full SamsungLife" default="build.all" basedir=".">
-	<property name="version" value="1.1.0"/>
+<project name="_Oden Full SamsungLife" default="build.all.dbg" basedir=".">
+	<property name="version" value="1.2.0"/>
 	<property name="oden.fwk" location="../anyframe.oden.bundle"/>
 	<target name="build.all">
-		<ant antfile="../anyframe.oden.bundle/build.xml" inheritall="false" />
-					
-		<ant antfile="../anyframe.common.bundle.gate/build.xml" inheritall="false" />
+		<condition property="todo" else="all-local">
+			<isset property="todo"/>
+		</condition>
+		<ant antfile="../anyframe.oden.bundle/build.xml" target="${todo}" inheritall="false" />
+			
+		<ant antfile="../anyframe.common.bundle.gate/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.common/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.common/build.xml" target="${todo}" inheritall="false" />
 				
-		<ant antfile="../anyframe.oden.bundle.deploy/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.core/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.core/build.xml" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ent.misc/build.xml" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ent.repository/build.xml" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ent.snapshot/build.xml" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ent.http/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.hessiancli/build.xml" target="${todo}" inheritall="false" />
+				
+		<ant antfile="../anyframe.oden.bundle.hessiansvr/build.xml" target="${todo}" inheritall="false" />
 		
-		<ant antfile="../anyframe.oden.bundle.ent.auth/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.ent.misc/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.samsunglife/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.ent.repository/build.xml" target="${todo}" inheritall="false" />
+
+		<ant antfile="../anyframe.oden.bundle.ent.snapshot/build.xml" target="${todo}" inheritall="false" />
+
+		<ant antfile="../anyframe.oden.bundle.ent.http/build.xml" target="${todo}" inheritall="false" />
+		
+		<ant antfile="../anyframe.oden.bundle.ent.auth/build.xml" target="${todo}" inheritall="false" />
+		
+		<ant antfile="../anyframe.oden.bundle.samsunglife/build.xml" target="${todo}" inheritall="false" />
+	</target>
+	
+	<target name="build.all.dbg">
+		<property name="todo" value="all.dbg" />
+		<antcall target="build.all" />
 	</target>
 	
 	<target name="pack.agent" depends="build.all" description="package oden agent">
@@ -36,21 +46,25 @@
 		<copy todir="${basedir}/pack/bundle">
 			<fileset dir="${oden.fwk}/bundle" 
 				includes=
-					"anyframe.oden.bundle.deploy-*.jar,
+					"anyframe.oden.bundle.hessiansvr-*.jar,
 					anyframe.oden.bundle.common-*.jar,
 					org.apache.felix.configadmin-*.jar,
 					org.apache.felix.eventadmin-*.jar,
+					org.apache.felix.http.jetty-*.jar,
 					org.apache.felix.log-*.jar,
 					org.apache.felix.scr-*.jar,
-					remote-*.jar,
-					felix*.jar,
-					org.json_*.jar"/>
+					hessian-*.jar,
+					felix*.jar"/>
 		</copy>
 		<copy todir="${basedir}/pack">
-			<fileset dir="rscs" includes="startup.sh,shutdown.sh"/>
+			<fileset dir="rscs" includes="startup-agent.sh,shutdown.sh,startup.cmd"/>
 		</copy>
+		<rename src="pack/startup-agent.sh" dest="pack/startup.sh"/>
 		
-		<tar destfile="${basedir}/pack/oden-agent-${version}.tar" basedir="${basedir}/pack" excludes="*.tar.gz,**/*.svn"/>
+		<tar destfile="${basedir}/pack/oden-agent-${version}.tar">
+			<tarfileset dir="pack" includes="*.sh" filemode="755" />
+			<tarfileset dir="pack" includes="bin/**,bundle/**"/>
+		</tar>
 		<gzip destfile="${basedir}/pack/oden-agent-${version}.tar.gz" src="${basedir}/pack/oden-agent-${version}.tar"/>
 		<delete file="${basedir}/pack/oden-agent-${version}.tar"/>
 	</target>
@@ -67,9 +81,10 @@
 		<copy todir="${basedir}/pack/bundle">
 			<fileset dir="${oden.fwk}/bundle" 
 				includes="anyframe.common.bundle.gate-*.jar,
-					anyframe.common.bundle.log-*.jar,
 					anyframe.oden.bundle.common-*.jar,
 					anyframe.oden.bundle.core-*.jar,
+					anyframe.oden.bundle.hessiancli-*.jar,
+					anyframe.oden.bundle.samsunglife-*.jar,
 					anyframe.oden.bundle.ent.misc-*.jar,
 					anyframe.oden.bundle.ent.repository-*.jar,
 					anyframe.oden.bundle.ent.snapshot-*.jar,
@@ -84,7 +99,6 @@
 					org.apache.felix.scr-*.jar,
 					org.apache.felix.shell.remote-*.jar,
 					org.json_*.jar,
-					remote-*.jar,
 					hessian-*.jar,
 					jdom.jar,
 					xerces-*.jar" />
@@ -96,7 +110,10 @@
 			<fileset dir="rscs" includes="startup.sh,shutdown.sh,runc.sh,acc.sh"/>
 		</copy>
 		
-		<tar destfile="${basedir}/pack/oden-${version}.tar" basedir="${basedir}/pack" excludes="*.tar.gz,**/*.svn"/>
+		<tar destfile="${basedir}/pack/oden-${version}.tar">
+			<tarfileset dir="pack" includes="*.sh" filemode="755" />
+			<tarfileset dir="pack" includes="bin/**,bundle/**,conf/**"/>
+		</tar>
 		<gzip destfile="${basedir}/pack/oden-${version}.tar.gz" src="${basedir}/pack/oden-${version}.tar"/>
 		<delete file="${basedir}/pack/oden-${version}.tar"/>
 	</target>

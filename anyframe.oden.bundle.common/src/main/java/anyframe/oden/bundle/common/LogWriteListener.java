@@ -69,11 +69,30 @@ public class LogWriteListener implements LogListener {
 		final String msg = entry.getMessage();
 
 		try {
-			writeToCacheLog(format(who, level, date, msg), date);
+			writeToCacheLog(format(who, level, date, msg != null ? msg : entry.getException().getMessage()), date);
+			System.out.println(stackTrace(entry.getException()));
 		} catch (IOException e) {
 			System.err.println(format(this.getClass().getName(), 1, 
 					System.currentTimeMillis(), "Fail to write logs." + e.getMessage() ));;
 		}
+	}
+	
+	private static String stackTrace(Throwable t) {
+		if(t == null) return "";
+		
+		String s = t.getClass().getName();
+		String msg = t.getLocalizedMessage();
+		
+		StringBuffer buf = new StringBuffer(msg != null ? s + ": " + msg : s);
+		buf.append('\n');
+		for(StackTraceElement trace : t.getStackTrace()){
+			buf.append("\tat " + trace + "\n");
+		}
+		
+		if(t.getCause() != null)
+			buf.append(stackTrace(t.getCause()));
+		
+		return buf.toString();
 	}
 
 	private String format(String who, int level, long date, String msg) {

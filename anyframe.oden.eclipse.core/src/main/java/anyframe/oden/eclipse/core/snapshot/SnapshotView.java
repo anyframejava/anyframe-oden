@@ -74,6 +74,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import anyframe.oden.eclipse.core.CommandNotFoundException;
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
@@ -482,8 +483,7 @@ public class SnapshotView extends ViewPart {
 					locationVar.select(i);
 				}
 			}
-		} else if (locVar
-				.equals(CommandMessages.ODEN_CLI_OPTION_locvarsign)) {
+		} else if (locVar.equals(CommandMessages.ODEN_CLI_OPTION_locvarsign)) {
 			for (int i = 0; i < comboLocItem.length; i++) {
 				if (comboLocItem[i]
 						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText)) {
@@ -573,8 +573,7 @@ public class SnapshotView extends ViewPart {
 						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText)) {
 					result = ""; //$NON-NLS-1$
 				} else {
-					result = CommandMessages.ODEN_CLI_OPTION_locvarsign
-							+ text;
+					result = CommandMessages.ODEN_CLI_OPTION_locvarsign + text;
 				}
 				return result;
 			}
@@ -615,7 +614,8 @@ public class SnapshotView extends ViewPart {
 
 	private void setLocPathText(HashMap<String, String> mapStrSrc) {
 		// String agent = mapStrSrc.get("agent-name");
-		String locVar = mapStrSrc.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar);
+		String locVar = mapStrSrc
+				.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar);
 		String locVarPath = mapStrSrc
 				.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath);
 
@@ -640,14 +640,14 @@ public class SnapshotView extends ViewPart {
 		int numAgent = source
 				.indexOf(UIMessages.ODEN_SNAPSHOT_SnapshotView_AgentLocSeperateSign);
 		String agent = source.substring(0, numAgent);
-		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyAgent, agent); 
+		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyAgent,
+				agent);
 		String tempLoc = source.substring(numAgent + 1);
 
 		String locVar = ""; //$NON-NLS-1$
 		String location = ""; //$NON-NLS-1$
 
-		if (tempLoc
-				.indexOf(CommandMessages.ODEN_CLI_OPTION_locvarsign) == 0) { // location-variable
+		if (tempLoc.indexOf(CommandMessages.ODEN_CLI_OPTION_locvarsign) == 0) { // location-variable
 			int numLocVar = tempLoc.indexOf("/"); //$NON-NLS-1$
 			if (numLocVar != -1) {
 				locVar = tempLoc.substring(0, numLocVar); // $location-variable
@@ -671,8 +671,12 @@ public class SnapshotView extends ViewPart {
 			locVar = ""; //$NON-NLS-1$
 			location = tempLoc;
 		}
-		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar, locVar);
-		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath, location);
+		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar,
+				locVar);
+		result
+				.put(
+						UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath,
+						location);
 
 		return result;
 	}
@@ -759,9 +763,10 @@ public class SnapshotView extends ViewPart {
 			// HashMap aa =locVariable;
 			// System.out.println();
 		} catch (Exception odenException) {
-			OdenActivator.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MsgAgentInfo,
-					odenException);
+			OdenActivator
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MsgAgentInfo,
+							odenException);
 			odenException.printStackTrace();
 		}
 	}
@@ -942,7 +947,8 @@ public class SnapshotView extends ViewPart {
 		new CommonUtil().initServerCombo(serverCombo);
 
 		if (selectedName == null) {
-//			compositeDetail = new Composite(compositeWhole, SWT.NONE | SWT.BORDER);
+			// compositeDetail = new Composite(compositeWhole, SWT.NONE |
+			// SWT.BORDER);
 			listenCombo();
 		}
 		serverCombo.addSelectionListener(new SelectionAdapter() {
@@ -951,7 +957,7 @@ public class SnapshotView extends ViewPart {
 			}
 		});
 	}
-	
+
 	private static void listenCombo() {
 		if (serverCombo.getItemCount() == 0) {
 
@@ -985,7 +991,7 @@ public class SnapshotView extends ViewPart {
 		}
 		invisibleRoot = null;
 		refreshTree();
-//		clearComposite();
+		// clearComposite();
 	}
 
 	/**
@@ -1008,6 +1014,8 @@ public class SnapshotView extends ViewPart {
 		String result = null;
 		try {
 			result = OdenBroker.sendRequest(SHELL_URL, "snapshot -json"); //$NON-NLS-1$
+		} catch (CommandNotFoundException e) {
+			OdenActivator.error("Anyframe Oden command not found.", e);
 		} catch (OdenException e) {
 			OdenActivator
 					.error(

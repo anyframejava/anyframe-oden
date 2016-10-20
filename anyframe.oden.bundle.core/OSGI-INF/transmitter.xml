@@ -4,11 +4,12 @@
    <service>
       <provide interface="anyframe.oden.bundle.core.txmitter.TransmitterService"/>
    </service>
-   <reference name="REMOTE_OSGi_SERVICE"
-         interface="ch.ethz.iks.r_osgi.RemoteOSGiService"
-         cardinality="0..1"
+  <reference name="DEPLOYER_FACTORY"
+         interface="anyframe.oden.bundle.deploy.DeployerFactory"
+         cardinality="1..n"
          policy="dynamic"
-         bind="setRemoteOSGiService"
+         bind="addDeployerFactory"
+         unbind="removeDeployerFactory"
    />
 </component>   
 

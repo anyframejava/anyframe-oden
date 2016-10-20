@@ -60,4 +60,12 @@ public class Utils {
 		}
 		return buf.toString();
 	}
+	
+	public static int hashCode(Object... args){
+		int hash = 17;
+		for(Object o : args){
+			hash = 37*hash + o.hashCode();
+		}
+		return hash;
+	}
 }

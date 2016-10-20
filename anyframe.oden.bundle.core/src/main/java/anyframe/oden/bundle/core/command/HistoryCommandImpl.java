@@ -18,6 +18,7 @@ package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +37,6 @@ import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.DateUtil;
 import anyframe.oden.bundle.common.FileUtil;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.Utils;
@@ -49,7 +49,8 @@ import anyframe.oden.bundle.core.job.DeployFileResolver;
 import anyframe.oden.bundle.core.job.DeployJob;
 import anyframe.oden.bundle.core.job.Job;
 import anyframe.oden.bundle.core.job.JobManager;
-import anyframe.oden.bundle.core.record.DeployLogService2;
+import anyframe.oden.bundle.core.record.DeployLogService;
+import anyframe.oden.bundle.core.record.MiniRecordElement;
 import anyframe.oden.bundle.core.record.RecordElement2;
 import anyframe.oden.bundle.core.txmitter.TransmitterService;
 import anyframe.oden.bundle.deploy.DeployerService;
@@ -79,9 +80,9 @@ public class HistoryCommandImpl extends OdenCommand {
 	}
 	
 	
-	private DeployLogService2 deploylog;
+	private DeployLogService deploylog;
 	
-	protected void setDeployLogService(DeployLogService2 recordsvc) {
+	protected void setDeployLogService(DeployLogService recordsvc) {
 		this.deploylog = recordsvc;
 	}
 	
@@ -109,14 +110,12 @@ public class HistoryCommandImpl extends OdenCommand {
 			isJSON = cmd.getOption(Cmd.JSON_OPT) != null;
 			
 			if(Cmd.SHOW_ACTION.equals(action)) {
-				String[] date = cmd.getOptionArgArray(DATE_OP);
-				List<RecordElement2> list = deploylog.search(cmd.getActionArg(), 
+				List<RecordElement2> list = new ArrayList<RecordElement2>();
+				list.add(deploylog.search(cmd.getActionArg(), 
 						cmd.getOptionArg(USER_OP),
 						cmd.getOptionArg(AGENT_OP),
 						cmd.getOptionArg(PATH_OP),
-						date.length > 0 ? date[0] : "",
-						date.length > 1 ? date[1] : (date.length > 0 ? date[0] : ""),
-						cmd.getOption(FAILONLY_OP) != null);
+						cmd.getOption(FAILONLY_OP) != null));
 				if(isJSON){
 					ja = jsonize(list);
 				} else {
@@ -130,28 +129,27 @@ public class HistoryCommandImpl extends OdenCommand {
 				}
 				
 				// show all histories of that date
-				List<RecordElement2> list = deploylog.search(null, null, null, null, 
-						date.length > 0 ? date[0] : "", date.length > 1 ? date[1] : (date.length > 0 ? date[0] : ""),false);
-				boolean isDetail = cmd.getOption(DETAIL_OPT) != null;
+				List<MiniRecordElement> list = deploylog.search(  
+						date.length > 0 ? date[0] : "", date.length > 1 ? date[1] : (date.length > 0 ? date[0] : ""),
+								null, false);
 				if(isJSON){
-					for(RecordElement2 r : list){
+					for(MiniRecordElement r : list){
 						String status = r.isSuccess() ? "S" : "F";
 						JSONObject jo = new JSONObject().put("id", r.id()).put("date", r.getDate()).put("status", status).put("desc", r.desc());
-						if(isDetail)
-							appendDetails(jo, r.getDeployFiles());
+						if(cmd.getOption(DETAIL_OPT) != null)
+							jo.put("nitems", r.getNDeploys()).put("nsuccess", r.getNDeploys()).put("total", r.getNDeploys());
 						ja.put(jo);
 					}
 				} else {
 					StringBuffer buf = new StringBuffer();
-					for(RecordElement2 r : list){
+					for(MiniRecordElement r : list){
 						String status = r.isSuccess() ? "Success" : "Fail";
 						buf.append(r.id() + "\t" + DateUtil.toStringDate(r.getDate())
-								+ "\t" + status + " (" + r.getDeployFiles().size() + ")\t" + r.desc() + "\n");
+								+ "\t" + status + " (" + r.getNDeploys() + ")\t" + r.desc() + "\n");
 					}
 					buf.append("To see more details, use this command: history show <id>");
 					consoleResult = buf.toString();
 				}
-				
 			}else if(UNDO_ACTION.equals(action)){
 				String id = cmd.getActionArg();
 				List<String> paths = cmd.getOptionArgList(PATH_OP);
@@ -164,10 +162,9 @@ public class HistoryCommandImpl extends OdenCommand {
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = undo(id, paths, isSync, user);
 				if(isSync){
-					List<RecordElement2> list = deploylog.search(txid,
-							null, null, null, null, null, false);
-					Assert.check(list.size() == 1, "Couldn't find a log: " + txid);
-					RecordElement2 r = list.get(0);
+					RecordElement2 r = deploylog.search(txid,
+							null, null, null, false);
+					Assert.check(r != null, "Couldn't find a log: " + txid);
 					if(isJSON)
 						ja.put(new JSONObject()
 								.put("txid", txid)
@@ -189,10 +186,9 @@ public class HistoryCommandImpl extends OdenCommand {
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = redeploy(id, isSync, user);
 				if(isSync){
-					List<RecordElement2> list = deploylog.search(txid,
-							null, null, null, null, null, false);
-					Assert.check(list.size() == 1, "Couldn't find a log: " + txid);
-					RecordElement2 r = list.get(0);
+					RecordElement2 r = deploylog.search(txid,
+							null, null, null, false);
+					Assert.check(r != null, "Couldn't find a log: " + txid);
 					if(isJSON)
 						ja.put(new JSONObject()
 								.put("txid", txid)
@@ -216,7 +212,7 @@ public class HistoryCommandImpl extends OdenCommand {
 			if(isJSON)
 				out.println(ja.toString());
 			else if(consoleResult.length() > 0)
-				out.println(consoleResult);			
+				out.println(consoleResult);
 		}catch(OdenException e){
 			if(isJSON){
 				err.println(JSONUtil.jsonizedException(e));
@@ -232,7 +228,7 @@ public class HistoryCommandImpl extends OdenCommand {
 				Logger.log(LogService.LOG_ERROR, e.getMessage(), e);	
 			}
 		}
-
+		System.gc();
 	}
 	
 	private void appendDetails(JSONObject jo, Set<DeployFile> deployFiles) {
@@ -252,17 +248,16 @@ public class HistoryCommandImpl extends OdenCommand {
 
 	private String redeploy(final String id, boolean isSync, String user) throws OdenException {
 		// composite deploy job & schedule it
-		Job j = new TaskDeployJob2(context, user,
+		Job j = new TaskDeployJob(context, user,
 				getName() + " " + REDEPLOY_ACTION + " " + id,
 				new DeployFileResolver() {
 					public Set<DeployFile> resolveDeployFiles() throws OdenException {
 						// get deployfiles from the history regarding the specified id.
-						List<RecordElement2> list = deploylog.search(id, null, null, null, null, null, false);
-						if(list.size() != 1)
-							throw new OdenException("Fail to find a history for " + id);
+						RecordElement2 r = deploylog.search(id, null, null, null, false);
+						Assert.check(r != null, "Fail to find a history for " + id);
 						
 						// filter deployfiles to get the failed files & their related files.
-						return DeployFileUtil.filterToRedeploy(list.get(0).getDeployFiles());
+						return DeployFileUtil.filterToRedeploy(r.getDeployFiles());
 					}
 				});
 		
@@ -342,11 +337,11 @@ public class HistoryCommandImpl extends OdenCommand {
 	private Set<DeployFile> undoFiles(String id, Map<AgentLoc, String> paths) throws OdenException {
 		Set<DeployFile> undos = new ArraySet<DeployFile>();
 		
-		List<RecordElement2> record = deploylog.search(id, null, null, null, null, null, false);
-		if(record.size() != 1 || record.get(0).getDeployFiles().size() == 0)
+		RecordElement2 record = deploylog.search(id, null, null, null, false);
+		if(record == null)
 			throw new OdenException("Couldn't retrieve the history : " + id);
 		
-		for(DeployFile f : record.get(0).getDeployFiles()){
+		for(DeployFile f : record.getDeployFiles()){
 			boolean matched = false;
 			for(AgentLoc loc : paths.keySet()){
 				if(f.getAgent().equals(loc) && f.getPath().equals(paths.get(loc))){
@@ -439,7 +434,7 @@ public class HistoryCommandImpl extends OdenCommand {
 	}
 
 	public String getShortDescription() {
-		return "inquiry deploy logs.";
+		return "list / re-deploy / undo Finished Tasks";
 	}
 
 	public String getUsage() {
@@ -447,16 +442,17 @@ public class HistoryCommandImpl extends OdenCommand {
 	}
 
 	public String getFullUsage() {
-		return getName() + " " + Cmd.INFO_ACTION + " [-d[ate] <start-date: yyyyMMdd> <end-date: yyyyMMdd>]" + "\n" +
-				getName() + " " + Cmd.SHOW_ACTION + " [<txid> | -d[ate] <start-date: yyyyMMdd> <end-date: yyyyMMdd>]" +
+		return getName() + " " + Cmd.INFO_ACTION + " -d[ate] <start-date: yyyyMMdd> [<end-date: yyyyMMdd>]" + 
+				"\n\t[-u[ser] <user-access-ip>] " +				
+				"\n\t[-f[ailonly]]" + "\n" +
+				getName() + " " + Cmd.SHOW_ACTION + " [<txid>]" +
 				"\n\t[-u[ser] <user-access-ip>] " +
 				"\n\t[-a[gent] <host-name>] " +
 				"\n\t[-p[ath] <path>] " +
 				"\n\t[-f[ailonly]]" + 
 				"\n" + getName() + " " + UNDO_ACTION + " <txid> -sync" +
 				"\n\t[-p[ath] <agent-name>:<absolute-path> <file-path> ...]" +
-				"\n" + getName() + " " + REDEPLOY_ACTION + " <txid> -sync";
-				
+				"\n" + getName() + " " + REDEPLOY_ACTION + " <txid> -sync";		
 	}
 	
 }

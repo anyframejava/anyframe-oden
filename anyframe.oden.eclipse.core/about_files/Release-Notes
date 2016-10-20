@@ -1,4 +1,27 @@
+============================================================
+Version 1.2.0 - May 12, 2010
 
+Improvements
+ * [ODEN-322] - Anyframe Common Plug-in 3.1.0으로 버전 수정, Log4j 및 Common-logging 삭제
+ * [ODEN-323] - 적용 사이트 특화 Plug-in 기능 분리
+ 
+# 1.2.0 버전은 Anyframe Oden Server 1.2.0 버전과 호환이 가능합니다.
+
+============================================================
+Version 1.1.0 - February 11, 2010
+
+Improvements
+ * [ODEN-247] - Oden History View에서 오류 발생시 오류 내용을 Tooltip을 통해 제공한다.
+ * [ODEN-278] - History view 상에서  Redeploy할 수 있도록 기능을 추가한다. 
+ * [ODEN-279] - Job Manager File Request 처리 로직 변경한다.
+ * [ODEN-285] - Eclipse plug in UI 상에서 계정 및 암호를 입력 할 수 있는 기능을 추가한다.
+ * [ODEN-302] - Policy 내에서 삭제 기능 수행할 수 있는 옵션을 추가한다.
+ * [ODEN-247] - Oden History View에서 오류 발생시 오류 내용을 Tooltip을 통해 제공한다.
+
+New Features
+ * [ODEN-276] - Oden Dashboard 작성  
+ 
+ 
 ============================================================
 Version 1.0.0 - November 16, 2009
 

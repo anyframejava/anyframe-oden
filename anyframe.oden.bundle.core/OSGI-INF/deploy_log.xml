@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="DeployLog" immediate="true" >
-	<implementation class="anyframe.oden.bundle.core.record.DeployLogImpl2"/>
+	<implementation class="anyframe.oden.bundle.core.record.DeployLogImpl"/>
 	<service>
-		<provide interface="anyframe.oden.bundle.core.record.DeployLogService2"/>
+		<provide interface="anyframe.oden.bundle.core.record.DeployLogService"/>
 	</service>	
 </component>

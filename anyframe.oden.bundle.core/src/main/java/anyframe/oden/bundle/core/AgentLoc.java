@@ -22,8 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import anyframe.oden.bundle.common.FileUtil;
-import anyframe.oden.bundle.common.JSONizable;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.common.Utils;
+import anyframe.oden.bundle.core.command.JSONizable;
 import anyframe.oden.bundle.core.config.AgentElement;
 import anyframe.oden.bundle.core.config.AgentLocation;
 import anyframe.oden.bundle.core.config.OdenConfigService;
@@ -209,6 +210,11 @@ public class AgentLoc implements JSONizable, Serializable{
 				return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Utils.hashCode(agentAddr, agentName, location);
 	}
 	
 	private boolean equals(String s0, String s1){

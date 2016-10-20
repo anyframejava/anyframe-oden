@@ -108,8 +108,7 @@ class FTPConnectionPool {
 		if(conn != null){
 			try{
 				conn.logout();
-				conn.disconnect();
-//System.out.println("disconnected to ftp: " + Thread.currentThread().getId());				
+				conn.disconnect();				
 				pool.remove(key);
 			}catch(IOException e){}
 		}
