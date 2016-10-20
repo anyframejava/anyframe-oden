@@ -1,0 +1,3 @@
+# Run
+# Configuration file: conf/oden.ini
+java -jar bin/anyframe.oden.bundle.jar [-port <port>]

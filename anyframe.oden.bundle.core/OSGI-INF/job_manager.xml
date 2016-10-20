@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="JobManager" immediate="true" >
+	<implementation class="anyframe.oden.bundle.core.job.JobManagerImpl"/>
+	<service>
+		<provide interface="anyframe.oden.bundle.core.job.JobManager"/>
+	</service>
+</component>

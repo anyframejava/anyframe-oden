@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="RepositoryProvider" immediate="true">
+   <implementation class="anyframe.oden.bundle.core.RepositoryProviderImpl"/>
+   <service>
+      <provide interface="anyframe.oden.bundle.core.RepositoryProviderService"/>
+   </service>
+   <reference name="REPOSITORY_SERVICE"
+         interface="anyframe.oden.bundle.repository.RepositoryService"
+         cardinality="0..n"
+         policy="dynamic"
+         bind="addRepositoryService"
+         unbind="removeRepositoryService"
+   />
+</component>   
+

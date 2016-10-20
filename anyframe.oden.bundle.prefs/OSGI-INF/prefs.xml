@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="Prefs" immediate="true" >
+	<implementation class="anyframe.oden.bundle.prefs.PrefsServiceImpl"/>
+	<service>
+		<provide interface="anyframe.oden.bundle.prefs.PrefsService"/>
+	</service>
+   <reference name="PREFERENCES_SERVICE"
+         interface="org.osgi.service.prefs.PreferencesService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setPrefsService"
+   />	
+</component>

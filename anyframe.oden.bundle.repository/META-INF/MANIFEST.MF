@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Repository
+Bundle-SymbolicName: anyframe.oden.bundle.repository
+Bundle-Version: 1.0.0
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: anyframe.oden.bundle.common,
+ org.kxml2.io,
+ org.osgi.service.component;version="1.0.0",
+ org.xmlpull.v1
+Export-Package: anyframe.oden.bundle.repository
+Service-Component: OSGI-INF/file_system_repository.xml, OSGI-INF/ftp_repository.xml
+Bundle-ClassPath: .,
+ lib/commons-net-1.4.1.jar,
+ lib/jakarta-oro-2.0.8.jar

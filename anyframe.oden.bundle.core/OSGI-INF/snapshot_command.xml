@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="SnapshotCommand" immediate="true" >
+	<implementation class="anyframe.oden.bundle.core.command.SnapshotCommandImpl"/>
+	<service>
+		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
+	</service>
+   <reference name="PERSISTENCE_SERVICE"
+         interface="anyframe.oden.bundle.prefs.PrefsService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setPrefsService"
+   />
+   <reference name="ODEN_CONFIG_SERVICE"
+         interface="anyframe.oden.bundle.core.config.OdenConfigService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setConfigService"
+   />   
+   <reference name="TRANSMITTER_SERVICE"
+         interface="anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
+   />
+   <reference name="DEPLOY_LOG_SERVICE"
+         interface="anyframe.oden.bundle.core.record.DeployLogService2"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setDeployLogService"
+   />
+</component>

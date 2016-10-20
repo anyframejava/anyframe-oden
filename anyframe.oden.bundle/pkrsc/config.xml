@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oden>
+	<agents>
+		<agent name="%agentName%">
+			<address host="%agentHost%" port="9862"/>
+			<default-location value="%agentLoc%"/>
+		</agent>
+	</agents>
+</oden>

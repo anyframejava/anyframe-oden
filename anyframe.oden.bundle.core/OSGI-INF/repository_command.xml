@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="RepositoryCommand" immediate="true" >
+	<implementation class="anyframe.oden.bundle.core.command.RepositoryCommandImpl"/>
+	<service>
+		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
+	</service>
+	<reference name="REPOSITORY_PROVIDER_SERVICE"
+         interface="anyframe.oden.bundle.core.RepositoryProviderService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setRepositoryProvider"
+   />
+</component>
