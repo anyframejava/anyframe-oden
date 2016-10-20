@@ -1,0 +1,32 @@
+<section id="concepts_deployingitems">
+	<title>Deploying Items</title>
+
+	<para>
+		Oden은 배포할 파일이 존재하는 위치(Source)와 파일이 배포될 경로들(Target)을 묶어
+		Job형태로 관리한다. 배포 실행은 Job단위로 이루어 진다. 
+	</para>
+	
+	<section id="concepts_deployingitems_jobs">
+		<title>Job</title>
+
+		<para>
+			 어디에서 어디로 배포할 것인지에 대해 기술된 배포 설정. 하나의 Source와 여러개의 Target으로 이루어 짐.
+		</para>
+	</section>
+	
+	<section id="concepts_deployingitems_policies">
+		<title>Source</title>
+
+		<para>배포할 파일이 존재하는 경로. Oden Server가 설치된 시스템에 존재. 
+		</para>
+	</section>
+
+	<section id="concepts_deployingitems_tasks">
+		<title>Target</title>
+
+		<para>
+			파일이 배포될 위치를 말함. 해당 시스템에 Agent가 설치되어 있어야 함.
+		</para>
+	</section>
+	
+</section>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="DeployCommand" immediate="true" >
+	<implementation class="org.anyframe.oden.bundle.job.DeployCommandImpl"/>
+	<service>
+		<provide interface="org.anyframe.oden.bundle.gate.CustomCommand"/>
+	</service>
+	<reference name="REPOSITORY_PROVIDER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.RepositoryProviderService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setRepositoryProvider"
+	/>
+	<reference name="JOB_MANAGER"
+		interface="org.anyframe.oden.bundle.core.job.JobManager"
+		cardinality="1..1"
+		policy="dynamic"
+		bind="setJobManager"
+	/>
+	<reference name="JOB_LOGGER_SERVICE"
+         interface="org.anyframe.oden.bundle.job.log.JobLogService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setJobLogService"
+	/>
+	<reference name="ODEN_CONFIG_SERVICE"
+         interface="org.anyframe.oden.bundle.job.config.JobConfigService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setJobConfigService"
+	/>
+	<reference name="TRANSMITTER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
+	/>
+	<reference name="PAGE_HANDLER"
+         interface="org.anyframe.oden.bundle.job.page.PageHandler"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setPageHandler"
+	/>
+ <reference bind="setExecCommand" cardinality="1..n" interface="org.anyframe.oden.bundle.gate.CustomCommand" name="EXEC_COMMAND" policy="dynamic"/>
+</component>

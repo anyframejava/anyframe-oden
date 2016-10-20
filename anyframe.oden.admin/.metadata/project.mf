@@ -1,2 +1,0 @@
-project.name=anyframe.oden.admin
-package.name=anyframe.oden.admin

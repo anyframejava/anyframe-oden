@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="KeyGenerator" immediate="true" >
+	<implementation class="org.anyframe.oden.bundle.core.keygen.DateKeyGenerator"/>
+	<service>
+		<provide interface="org.anyframe.oden.bundle.core.keygen.KeyGenerator"/>
+	</service>	
+</component>

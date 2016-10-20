@@ -1,0 +1,567 @@
+<section id="workingwithodenadmin_job">
+	<title>Job</title>
+
+	<para>
+		Job is an Oden deployment setting unit that states from where to where Job will be deployed. 
+		Job consists of one SOURCE and several Targets. 
+		SOURCE is the path where the file to be deployed is located (build server), 
+		and Target is the path that the file will be deployed to (development or management server).
+	</para>
+
+	<section id="workingwithodenadmin_job_list">
+		<title>Job List</title>
+		
+		<para>
+			Job list view shows the list of Jobs that are registered. 
+			Job Name shows the name of saved Job. Different Jobs should not have the same name. 
+			When you click the name, you will move to the Job modification view. 
+			Job Status shows whether Job deployment has recently succeeded. 
+			Green means success, and red means failure. 
+			Job Action shows the icons that execute the actions related to Job. 
+			The actions of each Action icon is as the below table.
+		</para>
+	
+		<para>
+			<table>
+				<title>Job Actions</title>
+				<tgroup cols="3">
+					<thead>
+						<row>
+							<entry>Icon</entry>
+							<entry>Name</entry>
+							<entry>Description</entry>
+						</row>
+					</thead>
+					<tbody>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_deploy.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_deploy">Job Deploy</link>
+							</entry>
+							<entry align="left">
+								Button that is generally used for deployment. 
+								You can check the files to be deployed in advance. 
+								Deployment targets can be files that have been changed after the last deployment, 
+								or files that have to be deleted among the already-deployed files. 
+							</entry>
+						</row>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_cleandeploy.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_cleandeploy">Job Clean Deploy</link>
+							</entry>
+							<entry align="left">
+								In most cases the above Deploy is used. 
+								But if that is not enough, all files will be deleted and deployed again. 
+							</entry>
+						</row>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_compare.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_compare">Compare Targets</link>
+							</entry>
+							<entry align="left">
+								When there are several Target Servers, 
+								you might wonder whether the deployed files are really the same. 
+								Compare Targets function compares files in Target Servers and checks if they are the same. 
+								This functions works only when there are two Target Servers or more.
+							</entry>
+						</row>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_runscript.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_script">Run Script</link>
+							</entry>
+							<entry align="left">
+								This command can be used when a specific command or script runs in Target Server. 
+								It is generally used for stopping server before deployment, starting server after deployment, etc. 
+								To used this function, register the command to be executed in Job Command in advance.
+							</entry>
+						</row>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_del.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_addremove_remove">Delete Job</link>
+							</entry>
+							<entry align="left">
+								Deletes the related Job.
+							</entry>
+						</row>
+						<row>
+							<entry align="center">
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="../image/WorkingWithOdenAdmin/job_rollback.gif"
+											align="center" />
+									</imageobject>
+								</mediaobject>
+							</entry>
+							<entry align="left">
+								<link linkend="workingwithodenadmin_job_rollback">Job Rollback</link>
+							</entry>
+							<entry align="left">
+								해당 Job의 최근 배포작업을 원복한다.
+							</entry>
+						</row>
+					</tbody>
+				</tgroup>
+			</table>
+		</para>
+	</section>
+
+	<section id="workingwithodenadmin_job_addremove">
+		<title>Add and Remove Job</title>
+
+		<para>
+			With the Add button on the upper right part of the Job list view, you can register a new Job. 
+			You can also search and update a registered Job by selecting the Job name. 
+			You can delete the related job by clicking the Action recycle bin icon.
+		</para>
+
+		<section id="workingwithodenadmin_job_addremove_add">
+			<title>Add Job</title>
+
+			<para>
+				If you click the Job add button or previous Job name on the upper right part of the Job list view, 
+				you will move to the Job detail view.
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">Job Name</emphasis>
+					</para>
+					<para>
+						Enter the Job name. This is the only key to tell the difference between Jobs, 
+						so make sure that it does not duplicated with previous Job names.
+				</para>
+				</listitem>
+			</itemizedlist>
+
+			<section id="workingwithodenadmin_job_addremove_add_source">
+				<title>SOURCE</title>
+
+				<para>
+					Section to enter the path of file to be deployed (build server). 
+					Oden Server is installed in build server, so you can write the path the deployed file exists in as absolute path. 
+					Among SOURCE items, you should enter Directory item.
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">Directory</emphasis>
+						</para>
+						<para>
+							Enter the highest path among the paths that include deployment file as the absolute path. 
+							The folders and files under this path are transferred to Target as they are. 
+							Therefore, folders and files under this directory should be in a format that will be deployed.
+						</para>
+						<programlisting><![CDATA[ex> c:/anyframe/target(Windows)
+    /anyframe/target(Unix)]]></programlisting>
+    					<para>
+    						In Windows, backslash can be used when separating folder.
+    					</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Excludes(optional)</emphasis>
+						</para>
+						<para>
+							Enter the conditions of files to be excluded from deployment. 
+							Separate with spaces when there are two conditions or more. 
+						</para>
+						<programlisting><![CDATA[ex> **/*.jar **/.svn/**
+    (Exclude all jar files and all files under .svn folder)]]></programlisting>
+    					<para>
+    						** indicates all child folders. * indicates the current folder. 
+    						For instance, **/*.jar means that deployment will be done excluding all jar files in child folder. 
+    						**/.svn/** means all folders that have .svn are excluded.
+    					</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Mappings(optional)</emphasis>
+						</para>
+						
+						<para>
+							Mapping should be set to deploy only changed files. 
+							For instance, when deploying *.class file, you can check changes by using *.java file information before build.
+						</para>
+						
+						<para>
+							In case of Anyframe project, 
+							you can find mapping information by analyzing folder structures using the Auto Mapping button. 
+							However, take note that all previous mapping information will be deleted. 
+							To use Auto Mapping information, Job should be registered in server. 
+							Therefore, set job completely, save, come back to Job, and click the Auto Mapping button.
+						</para>
+						
+						<note>
+							<para>
+								Generally, the previously built resource and class files are all deleted or re-built during build, or they are copied. 
+								Therefore, not only changed files, but all files are newly created, 
+								so the date of all files are changed to the current date. 
+								Oden senses changed files through the file timestamp. 
+								In the above case, the date of all files change, so you can think that all files have changed. 
+								However, in case of the original file (the original of class file is java file) before build, 
+								the date of only the changed files have been changed. 
+								So, you can see which files have been changed through Oden. 
+								In Mappings, you write the path of original file, not the files to be deployed. 
+								(When downloading java file for configuration management, the date of unchanged files remain the same, 
+								because only the changed files are downloaded.)
+							</para>
+							<para>
+								If this is hard to understand, you can find most mapping information by simply clicking the Auto Mapping button. 
+								Auto Mapping can get mapping information based on the WEB-INF folder, 
+								so when there is no WEB-INF folder in the deployment target folder, you will see no results. 
+							</para>
+							<para>
+								In case of general resource files that are not .class file, 
+								you can sense only changed files without mapping by setting ant copy tag as preservelastmodified="true" 
+								when copying from original directory to build directory. 
+							</para>
+						</note>
+						
+						<para>
+							If you look into the web application format, 
+							there are only class files in WEB-INF/classes folder. 
+							We deploy those files to Target Server. 
+							WEB-INF/classes is a result of building src file. 
+							Write WEB-INF/classes, and src path in Mappings. 
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									<emphasis role="bold">SUB DIRECTORY</emphasis>
+								</para>
+								<para>
+									Write relative class below the path written in Directory of SOURCE section. 
+									If you write WEB-INF/classes, the real path becomes SOURCE Directory path + WEB-INF/classes.
+								</para>
+								<programlisting><![CDATA[ex> WEB-INF/classes]]></programlisting>
+							</listitem>
+							<listitem>
+								<para>
+									<emphasis role="bold">SCM MAPPING DIRECTORY</emphasis>
+								</para>
+								<para>
+									SUB DIRECTORY has file to be deployed. Write the path of the original files before build or copy. 
+									Even if it is not class file, write the path of the original file before copy if the file was copied.
+								</para>
+								<programlisting><![CDATA[ex> c:/anyframe/src/main/java(Windows)
+    /anyframe/src/main/java(Unix)]]></programlisting>
+							</listitem>
+						</itemizedlist>
+						
+						<note>
+							<para>
+								If there are two src folders which are src/main/java and src/main/resource, 
+								they will all go to WEB-INF/classes folder after build. 
+								Also, write mapping information as WEB-INF/classes - src/main/java and 
+								WEB-INF/classes - src/main/resource
+							</para>
+						</note>
+			
+					</listitem>
+				</itemizedlist>
+			</section>
+
+			<section id="workingwithodenadmin_job_addremove_add_targets">
+				<title>Targets</title>
+				<para>
+					Section to enter Target Server (development or source server) that file will be deployed to. 
+					Oden should run in Agent mode in Target Server. More that one should be entered.
+			</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">STATUS</emphasis>
+						</para>
+						<para>
+							If you enter all Target Servers, save, and search Job again, you will see a light on the STATUS item. 
+							Green light means that Target Server and Oden Agent is connected properly, 
+							and grey light means that the target server and Oden Agent cannot be connected. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">NAME</emphasis>
+						</para>
+						<para>
+							Define the name that Target Server states. 
+							The name should not duplicated with another Target in the same Job.  
+							The name can duplicated with a Target in another Job.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">URL</emphasis>
+						</para>
+						<para>
+							Section to enter the URL of Target Server. 
+							Should be entered in ip:port or domain:port format. 
+							Oden Agent appears on port, and the default value is 9872.
+						</para>
+						<programlisting><![CDATA[ex> 127.0.0.1:9872]]></programlisting>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">PATH</emphasis>
+						</para>
+						<para>
+							Section that shows where in the Target Server the file will be deployed in. 
+							If you deploy, the files and folders under SOURCE Directory will be transferred to under this PATH. 
+						</para>
+						<programlisting><![CDATA[ex> d:/anyframe/oden/server/webapp(Windows)
+    /anyframe/oden/server/webapp(Unix)]]></programlisting>
+					</listitem>
+				</itemizedlist>
+				
+				<note>
+					<para>
+						Target and Oden Agent is not mapped 1:1. 
+						Only Oden Agent needs to run on the system that Target indicates. 
+						Therefore, one Oden Agent can be mapped with several Targets. 
+						For instance, when a file has to be deployed to several paths of a specific system, 
+						several Targets can be registered with different PATHs. 
+					</para>
+				</note>
+				
+			</section>
+
+			<section id="workingwithodenadmin_job_addremove_add_commands">
+				<title>Commands(optional)</title>
+				<para>
+					You can run a specific command or script in a system defined in Target. 
+					The command you wish to execute should be registered in Commands. 
+					The registered command can be executed by clicking the Run Script icon on the Job list view. 
+			</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">NAME</emphasis>
+						</para>
+						<para>
+							Refers to command. Should not duplicated with other Commands names in the same Job. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">PATH</emphasis>
+						</para>
+						<para>
+							Enter that location the command will be executed. 
+							When executing dir command, 
+							you should enter here where you wish it will be executed. 
+							If you want to execute catalina.bat of Tomcat, 
+							enter the path in which catalina.bat exists. 
+						</para>
+						<programlisting><![CDATA[ex> c:/anyframe/util/tomcat/bin(Windows)
+    /anyframe/util/tomcat/bin(Unix)]]></programlisting>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">SCRIPT</emphasis>
+						</para>
+						<para>
+							Enter the command or script to be executed. 
+							Parameter can be entered after the command. 
+							When entering command or script, ./ should not be used as in ./startup.sh.
+						</para>
+						<programlisting><![CDATA[ex> startup.bat(Windows) startup.sh(Unix)]]></programlisting>
+					</listitem>
+				</itemizedlist>
+			</section>
+			
+			<warning>
+				<title>Warning</title>
+				<para>To register Job properly, 
+				enter one or more Job Names, Directories, and Targets.</para>
+			</warning>
+			
+		</section>
+
+		<section id="workingwithodenadmin_job_addremove_remove">
+			<title>Delete Job</title>
+
+			<para>
+				You can delete Job by clicking the Job recycle bin icon on the Job list view. 
+			</para>
+
+			<note>
+				<para>
+					Only Admin role account can use this function, so that Job is not deleted by anyone. 
+				</para>
+			</note>
+		</section>
+
+	</section>
+
+	<section id="workingwithodenadmin_job_deploy">
+		<title>Job Deploy</title>
+
+		<para>
+			Check the list of files that will be deployed. Among them, only some can be deployed or deleted. 
+			To see all files to be deployed, selected All of Deploy Scope, 
+			and to see only the changed files after deployment, select Modified only. 
+			Check Delete if you with to see the files to be deployed that exist in Target but not in SOURCE. 
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">Modified Only</emphasis>
+				</para>
+				<para>
+					Select this when you want to deploy only changed files. 
+					When setting Job, if Mapping information is not set properly, 
+					you can see not only the changed files but also the unchanged files. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">All</emphasis>
+				</para>
+				<para>
+					Recognizes all files under deployment Directory, regardless of whether or not they were changed. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Delete</emphasis>
+				</para>
+				<para>
+					Option that decides whether to delete of ignore when an unnecessary file is included in Target 
+					comparing Target with SOURCE. 
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			After selecting deployment options, 
+			you can check the list of deployment targets using the Preview button. 
+			If there is an item you wish to remove from the deployment target list, 
+			the item will not be deployed or deleted when you click the X on the right side of the item
+		</para>
+		
+		<para>
+			Deploy button deploys only the files shown on the page, 
+			and Deploy All deploys the files on all pages. 
+			However, it is impossible to deploy while excluding some files by clicking the X button when deploying with the Deploy All button. 
+			Even when clicked, all files will be deployed. 
+			If you wish to deploy or delete excluding only a few files, 
+			click the Deploy button and execute deploy or delete. 
+			If you click the Deploy button, the page will not change at first, 
+			and after the deployment ends, the page will show a list of items that have not completed deployment. 
+		</para>
+		
+		<para>
+			If you execute deployment through Deploy All, you will see a pop-up. 
+			In this pop-up, you can set which command to execute among the script commands registered in Job after deployment. 
+			If you wish to run script after deployment, select the related script and carry out deployment. 
+			If you wish to do only deployment, select None and carry out deployment. 
+			Then, no script will be executed after deployment.
+		</para>
+	</section>
+
+
+	<section id="workingwithodenadmin_job_cleandeploy">
+		<title>Job Clean Deploy</title>
+
+		<para>
+			Command to initialize Target Server directory and synchronize to current Oden Server status. 
+			In other words, this commands deletes all files in Target Server and deploys all files in SOURCE to the related server. 
+			However, unlike Deploy, it does not support preview and there are no options to choose from. 
+			Note that deployment is carried out the moment you click the icon. 
+		</para>
+	</section>
+
+	<section id="workingwithodenadmin_job_compare">
+		<title>Compare Targets</title>
+
+		<para>
+			View to check the consistency among Target Servers. 
+			It checks if the files deployed in Targets match or not, and shows results. 
+			It shows the list of files that do not match, 
+			and when you uncheck the Failed Only button on the upper right side, 
+			you can see all the files deployed in Targets including the matching ones. 
+			The following can be files that do not match.
+		</para>
+		<itemizedlist>
+			<listitem><para>When not included in some targets among the searched targets.</para></listitem>
+			<listitem><para>When the file exists but the file size is wrong.</para></listitem>
+			<listitem><para>When the file exists but the Timestamp of the file is wrong.</para></listitem>
+		</itemizedlist>
+	</section>
+
+	<section id="workingwithodenadmin_job_script">
+		<title>Run Script</title>
+
+		<para>
+			View that executes registered Command when setting Job. 
+			Generally used for executing commands such as stopping server before deployment and starting server after deployment. 
+			This view can be accessed when at least one or more Commands are registered when setting Job. 
+			In the script view, first select the Targets to execute command, 
+			and then click the arrow icon of the command to be executed from the right Command list to execute the command. 
+			When the location of script to execute is different for each Target, 
+			you can enter the relative path instead of the absolute path in the PATH item of Commands when setting Job. 
+		</para>
+
+		<para>
+			Commands like dir end right away, so the results are shown when the command ends. 
+			However, when it is the same as the command that runs application, etc., 
+			the command does not end until the application ends. 
+			So, Oden view shows results for only 15 seconds and retreats, and the process runs in the background of the system. 
+			You can check the process through Unix ps command or Windows task manager, etc. 
+			The 15 seconds waiting time can be changed in exec.timeout property of core/conf/oden.ini.
+		</para>
+		
+	</section>
+	
+		<section id="workingwithodenadmin_job_rollback">
+		<title>Job Rollback</title>
+
+		<para>
+			최근 배포한 파일을 원복 하는 명령이다. Admin 화면에서는 최신 배포만 기능을 제공 하며 이전의 배포 작업의 원복을 원할 경우는  Web Console에서 deploy undo txid를 직접 입력하여 수행한다. 
+		</para>
+
+	</section>
+</section>

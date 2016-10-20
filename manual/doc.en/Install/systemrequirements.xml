@@ -1,0 +1,55 @@
+<section id="install_systemrequirements">
+	<title>System Requirements</title>
+
+	<para>
+		Requirements for Oden installation are as the following.	
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				Oden Server and Agent installation requirement 
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						20MB or more hard disk 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						512MB RAM or more 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				Oden Admin installation requirement 
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						30MB ore more hard disk 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						256MB RAM or more 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+	</itemizedlist>
+
+</section>

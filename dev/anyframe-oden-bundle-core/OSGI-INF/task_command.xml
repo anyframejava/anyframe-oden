@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="TaskCommand" immediate="true" >
+	<implementation class="org.anyframe.oden.bundle.core.command.TaskCommandImpl"/>
+	<service>
+		<provide interface="org.anyframe.oden.bundle.gate.CustomCommand"/>
+	</service>
+	<reference name="REPOSITORY_PROVIDER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.RepositoryProviderService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setRepositoryProvider"
+   />
+   <reference name="PERSISTENCE_SERVICE"
+         interface="org.anyframe.oden.bundle.core.prefs.PrefsService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setPrefsService"
+   />
+   <reference name="ODEN_CONFIG_SERVICE"
+         interface="org.anyframe.oden.bundle.core.config.OdenConfigService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setConfigService"
+   />
+   <reference name="POLICY_COMMAND"
+         interface="org.anyframe.oden.bundle.gate.CustomCommand"
+         cardinality="1..n"
+         policy="dynamic"
+         bind="setPolicyCommand"
+   />
+   <reference name="DEPLOY_LOG_SERVICE"
+         interface="org.anyframe.oden.bundle.core.record.DeployLogService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setDeployLogService"
+   />
+   <reference name="JOB_MANAGER"
+         interface="org.anyframe.oden.bundle.core.job.JobManager"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setJobManager"
+   />
+</component>

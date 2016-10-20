@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+[
+<!ENTITY overview_introduction SYSTEM "Overview/introduction.xml">
+<!ENTITY overview_keyfeatures SYSTEM "Overview/keyfeatures.xml">
+<!ENTITY overview_support SYSTEM "Overview/support.xml">
+
+<!ENTITY concepts_architecture SYSTEM "Concepts/architecture.xml">
+<!ENTITY concepts_serversandagents SYSTEM "Concepts/serversandagents.xml">
+<!ENTITY concepts_deployingitems SYSTEM "Concepts/deployingitems.xml">
+<!ENTITY concepts_userinterface SYSTEM "Concepts/userinterface.xml">
+
+<!ENTITY install_systemrequirements SYSTEM "Install/systemrequirements.xml">
+<!ENTITY install_installinganyframeoden SYSTEM "Install/installinganyframeoden.xml">
+
+<!ENTITY workingwithcommandline_introductiontoodenshell SYSTEM "WorkingWithCommandLine/introductiontoodenshell.xml">
+<!ENTITY workingwithcommandline_odenshellcommands SYSTEM "WorkingWithCommandLine/odenshellcommands.xml">
+
+<!ENTITY workingwithodenadmin_introductionodenadmin SYSTEM "WorkingWithOdenAdmin/introdudctionodenadmin.xml">
+<!ENTITY workingwithodenadmin_job SYSTEM "WorkingWithOdenAdmin/job.xml">
+<!ENTITY workingwithodenadmin_history SYSTEM "WorkingWithOdenAdmin/history.xml">
+<!ENTITY workingwithodenadmin_status SYSTEM "WorkingWithOdenAdmin/status.xml">
+<!ENTITY workingwithodenadmin_log SYSTEM "WorkingWithOdenAdmin/log.xml">
+<!ENTITY workingwithodenadmin_user SYSTEM "WorkingWithOdenAdmin/user.xml">
+
+
+]
+>
+
+	<!--
+		Licensed to the Apache Software Foundation (ASF) under one or more
+		contributor license agreements. See the NOTICE file distributed with
+		this work for additional information regarding copyright ownership.
+		The ASF licenses this file to you under the Apache License, Version
+		2.0 (the "License"); you may not use this file except in compliance
+		with the License. You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+
+<book lang="ko">
+	<title>Anyframe Oden</title>
+
+	<bookinfo>
+
+		<copyright>
+			<year>2009-2011</year>
+			<holder>삼성SDS</holder>
+		</copyright>
+
+		<releaseinfo>version 2.2.0</releaseinfo>
+		
+		<productname>Anyframe Oden</productname>
+
+		<pubdate lang="en">2011.06.30</pubdate>
+
+		<authorgroup>
+			<corpauthor></corpauthor>
+		</authorgroup>
+
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="../image/common/logo_pdf.jpg" />
+			</imageobject>
+		</mediaobject>
+		<legalnotice>
+			<para>본 문서의 저작권은 삼성SDS에 있으며 Anyframe 오픈소스 커뮤니티 활동의 목적하에서 자유로운 이용이 가능합니다.
+			본 문서를 복제, 배포할 경우에는 저작권자를 명시하여 주시기 바라며 본 문서를 변경하실 경우에는 
+			원문과 변경된 내용을 표시하여 주시기 바랍니다. 
+			원문과 변경된 문서에 대한 상업적 용도의 활용은 허용되지 않습니다.
+			본 문서에 오류가 있다고 판단될 경우 이슈로 등록해 주시면 적절한 조치를 취하도록 하겠습니다.
+			</para>
+		</legalnotice>
+	</bookinfo>
+
+	<chapter id="overview">
+		<title>Overview</title>
+		<para>
+			Anyframe Open Deployment ENvironment (이하 Oden)
+			<footnote>
+				<para>
+					Oden은 OSGi, Eclipse 등 Java 기술을 활용하고 있으며, 손쉽게 확장이 가능한 개방형
+					아키텍처를
+					지향한다. 더불어
+					각종 UNIX, Mac OS X, Microsoft Windows 등 다양한 플랫폼 환경을
+					지원한다.
+				</para>
+			</footnote>
+			은 CI
+			<footnote>
+				<para>
+					Continuous Integration: 빌드, 테스트, 배포 등의 일련의 절차를 통합/자동화함으로써
+					소프트웨어
+					딜리버리의 시간을
+					단축시키는 기법 및 이를 가능하게 하는 것
+			</para>
+			</footnote>
+			환경을 통해 빌드된
+			어플리케이션 컴포넌트 및 각종 설정파일, 웹파일 등을 원하는 배포대상서버에 편리하게 배포할 수
+			있도록 하는
+			배포관리 툴이다.
+			본 장에서는 Oden의 개발 배경 및 주요 특징에 대한 간략한 소개를 제공한다.
+		</para>
+		
+		&overview_introduction;
+		&overview_keyfeatures;
+		&overview_support;
+	</chapter>
+ 
+	<chapter id="concepts">
+		<title>Concepts</title>
+		<para>
+			본 장에서는 Oden에 대한 보다 상세한 이해를 돕기 위해, Oden에서 지향하는 아키텍처의 형태 및 주요
+			구성요소에 대한 소개를 제공한다. 
+		</para>
+		&concepts_architecture;
+		&concepts_serversandagents;
+		&concepts_deployingitems;
+		&concepts_userinterface;
+	</chapter>
+
+	<chapter id="install">
+		<title>Install and Configuration</title>
+		<para>
+			본 장에서는 Oden을 사용하기 위한 설치요구사항과 설치 및 설정에 대한 소개를 제공한다. 
+		</para>
+		&install_systemrequirements;
+        &install_installinganyframeoden;
+	</chapter>
+
+	<chapter id="workingwithcommandline">
+		<title>Working with Command Line</title>
+		<para>
+			Oden 명령어를 실행시키기 위해 runc라는 커맨드라인 명령어를 제공한다. runc.sh(runc.cmd) 이후에 Oden명령어를 입력하면 Oden에 명령을 전달할 수 있다.
+		</para>
+		&workingwithcommandline_introductiontoodenshell;
+		&workingwithcommandline_odenshellcommands;
+	</chapter>
+
+	<chapter id="workingwithodenadmin">
+		<title>Working with Oden Admin</title>
+		<para>
+			본 장에서는 Oden의 Web 기반 GUI 환경에 대한 보다 상세한 이해를 위한 설명을 제공한다. 
+		</para> 
+		&workingwithodenadmin_introductionodenadmin;
+		&workingwithodenadmin_job;
+		&workingwithodenadmin_history;
+		&workingwithodenadmin_status;
+		&workingwithodenadmin_log;
+		&workingwithodenadmin_user;
+	</chapter>
+
+</book>

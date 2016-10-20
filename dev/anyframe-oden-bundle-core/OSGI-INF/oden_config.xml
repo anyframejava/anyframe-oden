@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="OdenConfig" immediate="true">
+   <implementation class="org.anyframe.oden.bundle.core.config.OdenConfigImpl"/>
+   <service>
+      <provide interface="org.anyframe.oden.bundle.core.config.OdenConfigService"/>
+   </service>
+   <reference name="TRANSMITTER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
+   />
+</component>   
+

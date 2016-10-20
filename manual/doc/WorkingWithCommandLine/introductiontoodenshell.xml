@@ -1,0 +1,15 @@
+<section id="workingwithcommandline_introductiontoodenshell">
+	<title>Introduction to Oden Command Line</title>
+	
+	<section id="workingwithcommandline_100">
+		<title>How to run Oden Commands</title>
+		<para>bin폴더의 runc.sh(혹은 runc.cmd) 명령어를 통해 Oden 명령어를 커맨드라인에서 실행시킬 수 있다.
+		</para> 
+		<programlisting><![CDATA[bin/runc.sh history info
+(Windows에서는 bin/runc.cmd history info)]]></programlisting>
+		
+		<para>웹콘솔을 통해 명령어를 실행할 수 있다.</para>
+		<programlisting><![CDATA[http://localhost:9860/wconsole.html]]></programlisting>
+		<para>9860은 Oden Server의 기본 포트이다. 웹콘솔은 Oden Admin이 아닌 Oden Server에서 제공하는 것이다.</para>
+	</section>
+</section>

@@ -1,0 +1,71 @@
+<section id="concepts_architecture">
+	<title>Architecture</title>
+
+	<para>
+		Deployment management environment using Oden consists of the following factors.
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">Server and Agent</emphasis>
+				</para>
+				<para>
+					Core module that executes various deployment-related works. 
+					Server is installed in build server, and Agent is installed in Target Server (server in which file will be deployed).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Oden Admin</emphasis>
+				</para>
+				<para>
+					GUI environment for deployment monitoring or execution
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+
+	<para>
+		Use Oden to deploy target in Target Server, and search results through log. 
+		The following is an explanation of this by each section.
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				Build deployment target through CI server
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Request deployment through command or Oden Admin
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Sense the change of the deployment target, and return the change target to Agent
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Deploy and save deployment record through Agent
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Check deployment results through command or Oden Admin
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<para>
+		The following figure shows this deployment flow.
+		<mediaobject>
+			<imageobject>
+				<title>Oden Deployment Flow</title>
+				<imagedata fileref="../image/Concepts/concepts_deploymentflow.png"
+					align="left" width="6in"/>
+			</imageobject>
+		</mediaobject>
+	</para>
+
+</section>

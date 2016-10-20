@@ -1,0 +1,55 @@
+<section id="install_systemrequirements">
+	<title>System Requirements</title>
+
+	<para>
+		Oden을 설치하기 위해서는 다음의 요구사항을 충족해야 한다.
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				Oden Server 및 Agent 설치요구사항
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						20MB 이상 하드디스크 공간 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						512MB RAM 이상
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				Oden Admin 설치요구사항
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						30MB 이상 하드디스크 공간 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						256MB RAM 이상
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+	</itemizedlist>
+
+</section>

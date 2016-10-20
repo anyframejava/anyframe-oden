@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oden> 
+   
+  
+<job name="testA">
+    <source dir="C:/ats-1.6.1/anyframe-4.6.1/applications/test" excludes=""/>
+    <target address="localhost:9872" dir="d:/test" name="t0"/>
+  </job>
+  <job name="testB">
+    <source dir="C:/workspace_dm/dm-pjt" excludes=""/>
+    <target address="localhost:9872" dir="d:/test" name="t0"/>
+  </job>
+  <job name="testC">
+    <source dir="C:/workspace_dm/dm-pjt" excludes=""/>
+    <target address="localhost:9872" dir="d:/testback" name="t0"/>
+  </job>
+<job name="test1">
+    <source dir="c:/anyframe-5.0.0/hsqldb" excludes=""/>
+    <target address="localhost:9872" dir="c:/target1" name="target1"/>
+  </job>
+  <job name="testtest">
+    <source dir="d:/eclipse-workspace/workspace/anyframe-oden-admin" excludes=""/>
+    <target address="localhost:9872" dir="c:/target1" name="target1"/>
+  </job>
+</oden>

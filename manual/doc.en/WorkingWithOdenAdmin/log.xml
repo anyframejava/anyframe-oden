@@ -1,0 +1,24 @@
+<section id="workingwithodenadmin_log">
+	<title>Log</title>
+
+	<para>
+		View to check System Log that occurs in Oden Server.
+	</para>
+
+	<section id="workingwithodenadmin_log_searchlog">
+		<title>Oden System Log</title>
+
+		<para>
+			When a problem occurs during deployment, 
+			this view helps when it is difficult to find the cause only with message, 
+			or is used for debugging by developer. 
+		    Log can be checked by date. Through it, you can see what kind of problem occurred between Oden Admin and Oden Server. 
+		</para>
+		
+		<note>
+			<para>
+				Only Admin role can use this function.
+			</para>
+		</note>
+	</section>
+</section>

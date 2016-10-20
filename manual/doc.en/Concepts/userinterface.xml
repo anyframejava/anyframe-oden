@@ -1,0 +1,25 @@
+<section id="concepts_userinterface">
+	<title>User Interface</title>
+
+	<para>
+		Oden basically provides CLI(Command Line Interface) environment, and a special GUI environment for user convenience.
+	</para>
+
+	<section id="concepts_userinterface_cli">
+		<title>Command Line Interface</title>
+
+		<para>
+			Command can be transferred to Oden through script provided in Oden Server. 
+			For more information, refer to <link linkend="workingwithcommandline">"Working with Command
+				Line"</link>.
+		</para>
+	</section>
+	
+	<section id="concepts_userinterface_gui">
+		<title>Graphical User Interface</title>
+
+		<para>
+			GUI environment called <link linkend="workingwithodenadmin">Oden Admin</link> is provided to use Oden more conveniently.
+		</para>
+	</section>
+</section>

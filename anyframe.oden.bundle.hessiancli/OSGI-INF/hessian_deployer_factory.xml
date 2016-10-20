@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="HessianDeployerFactory" immediate="true">
-   <implementation class="anyframe.oden.bundle.hessiancli.HessianDeployerFactory"/>
-   <service>
-      <provide interface="anyframe.oden.bundle.deploy.DeployerFactory"/>
-   </service>
-</component>

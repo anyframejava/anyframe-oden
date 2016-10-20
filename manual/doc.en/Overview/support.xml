@@ -1,0 +1,32 @@
+<section id="overview_support">
+	<title>Support</title>
+
+	<section id="overview_support_tech">
+		<title>Technical Support</title>
+		<para>
+			Technical support for Anyframe is done through the Anyframe open source community site forum (
+			<ulink url="http://www.anyframejava.org/forum">http://www.anyframejava.org/forum</ulink>
+			), and provides QnA and specific guidelines and solutions for source code. 
+			When you need technical consulting support for a specific project, 
+			you can make a request through contact us of the Anyframe open source community site (
+			<ulink url="http://www.anyframejava.org/about/contactus">http://www.anyframejava.org/about/contactus</ulink>
+			). Also, you can request issues on Bug Fix, Improvements, and New Features 
+			through the issue management system JIRA(
+			<ulink url="http://dev.anyframejava.org/jira">http://dev.anyframejava.org/jira</ulink>
+			). For more information, click here (
+			<ulink url="http://www.anyframejava.org/development/issue">http://www.anyframejava.org/development/issue
+			</ulink>
+			).
+		</para>
+	</section>
+
+	<section id="overview_support_maintenance">
+		<title>Maintenance</title>
+		<para>
+			You can get libraries, manuals, etc. of the latest and previous versions through the Anyframe open source community site (
+			<ulink url="http://www.anyframejava.org">http://www.anyframejava.org</ulink>
+			). Patches and upgraded files are also provided through the open source community site. 
+			Notices are on the first page of the open source community site to be referred to whenever necessary.
+		</para>
+	</section>
+</section>

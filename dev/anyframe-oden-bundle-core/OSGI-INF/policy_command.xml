@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="PolicyCommand" immediate="true" >
+	<implementation class="org.anyframe.oden.bundle.core.command.PolicyCommandImpl"/>
+	<service>
+		<provide interface="org.anyframe.oden.bundle.gate.CustomCommand"/>
+	</service>
+	<reference name="REPOSITORY_PROVIDER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.RepositoryProviderService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setRepositoryProvider"
+   />
+   <reference name="PERSISTENCE_SERVICE"
+         interface="org.anyframe.oden.bundle.core.prefs.PrefsService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setPrefsService"
+   />	
+   <reference name="ODEN_CONFIG_SERVICE"
+         interface="org.anyframe.oden.bundle.core.config.OdenConfigService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setConfigService"
+   />
+   <reference name="TRANSMITTER_SERVICE"
+         interface="org.anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
+   />
+</component>

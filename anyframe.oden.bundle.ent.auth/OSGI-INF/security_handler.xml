@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="SecurityHandler" immediate="true" >
-	<implementation class="anyframe.oden.bundle.ent.auth.DefaultSecurityHandler"/>
-	<service>
-		<provide interface="anyframe.oden.bundle.ent.http.SecurityHandler"/>
-	</service>
-</component>

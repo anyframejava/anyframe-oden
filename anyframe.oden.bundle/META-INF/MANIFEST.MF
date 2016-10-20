@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Bundle-SymbolicName: anyframe.oden.bundle
-Main-Class: anyframe.oden.bundle.Oden
-Built-By: joon1k
-Class-Path: ../bundle/felix.jar

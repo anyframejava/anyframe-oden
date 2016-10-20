@@ -1,0 +1,281 @@
+<section id="workingwithcommandline_odenshellcommands">
+	<title>Oden Commands</title>
+
+	<para>
+		You can send command to Oden Server through Oden command. 
+		If there is space in the parameter, bind with quotation mark(""). 
+		When you wish to put several parameters behind option, 
+		line them up separating them with spaces. 
+		Even thought there are spaces, parts that are bound with quotation mark("") are seen as one parameter. 
+	</para>
+
+	<section id="workingwithcommandline_odenshellcommands_job">
+		<title>Job Command</title>
+		<para>
+			Job is a deployment setting that records from where to where deployment will be done. 
+			To deploy, deployment setting called Job is made first, and then Job is executed and deployed. 
+			Job consists of one Source and several Targets. 
+			Source refers to the path (build server) in which the file to be deployed is located, 
+			and Target refers to the path (development or execution server) in which the file will be deployed. 
+			Command that sets Job is not provided separately, 
+			and jobs.xml of Oden Server should be directly updated or set through Oden Admin. 
+			Go the the below 'References' to see how to modify jobs.xml. 
+		</para>
+		
+		<section id="workingwithcommandline_odenshellcommands_job_info">
+			<title>job info</title>
+			<para>
+				Command to check the registered job.   
+			</para>
+
+			<programlisting><![CDATA[job info [ <job> ]]]></programlisting>
+
+			<para>
+				 Show registered job list when there is no job name. 
+				 When job name is given as parameter, show the details of the related job list. 
+			</para>
+		</section>
+
+		<section id="workingwithcommandline_odenshellcommands_job_compare">
+			<title>job compare</title>
+			<para>
+				Many targets can be registered in job. 
+				Through this command, you can check if the files deployed in the related targets are the same.
+			</para>
+			<programlisting><![CDATA[job compare <job> [ -t <target> ... ] [ -failonly ]]]></programlisting>
+			<para>
+				If you want to compare the consistency of a specific target among the targets that are in a job, 
+				put the targets in a row after -t option and separate the names with spaces. 
+				When there are many files deployed in target, 
+				the list of files that are inconsistent will show when applying -failonly option, so it is easy to check consistency. 
+			</para>
+		</section>
+
+		<section id="workingwithcommandline_odenshellcommands_job_mapping_scan">
+			<title>job mapping-scan</title>
+			<para>
+				The original file of the file to be deployed is needed to deploy only the changed file. 
+				In other words, information on .java files is needed before building because deployment files are the results of general build. 
+				This information should be added to Mapping when setting the SOURCE of job. 
+				When using this command, you can see the Mapping information that fits the current job. 
+				Mapping information should be added to job based on this information. 
+			</para>
+			<programlisting><![CDATA[job mapping-scan <job>]]></programlisting>
+		</section>
+	</section>
+
+	<note>
+		<para>
+			When using Oden as command, edit xml and add job. 
+			Create jobs.xml in conf folder of Oden Server, and add job as the below. 
+		</para>
+		<programlisting><![CDATA[<oden> 
+  <job name="batch"> 
+    <source dir="/home/oden/workspace/src"/>
+    <target address="localhost:9872" dir="/home/oden/app0" name="t0"/> 
+    <target address="localhost:9873" dir="/home/oden/app1" name="t1"/>
+  </job>
+</oden>]]></programlisting>
+		<para>
+			The above is the basic format. 
+			You can start with oden tag and set several jobs in it. 
+			The name of one job should be defined as an attribute called name. 
+			A job should have one source. 
+			A job can have more that one target. 
+			Source should be a system in which Oden Server is installed, 
+			and the file to be deployed will exist in the related path. 
+			Target is a remote path in which file will be deployed, and Oden Agent should be installed. 
+			System ip and port (Agent basically uses 9872 port) related to address should be written. 
+			The path in which source file will be deployed should be defined in dir. 
+			Name is the name of this target, and is required. 
+			Target name should not be repeated within the same job. 
+			Between different jobs, having the same target name is allowed.
+		</para>
+		
+		<programlisting><![CDATA[<oden> 
+  <job name="batch">
+    <source dir="/home/oden/mypjt-1.0/dist" excludes="**/*.svn">
+      <mapping checkout-dir="/home/oden/mypjt-1.0" dir="."/>
+      <mapping checkout-dir="/home/oden/mypjt-1.0/src/main/java" dir="WEB-INF/classes"/>
+      <mapping checkout-dir="/home/oden/mypjt-1.0/src/main/resources" dir="WEB-INF/classes"/>
+    </source>
+    <target address="localhost:9872" dir="/home/oden/dest1" name="t1"/>
+    <target address="localhost:9873" dir="/home/oden/dest0" name="t0"/>
+    <target address="localhost:9974" dir="/home/oden/dest2" name="t2"/>
+    <command command="ls" dir="./" name="ls"/>
+    <command command="./catalina.sh run" dir="/Applications/tomcat-6.0.2/bin" name="tomcat"/>
+    <command command="ps -ef | grep tomcat" dir="./" name="ps"/>
+  </job>
+</oden>]]></programlisting>
+		<para>
+			The above example shows the most complicated job setting. 
+			There is a job name, and one source and several targets exist. 
+			Also, there are several commands. They are used when sending command to a target in a job. 
+			A field named excludes is added to source. 
+			Mapping information is additionally defined to deploy only changed files. 
+			Changed files are detected by using java file information before build when deploying class file. 
+			You can write java file path in checkout-dir, and class file path in dir. 
+			When project is carried out in Anyframe, 
+			you can find which information to put in by using job mapping-scan command. 
+			Command is defined when you want to execute a specific command in target system. 
+			You can write a name that indicates the command in 'name', 
+			and in 'command attribute', you can write the command to be executed and in which path the command will be executed in dir. 
+			This command tag is connected with exec command. 
+		</para>
+	</note>
+
+
+	<section id="workingwithcommandline_odenshellcommands_deploy">
+		<title>Deploy Command</title>
+
+		<section id="workingwithcommandline_odenshellcommands_deploy_test">
+			<title>deploy test</title>
+			<para>
+				Command to search the list of files to be deployed
+			</para>
+			<programlisting><![CDATA[deploy test <job> [ -t <target> ... ] 
+	[-u | -i ] [ -del ]]]></programlisting>			
+			<itemizedlist>
+			<listitem><para>If you wish to deploy in a specific target among job targets, 
+			list target names after -t option and separate them with spaces.</para></listitem>
+			<listitem><para>When you wish to deploy all files of job SOURCE, define -i option.</para></listitem>
+			<listitem><para>When you wish to deploy only changed files among job SOURCE files, use -u option. You cannot use with -i option.</para></listitem>
+			<listitem><para>When you with to delete files that are not in job SOURCE among files that are deployed in target, 
+			you can use -del option.</para></listitem>
+			</itemizedlist>
+		</section>
+
+		<section id="workingwithcommandline_odenshellcommands_deploy_run">
+			<title>deploy run</title>
+			<para>
+				Command to deploy SOURCE files
+			</para>
+			<programlisting><![CDATA[deploy run <job> [ -t <target> ... ] 
+	[-u | -i ] [ -del ]]]></programlisting>
+			<itemizedlist>
+			<listitem><para>If you wish to deploy in a specific target among job targets, 
+			list target names after -t option and separate them with spaces.</para></listitem>
+			<listitem><para>When you wish to deploy all files of job SOURCE, define -i option.</para></listitem>
+			<listitem><para>When you wish to deploy only changed files among job SOURCE files, use -u option. You cannot use with -i option.</para></listitem>
+			<listitem><para>When you with to delete files that are not in job SOURCE among files that are deployed in target, 
+			you can use -del option.</para></listitem>
+			</itemizedlist>
+		</section>
+
+		<section id="workingwithcommandline_odenshellcommands_deploy_undo">
+			<title>deploy undo</title>
+			<para>
+				배포를 원복하는 명령어  
+			</para>
+			<programlisting><![CDATA[deploy undo <txid>]]></programlisting>
+			<itemizedlist>
+			<listitem><para>txid를 통해 배포 작업을 원복한다. </para></listitem>
+			</itemizedlist>
+		</section>	
+	</section>
+
+	<section id="workingwithcommandline_odenshellcommands_log">
+		<title>Log Command</title>
+
+		<section id="workingwithcommandline_odenshellcommands_log_show">
+			<title>log show</title>
+			<para>
+				Command that shows details of deployment
+			</para>
+			<programlisting><![CDATA[log show <txId> [ -mode <A | U | D> ] [-path <path>] [-failonly] ]]></programlisting>
+			<para>
+				Shows the details of deployment related to txId. 
+				If you want to see the list of files that are added (A), changed (U), or deleted (D), use -mode option. 
+				If you want to find details on a specific file, enter the file name after -path. 
+				If you want to see a list of failed files, add -failonly and execute command. 
+			</para>
+		</section>
+		
+		<section id="workingwithcommandline_odenshellcommands_log_search">
+			<title>log search</title>
+
+			<para>
+				Shows the deployed list.
+			</para>
+
+			<programlisting><![CDATA[log search [-job <job>] [-user <user>] [-path <path>] [-failonly]]]></programlisting>
+
+			<para>
+				Use -job to see details on a specific job. Use -user to see deployment details that user has deployed. 
+				Use -path option to see deployment details of a specific file. 
+				Use -failonly option for the failure list. 
+			</para>
+		</section>
+		
+		<section id="workingwithcommandline_odenshellcommands_log_error">
+			<title>log error</title>
+
+			<para>
+				Shows system log of a specific date. 
+				Used when it is hard to see why deployment failed only with message, 
+				or for the debugging of developer. 
+			</para>
+
+			<programlisting><![CDATA[log error [-date <date>]]]></programlisting>
+			
+			<para>
+				Shows the recent system log when -date option is not defined. 
+				System log is saved in meta folder of oden server ordered by date. 
+				When the size of log file exceeds 10MB, backup the previous log and record log in a new log file.
+			</para>
+		</section>
+		
+		<note>
+			<para>
+				Deployment record is saved for 365 days as default. 
+				Can be changed through log.duration of oden.ini. 
+				In days.
+			</para>
+		</note>
+	</section>
+
+
+	<section id="workingwithcommandline_odenshellcommands_exec">
+		<title>Exec Command</title>
+
+		<section id="workingwithcommandline_odenshellcommands_exec_run">
+			<title>exec run</title>
+			<para>
+				Can execute command registered in job through exec command. 
+				Unless the related command does not exceptionally indicate target, 
+				it is executed on all Targets registered in job. 
+			</para>
+			<programlisting><![CDATA[exec run <job> [ -t <target> ... ] -c <command-name>...]]></programlisting>
+			<para>
+				Use -t to limit to specific targets and not all targets registered in job. 
+				Among the commands registered in job, list the names of commands to be executed after -c.
+			</para>
+		</section>
+	</section>
+	
+	<section id="workingwithcommandline_odenshellcommands_status">
+		<title>Status Command</title>
+
+		<para>
+			Command to check the details of deployment in progress. 
+			(Log command is related to the details of deployment already deployed, 
+			and Status command is related to the details of deployment in progress.)
+		</para>
+
+		<section id="workingwithcommandline_odenshellcommands_status_info">
+			<title>status info</title>
+			<para>
+				Shows the status of works in progress or the list of works that are pending. 
+			</para>
+			<programlisting><![CDATA[status info]]></programlisting>
+		</section>
+
+		<section id="workingwithcommandline_odenshellcommands_status_stop">
+			<title>status stop</title>
+			<para>
+				Cancels deployment works that are in progress or pending.
+			</para>
+			<programlisting><![CDATA[status stop <txid>]]></programlisting>
+		</section>
+	</section>
+</section>
