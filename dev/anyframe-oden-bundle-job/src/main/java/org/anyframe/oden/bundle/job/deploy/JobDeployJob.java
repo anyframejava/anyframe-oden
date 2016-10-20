@@ -149,8 +149,10 @@ public class JobDeployJob extends DeployJob {
 				try{
 					DeployerService ds = deployerManager.getDeployer(f);
 					if(ds == null)
-						throw new OdenException("Invalid agent: " + f.getAgent().agentAddr());
-			
+						throw new OdenException("Invalid agent: "
+								+ f.getAgent().agentName() + "["
+								+ f.getAgent().agentAddr() + "]");
+					
 					if(f.mode() == Mode.DELETE){
 						ds.backupNRemove(f.getAgent().location(), f.getPath(),
 								backupLocation.equals("snapshot") ? null
@@ -164,7 +166,7 @@ public class JobDeployJob extends DeployJob {
 						inProgressFiles.put(f, ds);	
 					}
 				}catch(Exception e){
-					Logger.error(e);
+					Logger.debug(e.getMessage());
 					setError(e.getMessage());
 					f.setErrorLog(Utils.rootCause(e));
 					f.setSuccess(false);

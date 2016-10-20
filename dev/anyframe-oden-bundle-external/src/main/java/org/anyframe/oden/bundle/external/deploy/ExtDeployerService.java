@@ -47,6 +47,15 @@ public interface ExtDeployerService {
 	public CfgReturnVO execute(CfgJob job) throws Exception;
 
 	/**
+	 * External API method , which deploy root directory in all files
+	 * 
+	 * @param job
+	 * @return
+	 * @throws Exception
+	 */
+	public CfgReturnVO executeRoot(CfgJob job) throws Exception;
+
+	/**
 	 * External API method , which deploy error files again
 	 * 
 	 * @param txid
@@ -54,8 +63,8 @@ public interface ExtDeployerService {
 	 * @return
 	 * @throws Exception
 	 */
-	public CfgReturnVO reexecute(String txid, String user) throws Exception; 
-	
+	public CfgReturnVO reexecute(String txid, String user) throws Exception;
+
 	/**
 	 * External API method , which undo the deployment job
 	 * 
@@ -75,7 +84,7 @@ public interface ExtDeployerService {
 	public String stop(String id) throws Exception;
 
 	/**
-	 * External API method , which show the deployment logs 
+	 * External API method , which show the deployment logs
 	 * 
 	 * @param id
 	 * @param pageIndex

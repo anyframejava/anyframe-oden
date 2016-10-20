@@ -68,7 +68,8 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			} catch (BrokerException e) {
 					throw new BrokerException(e.getMessage());	
 			} catch (ConnectException e) {
-				throw new BrokerException("broker.info.notavail");
+//				throw new BrokerException("broker.info.notavail");
+				throw new BrokerException("Oden Server is not available");
 			} catch (Exception e) {
 				throw new BrokerException("broker.exception");
 			} finally {
@@ -107,7 +108,8 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				String result = readAll(reader);
 				
 			} catch (ConnectException e) {
-				throw new BrokerException("broker.info.notavail");
+//				throw new BrokerException("broker.info.notavail");
+				throw new BrokerException("Oden Server is not available");
 			} catch (IOException e) {
 				throw new BrokerException("broker.info.notauth");
 			} finally {

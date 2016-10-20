@@ -54,7 +54,17 @@ public class Cmd {
 		try {
 			Cmd cmd = new Cmd();
 			cmd.loadINI();
-			System.out.println(cmd.sendRequest(cmd.toCommand(args)));
+			String rtn = cmd.sendRequest(cmd.toCommand(args));
+			if(rtn.startsWith("[S]")) {
+				// success
+				System.out.println(rtn);
+				System.exit(0); //normal
+			} else {
+				// fail
+				System.out.println(rtn);
+				System.exit(-1); //abnormal
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

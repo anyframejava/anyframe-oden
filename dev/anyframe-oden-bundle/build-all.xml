@@ -1,7 +1,8 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.3.0"/>
-	<property name="manual.dir" location="../manual/target/oden"/>
+	<property name="version" value="2.3.1"/>
+	<property name="manual.dir" location="../../../manual/manual/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
+	<property name="pksubname" value="Anyframe-Oden-${version}"/>
 	
 	<target name="build.all">
 		<condition property="todo" else="all-local">
@@ -242,21 +243,21 @@
 		<delete dir="${distDir}"/>
 		
 		<!-- pack core -->
-		<property name="artifactsDir" location="${distDir}/core"/>
+		<property name="artifactsDir" location="${distDir}/${pksubname}/core"/>
 		<antcall target="build.all"/>
 		<antcall target="_pack.server"/>
 		
 		<!-- pack admin -->
-		<ant antfile="../anyframe-oden-admin/build.xml" target="package" inheritall="false" />
-		<mkdir dir="${distDir}/admin"/>
-		<copy todir="${distDir}/admin" >
+		<ant antfile="../anyframe-oden-admin/build.xml" target="all" inheritall="false" />
+		<mkdir dir="${distDir}/${pksubname}/admin"/>
+		<copy todir="${distDir}/${pksubname}/admin" >
 			<fileset dir="../anyframe-oden-admin/pack"/>
 		</copy>
 		
 		<!-- pack manual -->
-		<mkdir dir="${distDir}/manual"/>
-		<copy todir="${distDir}/manual" failonerror="false">
-			<fileset dir="../manual/target/oden" includes="htmlsingle/**,image/**" excludes="image/WorkingWithEclipsePlugin/**"/>
+		<mkdir dir="${distDir}/${pksubname}/manual"/>
+		<copy todir="${distDir}/${pksubname}/manual" failonerror="false">
+			<fileset dir="${manual.dir}/reference" includes="htmlsingle/**,image/**,pdf/**" excludes="image/WorkingWithEclipsePlugin/**"/>
 		</copy>
 		
 		<!-- zip -->

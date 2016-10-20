@@ -205,7 +205,7 @@ public class ExtCompressDeployJob extends CompressJob {
 					inProgressFiles.put(f, ds);
 					
 				} catch (Exception e) {
-					Logger.error(e);
+					Logger.debug(e.getMessage());
 					setError(e.getMessage());
 					f.setErrorLog(Utils.rootCause(e));
 					f.setSuccess(false);

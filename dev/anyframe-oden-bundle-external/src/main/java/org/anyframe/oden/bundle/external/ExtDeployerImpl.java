@@ -103,91 +103,23 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		// service instance start
 		initServices();
 		synchronized (lock) {
-			List<CfgTarget> targets = getTargets(job);
-	
-			if (job == null || targets == null)
-				throw new OdenException(
-						"Deploy function is not activated. Check 'job'");
-	
-			long tm = System.currentTimeMillis();
-	
-			Job j;
-			
-			if (!job.isCompress())
-				// 일반전송
-				j = new ExtJobDeployJob(context, job.getFileInfo(),
-						job.getUserId(), job.getId(), targets,
-						new DeployFileResolver() {
-							public Collection<DeployFile> resolveDeployFiles()
-									throws OdenException {
-								return new SortedDeployFileSet(preview(job));
-							}
-						});
-			else
-				// 압축전송
-				j = new ExtCompressDeployJob(context, job, job.getUserId(), job
-						.getId(), targets, new CompressFileResolver() {
-					public Collection<DeployFile> compressDeployFiles()
-							throws OdenException {
-						return new SortedDeployFileSet(compPreview(job));
-					}
-				}, new DeployFileResolver() {
-					public Collection<DeployFile> resolveDeployFiles()
-							throws OdenException {
-						return new SortedDeployFileSet(preview(job));
-					}
-				});
-	
-			if (job.isSync()) {
-				jobManager.syncRun(j);
-				ShortenRecord r = jobLogger.search(j.id());
-				List<CfgReturnErr> errList = new ArrayList<CfgReturnErr>();
-	
-				Map<String, List<CfgReturnErr>> errs = new HashMap<String, List<CfgReturnErr>>();
-	
-				Set<DeployFile> error = jobLogger.show(j.id(), "", Mode.NA, true);
-				Iterator its = error.iterator();
-	
-				while (its.hasNext()) {
-					DeployFile data = (DeployFile) its.next();
-					String agentName = data.getAgent().agentName();
-					List<CfgReturnErr> fs = errs.get(agentName);
-	
-					if (fs == null) {
-						fs = new ArrayList<CfgReturnErr>();
-						fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
-					} else {
-						fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
-					}
-	
-					errs.put(agentName, fs);
-				}
-	
-				Assert.check(r != null, "Fail to get log: " + j.id());
-	
-				Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
-						+ "ms");
-	
-				// deploy exception option check. When true is, transaction is all
-				// or nothing
-				if (!r.isSuccess() && deployExcOpt)
-					rollback(j.id());
-	
-				return new CfgReturnVO(job.getId(), j.id(), r.isSuccess(), !r
-						.isSuccess()
-						&& deployExcOpt ? "0" : String.valueOf(r.getTotal()),
-						String.valueOf(r.getnSuccess()), errs);
-	
-			} else {
-				jobManager.schedule(j);
-				Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
-						+ "ms");
-	
-				return new CfgReturnVO(job.getId(), j.id(), null, "0", null, null);
-			}
+			return executeRun(job,false);
 		}
 	}
-
+	
+	/* 
+	 * Root directory 하단의 파일들을 배포
+	 * @param job
+	 * 
+	 */
+	public CfgReturnVO executeRoot(CfgJob job) throws Exception {
+		// service instance start
+		initServices();
+		synchronized (lock) {
+			return executeRun(job,true);
+		}
+	}
+	
 	/*
 	 * undo 기능 구현(txid를 키로 무조건 rollback을 수행한다)
 	 * 
@@ -322,6 +254,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 		for (CfgTarget target : script.getTargets()) {
 			DeployerService ds = txmitter.getDeployer(target.getAddress()
+					.contains(":") ? target.getAddress() : target.getAddress()
 					+ port);
 			if (ds == null) {
 				result.put(target.getName(), new CfgReturnScript(
@@ -360,6 +293,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		for (CfgTarget agent : agents) {
 			try {
 				DeployerService ds = txmitter.getDeployer(agent.getAddress()
+						.contains(":") ? agent.getAddress() : agent
+						.getAddress()
 						+ port);
 
 				if (ds.alive())
@@ -456,11 +391,12 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 		for (Iterator<DeployFile> it = fs.iterator(); it.hasNext();) {
 			DeployFile current = it.next();
-			CfgHistoryDetail detail = new CfgHistoryDetail(current.getRepo()
-					.toString(), current.getPath(), DeployFileUtil
-					.modeToString(current.mode()), StringUtil.makeEmpty(current
-					.errorLog()), current.getAgent().agentName(), String
-					.valueOf(current.isSuccess()));
+			CfgHistoryDetail detail = new CfgHistoryDetail(current.getPath(),
+					current.getRepo().toString(),
+					DeployFileUtil.modeToString(current.mode()),
+					StringUtil.makeEmpty(current.errorLog()), current
+							.getAgent().agentName(), String.valueOf(current
+							.isSuccess()));
 			data.add(detail);
 		}
 		return data;
@@ -469,7 +405,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	private void initServices() throws OdenException {
 		this.context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
-		this.port = context.getProperty("http.port") == null ? ":9872" : null;
+//		this.port = context.getProperty("http.port") == null ? ":9872" : null;
+		this.port = ":9872";
 
 		this.txmitter = (TransmitterService) BundleUtil.getService(context,
 				TransmitterService.class);
@@ -504,7 +441,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	private void initTxmintter() throws OdenException {
 		this.context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
-		this.port = context.getProperty("http.port") == null ? ":9872" : null;
+		this.port = ":9872";
 		this.txmitter = (TransmitterService) BundleUtil.getService(context,
 				TransmitterService.class);
 		Assert.check(txmitter != null, "Fail to load service."
@@ -548,8 +485,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			for (CfgTarget target : fileInfo.getTargets()) {
 				if (!targets.containsKey(target.getName())) {
 					targets.put(target.getName(), txmitter.getDeployer(target
-							.getAddress()
-							+ port));
+							.getAddress().contains(":") ? target.getAddress()
+							: target.getAddress() + port));
 				}
 			}
 		}
@@ -602,8 +539,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		ths.add(new Thread() {
 			@Override
 			public void run() {
-				SourceManager srcmgr = null;
 				for (CfgFileInfo fileInfo : job.getFileInfo()) {
+					SourceManager srcmgr = null;
 					try {
 						srcmgr = getSourceManager(fileInfo.getExeDir());
 
@@ -657,6 +594,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 											srcmgr.getRepository().args()[0],
 											srcTmp }), "temp.zip",
 									new AgentLoc(t.getName(), t.getAddress()
+											.contains(":") ? t.getAddress() : t
+											.getAddress()
 											+ port, targetTmp), 0L, 0L,
 									Mode.ADD));
 						}
@@ -682,7 +621,10 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	}
 
 	private String getTargetTmp(CfgTarget t) {
-		DeployerService ds = txmitter.getDeployer(t.getAddress() + port);
+		DeployerService ds = txmitter
+				.getDeployer(t.getAddress().contains(":") ? t.getAddress() : t
+						.getAddress()
+						+ port);
 		if (ds != null)
 			try {
 				return ds.getTempDirectory();
@@ -713,6 +655,94 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		}
 		return detail;
 	}
+	
+	private CfgReturnVO executeRun(final CfgJob job, boolean isRoot) throws Exception {
+		List<CfgTarget> targets = getTargets(job);
 
+		if (job == null || targets == null)
+			throw new OdenException(
+					"Deploy function is not activated. Check 'job'");
+
+		if (job.isCompress() && isRoot)
+			throw new OdenException(
+					"This option is not activated. Check 'isRoot option and compress option'");
+
+		long tm = System.currentTimeMillis();
+
+		Job j;
+
+		if (!job.isCompress())
+			// 일반전송
+			j = new ExtJobDeployJob(context, job.getFileInfo(),
+					job.getUserId(), job.getId(), targets,
+					new DeployFileResolver() {
+						public Collection<DeployFile> resolveDeployFiles()
+								throws OdenException {
+							return new SortedDeployFileSet(preview(job));
+						}
+					}, isRoot);
+		else
+			// 압축전송
+			j = new ExtCompressDeployJob(context, job, job.getUserId(), job
+					.getId(), targets, new CompressFileResolver() {
+				public Collection<DeployFile> compressDeployFiles()
+						throws OdenException {
+					return new SortedDeployFileSet(compPreview(job));
+				}
+			}, new DeployFileResolver() {
+				public Collection<DeployFile> resolveDeployFiles()
+						throws OdenException {
+					return new SortedDeployFileSet(preview(job));
+				}
+			});
+
+		if (job.isSync()) {
+			jobManager.syncRun(j);
+			ShortenRecord r = jobLogger.search(j.id());
+			List<CfgReturnErr> errList = new ArrayList<CfgReturnErr>();
+
+			Map<String, List<CfgReturnErr>> errs = new HashMap<String, List<CfgReturnErr>>();
+
+			Set<DeployFile> error = jobLogger.show(j.id(), "", Mode.NA, true);
+			Iterator its = error.iterator();
+
+			while (its.hasNext()) {
+				DeployFile data = (DeployFile) its.next();
+				String agentName = data.getAgent().agentName();
+				List<CfgReturnErr> fs = errs.get(agentName);
+
+				if (fs == null) {
+					fs = new ArrayList<CfgReturnErr>();
+					fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
+				} else {
+					fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
+				}
+
+				errs.put(agentName, fs);
+			}
+
+			Assert.check(r != null, "Fail to get log: " + j.id());
+
+			Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
+					+ "ms");
+
+			// deploy exception option check. When true is, transaction is all
+			// or nothing
+			if (!r.isSuccess() && deployExcOpt)
+				rollback(j.id());
+
+			return new CfgReturnVO(job.getId(), j.id(), r.isSuccess(), !r
+					.isSuccess()
+					&& deployExcOpt ? "0" : String.valueOf(r.getTotal()),
+					String.valueOf(r.getnSuccess()), errs);
+
+		} else {
+			jobManager.schedule(j);
+			Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
+					+ "ms");
+
+			return new CfgReturnVO(job.getId(), j.id(), null, "0", null, null);
+		}
+	}
 
 }

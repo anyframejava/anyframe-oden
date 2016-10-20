@@ -65,7 +65,7 @@ public class TransmitterImpl implements TransmitterService {
 		try{
 			ds = _getDeployer(addr);
 			if(ds == null || !ds.alive())
-				throw new IOException();
+				throw new IOException("Fail to access: " + addr);
 		}catch(Exception e){
 			// try one more
 			try{
@@ -73,7 +73,7 @@ public class TransmitterImpl implements TransmitterService {
 				if(ds == null || !ds.alive())
 					throw new IOException("Fail to access: " + addr);
 			}catch(Exception e2){
-				Logger.error(e2);
+				Logger.debug("Fail to access: " + addr);
 				return null;
 			}
 		}

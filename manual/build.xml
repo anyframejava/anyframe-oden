@@ -11,8 +11,11 @@
 	<!--
 	  - set dbf installer folder
 	 -->
-	<property name="dbf.home" value="d:/docbook" />
-
+	<property name="dbf.home" value="E:/workspace/docbook" />
+	<property name="result.dir" location="../manual/target/oden"/>
+	<property name="version" value="2.3.1"/>
+	<property name="link.dir" location="E:/Repo/anyframe-opensource/docs/deployer/${version}"/>
+	
 	<!--
       - Configure basic properties that will be used in the file.
       -->
@@ -22,7 +25,7 @@
 	<property name="image.pdf.dir" value="image/pdf" />
 	<property name="image.dir" value="image" />
 	<property name="font.dir" value="${dbf.home}/fonts" />
-	<property name="target.dir" value="target/oden" />
+	<property name="target.dir" value="target/reference" />
 	<property name="html.dir" value="${target.dir}/html" />
 	<property name="htmlsingle.dir" value="${target.dir}/htmlsingle" />
 	<property name="fo.dir" value="${target.dir}/fo" />
@@ -155,7 +158,7 @@
 			<param name="ignore.image.scaling" expression="1"/>
 			<classpath refid="xalan.classpath" />
 		</xslt>
-		<rename dest="${fo.dir}/Anyframe-Oden-2.2.0.fo" src="${fo.dir}/oden.fo"/>
+		<rename dest="${fo.dir}/Anyframe-Oden-${version}.fo" src="${fo.dir}/oden.fo"/>
 		<!-- Convert FO Files into pdf -->
 		<fop format="application/pdf" outdir="${pdf.dir}" userconfig="${dbf.home}/conf/fop-config.xml" force="true">
 			<fileset dir="${fo.dir}">
@@ -163,6 +166,23 @@
 			</fileset>
 		</fop>
 	</target>
+	
+	<target name="deploy-manual">
+		<copy todir="${result.dir}">
+			<fileset dir="target">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		<copy todir="${link.dir}">
+			<fileset dir="target">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- target for local build -->
 	<target name="all" depends="clean, copy, build-html, build-chunks, build-pdf" />
+	<!-- target for CI build -->
+	<target name="all-CI" depends="all, deploy-manual"/>
 
 </project>

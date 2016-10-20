@@ -211,7 +211,8 @@ public class DeployCommandImpl implements CustomCommand {
 			if (_u && _i)
 				throw new OdenException("Allowed only: -u or -i");
 			if (!_i && !_u && !_del)
-				_u = _del = true;
+//				default option -i
+				_i = true;
 			final boolean isUpdate = _u;
 			final boolean hasInclude = _i;
 			final boolean isDelete = _del;

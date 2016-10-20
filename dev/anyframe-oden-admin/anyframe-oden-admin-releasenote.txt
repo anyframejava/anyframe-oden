@@ -2,6 +2,22 @@ Anyframe ODEN Admin CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.3.1 (2012-06-15)
+-------------------------------------
+* JDK 7 환경 구동을 위한 개선.
+* message code 문제 개선.
+
+* 소스 코드 변경
+    - anyframe-oden-admin 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+  - N/A.
+
+
+
 Changes in version 2.3.0 (2012-04-10)
 -------------------------------------
 * 압축 배포 전송 기능 구현.

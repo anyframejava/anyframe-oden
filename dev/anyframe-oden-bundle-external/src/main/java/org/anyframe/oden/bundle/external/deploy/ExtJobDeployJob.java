@@ -71,10 +71,12 @@ public class ExtJobDeployJob extends DeployJob {
 	String id = null;
 	boolean deployExcOpt;
 	int backupcnt = 0;
+	// 배포 소스가 directory 구조가 아닐 때 , root directory 하단 파일 배포
+	boolean isRoot = false;
 	
 	public ExtJobDeployJob(BundleContext context, List<CfgFileInfo> fileInfo, 
 			String user, String desc, List<CfgTarget> targets, 
-			DeployFileResolver resolver) throws OdenException {
+			DeployFileResolver resolver, boolean isRoot) throws OdenException {
 		super(context, user, desc, resolver);
 		this.targets = targets;
 		
@@ -92,6 +94,7 @@ public class ExtJobDeployJob extends DeployJob {
 		this.backupcnt = context.getProperty("deploy.backupcnt").equals("") ? 100
 				: Integer.valueOf(context.getProperty("deploy.backupcnt"));
 		id = super.id;
+		this.isRoot = isRoot; 
 	}
 
 	String getAgentPort(BundleContext ctx) {
@@ -158,6 +161,27 @@ public class ExtJobDeployJob extends DeployJob {
 			
 			Collection<DeployFile> sameFiles = fs.get(rf);			
 			long t = System.currentTimeMillis();
+			
+			FatInputStream in = null;
+			try {
+				if(isRoot)
+					// root directory 하단 파일을 배포
+					in = reposvc.resolveRoot(rf);
+				else
+					in = reposvc.resolve(rf);
+			} catch(OdenException e){
+				for(DeployFile f : fs.get(rf)){	
+					f.setSuccess(false);
+					f.setErrorLog(Utils.rootCause(e));
+				}
+				Logger.error(e);
+				setError(e.getMessage());
+				
+				try { if(in != null) in.close(); } catch (IOException ioe) { }
+//				break;
+				continue;
+			}
+			
 			for(DeployFile f : sameFiles){				
 				if(f.mode() == Mode.NA)
 					continue;
@@ -184,7 +208,7 @@ public class ExtJobDeployJob extends DeployJob {
 						inProgressFiles.put(f, ds);	
 					}
 				}catch(Exception e){
-					Logger.error(e);
+					Logger.debug(e.getMessage());
 					setError(e.getMessage());
 					f.setErrorLog(Utils.rootCause(e));
 					f.setSuccess(false);
@@ -196,20 +220,7 @@ public class ExtJobDeployJob extends DeployJob {
 			}
 
 			// get inputstream to write
-			FatInputStream in = null;
-			try {
-				in = reposvc.resolve(rf);
-			} catch(OdenException e){
-				for(DeployFile f : fs.get(rf)){	
-					f.setSuccess(false);
-					f.setErrorLog(Utils.rootCause(e));
-				}
-				Logger.error(e);
-				setError(e.getMessage());
-				
-				try { if(in != null) in.close(); } catch (IOException ioe) { }
-				break;
-			}
+			
 			
 			
 			if(hasSameTargets(inProgressFiles))
@@ -236,7 +247,8 @@ public class ExtJobDeployJob extends DeployJob {
 		String addr = null;
 		for(DeployFile f : fmap.keySet()){
 			if(addr == null)
-				addr = f.getAgent().agentAddr() + port;
+//				addr = f.getAgent().agentAddr() + port;
+				addr = f.getAgent().agentAddr();
 			else if(!f.getAgent().agentAddr().equals(addr))
 				return false;
 		}
