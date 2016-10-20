@@ -15,7 +15,10 @@
  */
 package org.anyframe.oden.admin.service;
 
+import java.util.List;
+
 import org.anyframe.pagination.Page;
+import org.json.JSONObject;
 
 /**
  * This is ServerService Interface
@@ -46,5 +49,8 @@ public interface ServerService {
 	public String status(String param) throws Exception;
 
 	public Page findListByPk(String param) throws Exception;
+	
+	public Page findListByPk(String param, List<JSONObject> objectArray) throws Exception;
+	
 
 }

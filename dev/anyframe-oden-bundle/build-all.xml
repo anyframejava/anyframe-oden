@@ -1,5 +1,5 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.6.0.RC1"/>
+	<property name="version" value="2.6.0.RC2"/>
 	<property name="manual.dir" location="../../../manual/manual/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>

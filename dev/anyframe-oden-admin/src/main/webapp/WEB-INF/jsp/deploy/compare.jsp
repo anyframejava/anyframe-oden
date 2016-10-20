@@ -75,7 +75,7 @@
 	}
 	
 	function ok() {
-fn_addTab('03job', 'Job', 'job', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);
+		fn_addTab('03job', 'Job', 'job', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);
 	}
 
 	function setChooser(result){

@@ -5,6 +5,8 @@
 <% String resId = (String)request.getParameter("tabId"); 
    String resNm = (String)request.getParameter("tabName");
    String resPara = (String)request.getParameter("keyParam"); %>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />

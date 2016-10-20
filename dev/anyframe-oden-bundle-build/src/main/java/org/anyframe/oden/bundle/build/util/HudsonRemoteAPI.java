@@ -48,7 +48,7 @@ public class HudsonRemoteAPI {
 
 	private static String hudsonURL;
 
-	private Element jobConfigElement;
+//	private Element jobConfigElement;
 
 	// public static final String ID = CodeGeneratorActivator.PLUGIN_ID;
 
@@ -375,6 +375,21 @@ public class HudsonRemoteAPI {
 
 		return runJob;
 
+	}
+	
+	public boolean checkBuildServer() throws Exception {
+		boolean isServer = true;
+		
+		if("".equals(hudsonURL)) {
+			// build.url is empty
+			return false;
+		}
+		try {
+			getJobList();
+		} catch (IOException e) {
+			return false;
+		}
+		return isServer;
 	}
 
 	private static String getLastBuildNo(String buildName) throws Exception {

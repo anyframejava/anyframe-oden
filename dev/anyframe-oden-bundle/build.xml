@@ -1,6 +1,6 @@
 <project name="Oden" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe-oden-bundle" />
-	<property name="version" value="2.6.0.RC1"/>
+	<property name="version" value="2.6.0.RC2"/>
 	
 	<property name="service.src" location="${basedir}/src/main/java"/>
 	<property name="service.build" location="${basedir}/build"/>		

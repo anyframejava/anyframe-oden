@@ -115,5 +115,48 @@ public class ServerServiceImpl implements ServerService {
 			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
+	
+	/**
+	 * Method for getting Job mapping info in Job Detail page.
+	 * 
+	 * @param param, objectArray
+	 */
+	public Page findListByPk(String param, List<JSONObject> objectArray) throws Exception {
+
+		List<Target> list = new ArrayList<Target>();
+		if (!StringUtil.isEmpty(param)) {
+//			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+//			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+			for (JSONObject object : objectArray) {
+				JSONArray targets = (JSONArray) object.get("targets");
+
+				for (int num = 0; num < targets.length(); num++) {
+					JSONObject targetObject = (JSONObject) targets.get(num);
+					Target t = JsonConverter.jsonToTarget(targetObject);
+
+					String status = targetObject.getString("status");
+
+					String statusResult = "";
+					if (status.equalsIgnoreCase("T")) {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GREEN;
+					} else {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GRAY;
+					}
+					t.setStatus(statusResult);
+					t.setHidden(OdenConstants.A_HREF_HEAD + "javascript:delServer('" + t.getName() + "');" + OdenConstants.A_HREF_MID
+							+ OdenConstants.IMG_TAG_DEL + OdenConstants.A_HREF_TAIL);
+
+					list.add(t);
+				}
+			}
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+	}
 
 }

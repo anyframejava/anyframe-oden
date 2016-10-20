@@ -4,7 +4,7 @@
 	<property environment="env"/>
 
 	<property name="pack.name" value="anyframe-oden-admin" />
-	<property name="version" value="2.6.1.RC1"/>
+	<property name="version" value="2.4.1.RC2"/>
 	<!--property name="env.ANT_HOME" value="C:\ats-2.0.2\anyframe-5.0.1\ide\ant"/-->
 	<property name="dist" location="dist"/>
 	<property name="pack" location="pack"/>
