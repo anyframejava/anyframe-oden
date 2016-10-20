@@ -21,36 +21,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.anyframe.oden.bundle.common.OdenException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.anyframe.oden.bundle.common.OdenException;
-
 /**
  * Helper class to handling JSON object or converting String to JSON form.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class JSONUtil {
-	public final static String KNOWN_EXCEPTION = "KnownException";	
+	public final static String KNOWN_EXCEPTION = "KnownException";
 	public final static String UNKNOWN_EXCEPTION = "UnknownException";
-	
+
 	private static JSONArray toJsonArray(Collection c) throws JSONException {
 		JSONArray ja = new JSONArray();
-		for(Object o : c){
+		for (Object o : c) {
 			ja.put(jsonize(o));
 		}
 		return ja;
 	}
-	
+
 	private static JSONObject toJsonObject(Map map) throws JSONException {
 		JSONObject jo = new JSONObject();
-		for(Object k : map.keySet()){
+		for (Object k : map.keySet()) {
 			jo.put(jsonize(k).toString(), jsonize(map.get(k)));
 		}
-		
+
 		return jo;
 	}
 
@@ -61,19 +59,19 @@ public class JSONUtil {
 	 * @return
 	 * @throws JSONException
 	 */
-	public static Object jsonize(Object o) throws JSONException{
-		if(o == null)
+	public static Object jsonize(Object o) throws JSONException {
+		if (o == null)
 			throw new JSONException("Couldn't jsonize the object: " + o);
-		if(o instanceof Collection){
-			return toJsonArray((Collection)o);
-		}else if(o instanceof Map){
-			return toJsonObject((Map)o);
-		}else if(o instanceof JSONizable){
+		if (o instanceof Collection) {
+			return toJsonArray((Collection) o);
+		} else if (o instanceof Map) {
+			return toJsonObject((Map) o);
+		} else if (o instanceof JSONizable) {
 			return ((JSONizable) o).jsonize();
 		}
 		return o.toString();
 	}
-	
+
 	/**
 	 * convert object to json array
 	 * 
@@ -86,21 +84,21 @@ public class JSONUtil {
 		l.add(m);
 		return (JSONArray) JSONUtil.jsonize(l);
 	}
-	
+
 	private static String jsonizedException(String key, Exception e) {
 		JSONArray jarr = new JSONArray();
 		try {
-			jarr.put(new JSONObject().put(key, e.getMessage()) );
+			jarr.put(new JSONObject().put(key, e.getMessage()));
 		} catch (JSONException e1) {
 			try {
-				jarr.put(new JSONObject().put(KNOWN_EXCEPTION, 
-						JSONException.class.toString()) );
+				jarr.put(new JSONObject().put(KNOWN_EXCEPTION,
+						JSONException.class.toString()));
 			} catch (JSONException e2) {
 			}
 		}
 		return jarr.toString();
 	}
-	
+
 	/**
 	 * convert exception to json object
 	 * 
@@ -110,17 +108,17 @@ public class JSONUtil {
 	public static String jsonizedUnknowException(Exception e) {
 		return jsonizedException(UNKNOWN_EXCEPTION, e);
 	}
-	
+
 	/**
 	 * convert exception to json object
 	 * 
 	 * @param e
 	 * @return
 	 */
-	public static String jsonizedKnownException(Exception e){
+	public static String jsonizedKnownException(Exception e) {
 		return jsonizedException(KNOWN_EXCEPTION, e);
 	}
-	
+
 	/**
 	 * convert exception to json object
 	 * 
@@ -128,12 +126,12 @@ public class JSONUtil {
 	 * @return
 	 */
 	public static String jsonizedException(Exception e) {
-		if(e instanceof OdenException){
+		if (e instanceof OdenException) {
 			return jsonizedKnownException(e);
 		}
 		return jsonizedUnknowException(e);
 	}
-	
+
 	/**
 	 * json array to string
 	 * 
@@ -142,46 +140,46 @@ public class JSONUtil {
 	 */
 	public static String toString(JSONArray jArr) {
 		StringBuffer buf = new StringBuffer();
-		try{
-			for(int i=0; i<jArr.length(); i++){
+		try {
+			for (int i = 0; i < jArr.length(); i++) {
 				Object o = jArr.get(i);
-				if(o instanceof JSONArray) {
-					buf.append(toStringWithoutNewLine((JSONArray)o));
-				}else if(o instanceof JSONObject) {
-					buf.append(toString((JSONObject)o));
-				}else {
+				if (o instanceof JSONArray) {
+					buf.append(toStringWithoutNewLine((JSONArray) o));
+				} else if (o instanceof JSONObject) {
+					buf.append(toString((JSONObject) o));
+				} else {
 					buf.append(o.toString());
 				}
-				if(i < jArr.length())
+				if (i < jArr.length())
 					buf.append("\n");
 			}
-		}catch(JSONException e) {
+		} catch (JSONException e) {
 			jArr.toString();
 		}
 		return buf.toString();
 	}
-	
+
 	private static String toStringWithoutNewLine(JSONArray jArr) {
 		StringBuffer buf = new StringBuffer();
-		try{
-			for(int i=0; i<jArr.length(); i++){
+		try {
+			for (int i = 0; i < jArr.length(); i++) {
 				Object o = jArr.get(i);
-				if(o instanceof JSONArray) {
-					buf.append(toStringWithoutNewLine((JSONArray)o));
-				}else if(o instanceof JSONObject) {
-					buf.append(toString((JSONObject)o));
-				}else {
+				if (o instanceof JSONArray) {
+					buf.append(toStringWithoutNewLine((JSONArray) o));
+				} else if (o instanceof JSONObject) {
+					buf.append(toString((JSONObject) o));
+				} else {
 					buf.append(o.toString());
 				}
-				if(i < jArr.length())
+				if (i < jArr.length())
 					buf.append(", ");
 			}
-		}catch(JSONException e) {
+		} catch (JSONException e) {
 			return jArr.toString();
 		}
 		return buf.toString();
 	}
-	
+
 	/**
 	 * json object to string
 	 * 
@@ -190,14 +188,14 @@ public class JSONUtil {
 	 */
 	public static String toString(JSONObject jObj) {
 		StringBuffer buf = new StringBuffer();
-		try{
-			for(Iterator<String> i = jObj.keys();i.hasNext();){
+		try {
+			for (Iterator<String> i = jObj.keys(); i.hasNext();) {
 				String key = i.next();
 				buf.append(key).append(" = ").append(jObj.get(key));
-				if(i.hasNext())
+				if (i.hasNext())
 					buf.append(", ");
 			}
-		}catch(JSONException e){
+		} catch (JSONException e) {
 			return jObj.toString();
 		}
 		return buf.toString();

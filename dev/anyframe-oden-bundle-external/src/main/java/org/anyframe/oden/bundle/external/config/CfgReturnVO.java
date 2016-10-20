@@ -21,6 +21,11 @@ import java.util.Map;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgReturnVO Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgReturnVO implements Serializable {
 	/**
 	 * 
@@ -37,10 +42,10 @@ public class CfgReturnVO implements Serializable {
 
 	String sCount;
 
-	Map<String , List<CfgReturnErr>> errLog;
+	Map<String, List<CfgReturnErr>> errLog;
 
 	public CfgReturnVO(String ciId, String odenId, Boolean success,
-			String count, String sCount, Map<String , List<CfgReturnErr>> errLog) {
+			String count, String sCount, Map<String, List<CfgReturnErr>> errLog) {
 		this.ciId = ciId;
 		this.odenId = odenId;
 		this.success = success;
@@ -65,7 +70,7 @@ public class CfgReturnVO implements Serializable {
 		return count;
 	}
 
-	public Map<String , List<CfgReturnErr>> getErrLog() {
+	public Map<String, List<CfgReturnErr>> getErrLog() {
 		return errLog;
 	}
 

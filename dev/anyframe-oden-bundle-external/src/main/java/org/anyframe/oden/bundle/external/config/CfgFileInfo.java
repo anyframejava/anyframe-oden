@@ -20,6 +20,11 @@ import java.util.List;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgFileInfo Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgFileInfo implements Serializable {
 	/**
 	 * 

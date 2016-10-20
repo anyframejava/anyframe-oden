@@ -23,8 +23,7 @@ import org.anyframe.oden.bundle.common.Utils;
 /**
  * Domain class for history info.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class CfgHistory implements Serializable {
 	/**

@@ -2,10 +2,30 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.4.0 (2012-12-28)
+-------------------------------------
+* 파일 전송 시 암호화 하여 전송하는 기능 구현.
+* ODEN Agent 에서 허용 되는 Server 인증 기능 구현.
+
+
+* 소스 코드 변경
+    - anyframe-oden-bundle-common 변경,  anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - icu4j-4.6.1.jar 추가.
+  - commons-logging-1.1.1.jar 추가.
+  - org.apache.servicemix.bundles.jasypt-1.7_1.jar 추가.
+
+* 해결된 이슈 목록
+ODEN-15	배포 파일 정보 암호화 기능 구현
+ODEN-16	ODEN Agent 에서 허용되는 Server 인증 기능 구현
+
+
+
 Changes in version 2.3.1 (2012-06-15)
 -------------------------------------
 * JDK 7 환경 구동을 위한 개선.
-* ant 연계 시 Exit code 반환을 통한 성공 여부 확인 기능 추가 .
+* ant 연계 시 Exit code 반환을 통한 성공 여부 확인 기능 추가.
 * 로그 메세지 내용 추가를 통한 사용자 가독성 이슈 개선.
 * 매뉴얼에 배포 옵션 등에 관한 내용 추가.
 

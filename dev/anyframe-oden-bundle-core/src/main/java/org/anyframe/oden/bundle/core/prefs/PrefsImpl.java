@@ -15,37 +15,35 @@
  */
 package org.anyframe.oden.bundle.core.prefs;
 
+import org.anyframe.oden.bundle.common.OdenStoreException;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
-
-import org.anyframe.oden.bundle.common.OdenStoreException;
 
 /**
  * @see anyframe.oden.bundle.core.prefs.Prefs
  * 
- * @author Joonil Kim
- *
+ * @author Junghwan Hong
  */
-public class PrefsImpl implements Prefs{
+public class PrefsImpl implements Prefs {
 	private String name;
-	
+
 	private Preferences prefs;
-	
-	PrefsImpl(Preferences prefs, String name){
+
+	PrefsImpl(Preferences prefs, String name) {
 		this.prefs = prefs;
 		this.name = name;
 	}
-	
-	public synchronized void put(String key, String value) throws OdenStoreException{
+
+	public synchronized void put(String key, String value) throws OdenStoreException {
 		prefs.put(key, value);
 		flush();
 	}
-	
-	public synchronized String get(String key){
+
+	public synchronized String get(String key) {
 		return prefs.get(key, "");
 	}
-	
-	public synchronized String[] keys() throws OdenStoreException{
+
+	public synchronized String[] keys() throws OdenStoreException {
 		String[] keys = null;
 		try {
 			keys = prefs.keys();
@@ -54,13 +52,13 @@ public class PrefsImpl implements Prefs{
 		}
 		return keys == null ? new String[0] : keys;
 	}
-	
+
 	public synchronized void remove(String key) throws OdenStoreException {
 		prefs.remove(key);
 		flush();
 	}
-	
-	private synchronized void flush() throws OdenStoreException{
+
+	private synchronized void flush() throws OdenStoreException {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {

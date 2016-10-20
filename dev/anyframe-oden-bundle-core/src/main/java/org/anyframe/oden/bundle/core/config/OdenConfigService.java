@@ -22,33 +22,32 @@ import org.anyframe.oden.bundle.common.OdenException;
 /**
  * Oden Service to handling Oden's configuration file: config.xml
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface OdenConfigService {
 	/**
 	 * add agent to the oden config file
 	 */
 	public void addAgent(AgentElement agent) throws OdenException;
-	
+
 	/**
-	 * remove the agent from the config file 
+	 * remove the agent from the config file
 	 */
 	public void removeAgent(String name) throws OdenException;
-	
+
 	/**
 	 * get agent information by name
 	 */
 	public AgentElement getAgent(String name);
-	
+
 	/**
 	 * get all agent's names
 	 */
 	public List<String> getAgentNames() throws OdenException;
-	
+
 	/**
 	 * get backup location for the agent
 	 */
 	public String getBackupLocation(String agentName) throws OdenException;
-	
+
 }

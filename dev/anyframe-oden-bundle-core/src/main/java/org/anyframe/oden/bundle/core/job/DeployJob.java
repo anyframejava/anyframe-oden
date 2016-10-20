@@ -32,68 +32,72 @@ import org.osgi.framework.BundleContext;
 /**
  * Job to write log & make cancel available.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public abstract class DeployJob extends Job{
+public abstract class DeployJob extends Job {
 	protected TransmitterService txmitterService;
-	
+
 	protected DeployLogService deploylog;
-	
+
 	protected DeployerManager deployerManager;
 
 	protected Collection<DeployFile> deployFiles = Collections.EMPTY_SET;
-	
+
 	protected String user;
-	
+
 	protected String bakLoc;
-	
+
 	protected String errorMessage;
-	
+
 	private DeployFileResolver resolver;
-	
-	public DeployJob(BundleContext context, String user, String desc, 
-			DeployFileResolver resolver) throws OdenException{
+
+	public DeployJob(BundleContext context, String user, String desc,
+			DeployFileResolver resolver) throws OdenException {
 		super(context, desc);
 		this.resolver = resolver;
-		txmitterService = (TransmitterService) BundleUtil.getService(context, TransmitterService.class);
-		deploylog = (DeployLogService) BundleUtil.getService(context, DeployLogService.class);
-		Assert.check(txmitterService != null && deploylog != null, "Fail to load service.");
-		
+		txmitterService = (TransmitterService) BundleUtil.getService(context,
+				TransmitterService.class);
+		deploylog = (DeployLogService) BundleUtil.getService(context,
+				DeployLogService.class);
+		Assert.check(txmitterService != null && deploylog != null,
+				"Fail to load service.");
+
 		String undo = context.getProperty("deploy.undo");
-		deployerManager = new DeployerManager(context, id, (undo != null && undo.equals("true")) );
+		deployerManager = new DeployerManager(context, id,
+				(undo != null && undo.equals("true")));
 		this.user = user;
 	}
-	
+
 	@Override
 	void start() {
 		status = RUNNING;
 		currentWork = "resolving deploy files...";
-		try{
+		try {
 			deployFiles = resolver.resolveDeployFiles();
-		}catch (OdenException e){
+		} catch (OdenException e) {
 			errorMessage = e.getMessage();
 			return;
 		}
-		
-		totalWorks = deployFiles.size()+additionalWorks;
-		finishedWorks = 1;	// 1 is kind of addtional work
+
+		totalWorks = deployFiles.size() + additionalWorks;
+		finishedWorks = 1; // 1 is kind of addtional work
 		run();
-		finishedWorks = totalWorks -1;	//1 is kind of additional work
+		finishedWorks = totalWorks - 1; // 1 is kind of additional work
 	}
-	
+
 	@Override
 	public int todoWorks() {
 		return totalWorks - additionalWorks;
 	}
 
-	protected void done(){
+	protected void done() {
 		try {
-			RecordElement2 r = new RecordElement2(id, deployFiles, user, System.currentTimeMillis(), desc);
-			if(errorMessage != null){
+			RecordElement2 r = new RecordElement2(id, deployFiles, user,
+					System.currentTimeMillis(), desc);
+			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);
-			}else if(deployFiles.size() == 0){
+			} else if (deployFiles.size() == 0) {
 				r.setSucccess(true);
 			}
 			deploylog.record(r);

@@ -21,14 +21,13 @@ import java.util.List;
 /**
  * Domain class for server info in job.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Server implements Serializable {
 
-//	private static final long serialVersionUID = 1L;
+	// private static final long serialVersionUID = 1L;
 	private String status;
 	private String file;
 	private List<Fileinfo> fileinfo;

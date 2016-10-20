@@ -34,10 +34,9 @@ import org.json.JSONObject;
 import anyframe.core.idgen.impl.Base64;
 
 /**
- * This class provides some methods to interface server 
+ * This class provides some methods to interface server
  * 
- * @author HONG JungHwan
- *
+ * @author Junghwan Hong
  */
 public class OdenBrokerImpl implements OdenBrokerService {
 	private final int TIMEOUT = 15000; // millis
@@ -45,54 +44,56 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	public final String UNKNOWN_EXCEPTION = "UnknownException";
 	private static String userid = "";
 	private static String password = "";
-	
+
 	/**
 	 * Send request and get response, Interface server with http protocol
 	 */
-	public String sendRequest(String shellUrl, String msg) throws BrokerException {
+	public String sendRequest(String shellUrl, String msg)
+			throws BrokerException {
 		PrintWriter writer = null;
 		String result = null;
-		
-		if(shellUrl != null && ! (shellUrl.equals(""))){
+
+		if (shellUrl != null && !(shellUrl.equals(""))) {
 			try {
 				URLConnection conn = init(shellUrl);
-				
+
 				// send
 				writer = new PrintWriter(conn.getOutputStream());
 				writer.println(URLEncoder.encode(msg, "utf-8"));
-				
+
 				writer.flush();
-				
+
 				// receive
 				result = handleResult(conn);
 			} catch (BrokerException e) {
-					throw new BrokerException(e.getMessage());	
+				throw new BrokerException(e.getMessage());
 			} catch (ConnectException e) {
-//				throw new BrokerException("broker.info.notavail");
+				// throw new BrokerException("broker.info.notavail");
 				throw new BrokerException("Oden Server is not available");
 			} catch (Exception e) {
 				throw new BrokerException("broker.exception");
 			} finally {
-				if (writer != null){
+				if (writer != null) {
 					writer.close();
 				}
 			}
 			return result;
-		}else{
+		} else {
 			return ""; //$NON-NLS-1$
 		}
 	}
 
-	public boolean checkUser(String shellUrl , String userid, String password) throws Exception {
+	public boolean checkUser(String shellUrl, String userid, String password)
+			throws Exception {
 		PrintWriter writer = null;
-	    this.userid = userid;
-	    this.password = password;
-	    
+		this.userid = userid;
+		this.password = password;
+
 		if (shellUrl != null && !(shellUrl.equals(""))) {
 			try {
 
 				URLConnection conn = init(shellUrl);
-			
+
 				// send
 				writer = new PrintWriter(conn.getOutputStream());
 				writer.println("help");
@@ -102,13 +103,13 @@ public class OdenBrokerImpl implements OdenBrokerService {
 
 				BufferedReader reader = null;
 
-				reader = new BufferedReader(new InputStreamReader(conn
-						.getInputStream(), "utf-8"));
-				
+				reader = new BufferedReader(new InputStreamReader(
+						conn.getInputStream(), "utf-8"));
+
 				String result = readAll(reader);
-				
+
 			} catch (ConnectException e) {
-//				throw new BrokerException("broker.info.notavail");
+				// throw new BrokerException("broker.info.notavail");
 				throw new BrokerException("Oden Server is not available");
 			} catch (IOException e) {
 				throw new BrokerException("broker.info.notauth");
@@ -121,24 +122,25 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		}
 		return true;
 	}
-	
-	private String handleResult(URLConnection conn) throws BrokerException, IOException {
+
+	private String handleResult(URLConnection conn) throws BrokerException,
+			IOException {
 		String result = null;
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(conn
-					.getInputStream(),"utf-8"));
+			reader = new BufferedReader(new InputStreamReader(
+					conn.getInputStream(), "utf-8"));
 
 			result = readAll(reader);
 			// check if shell exception or unknown exception
 			JSONArray array = new JSONArray(result);
 			determineException(array);
 
-		}catch (JSONException e){
-			if(result.contains("Command not found")){
+		} catch (JSONException e) {
+			if (result.contains("Command not found")) {
 				throw new BrokerException("broker.exception.notcommand");
-			}else{
-				//throw new BrokerException("broker.info.notdata");
+			} else {
+				// throw new BrokerException("broker.info.notdata");
 			}
 		} catch (BrokerException e) {
 			throw new BrokerException(e.getMessage());
@@ -148,7 +150,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * ja가 exception이 들어있는 JSONArray인지 검사. exception이 들어있으면 해당 exception을
 	 * throw..
@@ -159,7 +161,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	 */
 	private void determineException(JSONArray ja) throws BrokerException,
 			IOException {
-		
+
 		if (ja == null || ja.length() != 1) {
 			return;
 		}
@@ -169,11 +171,12 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			if (obj instanceof JSONObject) {
 				final JSONObject json = (JSONObject) obj;
 				if (json.has(KNOWN_EXCEPTION)) {
-					//TODO known
-					//throw new BrokerException(json.getString(KNOWN_EXCEPTION));
-					//throw new BrokerException("broker.info.notdata");
+					// TODO known
+					// throw new
+					// BrokerException(json.getString(KNOWN_EXCEPTION));
+					// throw new BrokerException("broker.info.notdata");
 				} else if (json.has(UNKNOWN_EXCEPTION)) {
-					//TODO unknown
+					// TODO unknown
 					throw new BrokerException(json.getString(UNKNOWN_EXCEPTION));
 				} else {
 					// this is not a kind of exception
@@ -183,6 +186,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			throw new IOException(jexc.getMessage());
 		}
 	}
+
 	private String readAll(BufferedReader reader) throws IOException {
 		StringBuffer buf = new StringBuffer();
 		String line = null;
@@ -196,20 +200,20 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			IOException {
 		User user;
 		URLConnection con = new URL(url).openConnection();
-		
+
 		con.setUseCaches(false);
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
-		
+
 		// 우선 Oden Server 계정 상수로 세팅
-		if(url != null)
-			con.addRequestProperty("Authorization", "Basic "
-				+ encode("oden", "oden0"));
-		
+		if (url != null)
+			con.addRequestProperty("Authorization",
+					"Basic " + encode("oden", "oden0"));
+
 		return con;
 	}
-	
+
 	private static String encode(String id, String pwd) {
 		return Base64.encode((id + ":" + pwd).getBytes());
 	}

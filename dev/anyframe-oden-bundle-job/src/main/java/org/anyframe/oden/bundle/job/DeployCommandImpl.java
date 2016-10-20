@@ -38,11 +38,11 @@ import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.DeployFile;
+import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.DeployFileUtil;
 import org.anyframe.oden.bundle.core.Repository;
 import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.SortedDeployFileSet;
-import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.command.Cmd;
 import org.anyframe.oden.bundle.core.command.JSONUtil;
 import org.anyframe.oden.bundle.core.job.CompressFileResolver;
@@ -73,6 +73,11 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
+/**
+ * This is DeployCommandImpl Class
+ * 
+ * @author Junghwan Hong
+ */
 public class DeployCommandImpl implements CustomCommand {
 
 	private BundleContext context;
@@ -143,9 +148,7 @@ public class DeployCommandImpl implements CustomCommand {
 				executeExec(cmd, out, err);
 			}
 		} catch (Exception e) {
-			err
-					.println(isJSON ? JSONUtil.jsonizedException(e) : e
-							.getMessage());
+			err.println(isJSON ? JSONUtil.jsonizedException(e) : e.getMessage());
 			Logger.error(e);
 		}
 	}
@@ -211,7 +214,7 @@ public class DeployCommandImpl implements CustomCommand {
 			if (_u && _i)
 				throw new OdenException("Allowed only: -u or -i");
 			if (!_i && !_u && !_del)
-//				default option -i
+				// default option -i
 				_i = true;
 			final boolean isUpdate = _u;
 			final boolean hasInclude = _i;
@@ -227,11 +230,11 @@ public class DeployCommandImpl implements CustomCommand {
 
 			long tm = System.currentTimeMillis();
 			Job j;
-			
+
 			if (!isCompress) {
 				j = new JobDeployJob(context, job.getSource(), getUser(cmd),
-						cmd.getActionArg(), getActiveTargets(job
-								.getAllTargets(targets)),
+						cmd.getActionArg(),
+						getActiveTargets(job.getAllTargets(targets)),
 						new DeployFileResolver() {
 							public Collection<DeployFile> resolveDeployFiles()
 									throws OdenException {
@@ -243,8 +246,8 @@ public class DeployCommandImpl implements CustomCommand {
 			} else {
 				// 압축 전송
 				j = new CompressDeployJob(context, job.getSource(),
-						getUser(cmd), cmd.getActionArg(), getActiveTargets(job
-								.getAllTargets(targets)),
+						getUser(cmd), cmd.getActionArg(),
+						getActiveTargets(job.getAllTargets(targets)),
 						new CompressFileResolver() {
 							public Collection<DeployFile> compressDeployFiles()
 									throws OdenException {
@@ -252,8 +255,7 @@ public class DeployCommandImpl implements CustomCommand {
 										isUpdate, hasInclude, deployCandidates,
 										isDelete, deleteCandidates, targets));
 							}
-						},
-						new DeployFileResolver() {
+						}, new DeployFileResolver() {
 							public Collection<DeployFile> resolveDeployFiles()
 									throws OdenException {
 								return new SortedDeployFileSet(preview(job,
@@ -269,19 +271,21 @@ public class DeployCommandImpl implements CustomCommand {
 			Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
 					+ "ms");
 
-			// deploy exception option check. When exception option is true , transaction is all
+			// deploy exception option check. When exception option is true ,
+			// transaction is all
 			// or nothing
 			if (!r.isSuccess() && deployExcOpt)
 				rollback(getUser(cmd), j.id());
 
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject().put("txid", j.id()).put("status",
-								r.isSuccess() ? "S" : "F").put(
-								"count",
-								!r.isSuccess() && deployExcOpt ? "0" : r
-										.getTotal()).put("nsuccess",
-								r.getnSuccess())).toString();
+						new JSONObject()
+								.put("txid", j.id())
+								.put("status", r.isSuccess() ? "S" : "F")
+								.put("count",
+										!r.isSuccess() && deployExcOpt ? "0"
+												: r.getTotal())
+								.put("nsuccess", r.getnSuccess())).toString();
 			}
 			String total = !r.isSuccess() && deployExcOpt ? "0" : String
 					.valueOf(r.getTotal());
@@ -289,23 +293,22 @@ public class DeployCommandImpl implements CustomCommand {
 			return (r.isSuccess() ? "[S]" : "[F]") + " " + j.id() + "(" + total
 					+ ")";
 		} else if (action.equals("rerun")) {
-//			오류 난 배포 물만 재배포 
+			// 오류 난 배포 물만 재배포
 			final String id = cmd.getActionArg();
-			
+
 			if (id.length() == 0)
 				throw new OdenException("<txid> is required.");
-			
+
 			try {
 				jobLogger.show(id, "", Mode.NA, true);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				throw new OdenException("Couldn't find a log: " + id);
 			}
-			
+
 			long tm = System.currentTimeMillis();
-			
-			
-			Job j = new RerunJob(context, getUser(cmd), "deploy rerun:" + id, id,
-					new DeployFileResolver() {
+
+			Job j = new RerunJob(context, getUser(cmd), "deploy rerun:" + id,
+					id, new DeployFileResolver() {
 						public Set<DeployFile> resolveDeployFiles()
 								throws OdenException {
 							return jobLogger.show(id, "", Mode.NA, true);
@@ -321,10 +324,10 @@ public class DeployCommandImpl implements CustomCommand {
 					+ "ms");
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject().put("txid", j.id()).put("status",
-								r.isSuccess() ? "S" : "F").put("count",
-								r.getTotal()).put("nsuccess", r.getnSuccess()))
-						.toString();
+						new JSONObject().put("txid", j.id())
+								.put("status", r.isSuccess() ? "S" : "F")
+								.put("count", r.getTotal())
+								.put("nsuccess", r.getnSuccess())).toString();
 			}
 
 			return (r.isSuccess() ? "[S]" : "[F]") + " " + j.id() + "("
@@ -360,10 +363,10 @@ public class DeployCommandImpl implements CustomCommand {
 					+ "ms");
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject().put("txid", j.id()).put("status",
-								r.isSuccess() ? "S" : "F").put("count",
-								r.getTotal()).put("nsuccess", r.getnSuccess()))
-						.toString();
+						new JSONObject().put("txid", j.id())
+								.put("status", r.isSuccess() ? "S" : "F")
+								.put("count", r.getTotal())
+								.put("nsuccess", r.getnSuccess())).toString();
 			}
 
 			return (r.isSuccess() ? "[S]" : "[F]") + " " + j.id() + "("
@@ -395,8 +398,8 @@ public class DeployCommandImpl implements CustomCommand {
 
 			// if not equal to previous element, print previous one.
 			if (prevPath != null)
-				list.put(new JSONObject().put("path", prevPath).put("mode",
-						prevMode).put("targets", targets));
+				list.put(new JSONObject().put("path", prevPath)
+						.put("mode", prevMode).put("targets", targets));
 
 			prevPath = current.getPath();
 			prevMode = current.mode();
@@ -404,8 +407,8 @@ public class DeployCommandImpl implements CustomCommand {
 			targets.add(current.getAgent().agentName());
 		}
 		if (prevPath != null)
-			list.put(new JSONObject().put("path", prevPath).put("mode",
-					prevMode).put("targets", targets));
+			list.put(new JSONObject().put("path", prevPath)
+					.put("mode", prevMode).put("targets", targets));
 		return list;
 	}
 
@@ -499,19 +502,20 @@ public class DeployCommandImpl implements CustomCommand {
 		}
 		return activeTargets;
 	}
-	
+
 	private Collection<DeployFile> compPreview(final CfgJob job,
 			final boolean isUpdate, final boolean hasInclude,
 			final List<String> deployCandidates, final boolean isDelete,
-			final List<String> deleteCandidates, final List<String> targets) throws OdenException {
+			final List<String> deleteCandidates, final List<String> targets)
+			throws OdenException {
 		final SourceManager srcmgr = getSourceManager(job.getSource());
 		final List<CfgTarget> CfgTargets = job.getAllTargets(targets);
 		final Collection<DeployFile> ret = new Vector<DeployFile>();
 
 		List<Thread> ths = new ArrayList<Thread>();
 
-//		final Set<FileInfo> repofs = new HashSet<FileInfo>();
-//		ths.add(new RepoCollector(repofs, srcmgr));
+		// final Set<FileInfo> repofs = new HashSet<FileInfo>();
+		// ths.add(new RepoCollector(repofs, srcmgr));
 
 		final String srcTmp;
 		try {
@@ -519,21 +523,21 @@ public class DeployCommandImpl implements CustomCommand {
 		} catch (IOException e1) {
 			throw new OdenException("Don't create src temp directory");
 		}
-		
+
 		ths.add(new Thread() {
 			public void run() {
-				
+
 				for (final CfgTarget t : CfgTargets) {
-					
+
 					final String targetTmp = getTargetTmp(t);
-					ret.add(new DeployFile(new Repository(
-							new String[] { srcmgr.getRepository().args()[0] , srcTmp }), "temp.zip", new AgentLoc(
-							t.getName(), t.getAddress(), targetTmp), 0L, 0L,
-							Mode.ADD));
+					ret.add(new DeployFile(new Repository(new String[] {
+							srcmgr.getRepository().args()[0], srcTmp }),
+							"temp.zip", new AgentLoc(t.getName(), t
+									.getAddress(), targetTmp), 0L, 0L, Mode.ADD));
 				}
 			}
 		});
-		
+
 		for (Thread t : ths)
 			t.start();
 		for (Thread t : ths)
@@ -541,13 +545,13 @@ public class DeployCommandImpl implements CustomCommand {
 				t.join();
 			} catch (InterruptedException e) {
 			}
-			
+
 		return ret;
 	}
-	
-	private String getTargetTmp(CfgTarget t){
+
+	private String getTargetTmp(CfgTarget t) {
 		DeployerService ds = txmitter.getDeployer(t.getAddress());
-		if(ds != null)
+		if (ds != null)
 			try {
 				return ds.getTempDirectory();
 			} catch (Exception e) {
@@ -556,11 +560,12 @@ public class DeployCommandImpl implements CustomCommand {
 			}
 		return "";
 	}
-	
+
 	private Collection<DeployFile> preview(final CfgJob job,
 			final boolean isUpdate, final boolean hasInclude,
 			final List<String> deployCandidates, final boolean isDelete,
-			final List<String> deleteCandidates, final List<String> targets) throws OdenException {
+			final List<String> deleteCandidates, final List<String> targets)
+			throws OdenException {
 		final SourceManager srcmgr = getSourceManager(job.getSource());
 		// final List<CfgTarget> activeTargets =
 		// getActiveTargets(job.getAllTargets(targets));
@@ -771,8 +776,7 @@ public class DeployCommandImpl implements CustomCommand {
 				+ "\n\t[-u | -i ] [ -del ]"
 				+ "\ndeploy run <job> [ -t <target> ... ] "
 				+ "\n\t[-u | -i ] [ -del ] [ -c ]"
-				+ "\n\t[-after <command-name> ...]" 
-				+ "\ndeploy rerun <txid> "
+				+ "\n\t[-after <command-name> ...]" + "\ndeploy rerun <txid> "
 				+ "\ndeploy undo <txid> ";
 	}
 }

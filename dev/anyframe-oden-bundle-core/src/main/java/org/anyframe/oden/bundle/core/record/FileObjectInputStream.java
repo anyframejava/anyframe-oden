@@ -25,8 +25,7 @@ import java.io.ObjectInputStream;
 /**
  * InputStream can get the Objects from the file. This is used with FileObjectOutputStream.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class FileObjectInputStream extends FileInputStream {
 
@@ -41,31 +40,35 @@ public class FileObjectInputStream extends FileInputStream {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public Object readObject() throws IOException, ClassNotFoundException{
+	public Object readObject() throws IOException, ClassNotFoundException {
 		// get size
 		byte[] bsize = new byte[4];
 		read(bsize);
 		int size = size(bsize);
-		if(size < 0)
+		if (size < 0)
 			throw new IOException();
-		
+
 		byte[] contents = new byte[size];
 		read(contents);
-		
+
 		ObjectInputStream oin = null;
-		try{
-			oin = new ObjectInputStream(new ByteArrayInputStream(contents)); 
+		try {
+			oin = new ObjectInputStream(new ByteArrayInputStream(contents));
 			return oin.readObject();
-		}finally {
-			try { if(oin != null) oin.close(); } catch (IOException e) { }
+		} finally {
+			try {
+				if (oin != null)
+					oin.close();
+			} catch (IOException e) {
+			}
 		}
 	}
-	
+
 	private int size(byte[] size) {
 		int len = 0;
-		for(int i=3; i>=0; i--){ 
-			len |= ( (size[i] & 0x000000ff) << (8*i) ); 
-//			System.out.printf("%x %x\n", len, size[i]);
+		for (int i = 3; i >= 0; i--) {
+			len |= ((size[i] & 0x000000ff) << (8 * i));
+			// System.out.printf("%x %x\n", len, size[i]);
 		}
 		return len;
 	}

@@ -18,21 +18,20 @@ package org.anyframe.oden.bundle.core.txmitter;
 import org.anyframe.oden.bundle.deploy.DeployerService;
 
 /**
- * Oden Service to communicate with remote DeployerService. This sends 
+ * Oden Service to communicate with remote DeployerService. This sends
  * DelegateService's request to DeployerService.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface TransmitterService {
 	/**
-	 * get the DeployerService from addr 
+	 * get the DeployerService from addr
 	 * 
 	 * @param addr
 	 * @return
 	 */
 	public DeployerService getDeployer(String addr);
-	
+
 	/**
 	 * disconnect to the DeployerService
 	 * 

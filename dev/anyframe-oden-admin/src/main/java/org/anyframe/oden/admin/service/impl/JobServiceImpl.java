@@ -45,9 +45,9 @@ import anyframe.iam.core.acl.IViewResourceAccessService;
 import anyframe.iam.core.reload.IResourceReloadService;
 
 /**
- * @version 1.0
- * @created 14-7-2010 占쏙옙占쏙옙 10:13:30
- * @author LEE Sujeong
+ * This is JobServiceImpl Class
+ * 
+ * @author Sujeong Lee
  */
 @Service("jobService")
 @Transactional(rollbackFor = { Exception.class })
@@ -77,7 +77,7 @@ public class JobServiceImpl implements JobService {
 	@Inject
 	@Named("resourceReloadService")
 	IResourceReloadService service;
-	
+
 	@Inject
 	@Named("viewResourceAccessService")
 	IViewResourceAccessService viewResourceAccessService;
@@ -194,7 +194,7 @@ public class JobServiceImpl implements JobService {
 		if (opt.indexOf("c") != -1) {
 			option_c += "-c ";
 		}
-		
+
 		List paramList = new ArrayList();
 
 		boolean boolDeployAll = false;
@@ -224,7 +224,7 @@ public class JobServiceImpl implements JobService {
 		if (boolDeployAll) {
 			// deploy all whole page
 		} else {
-			Set wholeList = getListByPage(job, option_iu + option_d , objPage);
+			Set wholeList = getListByPage(job, option_iu + option_d, objPage);
 
 			option_iu = option_iu.replaceAll("u", "i");
 			// mode + "@oden@" + file
@@ -265,7 +265,7 @@ public class JobServiceImpl implements JobService {
 		return odenCommonDao.getResultString("deploy", "run", doubleQuotation
 				+ job + doubleQuotation + " " + option_result);
 	}
-	
+
 	/**
 	 * Method for rollback of Job Deploy.
 	 * 
@@ -347,12 +347,10 @@ public class JobServiceImpl implements JobService {
 			}
 
 			if (roles.contains(gName) || roles.get(0).equals("ROLE_ADMIN")) {
-				g
-						.setJobname(ahref_pre
-								+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
-								+ gName + "');" + ahref_mid + gName
-								+ ahref_post);
-				
+				g.setJobname(ahref_pre
+						+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
+						+ gName + "');" + ahref_mid + gName + ahref_post);
+
 				if (runningJob.contains(gName)) {
 					Iterator itr = runningMap.keySet().iterator();
 					String id = "";
@@ -387,7 +385,7 @@ public class JobServiceImpl implements JobService {
 					g.setTxId(id);
 					g.setDate(gStatus);
 					g.setMode(runningJobAction(id));
-					
+
 				} else {
 					String para = "-job " + doubleQuotation + gName
 							+ doubleQuotation;
@@ -396,10 +394,11 @@ public class JobServiceImpl implements JobService {
 
 					if (!(result == null) && !result.equals("")) {
 						JSONArray array = notUndoLog(new JSONArray(result));
-						
+
 						if (!(array.length() == 0)) {
-//							int n = array.length() - 1; // latest history
-							JSONObject object = (JSONObject) array.get(0); // latest history							
+							// int n = array.length() - 1; // latest history
+							JSONObject object = (JSONObject) array.get(0); // latest
+																			// history
 							gTxid = object.getString("txid");
 							String status = object.getString("status");
 							String date = object.getString("date");
@@ -414,40 +413,41 @@ public class JobServiceImpl implements JobService {
 							} else if (status.equalsIgnoreCase("F")) {
 								gStatus = ahref_pre
 										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahref_mid
-										+ imgFail + "(" + date + ")"
-										+ ahref_post;
+										+ gTxid + "');" + ahref_mid + imgFail
+										+ "(" + date + ")" + ahref_post;
 								;
 							} else {
 								gStatus = "";
 							}
-						
-//							String total = object.getString("total");
-//							JSONArray data = (JSONArray) object.get("data");
-//							if (!(data.length() == 0)) {
-//								JSONObject dataObj = (JSONObject) data.get(0);
-//
-//								gTxid = dataObj.getString("txid");
-//								String status = dataObj.getString("status");
-//								String date = dataObj.getString("date");
-//
-//								if (status.equalsIgnoreCase("S")) {
-//									gStatus = ahref_pre
-//											+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-//											+ gTxid + "');" + ahref_mid
-//											+ imgSuccess + "(" + date + ")"
-//											+ ahref_post;
-//									;
-//								} else if (status.equalsIgnoreCase("F")) {
-//									gStatus = ahref_pre
-//											+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-//											+ gTxid + "');" + ahref_mid
-//											+ imgFail + "(" + date + ")"
-//											+ ahref_post;
-//									;
-//								} else {
-//									gStatus = "";
-//								}
+
+							// String total = object.getString("total");
+							// JSONArray data = (JSONArray) object.get("data");
+							// if (!(data.length() == 0)) {
+							// JSONObject dataObj = (JSONObject) data.get(0);
+							//
+							// gTxid = dataObj.getString("txid");
+							// String status = dataObj.getString("status");
+							// String date = dataObj.getString("date");
+							//
+							// if (status.equalsIgnoreCase("S")) {
+							// gStatus = ahref_pre
+							// +
+							// "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+							// + gTxid + "');" + ahref_mid
+							// + imgSuccess + "(" + date + ")"
+							// + ahref_post;
+							// ;
+							// } else if (status.equalsIgnoreCase("F")) {
+							// gStatus = ahref_pre
+							// +
+							// "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+							// + gTxid + "');" + ahref_mid
+							// + imgFail + "(" + date + ")"
+							// + ahref_post;
+							// ;
+							// } else {
+							// gStatus = "";
+							// }
 						} else {
 							gTxid = gName;
 						}
@@ -470,40 +470,40 @@ public class JobServiceImpl implements JobService {
 
 	private JSONArray notUndoLog(JSONArray array) throws Exception {
 		JSONArray rtnArr = new JSONArray();
-		
+
 		if (!(array.length() == 0)) {
 			for (int i = 0; i < array.length(); i++) {
 				JSONObject object = (JSONObject) array.get(i);
 				JSONArray data = (JSONArray) object.get("data");
 				if (!(data.length() == 0)) {
-					for(int j=0 ; j < data.length() ; j++) {
+					for (int j = 0; j < data.length(); j++) {
 						JSONObject dataObj = (JSONObject) data.get(j);
 						String txid = dataObj.getString("txid");
-						if(! isUndoId(txid)) {
+						if (!isUndoId(txid)) {
 							rtnArr.put(dataObj);
 							break;
 						}
-						
+
 					}
-						
+
 				}
 			}
 		}
 		return rtnArr;
 	}
-	
+
 	private boolean isUndoId(String txid) throws Exception {
 		String para = "-job " + doubleQuotation + "deploy undo:" + txid
 				+ doubleQuotation;
-		
+
 		String result = odenCommonDao.getResultString("log", "search", para);
 		JSONArray array = new JSONArray(result);
 		JSONObject object = (JSONObject) array.get(0);
 		JSONArray data = (JSONArray) object.get("data");
-		
+
 		return data.length() == 0 ? false : true;
 	}
-	
+
 	/**
 	 * Methods for getting job list in progress.
 	 * 
@@ -513,7 +513,7 @@ public class JobServiceImpl implements JobService {
 		// HashMap resultMap = new HashMap();
 		String result = odenCommonDao.getResultString("status", "info");
 		String pre = "deploy undo:";
-		
+
 		if (!(result == null) && !result.equals("")) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
@@ -536,7 +536,7 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 	}
-	
+
 	/**
 	 * Methods for getting job name by transaction ID.
 	 * 
@@ -550,14 +550,14 @@ public class JobServiceImpl implements JobService {
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					String jobName = object.getString("job");
-					if(! jobName.equals(""))
+					if (!jobName.equals(""))
 						return jobName;
 				}
 			}
 		}
 		return "";
 	}
-	
+
 	/**
 	 * Method for getting actions for Job List in progress.
 	 * 
@@ -582,7 +582,7 @@ public class JobServiceImpl implements JobService {
 	 * @return String
 	 * @throws Exception
 	 */
-	private String stoppingJobAction(String jobName, String txId,String gStatus)
+	private String stoppingJobAction(String jobName, String txId, String gStatus)
 			throws Exception {
 
 		String imgDeploy = "<img src='images/ico_deploy.gif' alt='Job Deploy' title='Job Deploy' style='vertical-align:middle;'/>";
@@ -602,8 +602,9 @@ public class JobServiceImpl implements JobService {
 		String result = "";
 		List<Integer> permList = new ArrayList<Integer>();
 		permList.add(4);
-		
-		boolean access = viewResourceAccessService.isGranted("addUser", permList);
+
+		boolean access = viewResourceAccessService.isGranted("addUser",
+				permList);
 
 		int optCount = 0;
 		while (optCount < 6) {
@@ -644,7 +645,7 @@ public class JobServiceImpl implements JobService {
 				break;
 			case 4:
 				link = "javascript:delJob('" + jobName + "');";
-				if(access) {
+				if (access) {
 					action = imgDel;
 				} else {
 					action = imgDelUnable;
@@ -653,13 +654,13 @@ public class JobServiceImpl implements JobService {
 				break;
 			case 5:
 				link = "javascript:rollbackJob('" + txId + "');";
-				if(! gStatus.equals("")) {
+				if (!gStatus.equals("")) {
 					action = imgRollback;
 				} else {
 					action = imgRollbackUnable;
 					b = false;
 				}
-				break;	
+				break;
 			default:
 				break;
 			}
@@ -716,8 +717,8 @@ public class JobServiceImpl implements JobService {
 							strExcludes += excludes.get(num) + ", ";
 						}
 						if (!strExcludes.equals("")) {
-							strExcludes = strExcludes.substring(0, strExcludes
-									.length() - 2);
+							strExcludes = strExcludes.substring(0,
+									strExcludes.length() - 2);
 						}
 
 						g.setJobname(name);

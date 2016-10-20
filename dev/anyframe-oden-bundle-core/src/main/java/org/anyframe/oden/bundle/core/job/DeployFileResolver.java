@@ -20,6 +20,11 @@ import java.util.Collection;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.DeployFile;
 
+/**
+ * This is DeployFileResolver class.
+ * 
+ * @author Junghwan Hong
+ */
 public interface DeployFileResolver {
 	Collection<DeployFile> resolveDeployFiles() throws OdenException;
 }

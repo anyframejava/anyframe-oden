@@ -23,11 +23,16 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 
+/**
+ * This is LoggingAspect Class
+ * 
+ * @author Junghwan Hong
+ */
 @Aspect
 @Service
 public class LoggingAspect {
 
-//	@Pointcut("execution(* test1..*Impl.*(..)) || execution(* anyframe.core.ria.mip..*MiPServiceImpl.*(..))")
+	// @Pointcut("execution(* test1..*Impl.*(..)) || execution(* anyframe.core.ria.mip..*MiPServiceImpl.*(..))")
 	@Pointcut("execution(* anyframe.oden.admin..*Impl.*(..))")
 	public void serviceMethod() {
 	}

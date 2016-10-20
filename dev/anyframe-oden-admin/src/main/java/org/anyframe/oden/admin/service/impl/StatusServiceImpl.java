@@ -23,9 +23,9 @@ import org.springframework.stereotype.Service;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:35
- * @author HONG JungHwan
+ * This is StatusServiceImpl Class
+ * 
+ * @author Junghwan Hong
  */
 @Service("statusService")
 public class StatusServiceImpl implements StatusService {

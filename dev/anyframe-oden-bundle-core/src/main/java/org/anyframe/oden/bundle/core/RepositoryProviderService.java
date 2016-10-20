@@ -22,12 +22,10 @@ import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.repository.RepositoryService;
 
 /**
- * 
  * interface class to provides convenient methods to provide repository's
  * information.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public interface RepositoryProviderService {
 	/**
@@ -39,7 +37,7 @@ public interface RepositoryProviderService {
 	public RepositoryService getRepoServiceByURI(String[] repoArgs);
 
 	public RepositoryAdaptor getRepositoryAdaptor(String[] args);
-	
+
 	/**
 	 * get all loaded RepositoryService's protocols
 	 * 
@@ -65,7 +63,8 @@ public interface RepositoryProviderService {
 	public List<String> getRepositoryUsages();
 
 	/**
-	 * check if there are any matched RepositoryService with the specified repository arguments.
+	 * check if there are any matched RepositoryService with the specified
+	 * repository arguments.
 	 * 
 	 * @param repoArgs
 	 * @return

@@ -43,8 +43,7 @@ import org.anyframe.oden.bundle.common.StringUtil;
 /**
  * RepositoryService to access local file system.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	public static final String PROTOCOL = "file://";
@@ -83,8 +82,8 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		FatInputStream in = null;
 		try {
 			File f = new File(stripProtocol(args[0]), file);
-			in = new FatInputStream(new FileInputStream(f), file, f
-					.isDirectory(), f.lastModified(), f.length());
+			in = new FatInputStream(new FileInputStream(f), file,
+					f.isDirectory(), f.lastModified(), f.length());
 			return in;
 		} catch (Exception e) {
 			throw new OdenException(e);
@@ -105,8 +104,8 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		FatInputStream in = null;
 		try {
 			File f = new File(stripProtocol(path));
-			in = new FatInputStream(new FileInputStream(f), path, f
-					.isDirectory(), f.lastModified(), f.length());
+			in = new FatInputStream(new FileInputStream(f), path,
+					f.isDirectory(), f.lastModified(), f.length());
 
 			return in;
 		} catch (Exception e) {
@@ -221,8 +220,8 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		if (children == null)
 			throw new OdenException("Invalid location: " + path);
 		for (File f : children) {
-			FileInfo mf = new FileInfo(f.getPath(), f.isDirectory(), f
-					.lastModified());
+			FileInfo mf = new FileInfo(f.getPath(), f.isDirectory(),
+					f.lastModified());
 			files.add(mf);
 		}
 		return files;
@@ -435,14 +434,12 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 					if (ff.getName().equals("java")
 							|| ff.getName().equals("resources")) {
 						// src/main/java or src/main/resources
-						ret.add(FileUtil.getRelativePath(root, ff
-								.getAbsolutePath()));
+						ret.add(FileUtil.getRelativePath(root,
+								ff.getAbsolutePath()));
 					}
 				}
 				if (ret.isEmpty())
-					ret
-							.add(FileUtil.getRelativePath(root, f
-									.getAbsolutePath())); // src/main
+					ret.add(FileUtil.getRelativePath(root, f.getAbsolutePath())); // src/main
 			}
 			if (!ret.isEmpty())
 				break;
@@ -482,8 +479,8 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 
 		File f = findDirFile(dir, dirName, exclude == null ? null : new File(
 				exclude));
-		return f == null ? null : FileUtil.getRelativePath(root, f
-				.getAbsolutePath());
+		return f == null ? null : FileUtil.getRelativePath(root,
+				f.getAbsolutePath());
 	}
 
 	private File findDirFile(File dir, String dirName, File exclude) {

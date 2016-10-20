@@ -33,18 +33,17 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * Main class to generate oden accounts
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Account {
-//	final static String CONFIG_FILE = "conf/oden.ini";
-	
-	public static void main(String... args){
-		if(args.length != 2){
+	// final static String CONFIG_FILE = "conf/oden.ini";
+
+	public static void main(String... args) {
+		if (args.length != 2) {
 			System.out.println("Usage: <id> <pwd>");
 			System.exit(-1);
 		}
-		
+
 		File accFile = null;
 		try {
 			accFile = new File(odenHome(), SecurityHandler.ACCOUNT_FILE);
@@ -52,46 +51,57 @@ public class Account {
 			String encoded = encode(args[0], args[1]);
 			writeToFile(accFile, args[0], encoded);
 		} catch (Exception e) {
-			try{System.out.println(Account.class.getProtectionDomain().getCodeSource().getLocation().toURI()+"");}catch(Exception ee){}
+			try {
+				System.out.println(Account.class.getProtectionDomain()
+						.getCodeSource().getLocation().toURI()
+						+ "");
+			} catch (Exception ee) {
+			}
 			System.out.println("Fail to register account. " + e.getMessage());
 			System.exit(-1);
 		}
 		System.out.println(args[0] + " is registered: " + accFile);
 	}
 
-	private static String encode(String id, String pwd) throws UnsupportedEncodingException {
-		return new String(Base64.encodeBase64((id + ":" + pwd).getBytes()), "ASCII");
+	private static String encode(String id, String pwd)
+			throws UnsupportedEncodingException {
+		return new String(Base64.encodeBase64((id + ":" + pwd).getBytes()),
+				"ASCII");
 	}
-	
-	private static void writeToFile(File f, String id, String encoded) throws IOException {
+
+	private static void writeToFile(File f, String id, String encoded)
+			throws IOException {
 		Properties prop = new Properties();
-		
-		if(f.exists()){
+
+		if (f.exists()) {
 			InputStream in = null;
-			try{
+			try {
 				in = new BufferedInputStream(new FileInputStream(f));
 				prop.load(in);
-			}finally{
-				if(in != null) in.close();
+			} finally {
+				if (in != null)
+					in.close();
 			}
 		}
-		
+
 		prop.put(id, encoded);
-		
+
 		OutputStream out = null;
-		try{
+		try {
 			out = new BufferedOutputStream(new FileOutputStream(f));
 			prop.store(out, null);
-		}finally{
-			if(out != null) out.close();
-		}	
+		} finally {
+			if (out != null)
+				out.close();
+		}
 	}
 
 	public static File odenHome() {
-		try{
-			URL url = new URL(Account.class.getProtectionDomain().getCodeSource().getLocation().toString());
+		try {
+			URL url = new URL(Account.class.getProtectionDomain()
+					.getCodeSource().getLocation().toString());
 			return new File(url.getPath()).getParentFile().getParentFile();
-		}catch(Exception e){
+		} catch (Exception e) {
 			return new File("..");
 		}
 	}

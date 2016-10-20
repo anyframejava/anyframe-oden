@@ -19,20 +19,25 @@ import org.anyframe.oden.bundle.common.FatInputStream;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.repository.RepositoryService;
 
+/**
+ * This is RepositoryAdaptor class.
+ * 
+ * @author Junghwan Hong
+ */
 public class RepositoryAdaptor {
 	RepositoryService svc;
 	String[] args;
-	
-	public RepositoryAdaptor(RepositoryService svc, String[] args){
+
+	public RepositoryAdaptor(RepositoryService svc, String[] args) {
 		this.svc = svc;
 		this.args = args;
 	}
-	
-	public FatInputStream resolve(String file) throws OdenException{
+
+	public FatInputStream resolve(String file) throws OdenException {
 		return svc.resolve(args, file);
 	}
-	
-	public void close(){
+
+	public void close() {
 		svc.close(args);
 	}
 }

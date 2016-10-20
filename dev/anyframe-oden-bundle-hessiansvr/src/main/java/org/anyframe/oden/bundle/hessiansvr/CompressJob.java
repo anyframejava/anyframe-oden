@@ -30,116 +30,123 @@ import org.anyframe.oden.bundle.deploy.DoneFileInfo;
 import org.anyframe.oden.bundle.deploy.StoppableJob;
 
 /**
+ * Job to compress files.
  * 
- * Job to compress files. 
+ * @author Junghwan Hong
  * @see anyframe.oden.bundle.deploy.StoppableJob
- * 
- * @author joon1k
- *
  */
 public class CompressJob extends StoppableJob {
 	String srcdir;
 	String destFile;
-	
-	public CompressJob(String id, String srcdir, String destFile){
+
+	public CompressJob(String id, String srcdir, String destFile) {
 		super(id);
 		this.srcdir = srcdir;
 		this.destFile = destFile;
 	}
-	
-	
+
 	@Override
 	protected Object execute() throws IOException {
 		File s = new File(srcdir);
 		File d = new File(destFile);
-		
-		if(!s.isAbsolute())
+
+		if (!s.isAbsolute())
 			throw new IOException("Absolute path is allowed only: " + s);
-		if(!d.isAbsolute())
+		if (!d.isAbsolute())
 			throw new IOException("Absolute path is allowed only: " + d);
-		
-		return compress(s, d);		
+
+		return compress(s, d);
 	}
 
-	private DoneFileInfo compress(File srcdir, File destFile) throws IOException {		
+	private DoneFileInfo compress(File srcdir, File destFile)
+			throws IOException {
 		try {
 			FileUtil.mkdirs(destFile);
 			_compress(srcdir, destFile);
-			return new DoneFileInfo(destFile.getName(), false, destFile.lastModified(), destFile.length(), false, true);
-		}catch(IOException e) {
-			if(destFile != null)
+			return new DoneFileInfo(destFile.getName(), false,
+					destFile.lastModified(), destFile.length(), false, true);
+		} catch (IOException e) {
+			if (destFile != null)
 				destFile.delete();
 			throw e;
 		}
 	}
-	
+
 	/**
-	 * dir을 jar로 묶음.
-	 * jar가 이미 존재하면, 기존꺼 새걸로 바꿈.
+	 * dir을 jar로 묶음. jar가 이미 존재하면, 기존꺼 새걸로 바꿈.
+	 * 
 	 * @param dir
 	 * @param jar
 	 * @return size of the compressed file
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private long _compress(File dir, File jar) throws IOException{
-		if(!dir.exists() || !dir.isDirectory())
+	private long _compress(File dir, File jar) throws IOException {
+		if (!dir.exists() || !dir.isDirectory())
 			throw new IOException("Couldn't find: " + dir);
-		if(jar.exists()){
-			if(jar.isDirectory())
+		if (jar.exists()) {
+			if (jar.isDirectory())
 				throw new IOException("Fail to write: " + jar.getPath());
 			jar.delete();
 		}
 
 		ZipOutputStream jout = null;
-		try{
-			jout = new ZipOutputStream(
-					new BufferedOutputStream(new FileOutputStream(jar) ));
+		try {
+			jout = new ZipOutputStream(new BufferedOutputStream(
+					new FileOutputStream(jar)));
 			compressDir(dir, dir, jout);
 			return jar.length();
 		} finally {
-			if(jout != null) jout.close();
+			if (jout != null)
+				jout.close();
 		}
 	}
-	
+
 	/**
-	 * dir의 파일들을 out으로 압축. root는 dir과 동일하게 적으면 됨
-	 * 파일들의 시간 그대로 유지.
+	 * dir의 파일들을 out으로 압축. root는 dir과 동일하게 적으면 됨 파일들의 시간 그대로 유지.
+	 * 
 	 * @param root
 	 * @param dir
 	 * @param out
 	 * @return size of the orginal dir
 	 * @throws IOException
 	 */
-	private void compressDir(final File root, File dir, ZipOutputStream out) 
+	private void compressDir(final File root, File dir, ZipOutputStream out)
 			throws IOException {
 		File[] files = dir.listFiles();
-		if(files != null){
-			for(File file : files) {
-				if(stop)
+		if (files != null) {
+			for (File file : files) {
+				if (stop)
 					throw new IOException("stopped by a user.");
-				
-				if(file.isDirectory()){
+
+				if (file.isDirectory()) {
 					compressDir(root, file, out);
 					continue;
 				}
-				
+
 				InputStream in = null;
 				try {
-					in = new BufferedInputStream(
-							new FileInputStream(file));
-					ZipEntry entry = new ZipEntry(FileUtil.getRelativePath(root.getPath(), file.getPath()));
+					in = new BufferedInputStream(new FileInputStream(file));
+					ZipEntry entry = new ZipEntry(FileUtil.getRelativePath(
+							root.getPath(), file.getPath()));
 					out.putNextEntry(entry);
-					
+
 					FileUtil.copy(in, out);
 					entry.setTime(file.lastModified());
 
 				} finally {
-					try { out.closeEntry(); } catch (IOException e) {}
-					try{ if(in != null) in.close(); } catch(IOException e) {}
-					
+					try {
+						out.closeEntry();
+					} catch (IOException e) {
+					}
+					try {
+						if (in != null)
+							in.close();
+					} catch (IOException e) {
+					}
+
 				}
 			}
-						
+
 		}
 	}
 }

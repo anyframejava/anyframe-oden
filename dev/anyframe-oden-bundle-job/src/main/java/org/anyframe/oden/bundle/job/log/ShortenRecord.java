@@ -15,6 +15,11 @@
  */
 package org.anyframe.oden.bundle.job.log;
 
+/**
+ * This is ShortenRecord Class
+ * 
+ * @author Junghwan Hong
+ */
 public class ShortenRecord {
 	String id;
 	String job;
@@ -24,11 +29,12 @@ public class ShortenRecord {
 	int total;
 	int nSuccess;
 	String log;
-	
-	public ShortenRecord(){}
-	
+
+	public ShortenRecord() {
+	}
+
 	public ShortenRecord(String id, String job, long date, String user,
-			boolean isSuccess, int total, int nSuccess, String log){
+			boolean isSuccess, int total, int nSuccess, String log) {
 		this.id = id;
 		this.job = job;
 		this.date = date;
@@ -102,5 +108,5 @@ public class ShortenRecord {
 	public void setLog(String log) {
 		this.log = log;
 	}
-	
+
 }

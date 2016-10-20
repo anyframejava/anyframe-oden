@@ -16,11 +16,9 @@
 package org.anyframe.oden.bundle.core.job;
 
 /**
- * 
  * This class managing jobs in queue.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface JobManager {
 	/**
@@ -29,7 +27,7 @@ public interface JobManager {
 	 * @return
 	 */
 	public Job[] jobs();
-	
+
 	/**
 	 * get the job which are matched with the id.
 	 * 
@@ -37,22 +35,23 @@ public interface JobManager {
 	 * @return
 	 */
 	public Job job(String id);
-	
+
 	public Job job();
-	
+
 	/**
 	 * canceling the job which are running or waiting
+	 * 
 	 * @param j
 	 */
 	public void cancel(Job j);
-	
+
 	/**
 	 * scheduling the job
 	 * 
 	 * @param j
 	 */
 	public void schedule(Job j);
-	
+
 	/**
 	 * scheduling the job & waiting to finish
 	 * 

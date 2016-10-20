@@ -35,8 +35,8 @@ import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.common.Utils;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.DeployFile;
-import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.DeployFile.Mode;
+import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.command.DeployerManager;
 import org.anyframe.oden.bundle.core.job.DeployFileResolver;
 import org.anyframe.oden.bundle.core.job.DeployJob;
@@ -54,8 +54,7 @@ import org.osgi.framework.BundleContext;
 /**
  * ReDeploy Job & make cancel available.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class RerunJob extends DeployJob {
 	protected TransmitterService txmitterService;
@@ -143,20 +142,18 @@ public class RerunJob extends DeployJob {
 
 				if (f.mode() == Mode.DELETE) {
 					// delete mode
-					d = ds
-							.backupNRemove(f.getAgent().location(),
-									f.getPath(), backupLocation
-											.equals("snapshot") ? null
-											: FileUtil.combinePath(
-													backupLocation, id),
-									backupcnt);
+					d = ds.backupNRemove(
+							f.getAgent().location(),
+							f.getPath(),
+							backupLocation.equals("snapshot") ? null : FileUtil
+									.combinePath(backupLocation, id), backupcnt);
 
 					f.setSuccess(true);
 					nSuccess++;
 				} else {
 					// add, update mode
 					f.setDate(t);
-					DeployerHelper.readyToDeploy(ds, f, true, backupcnt);
+					DeployerHelper.readyToDeploy(ds, f, true, backupcnt,false);
 					inProgressFiles.put(f, ds);
 				}
 
@@ -197,8 +194,8 @@ public class RerunJob extends DeployJob {
 
 	protected void done() {
 		try {
-			RecordElement2 r = new RecordElement2(id, deployFiles, user, System
-					.currentTimeMillis(), desc);
+			RecordElement2 r = new RecordElement2(id, deployFiles, user,
+					System.currentTimeMillis(), desc);
 			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);
@@ -260,8 +257,11 @@ public class RerunJob extends DeployJob {
 			Thread th = new Thread() {
 				public void run() {
 					try {
-						DoneFileInfo info = DeployerHelper.close(deployer, f,
-								null, backupLocation.equals("snapshot") ? null
+						DoneFileInfo info = DeployerHelper.close(
+								deployer,
+								f,
+								null,
+								backupLocation.equals("snapshot") ? null
 										: FileUtil.combinePath(backupLocation,
 												id));
 						if (info == null || info.size() == -1L)

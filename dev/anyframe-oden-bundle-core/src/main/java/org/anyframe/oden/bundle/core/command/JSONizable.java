@@ -16,11 +16,10 @@
 package org.anyframe.oden.bundle.core.command;
 
 /**
- * If there some classes implementing this, it means it can generate
- * JSON output.
+ * If there some classes implementing this, it means it can generate JSON
+ * output.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface JSONizable {
 	public Object jsonize();

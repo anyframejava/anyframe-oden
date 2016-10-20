@@ -18,6 +18,11 @@ package org.anyframe.oden.admin.common;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is Opt Class
+ * 
+ * @author Junghwan Hong
+ */
 public class Opt {
 
 	protected String name = "";
@@ -25,12 +30,13 @@ public class Opt {
 
 	/**
 	 * 
-	 * @param sOpt option name and its args. option name hasn't '-'.
+	 * @param sOpt
+	 *            option name and its args. option name hasn't '-'.
 	 */
 	public Opt(String sOpt) {
 		String[] sArgs = CommonUtil.split(sOpt);
 		name = sArgs[0];
-		for(int i=1; i < sArgs.length; i++)
+		for (int i = 1; i < sArgs.length; i++)
 			args.add(sArgs[i]);
 	}
 
@@ -40,19 +46,19 @@ public class Opt {
 
 	public List<String> getArgList() {
 		List<String> list = new ArrayList<String>();
-		for(String s : args)
+		for (String s : args)
 			list.add(s);
 		return list;
 	}
 
-	public String[] getArgArray() { 
+	public String[] getArgArray() {
 		return args.toArray(new String[args.size()]);
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer("-"+name);
-		for(String val0 : args){
+		StringBuffer buf = new StringBuffer("-" + name);
+		for (String val0 : args) {
 			buf.append(" \"" + val0 + "\"");
 		}
 		return buf.toString();

@@ -18,24 +18,22 @@ package org.anyframe.oden.bundle.deploy;
 import java.io.IOException;
 
 /**
- * 
  * This class can control job to start and stop.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public abstract class StoppableJob {
 	protected boolean stop = false;
-	
+
 	protected boolean isAlive = false;
-	
+
 	protected String id;
-	
-	public StoppableJob(String id){
+
+	public StoppableJob(String id) {
 		this.id = id;
 	}
-	
-	public Object start() throws IOException{
+
+	public Object start() throws IOException {
 		isAlive = true;
 		Object o = execute();
 		isAlive = false;
@@ -44,18 +42,18 @@ public abstract class StoppableJob {
 		}
 		return o;
 	}
-	
+
 	abstract protected Object execute() throws IOException;
-	
-	public void stop(){
+
+	public void stop() {
 		stop = true;
 	}
-	
-	public boolean isAlive(){
+
+	public boolean isAlive() {
 		return isAlive;
 	}
-	
-	public String id(){
+
+	public String id() {
 		return id;
 	}
 }

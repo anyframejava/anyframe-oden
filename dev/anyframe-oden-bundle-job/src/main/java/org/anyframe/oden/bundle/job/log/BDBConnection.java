@@ -26,46 +26,54 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.Transaction;
 import com.sleepycat.je.TransactionConfig;
 
+/**
+ * This is BDBConnection Class
+ * 
+ * @author Junghwan Hong
+ */
 public class BDBConnection {
 	Environment env;
 	boolean readonly;
-	
-	public BDBConnection(boolean readonly){
+
+	public BDBConnection(boolean readonly) {
 		this("meta", readonly);
 	}
-	
-	public BDBConnection(String loc, boolean readonly){
+
+	public BDBConnection(String loc, boolean readonly) {
 		this.readonly = readonly;
 		env = getEnvironment(loc, readonly);
 	}
-	
-	private Environment getEnvironment(String loc, boolean readonly){
+
+	private Environment getEnvironment(String loc, boolean readonly) {
 		EnvironmentConfig envCfg = new EnvironmentConfig();
 		envCfg.setReadOnly(readonly);
 		envCfg.setAllowCreate(!readonly);
 		envCfg.setTransactional(!readonly);
-		return new Environment(
-				new File(BundleUtil.odenHome(), loc), envCfg);
+		return new Environment(new File(BundleUtil.odenHome(), loc), envCfg);
 	}
-	
-	public Database openDB(String name){
-		return env.openDatabase(null, name, getDBConfig(readonly));	
+
+	public Database openDB(String name) {
+		return env.openDatabase(null, name, getDBConfig(readonly));
 	}
-	
-	private DatabaseConfig getDBConfig(boolean readonly){
+
+	private DatabaseConfig getDBConfig(boolean readonly) {
 		DatabaseConfig dbcfg = new DatabaseConfig();
 		dbcfg.setReadOnly(readonly);
 		dbcfg.setAllowCreate(!readonly);
 		dbcfg.setTransactional(!readonly);
 		return dbcfg;
 	}
-	
-	public void close(){
-		try{ if(env != null) env.close(); }catch(Exception e){}
+
+	public void close() {
+		try {
+			if (env != null)
+				env.close();
+		} catch (Exception e) {
+		}
 	}
-	
-	public Transaction beginTransaction(Transaction parent, 
-			TransactionConfig txConfig){
+
+	public Transaction beginTransaction(Transaction parent,
+			TransactionConfig txConfig) {
 		return env.beginTransaction(parent, txConfig);
 	}
 }

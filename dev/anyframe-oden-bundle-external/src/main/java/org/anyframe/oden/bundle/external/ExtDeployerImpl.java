@@ -75,11 +75,9 @@ import org.osgi.framework.FrameworkUtil;
  * all methods are throws Exception to catch ROSGiException(RuntimeExcetpion) on
  * the remote caller.
  * 
+ * @author Junghwan Hong
  * @see ExtDeployerService
  * @ThreadSafe
- * 
- * @author junghwan.hong
- * 
  */
 public class ExtDeployerImpl implements ExtDeployerService {
 

@@ -18,14 +18,13 @@ package org.anyframe.oden.bundle.common;
 /**
  * There some bugs while parsing strings, you can use this.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public class OdenParseException extends OdenException{
+public class OdenParseException extends OdenException {
 
 	private static final long serialVersionUID = 7470352273080950966L;
 
-	public OdenParseException(String line){
+	public OdenParseException(String line) {
 		super("Fail to parse string: " + line);
 	}
 }

@@ -16,7 +16,7 @@
 			관리하며 사용자는 커맨드 라인이나 ODEN Admin과 같은 GUI환경을 통해 ODEN Server에 명령을
 			내리게
 			된다. 사용자는 Agent에 직접 명령을 내릴 수 없으며, ODEN Server를 통해 Agent에 명령을 내려야
-			한다.
+			하며 대칭키 방식의 알고리즘을 통해 암호화 하여 주요 정보는 기밀성을 보장한다.
 		</para>
 
 		<section
@@ -25,7 +25,7 @@
 
 			<para>
 				배포될 파일이 존재하는 시스템에 
-				ODEN Server를 설치해야 한다. 
+				ODEN Server를 설치해야 하고 원할한 작동을 위해 설치 경로는 영문으로 구성 되어야 한다. 
 			</para>
 
 			<para>
@@ -39,7 +39,7 @@
 			</para>
 		    <para>
 		    	압축파일에는 ODEN 및 ODEN Admin이 모두 포함되어 있다. ODEN은 Server모드(bin/startup.sh or bin/startup.cmd)로도 
-		    	Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. Agent만 설치하고 싶다면, oden폴더만 복사하여
+		    	Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. Agent만 설치하고 싶다면, core 디렉토리만 복사하여
 		    	Agent모드로 부팅시키면 된다.
 		    </para>
 		    
@@ -125,7 +125,7 @@
 					</listitem>
 					<listitem>
 						<para>
-							page.scale, page.cache.size: page처리 시 사용될 기본값. 수정할 필요없음.
+							page.scale: page처리 시 사용될 기본값. 수정할 필요없음.
 						</para>
 					</listitem>
 					
@@ -137,6 +137,16 @@
 					<listitem>
 						<para>
 							log.duration: 배포 이력 보관 기간. 단위 day. 기본값 365.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							server.ip: ODEN Server의 IP. 허용되는 ODEN Server의 IP를 등록할 때 사용
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							security.key: 파일 전송 시 암호화 및 복호화를 하기 위한 키 값. 기능을 사용 할 경우 키 값을 정의하며, oden.ini 와 agent.ini 에 동일한 값이 정의 되어야 한다.
 						</para>
 					</listitem>
 				</itemizedlist>

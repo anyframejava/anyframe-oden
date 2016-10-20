@@ -20,9 +20,8 @@ import java.io.Serializable;
 /**
  * Domain class for status info.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Status implements Serializable {
@@ -106,7 +105,7 @@ public class Status implements Serializable {
 	public void setProgress(String progress) {
 		this.progress = progress;
 	}
-	
+
 	public String getTotalWorks() {
 		return totalWorks;
 	}

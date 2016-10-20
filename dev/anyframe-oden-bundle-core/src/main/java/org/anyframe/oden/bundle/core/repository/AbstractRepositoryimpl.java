@@ -23,34 +23,34 @@ import java.io.IOException;
 /**
  * Abstract class having common method for the RepositoryService.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public abstract class AbstractRepositoryimpl implements RepositoryService {
 
 	public boolean matchedURI(String[] args) {
-		if(args.length == 0)
+		if (args.length == 0)
 			return false;
-		if(args[0].startsWith(getProtocol())){
+		if (args[0].startsWith(getProtocol())) {
 			return true;
 		}
 		return false;
 	}
-		
+
 	protected String stripProtocol(String uri) {
-		if(!uri.startsWith(getProtocol()))
+		if (!uri.startsWith(getProtocol()))
 			return uri;
 		return uri.substring(getProtocol().length());
 	}
 
-	
 	/**
 	 * close시 파일도 삭제
+	 * 
 	 * @author joon1k
-	 *
+	 * 
 	 */
 	protected class TmpFileInputStream extends FileInputStream {
 		private File file;
+
 		public TmpFileInputStream(File file) throws FileNotFoundException {
 			super(file);
 			this.file = file;
@@ -58,14 +58,14 @@ public abstract class AbstractRepositoryimpl implements RepositoryService {
 
 		@Override
 		public void close() throws IOException {
-			try{
+			try {
 				super.close();
 			} finally {
 				file.delete();
-			}	// end of try catch
-			
+			} // end of try catch
+
 		}
-		
+
 	}
-	
+
 }

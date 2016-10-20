@@ -23,21 +23,20 @@ import java.util.List;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+
 /**
- * 
  * One of several ways to register the OSGi service.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class BundleUtil {
 	public static Object getService(BundleContext ctx, Class clz) {
 		List<Object> svcs = getServices(ctx, clz);
-		if(svcs.size() == 0)
+		if (svcs.size() == 0)
 			return null;
 		return svcs.get(0);
 	}
-	
+
 	/**
 	 * method to get the osgi service from the bundle context
 	 * 
@@ -46,28 +45,30 @@ public class BundleUtil {
 	 * @return
 	 */
 	public static List<Object> getServices(BundleContext ctx, Class clz) {
-		try{
-			ServiceReference[] refs = ctx.getServiceReferences(clz.getName(), null);
+		try {
+			ServiceReference[] refs = ctx.getServiceReferences(clz.getName(),
+					null);
 			List<Object> svcs = new ArrayList<Object>();
-			for(int i=0; i<refs.length; i++)
+			for (int i = 0; i < refs.length; i++)
 				svcs.add(ctx.getService(refs[i]));
 			return svcs;
-		}catch(Throwable t){
+		} catch (Throwable t) {
 		}
 		return Collections.EMPTY_LIST;
 	}
-	
+
 	/**
-	 * method to get the oden home directory. Through this you can get the oden home
-	 * directory regardless of where you launch the oden.
+	 * method to get the oden home directory. Through this you can get the oden
+	 * home directory regardless of where you launch the oden.
 	 * 
 	 * @return
 	 */
 	public static File odenHome() {
-		try{
-			URL url = new URL(BundleUtil.class.getProtectionDomain().getCodeSource().getLocation().toString());
+		try {
+			URL url = new URL(BundleUtil.class.getProtectionDomain()
+					.getCodeSource().getLocation().toString());
 			return new File(url.getPath()).getParentFile().getParentFile();
-		}catch(Exception e){
+		} catch (Exception e) {
 			return new File("..");
 		}
 	}

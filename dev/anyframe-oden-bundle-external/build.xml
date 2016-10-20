@@ -1,7 +1,7 @@
-<project name="Oden External Interface" default="all-local" basedir=".">
+<project name="Oden External Interface" default="all.dbg" basedir=".">
 	
 	<property name="bundle.name" value="anyframe-oden-bundle-external" />
-	<property name="version" value="1.0.1"/>
+	<property name="version" value="1.2.0"/>
 			
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -23,7 +23,7 @@
 			<not><isset property="dbg"/></not>
 		</condition>
 		<javac srcdir="${src}" destdir="${build}"
-				debug="on" debuglevel="lines,vars,source" encoding="utf-8">
+			debug="true" debuglevel="lines,vars,source" deprecation="on" encoding="utf-8">
 			<classpath>
 				<fileset dir="${bundle.loc}"/>
 				<pathelement location="lib/hessian-3.1.6.jar"/>
@@ -31,7 +31,17 @@
 		</javac>
 	</target>
 	
-	<target name="dist.bundle" depends="compile.bundle">
+	<target name="pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+	        <formatter type="xml" toFile="target/pmd.xml"/>
+	        <fileset dir="src">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>
+	    	
+	<target name="dist.bundle" depends="compile.bundle, pmd">
 		<copy todir="${build}">
 			<fileset dir="${basedir}" includes="OSGI-INF/*.xml"/>
 		</copy>
@@ -72,7 +82,7 @@
 	</target>
 	
 	<target name="all.dbg">
-		<property name="dbg" value="on"/>
+		<property name="dbg" value="true"/>
 		<antcall target="all-local"/>
 	</target>
 	

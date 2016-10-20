@@ -22,50 +22,45 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * This class provides some properties when using OdenBrokerService.   
+ * This class provides some properties when using OdenBrokerService.
  * 
- * @author Hong JungHwan
- *
+ * @author Junghwan Hong
  */
 public class BrokerHandler implements InitializingBean {
 
 	private static OdenBrokerService OdenBroker = new OdenBrokerImpl();
-	
+
 	private static String server;
 	private static String port;
-	
+
 	protected static ApplicationContext context;
 
-	
 	/**
 	 * initializing
 	 */
 	private void setup() {
-		context = new ClassPathXmlApplicationContext("classpath:spring/context-property.xml");
+		context = new ClassPathXmlApplicationContext(
+				"classpath:spring/context-property.xml");
 		Map key = (Map) context.getBean("contextProperties");
-		
+
 		server = (String) key.get("oden.server");
 		port = (String) key.get("oden.port");
 	}
-	
-	
-	
-	public static String cmdConnect(String cmd) throws Exception{
-		//setup();
-		
+
+	public static String cmdConnect(String cmd) throws Exception {
+		// setup();
+
 		String result = "";
-		
+
 		result = OdenBroker.sendRequest("http://" + server + ":" + port
 				+ "/shell", cmd);
-		
+
 		return result;
 	}
-
-
 
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
 		setup();
 	}
-	
+
 }

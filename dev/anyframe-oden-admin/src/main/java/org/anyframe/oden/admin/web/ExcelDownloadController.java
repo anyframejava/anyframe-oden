@@ -35,40 +35,41 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * controller class for exceldownload.
- * @author Hong JungHwan
+ * 
+ * @author Junghwan Hong
  */
 @Controller
 @RequestMapping("/excel.do")
-public class ExcelDownloadController  {
+public class ExcelDownloadController {
 	@Resource
-    private HistoryService historyService = null;
+	private HistoryService historyService = null;
 	@Resource
 	private JobService jobService = null;
-	
-	@RequestMapping(params="method=history")
-	public void export2excelHistory(@RequestParam("cmd") String cmd, 
+
+	@RequestMapping(params = "method=history")
+	public void export2excelHistory(@RequestParam("cmd") String cmd,
 			Model model, HttpServletResponse res) throws Exception {
 		List<Log> logs = historyService.findByPkExcel(cmd);
-		
+
 		res.reset();
-		res.setHeader("Content-type","application/xls");
-		res.setHeader("Content-disposition","inline; filename=history.xls");
+		res.setHeader("Content-type", "application/xls");
+		res.setHeader("Content-disposition", "inline; filename=history.xls");
 
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();
-		
-		
+
 		HSSFRow row0 = sheet.createRow(0);
 		row0.createCell(0).setCellValue(new HSSFRichTextString("ID"));
 		row0.createCell(1).setCellValue(new HSSFRichTextString("JOB NAME"));
 		row0.createCell(2).setCellValue(new HSSFRichTextString("DATE"));
-		row0.createCell(3).setCellValue(new HSSFRichTextString("COUNTS(SUCCESS/TOTAL)"));
+		row0.createCell(3).setCellValue(
+				new HSSFRichTextString("COUNTS(SUCCESS/TOTAL)"));
 		row0.createCell(4).setCellValue(new HSSFRichTextString("USER ID"));
-		
+
 		int irow = 1;
-		for(Log p : logs) {
+		for (Log p : logs) {
 			HSSFRow row = sheet.createRow(irow++);
-			
+
 			int icell = 0;
 			row.createCell(icell++).setCellValue(
 					new HSSFRichTextString(p.getTxid()));
@@ -81,18 +82,19 @@ public class ExcelDownloadController  {
 			row.createCell(icell++).setCellValue(
 					new HSSFRichTextString(p.getUser()));
 		}
-	    wb.write(res.getOutputStream());
+		wb.write(res.getOutputStream());
 	}
-	
-	@RequestMapping(params="method=historydetail")
+
+	@RequestMapping(params = "method=historydetail")
 	public void export2excelHistoryDetail(@RequestParam("txid") String txid,
 			@RequestParam("cmd") String cmd, Model model,
 			HttpServletResponse res) throws Exception {
-		List<Log> logs = historyService.showExcel(txid , cmd);
+		List<Log> logs = historyService.showExcel(txid, cmd);
 
 		res.reset();
 		res.setHeader("Content-type", "application/xls");
-		res.setHeader("Content-disposition", "inline; filename=historydetail.xls");
+		res.setHeader("Content-disposition",
+				"inline; filename=historydetail.xls");
 
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();
@@ -126,18 +128,19 @@ public class ExcelDownloadController  {
 		}
 		wb.write(res.getOutputStream());
 	}
-	
-	@RequestMapping(params="method=compare")
+
+	@RequestMapping(params = "method=compare")
 	public void export2excelCompare(@RequestParam("cmd") String param,
 			@RequestParam("tgt") String tgt, Model model,
 			HttpServletResponse res) throws Exception {
 		String[] tgts = tgt.split(",");
 		List<HashMap> compares = jobService.excel(param);
 		int icol = 2;
-		
+
 		res.reset();
 		res.setHeader("Content-type", "application/xls");
-		res.setHeader("Content-disposition", "inline; filename=comparetarget.xls");
+		res.setHeader("Content-disposition",
+				"inline; filename=comparetarget.xls");
 
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();
@@ -145,23 +148,23 @@ public class ExcelDownloadController  {
 		HSSFRow row0 = sheet.createRow(0);
 		row0.createCell(0).setCellValue(new HSSFRichTextString("STATUS"));
 		row0.createCell(1).setCellValue(new HSSFRichTextString("FILE"));
-		for(String t : tgts) {
+		for (String t : tgts) {
 			row0.createCell(icol).setCellValue(new HSSFRichTextString(t));
 			icol++;
 		}
-		
+
 		int irow = 1;
 		for (HashMap hm : compares) {
 			HSSFRow row = sheet.createRow(irow++);
 
 			int icell = 0;
 			row.createCell(icell++).setCellValue(
-					new HSSFRichTextString((String)hm.get("status")));
+					new HSSFRichTextString((String) hm.get("status")));
 			row.createCell(icell++).setCellValue(
-					new HSSFRichTextString((String)hm.get("file")));
-			for(String t : tgts) {
+					new HSSFRichTextString((String) hm.get("file")));
+			for (String t : tgts) {
 				row.createCell(icell++).setCellValue(
-						new HSSFRichTextString((String)hm.get(t)));
+						new HSSFRichTextString((String) hm.get(t)));
 			}
 		}
 		wb.write(res.getOutputStream());

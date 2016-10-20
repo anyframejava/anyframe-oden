@@ -4,7 +4,7 @@
 	<property environment="env"/>
 	
 	<property name="pack.name" value="anyframe-oden-admin" />
-	<property name="version" value="2.3.1-SNAPSHOT"/>
+	<property name="version" value="2.4.0"/>
 	<!--property name="env.ANT_HOME" value="C:\ats-2.0.2\anyframe-5.0.1\ide\ant"/-->
 	<property name="dist" location="dist"/>
 	<property name="pack" location="pack"/>
@@ -15,13 +15,15 @@
 			<pathelement location="${env.ANT_HOME}/lib/maven-ant-tasks-2.0.10.jar" />
 		</classpath>
 	</typedef>
-	
+
 	<target name="init">
 		<delete dir="${dist}"/>
 		<delete dir="${pack}"/>
+		<delete dir="target"/>
 		<mkdir dir="${dist}/WEB-INF/classes"/>
 		<mkdir dir="${dist}/WEB-INF/lib"/>
 		<mkdir dir="${pack}"/>
+		<mkdir dir="target"/>
 	</target>
 
 	<target name="compile">
@@ -47,6 +49,16 @@
 				<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar"/-->
 			</classpath>
 		</javac>
+	</target>
+	
+	<target name="pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+	        <formatter type="xml" toFile="target/pmd.xml"/>
+	        <fileset dir="src">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
 	</target>
 	
 	<target name="cp-rscs">
@@ -85,6 +97,6 @@
 		<antcall target="war"/>
 	</target>
 	
-	<target name="all" depends="init, cp-rscs, compile , war, package"/>
+	<target name="all" depends="init, cp-rscs, compile, pmd, war, package"/>
 		
 </project>

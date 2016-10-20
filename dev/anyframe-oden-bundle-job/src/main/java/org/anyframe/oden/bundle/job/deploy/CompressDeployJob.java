@@ -37,8 +37,8 @@ import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.common.Utils;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.DeployFile;
-import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.DeployFile.Mode;
+import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.command.DeployerManager;
 import org.anyframe.oden.bundle.core.job.CompressFileResolver;
 import org.anyframe.oden.bundle.core.job.CompressJob;
@@ -58,11 +58,9 @@ import org.anyframe.oden.bundle.job.log.JobLogService;
 import org.osgi.framework.BundleContext;
 
 /**
- * 
  * Job to deploying by compressing file.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class CompressDeployJob extends CompressJob {
 	RepositoryProviderService repositoryProvider;
@@ -136,7 +134,7 @@ public class CompressDeployJob extends CompressJob {
 			throws OdenException {
 		// local compress temp delete
 		currentWork = "clean temporary file";
-		
+
 		FileUtil.removeDir(new File(compSrc));
 		List<Thread> ths = new ArrayList<Thread>();
 
@@ -194,7 +192,7 @@ public class CompressDeployJob extends CompressJob {
 	private Map<AgentLoc, Collection<DeployFile>> groupByAgent(
 			Collection<DeployFile> files) {
 		Map<AgentLoc, Collection<DeployFile>> ret = new HashMap<AgentLoc, Collection<DeployFile>>();
-		
+
 		for (DeployFile f : files) {
 			AgentLoc al = new AgentLoc(f.getAgent().agentName(), f.getAgent()
 					.agentAddr(), f.getAgent().location());
@@ -206,7 +204,7 @@ public class CompressDeployJob extends CompressJob {
 		}
 		return ret;
 	}
-	
+
 	protected void compDeploy(Collection<DeployFile> compfiles)
 			throws OdenException {
 		// files having same path and diff agent
@@ -221,7 +219,7 @@ public class CompressDeployJob extends CompressJob {
 
 			// init deployer
 			Map<DeployFile, DeployerService> inProgressFiles = new ConcurrentHashMap<DeployFile, DeployerService>();
-			
+
 			Collection<DeployFile> sameFiles = fs.get(rf);
 			long t = System.currentTimeMillis();
 
@@ -231,7 +229,7 @@ public class CompressDeployJob extends CompressJob {
 
 				if (f.mode() == Mode.NA)
 					continue;
-				
+
 				try {
 					DeployerService ds = deployerManager.getDeployer(f);
 					if (ds == null)
@@ -239,16 +237,16 @@ public class CompressDeployJob extends CompressJob {
 								+ f.getAgent().agentName() + "["
 								+ f.getAgent().agentAddr() + "]");
 					f.setDate(t);
-					DeployerHelper.readyToDeploy(ds, f, false, backupcnt);
+					DeployerHelper.readyToDeploy(ds, f, false, backupcnt,true);
 					inProgressFiles.put(f, ds);
-					
+
 				} catch (Exception e) {
 					Logger.debug(e.getMessage());
 					setError(e.getMessage());
 					f.setErrorLog(Utils.rootCause(e));
 					f.setSuccess(false);
 					closeCompressFiles(inProgressFiles);
-				} 
+				}
 			}
 			if (inProgressFiles.size() == 0) { // no add or update
 				finishedWorks += sameFiles.size();
@@ -258,8 +256,8 @@ public class CompressDeployJob extends CompressJob {
 			FatInputStream in = null;
 
 			try {
-				in = reposvc.resolve(FileUtil
-						.combinePath(compSrc, rf.getFile()));
+				in = reposvc
+						.resolve(FileUtil.combinePath(compSrc, rf.getFile()));
 			} catch (OdenException e) {
 				for (DeployFile f : fs.get(rf)) {
 					f.setSuccess(false);
@@ -301,13 +299,12 @@ public class CompressDeployJob extends CompressJob {
 	protected void closeCompressFiles(Map<DeployFile, DeployerService> fmap) {
 		for (DeployFile f : fmap.keySet()) {
 			DeployerService deployer = fmap.get(f);
-			
+
 			try {
-				DoneFileInfo info = DeployerHelper.close(deployer, f,
-						null, null);
+				DoneFileInfo info = DeployerHelper.close(deployer, f, null,
+						null);
 				if (info == null || info.size() == -1L)
-					throw new IOException("Fail to close: "
-							+ f.getPath());
+					throw new IOException("Fail to close: " + f.getPath());
 
 			} catch (Exception e) {
 				f.setSuccess(false);
@@ -316,7 +313,7 @@ public class CompressDeployJob extends CompressJob {
 				Logger.error(e);
 				setError(e.getMessage());
 			}
-			
+
 		}
 	}
 
@@ -328,16 +325,15 @@ public class CompressDeployJob extends CompressJob {
 		final Map<AgentLoc, Collection<DeployFile>> fs = groupByAgent(repofiles);
 
 		List<Thread> threads = new ArrayList<Thread>();
-		
+
 		final Map<String, DeployerService> inProgressFiles = Collections
 				.synchronizedMap(new HashMap<String, DeployerService>());
-		
-		for(AgentLoc al : fs.keySet()) {
-			inProgressFiles.put(al.agentName(), deployerManager
-								.getDeployer(al.agentAddr()));
+
+		for (AgentLoc al : fs.keySet()) {
+			inProgressFiles.put(al.agentName(),
+					deployerManager.getDeployer(al.agentAddr()));
 		}
-		
-		
+
 		for (final AgentLoc al : fs.keySet()) {
 			Map<String, FileInfo> rtn = new HashMap<String, FileInfo>();
 
@@ -352,33 +348,37 @@ public class CompressDeployJob extends CompressJob {
 					try {
 						sameFiles = fs.get(al);
 
-						DeployerService ds = inProgressFiles.get(al.agentName());
+						DeployerService ds = inProgressFiles
+								.get(al.agentName());
 						if (ds == null)
 							throw new OdenException("Invalid agent: "
 									+ al.agentName());
-						
-//						File src = new File(FileUtil.combinePath(compTargets
-//								.get(al.agentName()), "temp.zip"));
-//						File dest = new File(al.location());
-						
-						String src = FileUtil.combinePath(compTargets
-								.get(al.agentName()), "temp.zip");
+
+						// File src = new File(FileUtil.combinePath(compTargets
+						// .get(al.agentName()), "temp.zip"));
+						// File dest = new File(al.location());
+
+						String src = FileUtil.combinePath(
+								compTargets.get(al.agentName()), "temp.zip");
 						String dest = al.location();
-						
+
 						Map<String, FileInfo> rtn = null;
 						try {
-							if(ds.exist(compTargets
-									.get(al.agentName()), "temp.zip") && ds.fileInfo(compTargets
-											.get(al.agentName()), "temp.zip").size() !=-1L) 
+							if (ds.exist(compTargets.get(al.agentName()),
+									"temp.zip")
+									&& ds.fileInfo(
+											compTargets.get(al.agentName()),
+											"temp.zip").size() != -1L)
 								rtn = ds.zipCopy(src, dest, backupcnt,
 										backupLocation, undo);
-							else 
-								throw new OdenException("Can not copy zip file to: "
-										+ al.agentName());
-						} catch(Exception e){
+							else
+								throw new OdenException(
+										"Can not copy zip file to: "
+												+ al.agentName());
+						} catch (Exception e) {
 							throw new OdenException(e.getMessage());
 						}
-						
+
 						if (rtn.size() == 0 || rtn == null)
 							throw new OdenException("Do not copy to "
 									+ al.agentName());
@@ -393,7 +393,7 @@ public class CompressDeployJob extends CompressJob {
 							if (f.mode() == Mode.NA)
 								continue;
 							try {
-								if(f.mode() == Mode.DELETE){
+								if (f.mode() == Mode.DELETE) {
 									// delete
 									deployerManager.getDeployer(f)
 											.backupNRemove(
@@ -404,13 +404,13 @@ public class CompressDeployJob extends CompressJob {
 									nSuccess++;
 								} else { // add or update
 									f.setDate(t);
-	
+
 									// 비교 로직 exceptiion 인지
 									if (!rtn.isEmpty())
 										checkIntegrity(f, rtn);
 									else
-										throw new OdenException("Do not copy to "
-												+ f.getPath());
+										throw new OdenException(
+												"Do not copy to " + f.getPath());
 								}
 							} catch (Exception e) {
 								Logger.error(e);
@@ -418,10 +418,10 @@ public class CompressDeployJob extends CompressJob {
 								f.setErrorLog(Utils.rootCause(e));
 								f.setSuccess(false);
 							}
-							
+
 							finishedWorks += 1;
 						}
-						
+
 						// temp agent directory remove
 						ds.removeDirString(compTargets.get(al.agentName()));
 
@@ -445,7 +445,7 @@ public class CompressDeployJob extends CompressJob {
 			} catch (InterruptedException e) {
 			}
 		}
-		
+
 		// clean oden server temp directory
 		try {
 			cleanTemp();
@@ -461,7 +461,7 @@ public class CompressDeployJob extends CompressJob {
 
 		finishedWorks += 1;
 	}
-	
+
 	protected void checkIntegrity(final DeployFile f,
 			final Map<String, FileInfo> zfmap) {
 
@@ -593,8 +593,11 @@ public class CompressDeployJob extends CompressJob {
 			Thread th = new Thread() {
 				public void run() {
 					try {
-						DoneFileInfo info = DeployerHelper.close(deployer, f,
-								null, backupLocation.equals("snapshot") ? null
+						DoneFileInfo info = DeployerHelper.close(
+								deployer,
+								f,
+								null,
+								backupLocation.equals("snapshot") ? null
 										: FileUtil.combinePath(backupLocation,
 												id));
 						if (info == null || info.size() == -1L)
@@ -629,8 +632,8 @@ public class CompressDeployJob extends CompressJob {
 
 	protected void done() {
 		try {
-			RecordElement2 r = new RecordElement2(id, deployFiles, user, System
-					.currentTimeMillis(), desc);
+			RecordElement2 r = new RecordElement2(id, deployFiles, user,
+					System.currentTimeMillis(), desc);
 			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);
@@ -643,11 +646,11 @@ public class CompressDeployJob extends CompressJob {
 		} catch (OdenException e) {
 			Logger.error(e);
 		}
-//		try {
-//			cleanTemp(compFile);
-//		} catch (OdenException e) {
-//			Logger.error(e);
-//		}
+		// try {
+		// 		cleanTemp(compFile);
+		// } catch (OdenException e) {
+		// 		Logger.error(e);
+		// }
 		deployFiles.clear();
 		deployFiles = null;
 		compFile.clear();

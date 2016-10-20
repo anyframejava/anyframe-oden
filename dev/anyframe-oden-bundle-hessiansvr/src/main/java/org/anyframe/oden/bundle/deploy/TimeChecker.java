@@ -16,15 +16,13 @@
 package org.anyframe.oden.bundle.deploy;
 
 /**
- * 
  * To performance test. Check start and stop time gap.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface TimeChecker {
 	public void tick(String s);
-	
+
 	@Override
 	public String toString();
 }

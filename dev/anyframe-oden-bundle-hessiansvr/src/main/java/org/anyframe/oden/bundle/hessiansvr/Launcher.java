@@ -17,25 +17,30 @@ package org.anyframe.oden.bundle.hessiansvr;
 
 import org.anyframe.oden.bundle.deploy.CfgReturnScript;
 
+/**
+ * This is Launcher class.
+ * 
+ * @author Junghwan Hong
+ */
 public class Launcher {
-	
+
 	Proc proc;
-	
+
 	Watchdog watchdog;
-	
-	public Launcher(Proc proc){
+
+	public Launcher(Proc proc) {
 		this(proc, 20000);
 	}
-	
+
 	public Launcher(Proc proc, long timeout) {
 		this.proc = proc;
 		// proc will be finished in timeout
 		// but some case, it is not finished
 		// after waiting some secs, and kill that process forcefully.
-		watchdog = new Watchdog(proc, timeout+3000);
+		watchdog = new Watchdog(proc, timeout + 3000);
 	}
 
-	public CfgReturnScript start() throws Exception{
+	public CfgReturnScript start() throws Exception {
 		Thread th = new Thread(proc);
 		th.start();
 		watchdog.start();
@@ -44,32 +49,32 @@ public class Launcher {
 	}
 }
 
-class Watchdog extends Thread{
-	
+class Watchdog extends Thread {
+
 	WatchdogListener listener;
-	
+
 	long timeout;
-	
-	public Watchdog(WatchdogListener listener, long timeout){
+
+	public Watchdog(WatchdogListener listener, long timeout) {
 		this.listener = listener;
 		this.timeout = timeout;
 	}
-	
+
 	@Override
 	public void run() {
-		if(timeout == -1L)
+		if (timeout == -1L)
 			return;
-		
+
 		long start = System.currentTimeMillis();
 		long remain;
-		while( !listener.isFinished() &&
-				(remain = timeout - (System.currentTimeMillis() - start)) > 0){
+		while (!listener.isFinished()
+				&& (remain = timeout - (System.currentTimeMillis() - start)) > 0) {
 			synchronized (listener) {
 				try {
-//					listener.wait(remain);
+					// listener.wait(remain);
 					listener.wait(1000);
 				} catch (InterruptedException e) {
-				}	
+				}
 			}
 		}
 		listener.timedout();

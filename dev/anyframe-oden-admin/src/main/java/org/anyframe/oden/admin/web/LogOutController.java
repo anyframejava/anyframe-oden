@@ -25,20 +25,21 @@ import org.springframework.web.servlet.ModelAndView;
 
 /**
  * controller class for logout.
- * @author Hong JungHwan
+ * 
+ * @author Junghwan Hong
  */
 @Controller
-public class LogOutController  {
-    
-    @RequestMapping("/logout.do")
-    public ModelAndView process(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-    	        HttpSession session = request.getSession();
+public class LogOutController {
 
-        session.removeAttribute("userid");
-        session.removeAttribute("password");
-        session.invalidate();
-        
-        return new ModelAndView("login");
-    }
+	@RequestMapping("/logout.do")
+	public ModelAndView process(HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		HttpSession session = request.getSession();
+
+		session.removeAttribute("userid");
+		session.removeAttribute("password");
+		session.invalidate();
+
+		return new ModelAndView("login");
+	}
 }

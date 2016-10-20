@@ -29,7 +29,17 @@
 		</javac>
 	</target>
 	
-	<target name="dist.bundle" depends="compile.bundle">
+	<target name="pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+	        <formatter type="xml" toFile="target/pmd.xml"/>
+	        <fileset dir="src">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>
+	    	
+	<target name="dist.bundle" depends="compile.bundle, pmd">
 		<copy todir="${build}">
 			<fileset dir="${basedir}" includes="OSGI-INF/*.xml"/>
 		</copy>

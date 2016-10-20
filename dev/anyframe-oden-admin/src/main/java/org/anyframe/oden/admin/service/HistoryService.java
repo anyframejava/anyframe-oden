@@ -23,15 +23,15 @@ import org.anyframe.oden.admin.domain.Log;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:33
- * @author HONG JungHwan
+ * This is HistoryService Interface
+ * 
+ * @author Junghwan Hong
  */
 public interface HistoryService {
 
 	public Page show(Object objPage, String param, String opt) throws Exception;
 
-	public Page findByPk(Object objPage, String param ) throws Exception;
+	public Page findByPk(Object objPage, String param) throws Exception;
 
 	public List<Job> findJob(String role) throws Exception;
 
@@ -41,6 +41,6 @@ public interface HistoryService {
 
 	public List<Log> findByPkExcel(String param) throws Exception;
 
-	public List<Log> showExcel(String txid , String param) throws Exception;
+	public List<Log> showExcel(String txid, String param) throws Exception;
 
 }

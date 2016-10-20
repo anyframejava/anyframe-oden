@@ -2,14 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Oden Common
 Bundle-SymbolicName: anyframe-oden-bundle-common
-Bundle-Version: 1.3.0
+Bundle-Version: 1.4.0
 Bundle-Vendor: SAMSUNG SDS
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: org.anyframe.oden.bundle.common,
  org.kxml2.io,
  org.xmlpull.v1
 Bundle-ClassPath: .
-Import-Package: org.osgi.framework,
+Import-Package: org.jasypt.encryption.pbe,
+ org.jasypt.exceptions,
+ org.jasypt.salt,
+ org.osgi.framework,
  org.osgi.service.component,
  org.osgi.service.event,
  org.osgi.service.log

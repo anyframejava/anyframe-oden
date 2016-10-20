@@ -22,6 +22,11 @@ import org.springframework.stereotype.Repository;
 
 import anyframe.core.query.IQueryService;
 
+/**
+ * This is JobDao Class
+ * 
+ * @author Junghwan Hong
+ */
 @Repository("jobDao")
 public class JobDao {
 	@Inject
@@ -50,17 +55,17 @@ public class JobDao {
 		return queryService.remove("removeRoles", new Object[] { new Object[] {
 				"jobname", jobname } });
 	}
-	
+
 	/**
 	 * @param jobname
 	 * @return
 	 * @throws Exception
 	 */
 	public int removeAuthorities(String jobname) throws Exception {
-		return queryService.remove("removeAuthority", new Object[] { new Object[] {
-				"jobname", jobname } });
+		return queryService.remove("removeAuthority",
+				new Object[] { new Object[] { "jobname", jobname } });
 	}
-	
+
 	/**
 	 * @param jobname
 	 * @return

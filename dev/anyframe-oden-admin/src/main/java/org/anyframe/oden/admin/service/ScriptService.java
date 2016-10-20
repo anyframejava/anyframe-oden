@@ -21,24 +21,23 @@ import org.anyframe.oden.admin.domain.Command;
 
 import anyframe.common.Page;
 
-
-
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:36
- * @author LEE Sujeong
+ * This is ScriptService Interface
+ * 
+ * @author Sujeong Lee
  */
 public interface ScriptService {
 
 	/**
 	 * 
 	 * @param domain
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public Page findListByPk(String domain, String opt) throws Exception;
-	
-	public String run(String[]param, String name, String script) throws Exception;
-	
+
+	public String run(String[] param, String name, String script)
+			throws Exception;
+
 	public List<Command> getCommandList(String jobName) throws Exception;
 
 }

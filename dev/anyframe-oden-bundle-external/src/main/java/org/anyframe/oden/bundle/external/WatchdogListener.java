@@ -15,8 +15,13 @@
  */
 package org.anyframe.oden.bundle.external;
 
-public interface WatchdogListener{	
+/**
+ * This is WatchdogListener Interface
+ * 
+ * @author Junghwan Hong
+ */
+public interface WatchdogListener {
 	public void timedout();
-	
+
 	public boolean isFinished();
 }

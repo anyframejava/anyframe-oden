@@ -15,26 +15,15 @@
  */
 package org.anyframe.oden.bundle.hessiansvr;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.anyframe.oden.bundle.common.FileUtil;
-import org.anyframe.oden.bundle.deploy.DoneFileInfo;
-import org.anyframe.oden.bundle.deploy.StoppableJob;
-
 /**
- * 
  * Job to remove files.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 //public class RemoveDirJob extends StoppableJob{
 //	String dir;
 //	String bak;
-	
+
 //	public RemoveDirJob(String id, String dir, String bak){
 //		super(id);
 //		this.dir = dir;
@@ -94,4 +83,4 @@ import org.anyframe.oden.bundle.deploy.StoppableJob;
 //				dir.delete();
 //        }
 //	}
-//}
+// }

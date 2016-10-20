@@ -19,6 +19,11 @@ import java.io.Serializable;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgReturnErr Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgReturnErr implements Serializable {
 	/**
 	 * 

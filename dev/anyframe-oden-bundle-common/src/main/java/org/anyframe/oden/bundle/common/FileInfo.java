@@ -25,8 +25,7 @@ import java.io.Serializable;
  * access its contents. But because the file is not indicating the real
  * location, that try makes wrong result.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public class FileInfo implements Serializable {
 	/**

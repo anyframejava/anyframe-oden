@@ -18,23 +18,20 @@ package org.anyframe.oden.bundle.job.deploy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.framework.BundleContext;
-
 import org.anyframe.oden.bundle.common.Assert;
 import org.anyframe.oden.bundle.common.BundleUtil;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.config.OdenConfigService;
 import org.anyframe.oden.bundle.core.txmitter.TransmitterService;
 import org.anyframe.oden.bundle.deploy.DeployerService;
+import org.osgi.framework.BundleContext;
 
 /**
- * 
  * This class control connection pool for server and agents. 이 클래스를 사용함으로 써, 중간에
  * agent 와 연결이 실패하더라도 다음번에 연결을 시도하지 않음. connection timeout 시 시간이 너무 오래 걸리기 때문에
  * 매번 재 시도를 할 경우 배포가 너무 지연되게 됨.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public class SlimDeployManager {
 

@@ -15,7 +15,13 @@
  */
 package org.anyframe.oden.bundle.deploy;
 
+/**
+ * This is DeployerFactory class.
+ * 
+ * @author Junghwan Hong
+ */
 public interface DeployerFactory {
 	public String getProtocol();
+
 	public DeployerService newInstance(String addr);
 }

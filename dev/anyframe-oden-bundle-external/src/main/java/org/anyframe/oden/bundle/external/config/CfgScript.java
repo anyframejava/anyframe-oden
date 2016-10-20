@@ -20,6 +20,11 @@ import java.util.List;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgScript Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgScript implements Serializable {
 	/**
 	 * 

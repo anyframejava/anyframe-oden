@@ -29,49 +29,49 @@ import org.anyframe.oden.bundle.common.Pair;
 /**
  * Oden Service to access some file repositories like local filesystem or ftp.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface RepositoryService {
 	public boolean matchedURI(String[] args);
-	
+
 	public String getProtocol();
 
 	/**
 	 * 
 	 * @param repoArgs
-	 * @param string2 
-	 * @param string 
-	 * @param regex should be finished with file or wildcard file or **
+	 * @param string2
+	 * @param string
+	 * @param regex
+	 *            should be finished with file or wildcard file or **
 	 * @param isRecentOnly
 	 * @return
 	 * @throws OdenException
 	 */
-	public List<String> resolveFileRegex(String[] args, 
-			List<String> includes, List<String> excludes) 
-			throws OdenException;
+	public List<String> resolveFileRegex(String[] args, List<String> includes,
+			List<String> excludes) throws OdenException;
 
 	/**
-	 * Get file inputstream & its info using args. If there're some files to resolve, 
-	 * after resolving all files. close method should be called.
+	 * Get file inputstream & its info using args. If there're some files to
+	 * resolve, after resolving all files. close method should be called.
 	 * 
 	 * @param args
 	 * @param file
 	 * @return
 	 * @throws OdenException
 	 */
-	public FatInputStream resolve(String[] args, String file) throws OdenException;
-	
+	public FatInputStream resolve(String[] args, String file)
+			throws OdenException;
+
 	public FatInputStream resolve(String path) throws OdenException;
 
 	public FileInfo resolveAsFileInfo(String[] args, String file);
-	
-	public FileInfo resolveAsFileInfo(String[] args, List<String> refs, 
+
+	public FileInfo resolveAsFileInfo(String[] args, List<String> refs,
 			String file);
-	
+
 	/**
-	 * return required arguments to access repository service.
-	 * 커맨드라인에서 usage 로 사용 될 것임. 계정관련 인자는 사용법에서 제외
+	 * return required arguments to access repository service. 커맨드라인에서 usage 로
+	 * 사용 될 것임. 계정관련 인자는 사용법에서 제외
 	 * 
 	 * @return
 	 */
@@ -79,38 +79,40 @@ public interface RepositoryService {
 
 	/**
 	 * get child list only
+	 * 
 	 * @param args
 	 * @return
 	 * @throws OdenException
 	 */
 	public List<FileInfo> getFileList(String[] args) throws OdenException;
-	
+
 	/**
 	 * get child list including it's nested.
+	 * 
 	 * @param args
 	 * @return
 	 * @throws OdenException
 	 */
 	public List<FileInfo> listAllFiles(String[] args) throws OdenException;
-	
-	public List<String> listAllFiles(String[] args, String subdir, 
+
+	public List<String> listAllFiles(String[] args, String subdir,
 			List<String> excludes) throws OdenException;
-		
+
 	public void listAllFilesFileInfo(String[] args, String subdir,
-			List<Pair> dirSrcMap, 
-			List<String> excludes, Collection<FileInfo> ret) 
-			throws OdenIncompleteArgumentException;
-	
+			List<Pair> dirSrcMap, List<String> excludes,
+			Collection<FileInfo> ret) throws OdenIncompleteArgumentException;
+
 	/**
-	 * This makes RepositoryService to close its connection. Some RepositoryService
-	 * may sustain its connection for your Thread. In that case, because there's no way
-	 * to know if that Thread is alive, that connection will not be closed until program
-	 * is died. So, if you think your Thread will not use RepositoryService for some time,
-	 * call close method to close the connection. After being closed, if your Thread calls 
+	 * This makes RepositoryService to close its connection. Some
+	 * RepositoryService may sustain its connection for your Thread. In that
+	 * case, because there's no way to know if that Thread is alive, that
+	 * connection will not be closed until program is died. So, if you think
+	 * your Thread will not use RepositoryService for some time, call close
+	 * method to close the connection. After being closed, if your Thread calls
 	 * RepositoryService, a new connection will be created.
 	 */
 	public void close(String[] args);
-	
+
 	/**
 	 * copy repo[]/fpath to destpath/fpath
 	 * 
@@ -120,15 +122,16 @@ public interface RepositoryService {
 	 * @return
 	 * @throws OdenException
 	 */
-	public File getFile(String[] repoargs, String fpath, String destpath) throws OdenException;
-	
+	public File getFile(String[] repoargs, String fpath, String destpath)
+			throws OdenException;
+
 	public long getDate(String[] args) throws IOException;
 
 	public List<String> getSourceDirs(String[] repoArgs);
 
 	public String findDir(String[] repoArgs, String dirName, String exclude);
-	
+
 	public boolean isDirExisted(String[] args, String name);
-	
+
 	public String getAbsolutePathFromParent(String[] repoArgs, String name);
 }

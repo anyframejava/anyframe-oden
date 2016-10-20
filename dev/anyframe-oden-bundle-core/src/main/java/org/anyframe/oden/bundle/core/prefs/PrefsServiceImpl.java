@@ -19,18 +19,18 @@ import org.osgi.service.prefs.Preferences;
 import org.osgi.service.prefs.PreferencesService;
 
 /**
- * @see anyframe.oden.bundle.core.prefs.PrefsService
+ * This is PrefsServiceImpl class.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
+ * @see anyframe.oden.bundle.core.prefs.PrefsService
  */
-public class PrefsServiceImpl implements PrefsService{
+public class PrefsServiceImpl implements PrefsService {
 	private PreferencesService prefsvc;
-	
+
 	protected void setPrefsService(PreferencesService prefsvc) {
 		this.prefsvc = prefsvc;
 	}
-	
+
 	public Prefs getPrefs(String name) {
 		Preferences prefs = prefsvc.getUserPreferences(name).node("/");
 		return new PrefsImpl(prefs, name);

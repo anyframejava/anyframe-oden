@@ -20,14 +20,13 @@ import java.util.List;
 import org.anyframe.oden.bundle.common.OdenException;
 
 /**
- * Oden Service to log deploy information. Whenever deploy some files to Deployerervice,
- * that information is logged by this service.
+ * Oden Service to log deploy information. Whenever deploy some files to
+ * Deployerervice, that information is logged by this service.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface DeployLogService {
-	
+
 	/**
 	 * write a RecordElement2 to DeployLogService2
 	 * 
@@ -35,7 +34,7 @@ public interface DeployLogService {
 	 * @throws OdenException
 	 */
 	public void record(RecordElement2 r) throws OdenException;
-	
+
 	/**
 	 * search the record which are matched with every specified arguments.
 	 * 
@@ -49,15 +48,15 @@ public interface DeployLogService {
 	 * @return
 	 * @throws OdenException
 	 */
-//	public List<RecordElement2> search(String txid, String host, String agent, String path, 
-//			String startdate, String enddate, boolean failonly) throws OdenException;
-	
-	public List<MiniRecordElement> search(String startdate, String enddate, 
+	// public List<RecordElement2> search(String txid, String host, String agent, String path,
+	// String startdate, String enddate, boolean failonly) throws OdenException;
+
+	public List<MiniRecordElement> search(String startdate, String enddate,
 			String user, boolean failonly) throws OdenException;
-	
-	public RecordElement2 search(String txid, String user, String agent, 
+
+	public RecordElement2 search(String txid, String user, String agent,
 			String path, boolean failonly) throws OdenException;
-	
+
 	/**
 	 * get all date which having records.
 	 * 

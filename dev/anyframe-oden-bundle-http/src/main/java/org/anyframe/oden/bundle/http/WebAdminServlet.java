@@ -35,40 +35,36 @@ import org.ungoverned.osgi.service.shell.ShellService;
 /**
  * Servlet to make availble to execute commands in the OSGi Shell.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class WebAdminServlet extends HttpServlet {
 	public final static String NAME = "wadmin";
-	
+
 	private ShellService shellService;
-	
+
 	private HttpContext httpContext;
-	
+
 	private SecurityHandler securityHandler;
-	
-	protected void setHttpService(HttpService hs){
+
+	protected void setHttpService(HttpService hs) {
 		try {
-			hs.registerServlet(
-					"/" + WebAdminServlet.NAME, 
-					this, 
-					null, 
+			hs.registerServlet("/" + WebAdminServlet.NAME, this, null,
 					httpContext = new ShellHttpContext(hs, securityHandler));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	protected void setSecurityHandler(SecurityHandler handler){
+
+	protected void setSecurityHandler(SecurityHandler handler) {
 		this.securityHandler = handler;
-		if(httpContext != null)		// handler is already binded.
-			((ShellHttpContext)httpContext).setSecurityHandler(handler);
+		if (httpContext != null) // handler is already binded.
+			((ShellHttpContext) httpContext).setSecurityHandler(handler);
 	}
-	
+
 	protected void unsetSecurityHandler(SecurityHandler handler) {
 		setSecurityHandler(null);
 	}
-	
+
 	public void setShellService(ShellService sh) {
 		this.shellService = sh;
 	}
@@ -78,28 +74,28 @@ public class WebAdminServlet extends HttpServlet {
 			throws ServletException, IOException {
 		doPost(req, res);
 	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		req.setCharacterEncoding("utf-8");
 		res.setContentType("charset=utf-8");
 		res.setCharacterEncoding("utf-8");
-		
+
 		PrintWriter w = res.getWriter();
 		w.print(new JSONArray(taskList()).toString());
 		w.close();
 	}
-	
-	public List<Map<String, String>> taskList(){
+
+	public List<Map<String, String>> taskList() {
 		List<Map<String, String>> tasks = new LinkedList<Map<String, String>>();
-		
+
 		Map<String, Boolean> actives = activeJobList();
 		Map<String, Boolean> statuss = recentStatuss();
-		
-		for(String t : tasknames()){
+
+		for (String t : tasknames()) {
 			Map m = new HashMap<String, String>();
-			Boolean status = statuss.get(t); 
+			Boolean status = statuss.get(t);
 			m.put("status", status == null ? "X" : status ? "T" : "F");
 			m.put("task", t);
 			Boolean active = actives.get(t);
@@ -108,7 +104,7 @@ public class WebAdminServlet extends HttpServlet {
 		}
 		return tasks;
 	}
-	
+
 	private Map<String, Boolean> recentStatuss() {
 		Map<String, Boolean> m = new HashMap<String, Boolean>();
 		m.put("portal-deploy", true);
@@ -122,12 +118,12 @@ public class WebAdminServlet extends HttpServlet {
 		return m;
 	}
 
-	private List<String> tasknames(){
+	private List<String> tasknames() {
 		List<String> l = new LinkedList<String>();
 		l.add("portal-deploy");
 		l.add("channel-deploy");
 		l.add("batch-deploy");
 		return l;
 	}
-	
+
 }

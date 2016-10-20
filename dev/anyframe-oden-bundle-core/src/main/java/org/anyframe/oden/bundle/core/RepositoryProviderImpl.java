@@ -20,91 +20,92 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
-
 import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.repository.RepositoryService;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 
 /**
- * @see anyframe.oden.bundle.core.RepositoryProviderService
+ * This is RepositoryProviderImpl class.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
+ * @see anyframe.oden.bundle.core.RepositoryProviderService
  */
-public class RepositoryProviderImpl implements RepositoryProviderService{
+public class RepositoryProviderImpl implements RepositoryProviderService {
 	private List<RepositoryService> repoServices = new Vector<RepositoryService>();
 
 	private BundleContext context;
-	
+
 	public RepositoryProviderImpl() {
 	}
 
-	protected void activate(ComponentContext context){
+	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
 	}
-	
-	protected void addRepositoryService(RepositoryService rs){
+
+	protected void addRepositoryService(RepositoryService rs) {
 		repoServices.add(rs);
 	}
-	
-	protected void removeRepositoryService(RepositoryService rs){
+
+	protected void removeRepositoryService(RepositoryService rs) {
 		repoServices.remove(rs);
 	}
-	
+
 	public List getPackageList(String id, String pwd, String user)
-			throws Exception{
+			throws Exception {
 		return null;
 	}
-	
+
 	public List getContents(String file, String id, String pwd, String user)
-			throws Exception{
+			throws Exception {
 		return null;
-	}	
-	
-	public RepositoryService getRepoServiceByURI(String[] repoArgs){
-		for(RepositoryService repoService : repoServices){
-			if(repoService.matchedURI(repoArgs)){
+	}
+
+	public RepositoryService getRepoServiceByURI(String[] repoArgs) {
+		for (RepositoryService repoService : repoServices) {
+			if (repoService.matchedURI(repoArgs)) {
 				return repoService;
 			}
 		}
 		return null;
 	}
-	
-	public RepositoryAdaptor getRepositoryAdaptor(String[] args){
+
+	public RepositoryAdaptor getRepositoryAdaptor(String[] args) {
 		RepositoryService svc = getRepoServiceByURI(args);
-		if(svc == null) return null;
+		if (svc == null)
+			return null;
 		return new RepositoryAdaptor(svc, args);
 	}
-	
-	public boolean availableRepository(String[] repoArgs){
+
+	public boolean availableRepository(String[] repoArgs) {
 		return getRepoServiceByURI(repoArgs) != null;
 	}
-		
+
 	public List<String> getRepositoryProtocols() {
 		List<String> types = new ArrayList<String>();
-		for(RepositoryService repoService : repoServices){
+		for (RepositoryService repoService : repoServices) {
 			types.add(repoService.getProtocol());
 		}
 		return types;
 	}
 
-	public List<FileInfo> getFilesFromRepo(String[] repoargs) throws OdenException {
+	public List<FileInfo> getFilesFromRepo(String[] repoargs)
+			throws OdenException {
 		RepositoryService repo = getRepoServiceByURI(repoargs);
-		if(repo == null) {
-			throw new OdenException("Couldn't find a RepositoryService for " + Arrays.toString(repoargs));
+		if (repo == null) {
+			throw new OdenException("Couldn't find a RepositoryService for "
+					+ Arrays.toString(repoargs));
 		}
 		return repo.getFileList(repoargs);
 	}
 
 	public List<String> getRepositoryUsages() {
 		List<String> usages = new ArrayList<String>();
-		for(RepositoryService rs : repoServices){
+		for (RepositoryService rs : repoServices) {
 			usages.add(rs.getUsage());
 		}
 		return usages;
 	}
 
-	
 }

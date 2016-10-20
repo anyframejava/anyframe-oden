@@ -19,15 +19,13 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 
 /**
- * 
  * Resource register class for web-console.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class ResourceRegister {
 
-	protected void setHttpService(HttpService hs){
+	protected void setHttpService(HttpService hs) {
 		try {
 			hs.registerResources("/", "web", null);
 		} catch (NamespaceException e) {

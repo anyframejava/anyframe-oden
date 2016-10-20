@@ -19,77 +19,81 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
-
 import org.anyframe.oden.bundle.common.Logger;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.deploy.DeployerFactory;
 import org.anyframe.oden.bundle.deploy.DeployerService;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 
 /**
- * @see anyframe.oden.bundle.core.txmitter.TransmitterService
+ * This is TransmitterImpl class.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
+ * @see anyframe.oden.bundle.core.txmitter.TransmitterService
  */
 public class TransmitterImpl implements TransmitterService {
 	private BundleContext context;
-	
-	protected void activate(ComponentContext context){
+
+	protected void activate(ComponentContext context) {
 		this.context = context.getBundleContext();
 	}
-	
+
 	private List<DeployerFactory> deployfactories = new ArrayList<DeployerFactory>();
-	
-	protected void addDeployerFactory(DeployerFactory df){
+
+	protected void addDeployerFactory(DeployerFactory df) {
 		deployfactories.add(df);
 	}
-	
-	protected void removeDeployerFactory(DeployerFactory df){
+
+	protected void removeDeployerFactory(DeployerFactory df) {
 		deployfactories.remove(df);
 	}
-	
+
 	/**
-	 * get agent which is located in the ip. 
-	 * must be released by releaseDeployer(ip)
-	 * <pre>getDeployer("localhost:9871")</pre>
-	 * @param addr ip:port on which agent is located
+	 * get agent which is located in the ip. must be released by
+	 * releaseDeployer(ip)
+	 * 
+	 * <pre>
+	 * getDeployer(&quot;localhost:9871&quot;)
+	 * </pre>
+	 * 
+	 * @param addr
+	 *            ip:port on which agent is located
 	 * @return
-	 * @throws OdenException 
-	 * @throws Exception 
+	 * @throws OdenException
+	 * @throws Exception
 	 */
-	public DeployerService getDeployer(String addr){
+	public DeployerService getDeployer(String addr) {
 		// check if connection is available really
 		DeployerService ds = null;
-		try{
+		try {
 			ds = _getDeployer(addr);
-			if(ds == null || !ds.alive())
+			if (ds == null || !ds.alive())
 				throw new IOException("Fail to access: " + addr);
-		}catch(Exception e){
+		} catch (Exception e) {
 			// try one more
-			try{
+			try {
 				ds = _getDeployer(addr);
-				if(ds == null || !ds.alive())
+				if (ds == null || !ds.alive())
 					throw new IOException("Fail to access: " + addr);
-			}catch(Exception e2){
+			} catch (Exception e2) {
 				Logger.debug("Fail to access: " + addr);
 				return null;
 			}
 		}
 		return ds;
 	}
-		
-	private DeployerService _getDeployer(String addr) throws Exception{
+
+	private DeployerService _getDeployer(String addr) throws Exception {
 		final int idx = addr.indexOf("://");
-		final String protocol = addr.substring(0, idx < 0 ? 0 : idx+3);
-		for(DeployerFactory factory : deployfactories){
-			if(factory.getProtocol().equals(protocol))
+		final String protocol = addr.substring(0, idx < 0 ? 0 : idx + 3);
+		for (DeployerFactory factory : deployfactories) {
+			if (factory.getProtocol().equals(protocol))
 				return factory.newInstance(addr);
 		}
 		return null;
 	}
-	
-	public void disconnect(String addr) throws Exception{
+
+	public void disconnect(String addr) throws Exception {
 	}
 }

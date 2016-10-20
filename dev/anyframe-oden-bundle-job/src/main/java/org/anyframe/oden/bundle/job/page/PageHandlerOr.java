@@ -17,6 +17,11 @@ package org.anyframe.oden.bundle.job.page;
 
 import org.json.JSONArray;
 
-public interface PageHandlerOr{
+/**
+ * This is PageHandlerOr Interface
+ * 
+ * @author Junghwan Hong
+ */
+public interface PageHandlerOr {
 	public JSONArray run() throws Exception;
 }

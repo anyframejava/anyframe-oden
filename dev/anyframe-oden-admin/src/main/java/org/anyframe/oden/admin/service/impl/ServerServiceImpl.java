@@ -29,9 +29,9 @@ import org.springframework.stereotype.Service;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:27
- * @author LEE Sujeong
+ * This is ServerServiceImpl Class
+ * 
+ * @author Sujeong Lee
  */
 @Service("serverService")
 public class ServerServiceImpl implements ServerService {
@@ -42,6 +42,7 @@ public class ServerServiceImpl implements ServerService {
 	private String ahref_post = "</a>";
 
 	private String doubleQuotation = "\"";
+
 	/**
 	 * 
 	 * @param param
@@ -86,10 +87,10 @@ public class ServerServiceImpl implements ServerService {
 					doubleQuotation + param + doubleQuotation);
 
 			String imgDel = "<img src='images/ico_del.gif'/>";
-			
+
 			String imgStatusGreen = "<img src='images/status_green.png'/>";
 			String imgStatusGray = "<img src='images/status_gray.png'/>";
-			
+
 			if (!(result == null) && !result.equals("")) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
@@ -109,12 +110,12 @@ public class ServerServiceImpl implements ServerService {
 							String status = target.getString("status");
 
 							String statusResult = "";
-							if(status.equalsIgnoreCase("T")){
+							if (status.equalsIgnoreCase("T")) {
 								statusResult = imgStatusGreen;
-							}else{
+							} else {
 								statusResult = imgStatusGray;
 							}
-							
+
 							t.setName(name);
 							t.setUrl(address);
 							t.setPath(path);
@@ -123,7 +124,7 @@ public class ServerServiceImpl implements ServerService {
 									+ name + "');" + ahref_mid + imgDel
 									+ ahref_post);
 							t.setHiddenname(name);
-							
+
 							list.add(t);
 						}
 					}

@@ -1,6 +1,6 @@
 <project name="Oden Enterprise Http" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe-oden-bundle-http" />
-	<property name="version" value="2.0.2"/>
+	<property name="version" value="2.0.3"/>
 	
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -18,7 +18,7 @@
 	</target>
 	
 	<target name="compile.bundle" depends="init">
-		<condition property="dbg" value="off">
+		<condition property="dbg" value="true">
 			<not><isset property="dbg"/></not>
 		</condition>
 		<javac srcdir="${src}" destdir="${build}"
@@ -29,9 +29,27 @@
 		</javac>
 	</target>
 	
-	<target name="dist.bundle" depends="compile.bundle">
+	<target name="pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+	        <formatter type="xml" toFile="target/pmd.xml"/>
+	        <fileset dir="src">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>
+	        	
+	<target name="dist.bundle" depends="compile.bundle, pmd">
 		<copy todir="${build}">
 			<fileset dir="${basedir}" includes="OSGI-INF/*.xml,web/**/*.*" excludes="**/*.svn"/>
+		</copy>
+		<jar jarfile="${dist}/${bundle.name}-${version}.jar" basedir="${build}" 
+				manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+	
+	<target name="dist.bundle.itsm" depends="compile.bundle">
+		<copy todir="${build}">
+			<fileset dir="${basedir}" includes="OSGI-INF/*.xml" excludes="**/*.svn"/>
 		</copy>
 		<jar jarfile="${dist}/${bundle.name}-${version}.jar" basedir="${build}" 
 				manifest="${basedir}/META-INF/MANIFEST.MF" />
@@ -63,6 +81,16 @@
 		<property name="bundle.loc" value="../anyframe-oden-bundle/bundle"/>
 		<property name="dist" location="${basedir}/dist"/>
 		<antcall target="dist.bundle"/>
+		<delete dir="${bundle.loc}" includes="${bundle.name}-*.jar"/>
+		<copy todir="${bundle.loc}">
+	 		<fileset dir="${dist}"/>
+		</copy>
+	</target>
+	
+	<target name="all-local-itsm">
+		<property name="bundle.loc" value="../anyframe-oden-bundle/bundle"/>
+		<property name="dist" location="${basedir}/dist"/>
+		<antcall target="dist.bundle.itsm"/>
 		<delete dir="${bundle.loc}" includes="${bundle.name}-*.jar"/>
 		<copy todir="${bundle.loc}">
 	 		<fileset dir="${dist}"/>

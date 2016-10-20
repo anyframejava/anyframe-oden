@@ -24,15 +24,13 @@ import java.util.List;
 import org.anyframe.oden.bundle.common.FileUtil;
 
 /**
- * 
  * Work about Copy, Undo, Remove files.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class DeployerUtils {
 	private static int MAX_UNDO;
-	
+
 	/**
 	 * copy filePath's file to destPath
 	 * 
@@ -41,47 +39,52 @@ public class DeployerUtils {
 	 * @param destPath
 	 * @throws IOException
 	 */
-	public static void copy(String parentPath, String filePath, String destPath) throws IOException{
+	public static void copy(String parentPath, String filePath, String destPath)
+			throws IOException {
 		File destFile = new File(destPath, filePath);
 		boolean created = false;
-		try{			
-			if(!destFile.exists()){
+		try {
+			if (!destFile.exists()) {
 				FileUtil.mkdirs(destFile);
 				created = true;
-			}		
-//			FileUtil.copy(new File(parentPath, filePath), destFile);
+			}
+			// FileUtil.copy(new File(parentPath, filePath), destFile);
 			FileUtil.touchcopy(new File(parentPath, filePath), destFile);
-		}catch(IOException e){
-			if(destFile != null && created) destFile.delete();
+		} catch (IOException e) {
+			if (destFile != null && created)
+				destFile.delete();
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * backup file to the backPath for undo function
 	 * 
 	 * @param parentPath
 	 * @param filePath
-	 * @param bakPath null if no backup
-	 * @param bakDir Max Counts
+	 * @param bakPath
+	 *            null if no backup
+	 * @param bakDir
+	 *            Max Counts
 	 * @return is backuped?
 	 * @throws IOException
 	 */
-	public static boolean undoBackup(String parentPath, String filePath, String bakPath, int backupcnt) throws IOException {
+	public static boolean undoBackup(String parentPath, String filePath,
+			String bakPath, int backupcnt) throws IOException {
 		MAX_UNDO = backupcnt;
-		
-		if(bakPath == null)
+
+		if (bakPath == null)
 			return new File(parentPath, filePath).exists();
-		
-		if(!new File(parentPath, filePath).exists()
+
+		if (!new File(parentPath, filePath).exists()
 				|| !new File(bakPath).isAbsolute())
 			return false;
-		
+
 		removeOldUndos(new File(bakPath).getParent());
 		copy(parentPath, filePath, bakPath);
 		return true;
 	}
-	
+
 	/**
 	 * remove old backups for undo
 	 * 
@@ -89,25 +92,25 @@ public class DeployerUtils {
 	 */
 	public static void removeOldUndos(String bakDir) {
 		File bak = new File(bakDir);
-		if(!bak.exists() || !bak.isDirectory())
+		if (!bak.exists() || !bak.isDirectory())
 			return;
-		
+
 		List<Long> list = new ArrayList<Long>();
 		File[] fs = bak.listFiles();
-		for(File f : fs){
-			if(f.isDirectory()){
-				try{
+		for (File f : fs) {
+			if (f.isDirectory()) {
+				try {
 					long date = Long.parseLong(f.getName());
 					list.add(date);
-				}catch(Exception e){
+				} catch (Exception e) {
 					// ignore this file
 				}
 			}
 		}
-		if(list.size() > MAX_UNDO){
+		if (list.size() > MAX_UNDO) {
 			Collections.sort(list, Collections.reverseOrder());
-			for(int i=MAX_UNDO; i<list.size(); i++)
-				FileUtil.removeDir(new File(bakDir, String.valueOf(list.get(i)) ) );
-		}	
+			for (int i = MAX_UNDO; i < list.size(); i++)
+				FileUtil.removeDir(new File(bakDir, String.valueOf(list.get(i))));
+		}
 	}
 }

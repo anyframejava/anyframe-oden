@@ -25,6 +25,11 @@ import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.core.Repository;
 import org.anyframe.oden.bundle.core.repository.RepositoryService;
 
+/**
+ * This is RepoManager Class
+ * 
+ * @author Junghwan Hong
+ */
 public class RepoManager {
 	protected RepositoryService repo;
 	protected String[] repoArgs;
@@ -39,8 +44,8 @@ public class RepoManager {
 	}
 
 	public FileInfo resolveAsFileInfo(RepoFile rf) {
-		return repo.resolveAsFileInfo(makeToRepoArgs(rf.getSubdir()), rf
-				.getFile());
+		return repo.resolveAsFileInfo(makeToRepoArgs(rf.getSubdir()),
+				rf.getFile());
 	}
 
 	public FileInfo resolveAsFileInfo(String s) {
@@ -60,8 +65,8 @@ public class RepoManager {
 	}
 
 	public FatInputStream resolveRoot(RepoFile rf) throws OdenException {
-		return repo.resolve(makeToRepoArgs(rf.getSubdir()), FileUtil
-				.fileName(rf.getFile()));
+		return repo.resolve(makeToRepoArgs(rf.getSubdir()),
+				FileUtil.fileName(rf.getFile()));
 	}
 
 	public FatInputStream resolve(String path) throws OdenException {

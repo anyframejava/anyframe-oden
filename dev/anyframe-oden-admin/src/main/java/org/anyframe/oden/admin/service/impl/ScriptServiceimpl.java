@@ -29,9 +29,9 @@ import org.springframework.stereotype.Service;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:27
- * @author LEE Sujeong
+ * This is ScriptServiceimpl Class
+ * 
+ * @author Sujeong Lee
  */
 @Service("scriptService")
 public class ScriptServiceimpl implements ScriptService {
@@ -183,7 +183,7 @@ public class ScriptServiceimpl implements ScriptService {
 				}
 			}
 		}
-		
+
 		return cmds;
 	}
 

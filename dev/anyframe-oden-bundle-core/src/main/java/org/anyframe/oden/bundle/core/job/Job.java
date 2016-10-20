@@ -18,18 +18,16 @@ package org.anyframe.oden.bundle.core.job;
 import org.osgi.framework.BundleContext;
 
 /**
- * 
  * This represents job's information.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public abstract class Job {
 	public static final int NONE = 0;
 	public static final int SLEEPING = 0x01;
 	public static final int WAITING = 0x02;
 	public static final int RUNNING = 0x04;
-	
+
 	protected String id;
 	protected int status = WAITING;
 	protected boolean stop = false;
@@ -37,22 +35,22 @@ public abstract class Job {
 	protected String desc = "";
 	protected String currentWork = "";
 	protected BundleContext context = null;
-	
-	protected int additionalWorks = 1; 
+
+	protected int additionalWorks = 1;
 	protected int finishedWorks = 0;
 	protected int totalWorks;
-	
-	public Job(BundleContext context, String desc){
+
+	public Job(BundleContext context, String desc) {
 		date = System.currentTimeMillis();
 		id = String.valueOf(date);
 		this.context = context;
 		this.desc = desc;
 	}
-	
+
 	public String id() {
 		return id;
 	}
-	
+
 	public int status() {
 		return status;
 	}
@@ -60,31 +58,31 @@ public abstract class Job {
 	public long date() {
 		return date;
 	}
-	
+
 	public String desc() {
 		return desc;
 	}
-	
-	public String getCurrentWork(){
+
+	public String getCurrentWork() {
 		return currentWork;
 	}
-		
-	public int progress(){
-		return Math.round((float)(finishedWorks*100) / totalWorks);
+
+	public int progress() {
+		return Math.round((float) (finishedWorks * 100) / totalWorks);
 	}
-	
+
 	public int todoWorks() {
 		return totalWorks;
 	}
-	
+
 	void stop() {
 		cancel();
 	}
-	
+
 	protected void cancel() {
 		this.stop = true;
 	}
-	
+
 	protected boolean isStopped() {
 		return stop;
 	}
@@ -93,9 +91,9 @@ public abstract class Job {
 		status = RUNNING;
 		totalWorks = 1 + additionalWorks;
 		run();
-		finishedWorks = totalWorks-1;
+		finishedWorks = totalWorks - 1;
 	}
-	
+
 	void dispose() {
 		done();
 		finishedWorks = totalWorks;
@@ -104,12 +102,12 @@ public abstract class Job {
 			notifyAll();
 		}
 	}
-	
+
 	/**
 	 * If you want to make this job stop available, check stop in this method.
 	 */
 	protected abstract void run();
-	
+
 	protected abstract void done();
 
 }

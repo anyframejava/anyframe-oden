@@ -20,9 +20,8 @@ import java.io.Serializable;
 /**
  * Domain class for user info.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 public class User implements Serializable {
 	

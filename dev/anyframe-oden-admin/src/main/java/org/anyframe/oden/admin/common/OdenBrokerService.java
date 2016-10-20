@@ -17,26 +17,25 @@ package org.anyframe.oden.admin.common;
 
 import org.anyframe.oden.admin.exception.BrokerException;
 
-
 /**
- * This class provides some methods to interface server 
+ * This class provides some methods to interface server
  * 
- * @author HONG JungHwan
- *
+ * @author Junghwan Hong
  */
 public interface OdenBrokerService {
 	/**
-     * sendRequest and result Response
-     * 
-     * @param shellUrl
-     * @param msg
-     * @return response
-     * @throws BrokerException
-	 * @throws CommandNotFoundException 
-     */
-	
+	 * sendRequest and result Response
+	 * 
+	 * @param shellUrl
+	 * @param msg
+	 * @return response
+	 * @throws BrokerException
+	 * @throws CommandNotFoundException
+	 */
+
 	public String sendRequest(String shellUrl, String msg) throws Exception;
-	
-	public boolean checkUser(String shellUrl , String userid, String password) throws Exception;
-	
+
+	public boolean checkUser(String shellUrl, String userid, String password)
+			throws Exception;
+
 }

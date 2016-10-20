@@ -20,9 +20,9 @@ import org.anyframe.oden.admin.domain.User;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:43
- * @author HONG JungHwan
+ * This is CfgTarget Class
+ * 
+ * @author Junghwan Hong
  */
 public interface UserService {
 
@@ -30,13 +30,20 @@ public interface UserService {
 	 * 
 	 * @param userid
 	 * @param password
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean checkuser(Credential c) throws Exception;
+
 	public Page findList(String domain) throws Exception;
+
 	public User findUser(String id) throws Exception;
-	public void createUser(String role, String id, String pw, String[] jobs) throws Exception;
-	public void updateUser(String role, String id, String pw, String[] jobs) throws Exception;
+
+	public void createUser(String role, String id, String pw, String[] jobs)
+			throws Exception;
+
+	public void updateUser(String role, String id, String pw, String[] jobs)
+			throws Exception;
+
 	public void removeUser(String id) throws Exception;
 
 }

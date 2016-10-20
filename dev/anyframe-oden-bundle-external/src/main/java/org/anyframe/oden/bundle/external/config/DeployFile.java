@@ -21,47 +21,49 @@ import org.anyframe.oden.bundle.common.Utils;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.Repository;
 
-
 /**
  * This class store's file information which will be deployed.
  * 
- * @author junghwan.hong
- *
+ * @author Junghwan Hong
  */
-public class DeployFile implements Serializable{
+public class DeployFile implements Serializable {
 	private static final long serialVersionUID = 6130062622167186765L;
 
-	public enum Mode {ADD, UPDATE, DELETE, NA};
-	
+	public enum Mode {
+		ADD, UPDATE, DELETE, NA
+	};
+
 	private Repository repo;
-	
+
 	private String path;
-	
+
 	private AgentLoc agent;
-	
+
 	private long size;
-	
+
 	private long date;
-	
+
 	private String comment;
-	
+
 	private String errorLog;
-	
+
 	private Mode mode = Mode.NA;
-	
+
 	private boolean success = false;
 
-	public DeployFile(Repository repo, String path, AgentLoc agent, long size, long date, Mode mode){
+	public DeployFile(Repository repo, String path, AgentLoc agent, long size,
+			long date, Mode mode) {
 		this(repo, path, agent, size, date, mode, false);
 	}
-	
-	public DeployFile(Repository repo, String path, AgentLoc agent, long size, long date, String comment, Mode mode){
+
+	public DeployFile(Repository repo, String path, AgentLoc agent, long size,
+			long date, String comment, Mode mode) {
 		this(repo, path, agent, size, date, mode, false);
 		this.comment = comment;
 	}
-	
-	public DeployFile(Repository repo, String path, AgentLoc agent, long size, 
-			long date, Mode mode, boolean success){
+
+	public DeployFile(Repository repo, String path, AgentLoc agent, long size,
+			long date, Mode mode, boolean success) {
 		this.repo = repo;
 		this.path = path;
 		this.agent = agent == null ? new AgentLoc("", "", "") : agent;
@@ -70,11 +72,11 @@ public class DeployFile implements Serializable{
 		this.mode = mode;
 		this.success = success;
 	}
-	
+
 	public String getPath() {
 		return path;
 	}
-	
+
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -117,7 +119,8 @@ public class DeployFile implements Serializable{
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-		if(success) this.errorLog = "";
+		if (success)
+			this.errorLog = "";
 	}
 
 	public Repository getRepo() {
@@ -127,34 +130,36 @@ public class DeployFile implements Serializable{
 	public void setRepo(Repository repo) {
 		this.repo = repo;
 	}
-	
+
 	public String comment() {
 		return comment;
 	}
-	
+
 	public void setComment(String s) {
 		this.comment = s;
 	}
-	
+
 	public String errorLog() {
 		return errorLog;
 	}
-	
+
 	public void setErrorLog(String s) {
-		if(s == null) return;
-		
+		if (s == null)
+			return;
+
 		this.errorLog = s.trim();
 		this.success = false;
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
-		if(!(o instanceof DeployFile))
+		if (!(o instanceof DeployFile))
 			return false;
-		DeployFile d = (DeployFile)o;
-		return repo.equals(d.repo) && path.equals(d.path) && agent.agentName().equals(d.agent.agentName()); 
+		DeployFile d = (DeployFile) o;
+		return repo.equals(d.repo) && path.equals(d.path)
+				&& agent.agentName().equals(d.agent.agentName());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Utils.hashCode(repo, path, agent.agentName());

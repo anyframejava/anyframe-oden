@@ -31,24 +31,22 @@ import org.springframework.stereotype.Service;
 
 import anyframe.common.Page;
 
-
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:32
- * @author HONG JungHwan
+ * This is HistoryServiceImpl Class
+ *  
+ * @author Junghwan Hong
  */
 @Service("historyService")
-
 public class HistoryServiceImpl implements HistoryService {
 	private OdenCommonDao<History> odenCommonDao = new OdenCommonDao<History>();
-	
+
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
-	
+
 	private String ahref_pre = "<a href=\"";
 	private String ahref_mid = "\">";
 	private String ahref_post = "</a>";
-	
+
 	/**
 	 * Method for showing history detail information.
 	 * 
@@ -91,7 +89,7 @@ public class HistoryServiceImpl implements HistoryService {
 
 		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
 		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
-		
+
 		if (!(result == null) && !result.equals("")) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
@@ -109,25 +107,28 @@ public class HistoryServiceImpl implements HistoryService {
 								no = pageUnit * (page - 1) + j + 1;
 							}
 							String success = dataObj.getString("success");
-							
+
 							String successResult = "";
 							if (success.equalsIgnoreCase("true")) {
 								successResult = imgSuccess;
-							} else{
+							} else {
 								successResult = imgFail;
 							}
-							
-							JSONArray targets = (JSONArray) dataObj.get("targets");
+
+							JSONArray targets = (JSONArray) dataObj
+									.get("targets");
 							String target = "";
 							if (!(targets.length() == 0)) {
 								for (int n = 0; n < targets.length(); n++) {
 									target += "[" + targets.get(n) + "] ";
 								}
-								target = target.substring(0, target.length() - 1);
+								target = target.substring(0,
+										target.length() - 1);
 							}
-							
-//							String target = ((JSONObject) dataObj.get("agent"))
-//									.getString("name");
+
+							// String target = ((JSONObject)
+							// dataObj.get("agent"))
+							// .getString("name");
 							String path = dataObj.getString("path");
 							String mode = dataObj.getString("mode");
 							if (mode.equals("A"))
@@ -161,9 +162,9 @@ public class HistoryServiceImpl implements HistoryService {
 	 * 
 	 * @throws Exception
 	 */
-	public Page findByPk(Object objPage, String param ) throws Exception {
+	public Page findByPk(Object objPage, String param) throws Exception {
 		ArrayList list = new ArrayList();
-		
+
 		int page = Integer.parseInt(objPage + "");
 		int totalNum = 0;
 		String option = "";
@@ -173,7 +174,7 @@ public class HistoryServiceImpl implements HistoryService {
 		} else {
 			option += "-page" + " " + (page - 1);
 		}
-		
+
 		String result = odenCommonDao.getResultString("log", "search", param
 				+ " " + option);
 
@@ -190,8 +191,7 @@ public class HistoryServiceImpl implements HistoryService {
 					if (!(data.length() == 0)) {
 						for (int j = 0; j < data.length(); j++) {
 							JSONObject dataObj = (JSONObject) data.get(j);
-							
-							
+
 							int total = dataObj.getInt("total");
 							int nsuccess = dataObj.getInt("nsuccess");
 							String status = dataObj.getString("status");
@@ -202,11 +202,19 @@ public class HistoryServiceImpl implements HistoryService {
 
 							String txidAndStatus = "";
 							if (status.equalsIgnoreCase("S")) {
-								txidAndStatus = imgSuccess + "(" + ahref_pre
-								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "+txid+", $('#itemname').val());" + ahref_mid + txid + ahref_post + ")";
+								txidAndStatus = imgSuccess
+										+ "("
+										+ ahref_pre
+										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
+										+ txid + ", $('#itemname').val());"
+										+ ahref_mid + txid + ahref_post + ")";
 							} else if (status.equalsIgnoreCase("F")) {
-								txidAndStatus = imgFail + "(" + ahref_pre
-								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "+txid+", $('#itemname').val());" + ahref_mid + txid + ahref_post + ")";
+								txidAndStatus = imgFail
+										+ "("
+										+ ahref_pre
+										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
+										+ txid + ", $('#itemname').val());"
+										+ ahref_mid + txid + ahref_post + ")";
 							}
 
 							Log l = new Log();
@@ -229,14 +237,15 @@ public class HistoryServiceImpl implements HistoryService {
 	}
 
 	/**
-	 * Method for job list when init dropdown menu. 
+	 * Method for job list when init dropdown menu.
 	 * 
 	 * @throws Exception
 	 */
 	public List<Job> findJob(String role) throws Exception {
-		return odenCommonDao.findJob("job", "info",CommonUtil.getRoleList(role));
+		return odenCommonDao.findJob("job", "info",
+				CommonUtil.getRoleList(role));
 	}
-	
+
 	/**
 	 * 
 	 * @param param
@@ -303,12 +312,13 @@ public class HistoryServiceImpl implements HistoryService {
 	}
 
 	/**
-	 * Methode for downloading excel file with history detail information of certain transaction.
+	 * Methode for downloading excel file with history detail information of
+	 * certain transaction.
 	 * 
 	 * @param param
 	 * @throws Exception
 	 */
-	public List<Log> showExcel(String param , String opt) throws Exception {
+	public List<Log> showExcel(String param, String opt) throws Exception {
 		String txid = "";
 
 		if (param.indexOf("(") != -1) {
@@ -318,11 +328,12 @@ public class HistoryServiceImpl implements HistoryService {
 		} else {
 			txid = param;
 		}
-		
-		String result = odenCommonDao.getResultString("log", "show", txid + " " + opt);
+
+		String result = odenCommonDao.getResultString("log", "show", txid + " "
+				+ opt);
 
 		List<Log> list = new ArrayList<Log>();
-		
+
 		if (!(result == null) && !result.equals("")) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
@@ -335,15 +346,17 @@ public class HistoryServiceImpl implements HistoryService {
 							String success = dataObj.get("success").equals(
 									"true") ? "Success" : "Fail";
 
-							JSONArray targets = (JSONArray) dataObj.get("targets");
+							JSONArray targets = (JSONArray) dataObj
+									.get("targets");
 							String target = "";
 							if (!(targets.length() == 0)) {
 								for (int n = 0; n < targets.length(); n++) {
 									target += "[" + targets.get(n) + "] ";
 								}
-								target = target.substring(0, target.length() - 1);
+								target = target.substring(0,
+										target.length() - 1);
 							}
-							
+
 							String path = dataObj.getString("path");
 							String mode = dataObj.getString("mode");
 							if (mode.equals("A"))

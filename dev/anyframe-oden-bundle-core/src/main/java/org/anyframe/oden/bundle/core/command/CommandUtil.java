@@ -18,46 +18,44 @@ package org.anyframe.oden.bundle.core.command;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Collections of utility methods helping traversing Oden commands.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class CommandUtil {
-	
+
 	/**
-	 * space로 토큰을 나눠 배열로 리턴함
-	 * ""로 묶여진 문자열은 스페이스와 무관하게 하나의 토큰으로 인식
+	 * space로 토큰을 나눠 배열로 리턴함 ""로 묶여진 문자열은 스페이스와 무관하게 하나의 토큰으로 인식
+	 * 
 	 * @param line
 	 * @return
 	 */
 	public static String[] split(String line) {
 		List<String> args = new ArrayList<String>();
-		
+
 		boolean quote = false;
 		StringBuffer arg = new StringBuffer();
-		for(int i=0; i<line.length(); i++){
+		for (int i = 0; i < line.length(); i++) {
 			char c = line.charAt(i);
-			if(c == '"'){
+			if (c == '"') {
 				quote = !quote;
 				continue;
-			}else if(c == ' '){
-				if(!quote){ 
-					if(arg.length() >0){
+			} else if (c == ' ') {
+				if (!quote) {
+					if (arg.length() > 0) {
 						args.add(arg.toString());
-						arg.delete(0, arg.length());	// clear arg
+						arg.delete(0, arg.length()); // clear arg
 					}
 					continue;
 				}
 			}
 			arg.append(c);
 		}
-		if(arg.length() > 0)
+		if (arg.length() > 0)
 			args.add(arg.toString());
-		
-		return args.toArray(new String[args.size()] );
+
+		return args.toArray(new String[args.size()]);
 	}
-	
+
 }

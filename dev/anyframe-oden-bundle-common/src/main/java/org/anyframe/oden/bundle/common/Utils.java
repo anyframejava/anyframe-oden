@@ -20,8 +20,7 @@ import java.util.Map;
 /**
  * Utility class for Oden
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Utils {
 	/**
@@ -30,40 +29,44 @@ public class Utils {
 	 * @param t
 	 * @return
 	 */
-	public static String rootCause(Throwable t){
-		if(t.getCause() != null)
+	public static String rootCause(Throwable t) {
+		if (t.getCause() != null)
 			return rootCause(t.getCause());
 		return t.getMessage() == null ? t.toString() : t.getMessage();
 	}
-	
+
 	/**
-	 * get this jvm's memory usage & stack trace 
+	 * get this jvm's memory usage & stack trace
 	 * 
 	 * @return
 	 */
-	public static String jvmStat(){
+	public static String jvmStat() {
 		StringBuffer buf = new StringBuffer();
-//		JavaSysMon monitor = new JavaSysMon();
-//		CpuTimes initTimes = monitor.cpuTimes();
-//		Thread.sleep(500);
-//		buf.append("CPU usage: " + Math.round(monitor.cpuTimes().getCpuUsage(initTimes)*100) + "%\n");
+		// JavaSysMon monitor = new JavaSysMon();
+		// CpuTimes initTimes = monitor.cpuTimes();
+		// Thread.sleep(500);
+		// buf.append("CPU usage: " +
+		// Math.round(monitor.cpuTimes().getCpuUsage(initTimes)*100) + "%\n");
 
-		buf.append("Memory usage: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024) +"kb\n");
-		buf.append("Thread: " + Thread.activeCount() + " threads are running.\n");
+		buf.append("Memory usage: "
+				+ ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime()
+						.freeMemory()) / 1024) + "kb\n");
+		buf.append("Thread: " + Thread.activeCount()
+				+ " threads are running.\n");
 		Map<Thread, StackTraceElement[]> ttraces = Thread.getAllStackTraces();
-		for(Thread t : ttraces.keySet()){
+		for (Thread t : ttraces.keySet()) {
 			buf.append("#" + t.getId() + "\n");
-			for(StackTraceElement ele : ttraces.get(t)){
+			for (StackTraceElement ele : ttraces.get(t)) {
 				buf.append(ele + "\n");
 			}
 		}
 		return buf.toString();
 	}
-	
-	public static int hashCode(Object... args){
+
+	public static int hashCode(Object... args) {
 		int hash = 17;
-		for(Object o : args){
-			hash = 37*hash + o.hashCode();
+		for (Object o : args) {
+			hash = 37 * hash + o.hashCode();
 		}
 		return hash;
 	}

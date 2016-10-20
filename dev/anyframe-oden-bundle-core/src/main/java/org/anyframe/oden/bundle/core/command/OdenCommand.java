@@ -19,39 +19,39 @@ import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.anyframe.oden.bundle.gate.CustomCommand;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.config.AgentElement;
 import org.anyframe.oden.bundle.core.config.OdenConfigService;
 import org.anyframe.oden.bundle.core.prefs.Prefs;
 import org.anyframe.oden.bundle.core.prefs.PrefsService;
+import org.anyframe.oden.bundle.gate.CustomCommand;
 
 /**
  * abstract command to provides convenient methods to access DelegateService,
  * PrefsService and OdenConfigService.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public abstract class OdenCommand implements CustomCommand {
 	protected PrefsService prefsService;
-	
+
 	protected OdenConfigService configService;
-		
-	public void setPrefsService(PrefsService prefsService){
+
+	public void setPrefsService(PrefsService prefsService) {
 		this.prefsService = prefsService;
 	}
-	
+
 	public void setConfigService(OdenConfigService configService) {
 		this.configService = configService;
 	}
-	
-	protected Prefs getPrefs(String name){
+
+	protected Prefs getPrefs(String name) {
 		return prefsService.getPrefs(name);
 	}
-	
+
 	/**
 	 * get name's Cmd form from the preferences
+	 * 
 	 * @param preference
 	 * @param name
 	 * @return
@@ -59,14 +59,15 @@ public abstract class OdenCommand implements CustomCommand {
 	 */
 	protected Cmd toInfoCmd(String prefs, String name) throws OdenException {
 		String info = getPrefs(prefs).get(name);
-		if(info.length() == 0 )
+		if (info.length() == 0)
 			return null;
 		return new Cmd("foo fooAction \"" + name + "\" " + info);
 	}
-	
+
 	/**
-	 * agentName을 configService에서 찾아 해당하는 host:port값을 리턴해 줌
-	 * agentName이 configService에 없으면 ""를 리턴해 줌
+	 * agentName을 configService에서 찾아 해당하는 host:port값을 리턴해 줌 agentName이
+	 * configService에 없으면 ""를 리턴해 줌
+	 * 
 	 * @param agentName
 	 * @return
 	 * @throws FileNotFoundException
@@ -74,21 +75,21 @@ public abstract class OdenCommand implements CustomCommand {
 	 */
 	protected String getURIFromAgent(String agentName) throws OdenException {
 		AgentElement agent = configService.getAgent(agentName);
-		if(agent != null){
+		if (agent != null) {
 			return agent.getHost() + ":" + agent.getPort();
 		}
 		return "";
 	}
-	
+
 	protected String extractUserName(Cmd cmd) {
-		String user = cmd.getOptionArg(new String[]{Cmd.USER_OPT});
-		try{
-			if(user.length() == 0)
+		String user = cmd.getOptionArg(new String[] { Cmd.USER_OPT });
+		try {
+			if (user.length() == 0)
 				user = InetAddress.getLocalHost().getHostAddress();
-		} catch(UnknownHostException e){
+		} catch (UnknownHostException e) {
 			user = "";
 		}
 		return user;
 	}
-	
+
 }

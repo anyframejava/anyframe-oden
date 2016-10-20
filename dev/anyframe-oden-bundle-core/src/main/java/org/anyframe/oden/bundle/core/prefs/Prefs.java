@@ -18,20 +18,19 @@ package org.anyframe.oden.bundle.core.prefs;
 import org.anyframe.oden.bundle.common.OdenStoreException;
 
 /**
- * This has similar interface to java.util.Properties. But contents
- * are saved by OSGi Preferences Service.
+ * This has similar interface to java.util.Properties. But contents are saved by
+ * OSGi Preferences Service.
  * 
- * @author Joonil Kim
- *
+ * @author Junghwan Hong
  */
 public interface Prefs {
 	public void put(String key, String value) throws OdenStoreException;
-	
+
 	public String get(String key);
-	
+
 	public String[] keys() throws OdenStoreException;
-	
+
 	public void remove(String key) throws OdenStoreException;
-	
+
 	public void clear() throws OdenStoreException;
 }

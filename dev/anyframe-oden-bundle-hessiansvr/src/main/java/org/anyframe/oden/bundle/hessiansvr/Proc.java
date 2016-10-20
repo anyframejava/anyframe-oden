@@ -17,37 +17,38 @@ package org.anyframe.oden.bundle.hessiansvr;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLDecoder;
 
-import org.anyframe.oden.bundle.common.BundleUtil;
 import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.deploy.CfgReturnScript;
 
-
-public class Proc implements WatchdogListener, Runnable{
+/**
+ * This is Proc class.
+ * 
+ * @author Junghwan Hong
+ */
+public class Proc implements WatchdogListener, Runnable {
 	String command;
 	File dir;
 	Process process;
-//	String result;
+	// String result;
 	CfgReturnScript result;
-	
+
 	long timeout = 0;
 	BufferedReader in = null;
 	boolean isWin = false;
 	Object timeoutLock = new Object();
 	boolean timedout = false;
-	
-	public Proc(String command, String dir, long timeout){
+
+	public Proc(String command, String dir, long timeout) {
 		this.command = command;
 		this.dir = new File(dir);
 		this.timeout = timeout < 1 ? 20000 : timeout;
 	}
-	
+
+
 //	public void run2(){
-////		StringBuffer buf = new StringBuffer();
+////	StringBuffer buf = new StringBuffer();
 //		File redirectLog = new File(BundleUtil.odenHome(), "meta/out.log");
 //		if(redirectLog.exists())
 //			redirectLog.delete();
@@ -81,10 +82,10 @@ public class Proc implements WatchdogListener, Runnable{
 //			}
 //		} catch (Exception e) {
 //			e.printStackTrace();
-////			buf.append(e.getMessage() + "\n");
+////		buf.append(e.getMessage() + "\n");
 //			forceDestroy();
-////		}finally{
-////			try{ if(in !=null) in.close(); }catch(Exception e){}
+////	}finally{
+////		try{ if(in !=null) in.close(); }catch(Exception e){}
 //		}
 //		
 //		synchronized (timeoutLock) {
@@ -110,7 +111,7 @@ public class Proc implements WatchdogListener, Runnable{
 //			buf.append(e.getMessage());
 //		}
 //		result = buf.toString();
-//		
+//			
 //		synchronized (this) {
 //			notifyAll();	
 //		}
@@ -120,97 +121,106 @@ public class Proc implements WatchdogListener, Runnable{
 		StringBuffer buf = new StringBuffer();
 		try {
 			isWin = System.getProperty("os.name").startsWith("Windows");
-			ProcessBuilder pb = null; 
-			if(isWin){
-				pb = new ProcessBuilder(new String[]{"cmd", "/c", command})
+			ProcessBuilder pb = null;
+			if (isWin) {
+				pb = new ProcessBuilder(new String[] { "cmd", "/c", command })
 						.directory(dir);
 				pb.redirectErrorStream(true);
 				process = pb.start();
 			} else {
 				File cmd = new File(dir, command.split(" ")[0]);
-				if(cmd.exists()){
-					pb = new ProcessBuilder(new String[]{"sh", "-c", 
-						FileUtil.combinePath(dir.getAbsolutePath(), command)})
-							.directory(dir);
-				}else{
-					pb = new ProcessBuilder(new String[]{"sh", "-c", command})
+				if (cmd.exists()) {
+					pb = new ProcessBuilder(
+							new String[] {
+									"sh",
+									"-c",
+									FileUtil.combinePath(dir.getAbsolutePath(),
+											command) }).directory(dir);
+				} else {
+					pb = new ProcessBuilder(
+							new String[] { "sh", "-c", command })
 							.directory(dir);
 				}
 				pb.redirectErrorStream(true);
 				process = pb.start();
 			}
-			
+
 			String enco = System.getProperty("sun.jnu.encoding");
-			in = new BufferedReader(
-					new InputStreamReader(process.getInputStream(), enco) );
-			
+			in = new BufferedReader(new InputStreamReader(
+					process.getInputStream(), enco));
+
 			String s = null;
 			// being hanged in unix, not being hanged in win32
-			while(true){
-				while(!timedout && !in.ready()){
+			while (true) {
+				while (!timedout && !in.ready()) {
 					Thread.sleep(200);
 				}
-				if(timedout || (s = in.readLine()) == null)
+				if (timedout || (s = in.readLine()) == null)
 					break;
-				buf.append(s+"\n");
+				buf.append(s + "\n");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			buf.append(e.getMessage() + "\n");
 			forceDestroy();
-		}finally{
-			try{ if(in !=null) in.close(); }catch(Exception e){}
+		} finally {
+			try {
+				if (in != null)
+					in.close();
+			} catch (Exception e) {
+			}
 		}
 		try {
-//			result = URLDecoder.decode(buf.append(
-//					"\n>> exit code: " + process.waitFor() + "\n>> executed: " + command + " in the " + dir + "\n")
-//					.toString(), "utf-8");
+			// result = URLDecoder.decode(buf.append(
+			// "\n>> exit code: " + process.waitFor() + "\n>> executed: " +
+			// command + " in the " + dir + "\n")
+			// .toString(), "utf-8");
 			result = new CfgReturnScript(buf.toString(), "executed: " + command
 					+ " in the " + dir, process.waitFor());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		synchronized (this) {
-			notifyAll();	
+			notifyAll();
 		}
 	}
 
 	public synchronized void timedout() {
-//		if(!isWin){
-//			forceDestroy();
-//		}else{
-//			try{
-//				if(in != null)
-//					in.close();
-//			}catch(Exception e){}
-//		}
-		
+		// if(!isWin){
+		// 		forceDestroy();
+		// }else{
+		// 		try{
+		// 		if(in != null)
+		// 			in.close();
+		// 		}catch(Exception e){}
+		// }
+
 		synchronized (timeoutLock) {
 			timedout = true;
 			timeoutLock.notifyAll();
 		}
 	}
-	
-	private synchronized void forceDestroy(){
-		if(process != null)
+
+	private synchronized void forceDestroy() {
+		if (process != null)
 			process.destroy();
 	}
-	
-	public synchronized boolean isFinished(){
-		try{
-			if(process == null || in == null)
+
+	public synchronized boolean isFinished() {
+		try {
+			if (process == null || in == null)
 				return false;
 			process.exitValue();
-		}catch(Exception e){	
+		} catch (Exception e) {
 			// process is not finished
 			return false;
 		}
 		return true;
 	}
-	
-	public CfgReturnScript getResult(){
+
+	public CfgReturnScript getResult() {
 		return result;
 	}
-	
+
 }

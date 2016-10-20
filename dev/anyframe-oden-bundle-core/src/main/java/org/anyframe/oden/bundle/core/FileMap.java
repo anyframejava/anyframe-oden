@@ -19,36 +19,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 /**
- * This class has file list to be deployed and save the agent information
- * to which files are deployed.
+ * This class has file list to be deployed and save the agent information to
+ * which files are deployed.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public class FileMap extends HashMap<String, List<AgentFile>>{
-	
+public class FileMap extends HashMap<String, List<AgentFile>> {
+
 	/**
-	 * append a AgentFile to the list having same file path. 
+	 * append a AgentFile to the list having same file path.
 	 * 
 	 * @param file
 	 * @param agent
 	 */
-	public synchronized void append(String file, AgentFile agent){
+	public synchronized void append(String file, AgentFile agent) {
 		List<AgentFile> agents = get(file);
-		if(agents == null)
+		if (agents == null)
 			put(file, agents = new ArrayList<AgentFile>());
-		
+
 		boolean contains = false;
-		for(AgentFile a : agents){
-			if(agent.agent().equals(a.agent())){
+		for (AgentFile a : agents) {
+			if (agent.agent().equals(a.agent())) {
 				contains = true;
 				break;
 			}
 		}
-		if(!contains)
+		if (!contains)
 			agents.add(agent);
 	}
-	
+
 }

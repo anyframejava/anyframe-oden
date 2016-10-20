@@ -15,6 +15,7 @@
  */
 package org.anyframe.oden.bundle.hessiansvr;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -22,23 +23,27 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.osgi.service.http.HttpService;
-
 import org.anyframe.oden.bundle.common.Logger;
+import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.deploy.DeployerService;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.http.HttpService;
 
 import com.caucho.hessian.server.HessianServlet;
 
 /**
  * Servlet to make availble to execute commands in the OSGi Shell.
  * 
- * @author joon1k
+ * @author Junghwan Hong
  *
  */
 public class OdenHessianServlet extends HessianServlet{
 	private static final long serialVersionUID = 7131549884014328694L;
 	
 	public final static String NAME = "deploy";
+	
+	private static String CONFIG_FILE = "conf/agent.ini";
 	
 	protected void setHttpService(HttpService hs){
 		try {
@@ -63,7 +68,28 @@ public class OdenHessianServlet extends HessianServlet{
 	@Override
 	public void service(ServletRequest request, ServletResponse response)
 			throws IOException, ServletException {
-		Thread.currentThread().setContextClassLoader(DeployerImpl.class.getClassLoader());
-		super.service(request, response);
+		Thread.currentThread().setContextClassLoader(
+				DeployerImpl.class.getClassLoader());
+
+		if (isAccept(request.getRemoteAddr()))
+			super.service(request, response);
+		else
+			try {
+				throw new OdenException("Not Allowed IP");
+			} catch (OdenException e) {
+			}
+
+	}
+
+	@SuppressWarnings("unused")
+	private boolean isAccept(String clientIp) {
+		BundleContext context = FrameworkUtil.getBundle(this.getClass())
+				.getBundleContext();
+		String rightIp = context.getProperty("server.ip");
+		if(rightIp == null)
+			return true;
+		if (clientIp.equals(rightIp) && !(rightIp == null) )
+			return true;
+		return false;
 	}
 }

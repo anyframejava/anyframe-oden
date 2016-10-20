@@ -21,6 +21,11 @@ import org.anyframe.oden.bundle.common.Logger;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 
+/**
+ * This is SecuredServlet class.
+ * 
+ * @author Junghwan Hong
+ */
 public class SecuredServlet extends HttpServlet {
 	String name;
 

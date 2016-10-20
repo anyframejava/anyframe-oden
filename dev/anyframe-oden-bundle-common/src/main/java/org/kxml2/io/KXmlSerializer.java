@@ -24,6 +24,11 @@ package org.kxml2.io;
 import java.io.*;
 import org.xmlpull.v1.*;
 
+/**
+ * This is KXmlSerializer class.
+ * 
+ * @author Junghwan Hong
+ */
 public class KXmlSerializer implements XmlSerializer {
 
     //    static final String UNDEFINED = ":";
@@ -420,7 +425,7 @@ public class KXmlSerializer implements XmlSerializer {
         //		pending = true;
         //		depth++;
 
-        /*        if (cnt != nspCounts[depth]) {
+        /*      if (cnt != nspCounts[depth]) {
                     writer.write(' ');
                     writer.write("xmlns");
                     if (nspStack[cnt * 2] != null) {

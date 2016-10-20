@@ -38,6 +38,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.anyframe.oden.bundle.common.BundleUtil;
+import org.anyframe.oden.bundle.common.CipherUtil;
 import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.common.Logger;
@@ -47,16 +48,16 @@ import org.anyframe.oden.bundle.deploy.CfgReturnScript;
 import org.anyframe.oden.bundle.deploy.DeployerService;
 import org.anyframe.oden.bundle.deploy.DoneFileInfo;
 import org.anyframe.oden.bundle.deploy.StoppableJob;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * all methods are throws Exception to catch ROSGiException(RuntimeExcetpion) on
  * the remote caller.
  * 
+ * @author Junghwan Hong
  * @see DeployerService
  * @ThreadSafe
- * 
- * @author joon1k
- * 
  */
 public class DeployerImpl implements DeployerService {
 	private final String HOME = BundleUtil.odenHome().getPath();
@@ -64,10 +65,14 @@ public class DeployerImpl implements DeployerService {
 	private Object lock = new Object();
 
 	private int backupcnt;
-//
-//	private String backDir;
-//
-//	private String undo;
+	
+	private String securitykey = "";
+	
+	private boolean isCompress;
+	//
+	// private String backDir;
+	//
+	// private String undo;
 
 	public String jvmStat() {
 		return Utils.jvmStat();
@@ -92,8 +97,8 @@ public class DeployerImpl implements DeployerService {
 	public FileInfo fileInfo(String parent, String child) throws Exception {
 		File f = new File(toAbsPath(parent), child);
 		if (f.exists())
-			return new FileInfo(child, f.isDirectory(), f.lastModified(), f
-					.length());
+			return new FileInfo(child, f.isDirectory(), f.lastModified(),
+					f.length());
 		return null;
 	}
 
@@ -167,63 +172,79 @@ public class DeployerImpl implements DeployerService {
 
 	private Map<String, DeployOutputStream> fileStreams = new ConcurrentHashMap<String, DeployOutputStream>();
 
-//	private MODE mode = MODE.INIT;
+	// private MODE mode = MODE.INIT;
 
 	enum MODE {
 		INIT, WRITE, CLOSE
 	}
 
 	// public void init(String parent, String path, long date) throws Exception{
-	// init(parent, path, date, true);
+	// 		init(parent, path, date, true);
 	// }
 
 	public void init(String parent, String path, long date, boolean useTmp,
-			int backupcnt) throws Exception {
+			int backupcnt, boolean isCompress) throws Exception {
 		parent = toAbsPath(parent);
 		this.backupcnt = backupcnt;
+		
+		// get securitykey start
+		BundleContext context = FrameworkUtil.getBundle(this.getClass())
+				.getBundleContext();
+		this.isCompress = isCompress;
+		
+		if(context.getProperty("security.key") != null) 
+			securitykey = context.getProperty("security.key");
+		else
+			securitykey = "";
+		// get securitykey end
+
+		
 		synchronized (lock) {
-//			if (mode != MODE.INIT) {
-				// close all open streams.
-//				for (String f : fileStreams.keySet()) {
-//					try {
-//						fileStreams.remove(f).close(null, null, 0);
-//					} catch (IOException e) {
-//					}
-//				}
-//				mode = MODE.INIT;
-//			}
+			// if (mode != MODE.INIT) {
+			// 		close all open streams.
+			// 		for (String f : fileStreams.keySet()) {
+			// 			try {
+			// 				fileStreams.remove(f).close(null, null, 0);
+			// 			} catch (IOException e) {
+			// 			}
+			// 		}
+			// 		mode = MODE.INIT;
+			// }
 
 			final String key = parent + path;
 			if (fileStreams.containsKey(key))
-				throw new IOException("Couldn't open the file again: "
-						+ FileUtil.combinePath(parent, path));
+				fileStreams.remove(key);
+				
 			fileStreams.put(key, new DeployOutputStream(parent, path, date,
 					useTmp));
 		}
 	}
 
-//	public void zinit(int backupcnt, String backDir, String undo)
-//			throws Exception {
-//		this.backupcnt = backupcnt;
-//		this.backDir = backDir;
-//		this.undo = undo;
-//	}
+	// public void zinit(int backupcnt, String backDir, String undo)
+	// 		throws Exception {
+	// 			this.backupcnt = backupcnt;
+	// 			this.backDir = backDir;
+	// 			this.undo = undo;
+	// }
 
 	public boolean write(String parent, String path, ByteArray buf)
 			throws Exception {
 		parent = toAbsPath(parent);
 
 		synchronized (lock) {
-//			if (mode == MODE.CLOSE)
-//				throw new IOException(
-//						"Writing any bytes is not allowed while closing mode.");
-//			mode = MODE.WRITE;
+			// if (mode == MODE.CLOSE)
+			// 	throw new IOException("Writing any bytes is not allowed while closing mode.");
+			//		 mode = MODE.WRITE;
 
 			DeployOutputStream out = fileStreams.get(parent + path);
 			if (out == null)
 				throw new IOException("No open stream: "
 						+ FileUtil.combinePath(parent, path));
-			return out.write(buf.getBytes());
+			if(securitykey.equals("")|| isCompress) {
+				return out.write(buf.getBytes());
+			} else { 
+				return out.write(CipherUtil.decrypt(buf.getBytes()));
+			}
 		}
 	}
 
@@ -259,18 +280,18 @@ public class DeployerImpl implements DeployerService {
 		return total;
 	}
 
-	public Map<String, FileInfo> zipCopy(String src_, String dest_, int backupcnt,
-			String bakdir, String undo) throws Exception {
+	public Map<String, FileInfo> zipCopy(String src_, String dest_,
+			int backupcnt, String bakdir, String undo) throws Exception {
 		File src = new File(src_);
 		File dest = new File(dest_);
-		
+
 		synchronized (lock) {
 			if (!src.exists() || src.isDirectory())
 				throw new IOException("Couldn't find: " + src);
 			bakdir = toAbsPath(bakdir);
-			
+
 			Map<String, FileInfo> extractedfiles = new HashMap<String, FileInfo>();
-	
+
 			ZipFile zip = new ZipFile(src);
 			Enumeration<? extends ZipEntry> e = zip.entries();
 			while (e.hasMoreElements()) {
@@ -281,37 +302,41 @@ public class DeployerImpl implements DeployerService {
 				} else {
 					InputStream in = null;
 					OutputStream out = null;
-	
+
 					boolean success = false;
-//					long time = entry.getTime();
-	
+					// long time = entry.getTime();
+
 					boolean isUpdate = false;
-	
+
 					try {
 						in = new BufferedInputStream(zip.getInputStream(entry));
-	
+
 						f = new File(dest, entry.getName());
 						if (undo.equals("true") && f.exists()) {
 							// undo 기능 활성화
 							isUpdate = DeployerUtils.undoBackup(dest.getPath(),
 									entry.getName(), bakdir, backupcnt);
 						}
-	
+
 						File fparent = f.getParentFile();
 						fparent.mkdirs();
-	
+
 						out = new BufferedOutputStream(new FileOutputStream(f));
-	
+
 						copy(in, out);
 						success = true;
-						extractedfiles.put(entry.getName(), new FileInfo(entry
-								.getName(), false, f.lastModified(), f.length(), "",
-								success, isUpdate));
+						extractedfiles.put(
+								entry.getName(),
+								new FileInfo(entry.getName(), false, f
+										.lastModified(), f.length(), "",
+										success, isUpdate));
 					} catch (Exception e2) {
 						Logger.error(e2);
-						extractedfiles.put(entry.getName(), new FileInfo(entry
-								.getName(), false, 0, 0, Utils.rootCause(e2),
-								success, isUpdate));
+						extractedfiles
+								.put(entry.getName(),
+										new FileInfo(entry.getName(), false, 0,
+												0, Utils.rootCause(e2),
+												success, isUpdate));
 					} finally {
 						// do u wanna read this?
 						try {
@@ -324,10 +349,10 @@ public class DeployerImpl implements DeployerService {
 								in.close();
 						} catch (IOException x) {
 						}
-//						if (f != null)
-//							f.setLastModified(time);
+						// if (f != null)
+						// f.setLastModified(time);
 					}
-					
+
 				}
 			}
 			zip.close();
@@ -340,7 +365,7 @@ public class DeployerImpl implements DeployerService {
 		parent = toAbsPath(parent);
 		bakdir = toAbsPath(bakdir);
 		synchronized (lock) {
-//			mode = MODE.CLOSE;
+			// mode = MODE.CLOSE;
 
 			final String key = parent + path;
 
@@ -412,7 +437,7 @@ public class DeployerImpl implements DeployerService {
 			path.delete();
 		}
 	}
-	
+
 	/**
 	 * remove directory which are located on the path.
 	 * 
@@ -422,13 +447,12 @@ public class DeployerImpl implements DeployerService {
 		removeDir(new File(path));
 	}
 
-
 	// public List<DoneFileInfo> backupNRemoveDir(String id, String dir, String
 	// bak) throws Exception {
-	// synchronized (lock) {
-	// job = new RemoveDirJob(id, toAbsPath(dir), toAbsPath(bak));
-	// return (List<DoneFileInfo>) job.start();
-	// }
+	// 		synchronized (lock) {
+	// 			job = new RemoveDirJob(id, toAbsPath(dir), toAbsPath(bak));
+	// 			return (List<DoneFileInfo>) job.start();
+	// 		}
 	// }
 
 	public List<FileInfo> listAllFilesAsJob(String id, String path)
@@ -478,14 +502,14 @@ public class DeployerImpl implements DeployerService {
 				if (files[i].isDirectory()) {
 					backupRemoveDir(infos, files[i], root, bak);
 				} else {
-					DoneFileInfo info = new DoneFileInfo(FileUtil
-							.getRelativePath(root, files[i].getPath()), false,
-							files[i].lastModified(), files[i].length(), false,
-							false);
+					DoneFileInfo info = new DoneFileInfo(
+							FileUtil.getRelativePath(root, files[i].getPath()),
+							false, files[i].lastModified(), files[i].length(),
+							false, false);
 					infos.add(info);
 
-					info.setUpdate(DeployerUtils.undoBackup(root, info
-							.getPath(), bak, backupcnt));
+					info.setUpdate(DeployerUtils.undoBackup(root,
+							info.getPath(), bak, backupcnt));
 					info.setSuccess(files[i].delete());
 				}
 			}
@@ -558,7 +582,7 @@ public class DeployerImpl implements DeployerService {
 			File f = new File(srcPath, filePath);
 			long srcdate = f.lastModified();
 			long srcsz = f.length();
-			if(! f.exists())
+			if (!f.exists())
 				throw new IOException("File Not Found: "
 						+ new File(srcPath, filePath));
 			if (f.exists() && !f.delete())
@@ -594,18 +618,18 @@ public class DeployerImpl implements DeployerService {
 		return true;
 	}
 
-//	public String execShellCommand(String command, String dir, long timeout)
-//			throws Exception {
-//		return new Launcher(new Proc(command, toAbsPath(dir), timeout), timeout)
-//				.start();
-//	}
-	
-	public CfgReturnScript execShellCommand(String command, String dir, long timeout)
-			throws Exception {
+	// public String execShellCommand(String command, String dir, long timeout)
+	// throws Exception {
+	// 		return new Launcher(new Proc(command, toAbsPath(dir), timeout), timeout)
+	// 		.start();
+	// }
+
+	public CfgReturnScript execShellCommand(String command, String dir,
+			long timeout) throws Exception {
 		return new Launcher(new Proc(command, toAbsPath(dir), timeout), timeout)
 				.start();
 	}
-	
+
 	public String odenHome() {
 		return HOME;
 	}

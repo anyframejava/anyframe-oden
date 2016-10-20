@@ -16,11 +16,10 @@
 package org.anyframe.oden.bundle.common;
 
 /**
- * Some bugs are occurs while something are saved to some stores,
- * you can use this.
+ * Some bugs are occurs while something are saved to some stores, you can use
+ * this.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class OdenStoreException extends OdenException {
 

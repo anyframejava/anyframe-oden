@@ -20,6 +20,11 @@ import java.util.Collection;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.core.DeployFile;
 
+/**
+ * This is CompressFileResolver class.
+ * 
+ * @author Junghwan Hong
+ */
 public interface CompressFileResolver {
 	Collection<DeployFile> compressDeployFiles() throws OdenException;
 }

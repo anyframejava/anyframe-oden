@@ -14,29 +14,28 @@
  * limitations under the License.
  */
 package org.anyframe.oden.bundle.core;
+
 /**
- * 
  * This class contain policy's whole information.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Policy {
 	private String[] repoargs;
-	
+
 	private FileMap files;
-	
+
 	private boolean update;
-	
+
 	private String user;
 
-	public Policy(String[] repoargs, FileMap files, boolean update, String user){
+	public Policy(String[] repoargs, FileMap files, boolean update, String user) {
 		this.repoargs = repoargs;
 		this.files = files;
 		this.update = update;
 		this.user = user;
 	}
-	
+
 	public String[] getRepoargs() {
 		return repoargs;
 	}
@@ -68,5 +67,5 @@ public class Policy {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	
+
 }

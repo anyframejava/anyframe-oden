@@ -18,42 +18,41 @@ package org.anyframe.oden.bundle.deploy;
 import org.anyframe.oden.bundle.common.FileInfo;
 
 /**
- * 
  * File informaton about well-done job.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class DoneFileInfo extends FileInfo {
 
 	private static final long serialVersionUID = -6767136485115297651L;
-	
+
 	private boolean isUpdated = false;
-	
+
 	private boolean success = false;
-	
+
 	public DoneFileInfo(String path, boolean isDir, long lastModified, long size) {
 		this(path, isDir, lastModified, size, false, false);
 	}
-	
-	public DoneFileInfo(String path, boolean isDir, long lastModified, long size, boolean isUpdated, boolean success) {
+
+	public DoneFileInfo(String path, boolean isDir, long lastModified,
+			long size, boolean isUpdated, boolean success) {
 		super(path, isDir, lastModified, size);
 		this.isUpdated = isUpdated;
 		this.success = success;
 	}
-		
-	public void setSuccess(boolean s){
+
+	public void setSuccess(boolean s) {
 		this.success = s;
 	}
-	
+
 	public boolean success() {
 		return this.success;
 	}
-	
-	public void setUpdate(boolean isUpdate){
+
+	public void setUpdate(boolean isUpdate) {
 		this.isUpdated = isUpdate;
 	}
-	
+
 	public boolean isUpdate() {
 		return this.isUpdated;
 	}

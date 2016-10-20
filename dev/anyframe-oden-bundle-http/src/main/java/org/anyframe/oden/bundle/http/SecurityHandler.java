@@ -21,14 +21,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 
  * This class handle security bundle.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public interface SecurityHandler {
 	public final static String ACCOUNT_FILE = "conf/accounts.txt";
-	
-	public boolean handle(HttpServletRequest req, HttpServletResponse res) throws IOException;
+
+	public boolean handle(HttpServletRequest req, HttpServletResponse res)
+			throws IOException;
 }

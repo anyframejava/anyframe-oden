@@ -30,89 +30,87 @@ import java.util.Set;
 /**
  * Using this, you can use java.util.Properties more conveniently.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class PropertiesUtil {
-	public static Properties loadProperties(String name) 
+	public static Properties loadProperties(String name)
 			throws FileNotFoundException, IOException {
 		Properties prop = new Properties();
 		InputStream in = null;
 		try {
 			File f = new File(name);
 			FileUtil.mkdirs(f);
-			
-			in = new BufferedInputStream(
-					new FileInputStream(f));
+
+			in = new BufferedInputStream(new FileInputStream(f));
 			prop.load(in);
-		}finally {
+		} finally {
 			try {
-				if(in != null) in.close();
+				if (in != null)
+					in.close();
 			} catch (IOException e) {
 			}
 		}
 		return prop;
-		
+
 	}
-	
-	public static String getKeys(String name) 
-			throws FileNotFoundException, IOException {
+
+	public static String getKeys(String name) throws FileNotFoundException,
+			IOException {
 		StringBuffer buf = new StringBuffer();
 		Properties prop = PropertiesUtil.loadProperties(name);
-		for(Object key : prop.keySet()){
+		for (Object key : prop.keySet()) {
 			buf.append(key.toString() + "\n");
 		}
 		return buf.toString();
 	}
-	
-	public static void storeProperties(String name, Properties prop) 
+
+	public static void storeProperties(String name, Properties prop)
 			throws FileNotFoundException, IOException {
 		OutputStream out = null;
 		try {
 			File f = new File(name);
 			FileUtil.mkdirs(f);
-			
-			out = new BufferedOutputStream(
-					new FileOutputStream(f));
+
+			out = new BufferedOutputStream(new FileOutputStream(f));
 			prop.store(out, null);
 		} finally {
 			try {
-				if(out != null) out.close();
+				if (out != null)
+					out.close();
 			} catch (IOException e) {
 			}
 		}
 	}
 
-	public static String getProp(String name, String key) 
+	public static String getProp(String name, String key)
 			throws FileNotFoundException, IOException {
 		Properties prop = loadProperties(name);
 		return prop.getProperty(key);
 	}
-	
-	public static void addProp(String name, String key, String value) 
+
+	public static void addProp(String name, String key, String value)
 			throws FileNotFoundException, IOException {
 		Properties prop = loadProperties(name);
 		prop.put(key, value);
 		storeProperties(name, prop);
 	}
 
-	public static void removeProp(String name, String key) 
+	public static void removeProp(String name, String key)
 			throws FileNotFoundException, IOException {
 		Properties prop = loadProperties(name);
 		prop.remove(key);
 		storeProperties(name, prop);
 	}
 
-	public static String toString(String name) 
-			throws FileNotFoundException, IOException {
+	public static String toString(String name) throws FileNotFoundException,
+			IOException {
 		StringBuffer buf = new StringBuffer();
 		Properties prop = PropertiesUtil.loadProperties(name);
 		Set<Object> keys = prop.keySet();
-		for(Object key : keys){
+		for (Object key : keys) {
 			buf.append(key).append(" = ").append(prop.get(key)).append("\n");
 		}
 		return buf.toString();
 	}
-	
-	
+
 }

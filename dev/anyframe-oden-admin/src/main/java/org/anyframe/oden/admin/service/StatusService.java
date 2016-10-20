@@ -17,26 +17,24 @@ package org.anyframe.oden.admin.service;
 
 import anyframe.common.Page;
 
-
-
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:36
- * @author HONG JungHwan
+ * This is StatusService Interface
+ * 
+ * @author Junghwan Hong
  */
 public interface StatusService {
 
 	/**
 	 * 
 	 * @param domain
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public Page findList(String domain) throws Exception;
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public String stop(String param) throws Exception;
 

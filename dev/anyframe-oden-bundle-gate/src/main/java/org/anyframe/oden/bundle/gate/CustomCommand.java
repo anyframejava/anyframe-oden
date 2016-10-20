@@ -20,8 +20,7 @@ import org.ungoverned.osgi.service.shell.Command;
 /**
  * Anyframe command. This class is used to separate with default OSGi commands.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public interface CustomCommand extends Command{
+public interface CustomCommand extends Command {
 }

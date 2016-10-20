@@ -20,8 +20,7 @@ import java.util.Arrays;
 /**
  * There some bugs causes by incompleted arguments, you can use this.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class OdenIncompleteArgumentException extends OdenException {
 
@@ -34,5 +33,5 @@ public class OdenIncompleteArgumentException extends OdenException {
 	public OdenIncompleteArgumentException(String[] args) {
 		super(Arrays.toString(args) + " is incomplete.");
 	}
-	
+
 }

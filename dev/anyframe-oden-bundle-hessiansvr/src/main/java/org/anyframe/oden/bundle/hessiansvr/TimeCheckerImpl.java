@@ -21,31 +21,30 @@ import java.util.Map;
 import org.anyframe.oden.bundle.deploy.TimeChecker;
 
 /**
+ * This is TimeCheckerImpl class.
  * 
+ * @author Junghwan Hong
  * @see anyframe.oden.bundle.deploy.TimeChecker
- * 
- * @author joon1k
- *
  */
-public class TimeCheckerImpl implements TimeChecker{
+public class TimeCheckerImpl implements TimeChecker {
 	private Map<String, Long> m = new HashMap<String, Long>();
-	
+
 	private Map<String, Long> totals = new HashMap<String, Long>();
-	
-	public void tick(String s){
+
+	public void tick(String s) {
 		long t = System.currentTimeMillis();
-		if(m.containsKey(s)){
+		if (m.containsKey(s)) {
 			long total = totals.containsKey(s) ? totals.get(s) : 0L;
-			totals.put(s, total + ( t - m.remove(s)));
-		}else{
+			totals.put(s, total + (t - m.remove(s)));
+		} else {
 			m.put(s, System.currentTimeMillis());
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
-		for(String s : totals.keySet()){
+		for (String s : totals.keySet()) {
 			buf.append(s + ": " + totals.get(s) + "\n");
 		}
 		m = new HashMap<String, Long>();

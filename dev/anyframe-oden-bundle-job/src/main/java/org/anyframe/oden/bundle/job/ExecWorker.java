@@ -24,46 +24,53 @@ import org.anyframe.oden.bundle.deploy.DeployerService;
 import org.anyframe.oden.bundle.job.config.CfgCommand;
 import org.anyframe.oden.bundle.job.config.CfgTarget;
 
-public class ExecWorker extends Thread{
+/**
+ * This is ExecWorker Class
+ * 
+ * @author Junghwan Hong
+ */
+public class ExecWorker extends Thread {
 	DeployerService deployer;
-	
+
 	CfgTarget target;
-	
+
 	List<CfgCommand> commands;
-	
+
 	long timeout;
-	
+
 	StringBuffer result = new StringBuffer();
-	
-	public ExecWorker(DeployerService deployer, CfgTarget target, 
-			List<CfgCommand> commands, long timeout){
+
+	public ExecWorker(DeployerService deployer, CfgTarget target,
+			List<CfgCommand> commands, long timeout) {
 		this.deployer = deployer;
 		this.target = target;
 		this.commands = commands;
 		this.timeout = timeout;
 	}
-	
+
 	@Override
 	public void run() {
 		try {
-			for(CfgCommand c : commands){
-				String path = FileUtil.isAbsolutePath(c.getPath()) ?
-						c.getPath() : 
-						FileUtil.combinePath(target.getPath(), c.getPath());
-				result.append(StringUtil.makeEmpty(deployer.execShellCommand(
-						c.getCommand(), path, timeout) + "\n").toString());
+			for (CfgCommand c : commands) {
+				String path = FileUtil.isAbsolutePath(c.getPath()) ? c
+						.getPath() : FileUtil.combinePath(target.getPath(),
+						c.getPath());
+				result.append(StringUtil
+						.makeEmpty(
+								deployer.execShellCommand(c.getCommand(), path,
+										timeout) + "\n").toString());
 			}
 		} catch (Exception e) {
 			Logger.error(e);
 			result.append(e.getMessage() + "\n");
 		}
 	}
-	
-	public String getResult(){
+
+	public String getResult() {
 		return result.toString();
 	}
-	
-	public String getTargetName(){
+
+	public String getTargetName() {
 		return target.getName();
 	}
 }

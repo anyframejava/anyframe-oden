@@ -19,6 +19,11 @@ import java.util.Collection;
 
 import org.anyframe.oden.bundle.common.OdenException;
 
+/**
+ * This is SlimDeployFileResolver Interface
+ * 
+ * @author Junghwan Hong
+ */
 public interface SlimDeployFileResolver {
 	Collection<SlimDeployFile> resolveDeployFiles() throws OdenException;
 }

@@ -15,6 +15,11 @@
  */
 package org.anyframe.oden.bundle.http;
 
+/**
+ * This is WebService class.
+ * 
+ * @author Junghwan Hong
+ */
 public interface WebService {
 	public String name();
 }

@@ -22,18 +22,16 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.osgi.service.http.HttpService;
-
 import org.anyframe.oden.bundle.common.Logger;
 import org.anyframe.oden.bundle.external.deploy.ExtDeployerService;
+import org.osgi.service.http.HttpService;
 
 import com.caucho.hessian.server.HessianServlet;
 
 /**
  * Servlet to make availble to execute commands in the OSGi Shell.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class OdenExternalServlet extends HessianServlet {
 	/**
@@ -55,9 +53,7 @@ public class OdenExternalServlet extends HessianServlet {
 			prop.put("home-api", ExtDeployerService.class.getName());
 			prop.put("home-class", ExtDeployerImpl.class.getName());
 
-			hs
-					.registerServlet("/" + OdenExternalServlet.NAME, this,
-							prop, null);
+			hs.registerServlet("/" + OdenExternalServlet.NAME, this, prop, null);
 		} catch (Exception e) {
 			Logger.error(e);
 		}

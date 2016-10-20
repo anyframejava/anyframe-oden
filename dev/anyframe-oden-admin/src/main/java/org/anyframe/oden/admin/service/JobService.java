@@ -23,9 +23,9 @@ import org.anyframe.oden.admin.domain.Job;
 import anyframe.common.Page;
 
 /**
- * @version 1.0
- * @created 14-7-2010 占쏙옙占쏙옙 10:13:31
- * @author LEE Sujeong
+ * This is JobService Interface
+ * 
+ * @author Sujeong Lee
  */
 public interface JobService {
 

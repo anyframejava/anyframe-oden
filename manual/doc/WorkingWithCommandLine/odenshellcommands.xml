@@ -152,7 +152,7 @@
 			</para>
 			<programlisting><![CDATA[deploy rerun <txid>]]></programlisting>
 			<itemizedlist>
-			<listitem><para>txid를 통해 예외가 발생한 작업만 배포 작업을 재수행 한다. </para></listitem>
+			<listitem><para>txid는 배포 작업 후의 유일한 값이며 txid를 통해 예외가 발생한 작업만 배포 작업을 재수행 한다. txid는 Log Command를 통해 확인 할 수 있다.</para></listitem>
 			</itemizedlist>
 		</section>
 		<section id="workingwithcommandline_odenshellcommands_deploy_rerun">
@@ -162,7 +162,7 @@
 			</para>
 			<programlisting><![CDATA[deploy undo <txid>]]></programlisting>
 			<itemizedlist>
-			<listitem><para>txid를 통해 배포 작업을 원복한다. </para></listitem>
+			<listitem><para>txid는 배포 작업 후의 유일한 값이며 txid를 통해 배포 작업을 원복한다.  txid는 Log Command를 통해 확인 할 수 있다.</para></listitem>
 			</itemizedlist>
 		</section>	
 	</section>
@@ -175,9 +175,9 @@
 			<para>
 				배포한 상세 내역을 보여주는 명령어.  
 			</para>
-			<programlisting><![CDATA[log show <txId> [ -mode <A | U | D> ] [-path <path>] [-failonly] ]]></programlisting>
+			<programlisting><![CDATA[log show <txid> [ -mode <A | U | D> ] [-path <path>] [-failonly] ]]></programlisting>
 			<para>
-				txId에 해당하는 배포 내역의 상세를 보여준다. 새로 추가 되거나(A), 변경되거나(U), 삭제된(D) 
+				txid에 해당하는 배포 내역의 상세를 보여준다. 새로 추가 되거나(A), 변경되거나(U), 삭제된(D) 
 				파일의 목록만 보고싶다면 -mode옵션을 사용하면 된다. 배포된 내역중 특정 파일의 내역을 찾고 싶다면 
 				-path 이하에 파일명을 입력하면 된다. 실패한 파일 목록만 보고자 한다면 
 				-failonly 옵션을 덧붙여 명령을 실행하면 된다. 

@@ -15,7 +15,6 @@
  */
 package org.anyframe.oden.bundle.core.txmitter;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,21 +31,20 @@ import org.anyframe.oden.bundle.deploy.DoneFileInfo;
 /**
  * Helper class to access the DeployerService
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public class DeployerHelper {
 
 	public static void readyToDeploy(DeployerService ds, DeployFile f,
-			boolean useTmp, int backupcnt) throws Exception {
+			boolean useTmp, int backupcnt, boolean isCompress) throws Exception {
 
 		final String parent = f.getAgent().location();
 		final String child = f.getPath();
 		try {
-			ds.init(parent, child, f.getDate(), useTmp, backupcnt);
+			ds.init(parent, child, f.getDate(), useTmp, backupcnt,isCompress);
 		} catch (Exception e) {
 			try {
-				ds.init(parent, child, f.getDate(), useTmp, backupcnt);
+				ds.init(parent, child, f.getDate(), useTmp, backupcnt,false);
 			} catch (Exception e2) {
 				try {
 					ds.close(parent, child, null, null);
@@ -58,12 +56,12 @@ public class DeployerHelper {
 	}
 
 //	public static void readyToDeploy(DeployerService ds, int backupcnt,
-//			String backDir, String undo) throws Exception {
+//	String backDir, String undo) throws Exception {
 //
 //		try {
 //			ds.zinit(backupcnt, backDir, undo);
 //		} catch (Exception e) {
-//			throw e;
+//		throw e;
 //		}
 //	}
 
@@ -111,23 +109,22 @@ public class DeployerHelper {
 	}
 
 	// public static boolean removeDir(DeployerService ds, String txid,
-	// Set<DeployFile> fs,
-	// AgentLoc loc, String bakLoc) throws OdenException {
-	// boolean success = true;
-	// List<DoneFileInfo> results = Collections.EMPTY_LIST;
-	// try {
-	// results = ds.backupNRemoveDir(txid, loc.location(), bakLoc);
-	// } catch (Exception e) {
-	// throw new OdenException(e);
-	// }
-	// for(DoneFileInfo f : results){
-	// success = success & f.success();
-	// fs.add(new DeployFile(
-	// new Repository(new String[0]),
-	// f.getPath(), loc, f.size(), f.lastModified(),
-	// DeployFile.Mode.DELETE, f.success()));
-	// }
-	// return success;
+	// 		Set<DeployFile> fs, AgentLoc loc, String bakLoc) throws OdenException {
+	// 		boolean success = true;
+	// 		List<DoneFileInfo> results = Collections.EMPTY_LIST;
+	// 		try {
+	// 			results = ds.backupNRemoveDir(txid, loc.location(), bakLoc);
+	// 		} catch (Exception e) {
+	// 			throw new OdenException(e);
+	// 		}
+	// 		for(DoneFileInfo f : results){
+	// 			success = success & f.success();
+	// 			fs.add(new DeployFile(
+	// 			new Repository(new String[0]),
+	// 			f.getPath(), loc, f.size(), f.lastModified(),
+	// 			DeployFile.Mode.DELETE, f.success()));
+	// 		}
+	// 		return success;
 	// }
 
 	public static void restore(DeployerService ds, String txid,

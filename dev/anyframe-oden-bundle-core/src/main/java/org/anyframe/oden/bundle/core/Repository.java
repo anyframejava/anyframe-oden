@@ -18,46 +18,44 @@ package org.anyframe.oden.bundle.core;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.anyframe.oden.bundle.core.command.JSONizable;
 import org.json.JSONArray;
 
-import org.anyframe.oden.bundle.core.command.JSONizable;
 /**
- * 
  * This class contain Repository's whole information.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public class Repository implements JSONizable, Serializable{
+public class Repository implements JSONizable, Serializable {
 	private static final long serialVersionUID = 4973729525028146045L;
 
 	private String[] args = new String[0];
-	
-	public Repository(String[] args){
+
+	public Repository(String[] args) {
 		this.args = args;
 	}
-	
-	public Repository(AgentLoc agent){
+
+	public Repository(AgentLoc agent) {
 		this(agent.agentAddr(), agent.location());
 	}
-	
-	public Repository(String addr, String loc){
-		this(new String[]{addr, loc});
+
+	public Repository(String addr, String loc) {
+		this(new String[] { addr, loc });
 	}
-	
-	public String[] args(){
+
+	public String[] args() {
 		return args;
 	}
-	
-	public void setArgs(String[] args){
+
+	public void setArgs(String[] args) {
 		this.args = args;
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return Arrays.toString(args);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		return toString().equals(o.toString());
@@ -67,7 +65,7 @@ public class Repository implements JSONizable, Serializable{
 	public int hashCode() {
 		return toString().hashCode();
 	}
-	
+
 	public Object jsonize() {
 		return new JSONArray(Arrays.asList(args));
 	}

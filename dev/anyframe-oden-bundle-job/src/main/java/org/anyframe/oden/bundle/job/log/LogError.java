@@ -15,6 +15,11 @@
  */
 package org.anyframe.oden.bundle.job.log;
 
+/**
+ * This is LogError Class
+ * 
+ * @author Junghwan Hong
+ */
 public class LogError {
 	private String date;
 	private String contents;

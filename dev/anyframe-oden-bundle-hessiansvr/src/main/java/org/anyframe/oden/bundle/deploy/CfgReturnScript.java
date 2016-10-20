@@ -19,10 +19,12 @@ import java.io.Serializable;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgReturnScript class.
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgReturnScript implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	String stdOut;
@@ -53,8 +55,8 @@ public class CfgReturnScript implements Serializable {
 	public int hashCode() {
 		return Utils.hashCode(stdOut, runPath, exitCode);
 	}
-	
-//	append string result
+
+	// append string result
 	public String getString() {
 		return null;
 	}

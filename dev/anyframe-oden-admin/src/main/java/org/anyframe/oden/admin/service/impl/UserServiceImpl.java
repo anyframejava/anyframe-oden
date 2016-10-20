@@ -37,9 +37,9 @@ import anyframe.common.Page;
 import anyframe.iam.core.reload.IResourceReloadService;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:42
- * @author HONG JungHwan
+ * This is UserServiceImpl Class
+ *  
+ * @author Junghwan Hong
  */
 @Service("userService")
 @Transactional(rollbackFor = { Exception.class })
@@ -49,42 +49,44 @@ public class UserServiceImpl implements UserService {
 
 	@Value("#{contextProperties['oden.server'] ?: 'localhost'}")
 	private String server;
-	
+
 	@Value("#{contextProperties['oden.port'] ?: '9860'}")
 	private String port;
-	
+
 	private OdenCommonDao odenCommonDao = new OdenCommonDao<Status>();
-	
+
 	@Inject
-    @Named("odenUserDao")
+	@Named("odenUserDao")
 	private OdenUserDao odenUserDao;
-	
+
 	@Inject
 	@Named("resourceReloadService")
 	private IResourceReloadService resourceReloadService;
+
 	/**
 	 * 
 	 * @param password
 	 * @param userid
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public boolean checkuser(Credential c) throws Exception {
-		return request(c.getProperty("userid"),c.getProperty("password"));
+		return request(c.getProperty("userid"), c.getProperty("password"));
 	}
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private boolean request(String userid, String password) throws Exception {
-		return OdenBroker.checkUser("http://" + server + ":" + port+ "/shell" , userid, password);
+		return OdenBroker.checkUser("http://" + server + ":" + port + "/shell",
+				userid, password);
 	}
 
 	public Page findList(String domain) throws Exception {
 		return odenUserDao.getUserList();
 	}
-	
+
 	public User findUser(String id) throws Exception {
 		return odenUserDao.getUser(id);
 	}
@@ -92,10 +94,11 @@ public class UserServiceImpl implements UserService {
 	public void createUser(String role, String id, String pw, String[] jobs)
 			throws Exception {
 		odenUserDao.createUser(id, pw);
-		String groupId = ((HashMap)((ArrayList)odenUserDao.findGroupByName(role)).get(0)).get("groupId")+"";
+		String groupId = ((HashMap) ((ArrayList) odenUserDao
+				.findGroupByName(role)).get(0)).get("groupId") + "";
 		odenUserDao.createGroupUser(groupId, id);
-		for(int i=0; i<jobs.length; i++){
-			if(jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")){
+		for (int i = 0; i < jobs.length; i++) {
+			if (jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")) {
 				break;
 			}
 			String jobName = jobs[i];
@@ -107,11 +110,12 @@ public class UserServiceImpl implements UserService {
 	public void updateUser(String role, String id, String pw, String[] jobs)
 			throws Exception {
 		odenUserDao.updateUser(id, pw);
-		String groupId = ((HashMap)((ArrayList)odenUserDao.findGroupByName(role)).get(0)).get("groupId")+"";
+		String groupId = ((HashMap) ((ArrayList) odenUserDao
+				.findGroupByName(role)).get(0)).get("groupId") + "";
 		odenUserDao.updateGroupUser(groupId, id);
 		odenUserDao.removeAuthorities(id);
-		for(int i=0; i<jobs.length; i++){
-			if(jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")){
+		for (int i = 0; i < jobs.length; i++) {
+			if (jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")) {
 				break;
 			}
 			String jobName = jobs[i];
@@ -126,8 +130,8 @@ public class UserServiceImpl implements UserService {
 		odenUserDao.removeUser(id);
 		roleReloading();
 	}
-	
-	private void roleReloading() throws Exception{
+
+	private void roleReloading() throws Exception {
 		resourceReloadService.resourceReload("maps", "times");
 	}
 

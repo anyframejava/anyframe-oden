@@ -37,7 +37,7 @@ import anyframe.iam.core.userdetails.jdbc.CustomUserDetailsHelper;
 /**
  * controller class for create user.
  * 
- * @author Hong JungHwan
+ * @author Junghwan Hong
  */
 @Controller
 public class LogInController {
@@ -53,13 +53,13 @@ public class LogInController {
 
 	@Value("#{contextProperties['url'] ?: }")
 	String url;
-	
+
 	@RequestMapping("/login.do")
 	public ModelAndView checkUser(HttpServletRequest request) throws Exception {
 		ModelAndView mav = null;
 		HttpSession session = request.getSession();
 		userid = CustomUserDetailsHelper.getAuthenticatedUser().getUsername();
-		
+
 		Credential c = new Credential();
 		c.setProperty("userid", "oden");
 		c.setProperty("password", "oden0");
@@ -70,7 +70,7 @@ public class LogInController {
 				mav = new ModelAndView("jsonLayout");
 				session.setAttribute("userid", userid);
 				session.setAttribute("userrole", getRole());
-				
+
 			}
 		} catch (BrokerException e) {
 			mav = new ModelAndView("login");
@@ -84,14 +84,14 @@ public class LogInController {
 
 	private String getRole() throws Exception {
 		String roles = "";
-		if(! userid.equals("") || userid != null) {
+		if (!userid.equals("") || userid != null) {
 			Class.forName("org.hsqldb.jdbcDriver");
 			connection = DriverManager.getConnection(url, "sa", "");
 			ResultSet rs = connection.prepareStatement(
-					"SELECT ROLE_ID FROM AUTHORITIES WHERE SUBJECT_ID ='" + userid
-							+ "'").executeQuery();
-			while(rs.next()) {
-				roles = roles + rs.getString(1)+ ",";
+					"SELECT ROLE_ID FROM AUTHORITIES WHERE SUBJECT_ID ='"
+							+ userid + "'").executeQuery();
+			while (rs.next()) {
+				roles = roles + rs.getString(1) + ",";
 			}
 		}
 		return roles;

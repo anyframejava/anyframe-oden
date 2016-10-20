@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Oden 3rd party bundles
 Bundle-SymbolicName: anyframe.oden.bundle.libs
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-ClassPath: hessian-3.1.6.jar,
  jdom.jar,
  org.json_1.0.0.jar,
@@ -10,7 +10,10 @@ Bundle-ClassPath: hessian-3.1.6.jar,
  org.apache.felix.prefs-1.0.2.jar,
  remote-1.0.0.RC4.jar,
  org.apache.felix.framework.security-1.0.0.jar,
- berkelydb-4.0.103.jar
+ berkelydb-4.0.103.jar,
+ org.apache.servicemix.bundles.jasypt-1.7_1.jar,
+ commons-logging-1.1.1.jar,
+ icu4j-4.6.1.jar
 Export-Package: 
  com.caucho.burlap.client,
  com.caucho.burlap.io,
@@ -73,6 +76,10 @@ Export-Package:
  org.apache.commons.codec,
  org.apache.commons.codec.binary,
  org.apache.felix.prefs,
+ org.jasypt.encryption,
+ org.jasypt.encryption.pbe,
+ org.jasypt.exceptions,
+ org.jasypt.salt,
  org.jdom,
  org.jdom.adapters,
  org.jdom.filter,

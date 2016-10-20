@@ -17,6 +17,11 @@ package org.anyframe.oden.bundle.external.config;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgTarget Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgTarget {
 	String name;
 	String address;

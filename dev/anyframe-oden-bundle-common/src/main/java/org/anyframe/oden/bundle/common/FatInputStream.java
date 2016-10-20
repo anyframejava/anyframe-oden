@@ -21,8 +21,7 @@ import java.io.InputStream;
 /**
  * InputStream having some more its file information. 
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class FatInputStream extends BufferedInputStream{
 

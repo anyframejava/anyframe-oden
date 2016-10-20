@@ -17,36 +17,34 @@ package org.anyframe.oden.admin.service;
 
 import anyframe.common.Page;
 
-
-
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:30
- * @author LEE Sujeong
+ * This is ServerService Interface
+ *  
+ * @author Sujeong Lee
  */
 public interface ServerService {
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public String start(String param) throws Exception;
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public String stop(String param) throws Exception;
 
 	/**
 	 * 
 	 * @param param
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public String status(String param) throws Exception;
-	
+
 	public Page findListByPk(String param) throws Exception;
 
 }

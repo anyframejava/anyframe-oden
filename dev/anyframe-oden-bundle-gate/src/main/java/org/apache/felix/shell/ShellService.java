@@ -26,11 +26,13 @@ import org.osgi.framework.ServiceReference;
  * it is operating in a command line fashion, i.e., it receives a
  * complete command line, parses it, and executes the corresponding
  * command, but graphical interfaces are also possible.
- * <p>
+ * 
  * All commands in the impl service are actually implemented as OSGi
  * services; these services implement the <tt>Command</tt> service
  * interface. Any bundle can implement custom commands by creating
  * command services and registering them with the OSGi framework.
+ * 
+ * @author Junghwan Hong
 **/
 public interface ShellService
 {
@@ -63,7 +65,6 @@ public interface ShellService
     public ServiceReference getCommandReference(String name);
 
     /**
-     *
      * This method executes the supplied command line using the
      * supplied output and error print stream. The assumption of
      * this method is that a command line will be typed by the user
@@ -73,11 +74,9 @@ public interface ShellService
      * terminated by a space character (not including it) and
      * assumes that this leading token is the command name. For an
      * example, consider the following command line:
-     * </p>
-     * <pre>
+	 *
      *     update 3 http://www.foo.com/bar.jar
-     * </pre>
-     * <p>
+	 *
      * This is interpretted as an <tt>update</tt> command; as a
      * result, the entire command line (include command name) is
      * passed into the <tt>execute()</tt> method of the command

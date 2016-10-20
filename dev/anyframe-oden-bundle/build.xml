@@ -1,6 +1,6 @@
 <project name="Oden" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe-oden-bundle" />
-	<property name="version" value="2.3.1"/>
+	<property name="version" value="2.4.0"/>
 	
 	<property name="service.src" location="${basedir}/src/main/java"/>
 	<property name="service.build" location="${basedir}/build"/>		
@@ -27,8 +27,18 @@
 			</classpath>
 		</javac>
 	</target>
-		
-	<target name="dist.bundle" depends="compile.service">
+
+	<target name="pmd">
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+	        <formatter type="xml" toFile="target/pmd.xml"/>
+	        <fileset dir="src">
+	            <include name="**/*.java"/>
+	        </fileset>
+	    </pmd>
+	</target>
+	    	
+	<target name="dist.bundle" depends="compile.service, pmd">
 		<jar destfile="${dist}/oden-${version}.jar" basedir="${service.build}" 
 			manifest="${basedir}/META-INF/MANIFEST.MF" />
 		<copy todir="${dist}">
@@ -47,7 +57,7 @@
 			<fileset dir="${basedir}/bundle" excludes="anyframe*"/>
 		</copy>
 	</target>
-	
+	        	
 	<target name="all-local-src">
 		<property name="bundle.loc" value="../anyframe-oden-bundle/bundle"/>
 		<property name="dist" location="${basedir}/dist"/>

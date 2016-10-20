@@ -1,29 +1,36 @@
-1. Anyframe Oden Admin 3rd-party licenses
+Anyframe 프로젝트 내에 사용된 외부 오픈 소스의 경우 원 오픈 소스의 라이센스 정책을 따른다. 
+아래는 각 외부 오픈 소스의 정보(라이센스, 소스 코드 및 라이브러리 다운로드 등)를 얻을 수 있는 사이트 URL이므로 참고하도록 한다.
 
-1) JSON : http://www.json.org, JSON License
-2) Winstone 0.9.10 : http://winstone.sourceforge.net, LGPL or CDDL License
-3) EZMorph 1.0.6 : http://ezmorph.sourceforge.net, Apache License Version 2.0
-4) Hibernate Validator 4.0.2.GA : http://www.hibernate.org/subprojects/validator.html, Apache License Version 2.0
-5) AOP alliance 1.0 : http://aopalliance.sourceforge.net/, Public Domain
-6) Apache Commons BeanUtils 1.8.0 : http://commons.apache.org/beanutils/, Apache License 2.0
-7) Apache Commons Codec 1.3 : http://commons.apache.org/codec/, Apache License 2.0
-8) Apache Commons Collections 3.2 : http://commons.apache.org/collections/, Apache License 2.0
-9) Apache Commons Digester 1.8 : http://commons.apache.org/digester/, Apache License 2.0
-10) Apache Commons HttpClient 3.1 : http://hc.apache.org/httpclient-3.x/, Apache License 2.0
-11) Apache Commons IO 1.4 : http://commons.apache.org/io/,  Apache License 2.0
-12) Apache Commons JEXL 1.1 : http://commons.apache.org/jexl/, Apache License 2.0
-13) Apache Commons FileUpload 1.2 : http://commons.apache.org/fileupload/, Apache License 2.0
-14) Apache Commons Lang 2.4 : http://commons.apache.org/lang/, Apache License 2.0
-15) Apache Commons Logging 1.1.1 : http://commons.apache.org/logging/, Apache License 2.0
-16) Apache Commons Pool 1.5.3 : http://commons.apache.org/pool/, Apache License 2.0
-17) javax.inject-1 : http://grepcode.com , Apache License 2.0
-18) Java Architecture for XML Binding (JAXB) 2.1.12 : https://jaxb.dev.java.net/, CDDL License
-19) JSON-lib 2.2.3 : http://json-lib.sourceforge.net/ , The Apache Software License, Version 2.0
-20) JSR 250 : https://jsr250.dev.java.net/, CDDL License
-21) JavaServer Pages Standard Tag Library 1.1.2 : http://java.sun.com/products/jsp/jstl/ , Apache License V2.0
-22) Log4j 1.2.15 : http://logging.apache.org/log4j, Apache License 2.0 
-23) Apache POI 3.2-FINAL-20081019 : http://poi.apache.org/ , Apache Software License 2.0 
-24) SLF4J 1.5.3 : http://www.slf4j.org/, SLF4J Licence
-25) Spring Framework 3.0.3.RELEASE : http://www.springsource.org/, Apache License 2.0
-26) Apache Tiles 2.2.1 : http://tiles.apache.org/, Apache License 2.0
-27) JQuery 1.4.2 : http://jquery.com, MIT License or GPL License
+1) Apache Ant 1.6.5 : http://ant.apache.org/, Apache License Version 2.0
+2) Apache Felix 4.0.2 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+3) Apache Felix 1.4.1 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+4) Apache License Version 2.0  : http://www.apache.org/, Apache License Version 2.0
+5) Apache-Jakarta Codec 1.4 : http://commons.apache.org/codec/, Apache License Version 2.0
+6) Apache-XML Xerces Java 1 2.9.1 : http://xerces.apache.org/xerces2-j/index.html, Apache License Version 2.0
+7) Berkeley DB Java Edition 4.0.103 : http://www.oracle.com/us/products/database/overview/index.html, Oracle Berkeley DB Java Edition License
+8) core 3.1.1 : https://cfengine.com/community/, Eclipse Public License - v 1.0
+9) GlassFish 2.1 : http://glassfish.java.net/, COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+10) Hessian Binary Web Service Protocol 3.1.6 : http://hessian.caucho.com/, Apache 1.1
+11) International Components for Unicode - ICU4J 4.6.1 : http://site.icu-project.org/, ICU License
+12) Jakarta Commons-Logging 1.1.1 : http://commons.apache.org/logging/, Apache License Version 2.0
+13) JDOM  : http://www.jdom.org/, Jdom License
+14) jquery.autocomplete.bassistance 1.1 : http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/, MIT License V2
+15) jqueryjs 1.3.2 : http://code.google.com/p/jqueryjs/, MIT License V2
+16) json-framework 1.0.0 : https://github.com/bpo/json-framework/, JSon License
+17) kXML - A Lean Common XML API 2.2.2 : http://kxml.sourceforge.net/, BSD 2.0
+18) org.apache.felix.configadmin 1.2.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+19) org.apache.felix.eventadmin 1.0.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+20) org.apache.felix.http.jetty 2.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+21) org.apache.felix.log 1.0.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+22) org.apache.felix.prefs 1.0.2 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+23) org.apache.felix.prefs 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+24) org.apache.felix.scr 1.4.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+25) org.apache.felix.shell.remote 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+26) org.apache.felix.shell.tui 1.4.1 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+27) org.apche.servicemix.bundles.jasypt 1.7_1 : http://servicemix.apache.org, Apache License Version 2.0
+28) R-OSGi - r-osgi remote-1.0.0.RC4 : http://r-osgi.sourceforge.net/, BSD 2.0
+29) servlet-api-2.5  : https://github.com/saces/servlet-api-2.5/, Sun Servlet Binary Code License
+30) winstone-lite 0.9.10 : http://winstone.sourceforge.net, LGPL 2.1
+31) XMLPULL Parser based on Xerces 2 XNI v1 : http://xni2xmlpull.sourceforge.net/, Apache License Version 2.0
+
+

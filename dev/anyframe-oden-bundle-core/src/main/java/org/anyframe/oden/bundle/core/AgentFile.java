@@ -18,44 +18,43 @@ package org.anyframe.oden.bundle.core;
 /**
  * This class store's deployed file information in all agents.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class AgentFile {
 	private String agent;
-	
+
 	private String path;
-	
+
 	private long size;
-	
+
 	private long date;
-	
-	public AgentFile(String agent, String path){
+
+	public AgentFile(String agent, String path) {
 		this.agent = agent;
 		this.path = path;
 	}
-	
-	public void setSize(long size){
+
+	public void setSize(long size) {
 		this.size = size;
 	}
-	
-	public void setDate(long date){
+
+	public void setDate(long date) {
 		this.date = date;
 	}
-	
-	public String agent(){
+
+	public String agent() {
 		return agent;
 	}
-	
-	public String path(){
+
+	public String path() {
 		return path;
 	}
-	
-	public long size(){
+
+	public long size() {
 		return size;
 	}
-	
-	public long date(){
+
+	public long date() {
 		return date;
 	}
 }

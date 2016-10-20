@@ -15,11 +15,16 @@
  */
 package org.anyframe.oden.bundle.common;
 
-public class Pair{
+/**
+ * This is Pair class.
+ * 
+ * @author Junghwan Hong
+ */
+public class Pair {
 	String arg0;
 	String arg1;
-	
-	public Pair(String arg0, String arg1){
+
+	public Pair(String arg0, String arg1) {
 		this.arg0 = arg0;
 		this.arg1 = arg1;
 	}
@@ -39,6 +44,5 @@ public class Pair{
 	public void setArg1(String arg1) {
 		this.arg1 = arg1;
 	}
-	
-	
+
 }

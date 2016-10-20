@@ -20,12 +20,12 @@ import java.util.Properties;
 /**
  * Service class for checking user.
  * 
- * @author Hong JungHwan
- *
+ * @author Junghwan Hong
  */
 public class Credential extends Properties {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public Credential() {}
+	public Credential() {
+	}
 }

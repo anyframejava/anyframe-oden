@@ -18,9 +18,9 @@ package org.anyframe.oden.admin.service;
 import org.anyframe.oden.admin.domain.Log;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:34
- * @author HONG JungHwan
+ * This is LogService Interface
+ * 
+ * @author Junghwan Hong
  */
 public interface LogService {
 
@@ -38,6 +38,6 @@ public interface LogService {
 	 * @param param
 	 * @throws Exception
 	 */
-//	public Log findByPk(String param) throws Exception;
+	// public Log findByPk(String param) throws Exception;
 
 }

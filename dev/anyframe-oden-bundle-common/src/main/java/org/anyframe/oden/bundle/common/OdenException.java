@@ -16,12 +16,11 @@
 package org.anyframe.oden.bundle.common;
 
 /**
- * That you use this Exception means you put some meaningful
- * messages to this. That messages should have detailed information
- * and can be shown to customers directly. 
+ * That you use this Exception means you put some meaningful messages to this.
+ * That messages should have detailed information and can be shown to customers
+ * directly.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class OdenException extends Exception {
 	private static final long serialVersionUID = 6622800048854269793L;
@@ -33,7 +32,7 @@ public class OdenException extends Exception {
 	public OdenException(Throwable cause) {
 		super(cause);
 	}
-	
+
 	public OdenException(String msg, Throwable cause) {
 		super(msg, cause);
 	}

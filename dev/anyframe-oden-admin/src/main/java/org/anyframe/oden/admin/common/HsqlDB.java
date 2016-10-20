@@ -31,40 +31,45 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+/**
+ * This is HsqlDB Class
+ * 
+ * @author Junghwan Hong
+ */
 public class HsqlDB implements InitializingBean {
 	private String dbName = "odendb";
 	private Log logger = LogFactory.getLog(this.getClass());
 	private String url;
 	private static Server hsqlServer;
 	private int port;
-	
+
 	protected static ApplicationContext context;
-	
+
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
 		// HSQL DB Active 확인
 		setup();
-		
+
 		try {
 			isServerActive();
 		} catch (Exception e) {
 			// Active 서버 없음
 			startServer();
 		}
-		
+
 	}
-	
+
 	/**
 	 * initializing
 	 */
 	private void setup() {
-		context = new ClassPathXmlApplicationContext("classpath:spring/context-property.xml");
+		context = new ClassPathXmlApplicationContext(
+				"classpath:spring/context-property.xml");
 		Map key = (Map) context.getBean("contextProperties");
-		
+
 		port = Integer.valueOf((String) key.get("oden.db.port"));
 		url = (String) key.get("url");
 	}
-	
 
 	public void shutdown() {
 		if (hsqlServer != null)
@@ -83,17 +88,19 @@ public class HsqlDB implements InitializingBean {
 
 			hsqlServer.setDatabaseName(0, dbName);
 			hsqlServer.setDatabasePath(0, "file:" + dbName);
-			
+
 			logger.info("HSQL DB Set port" + " " + port);
 			hsqlServer.setPort(port);
-			
+
 			hsqlServer.start();
-			
+
 			if (hsqlServer.getStateDescriptor().equals("ONLINE")) {
-				logger.info("Invoking HSQL DB Started" + " " + "port:" + hsqlServer.getPort());
-				logger.info("hsqlServer Address:" +" " + hsqlServer.getAddress());
+				logger.info("Invoking HSQL DB Started" + " " + "port:"
+						+ hsqlServer.getPort());
+				logger.info("hsqlServer Address:" + " "
+						+ hsqlServer.getAddress());
 			}
-			
+
 			Connection con = null;
 
 			try {
@@ -101,7 +108,7 @@ public class HsqlDB implements InitializingBean {
 					Class.forName("org.hsqldb.jdbcDriver");
 					System.out.println("DB url:" + " " + url);
 					con = DriverManager.getConnection(url, "sa", "");
-					
+
 					getInitData(con);
 				}
 

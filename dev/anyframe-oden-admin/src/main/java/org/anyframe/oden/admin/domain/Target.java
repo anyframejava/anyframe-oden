@@ -20,9 +20,8 @@ import java.io.Serializable;
 /**
  * Domain class for target info in job.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Target implements Serializable {
@@ -33,9 +32,9 @@ public class Target implements Serializable {
 	private String hidden;
 	private String status;
 	private String hiddenname;
-	
+
 	// must add server restart info
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -43,7 +42,7 @@ public class Target implements Serializable {
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}

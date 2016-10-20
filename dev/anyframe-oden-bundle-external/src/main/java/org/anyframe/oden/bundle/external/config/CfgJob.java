@@ -19,6 +19,11 @@ import java.util.List;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgJob Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgJob {
 
 	String id;
@@ -31,13 +36,13 @@ public class CfgJob {
 	boolean compress;
 
 	public CfgJob(String id, String userId, List<CfgFileInfo> fileInfo,
-			boolean sync) { 
+			boolean sync) {
 		this.id = id;
 		this.userId = userId;
 		this.fileInfo = fileInfo;
 		this.sync = sync;
 	}
-	
+
 	public CfgJob(String id, String userId, List<CfgFileInfo> fileInfo,
 			boolean sync, boolean compress) {
 		this.id = id;
@@ -46,7 +51,7 @@ public class CfgJob {
 		this.sync = sync;
 		this.compress = compress;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
@@ -62,16 +67,17 @@ public class CfgJob {
 	public Boolean isSync() {
 		return sync;
 	}
-	
+
 	public boolean isCompress() {
 		return compress;
-		
+
 	}
-	
+
 	public String getRepoLocation() {
-		return fileInfo.size() == 0 ? "" : ((CfgFileInfo) fileInfo.get(0)).getExeDir();
+		return fileInfo.size() == 0 ? "" : ((CfgFileInfo) fileInfo.get(0))
+				.getExeDir();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Utils.hashCode(id, userId, fileInfo);

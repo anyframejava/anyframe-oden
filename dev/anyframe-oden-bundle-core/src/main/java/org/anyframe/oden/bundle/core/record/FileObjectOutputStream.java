@@ -26,12 +26,12 @@ import java.io.ObjectOutputStream;
  * This is kind of FileOutputStream which provides a way to store Object to file
  * with append mode.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class FileObjectOutputStream extends FileOutputStream {
-	
-	public FileObjectOutputStream(File file, boolean append) throws FileNotFoundException {
+
+	public FileObjectOutputStream(File file, boolean append)
+			throws FileNotFoundException {
 		super(file, append);
 	}
 
@@ -41,27 +41,31 @@ public class FileObjectOutputStream extends FileOutputStream {
 	 * @param o
 	 * @throws IOException
 	 */
-	public void writeObject(Object o) throws IOException{
+	public void writeObject(Object o) throws IOException {
 		ObjectOutputStream oos = null;
-		try{
+		try {
 			ByteArrayOutputStream bout = new ByteArrayOutputStream();
 			oos = new ObjectOutputStream(bout);
 			oos.writeObject(o);
 			oos.flush();
-			
+
 			byte[] contents = bout.toByteArray();
 			write(size(contents.length));
-			write(contents);	
-		}finally {
-			try { if(oos != null) oos.close(); } catch (IOException e) { }
+			write(contents);
+		} finally {
+			try {
+				if (oos != null)
+					oos.close();
+			} catch (IOException e) {
+			}
 		}
 	}
-	
+
 	private byte[] size(int length) {
 		byte[] size = new byte[4];
-		for(int i=0; i<4; i++){
+		for (int i = 0; i < 4; i++) {
 			size[i] = (byte) (length & 0x000000ff);
-//			System.out.printf("%x %x\n", length, size[i]);
+			// System.out.printf("%x %x\n", length, size[i]);
 			length = length >> 8;
 		}
 		return size;

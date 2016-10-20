@@ -29,11 +29,9 @@ import java.net.URLConnection;
 import java.util.Properties;
 
 /**
- * 
  * To connect oden server and control in command line.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Cmd {
 	private static final String HEADER_AUTHORIZATION = "Authorization";
@@ -41,37 +39,39 @@ public class Cmd {
 	private final static int TIMEOUT = 10000;
 
 	private String odenURL;
-	
+
 	private String user;
 
 	private String home;
-	
+
 	public static void main(String... args) {
-		if (args.length < 1){
-			System.err.println("Usage: runc.sh <oden-cmd>");
+		if (args.length < 1) {
+			System.err.println("Usage: runc.cmd(sh) <oden-cmd>");
 			System.exit(-1);
 		}
 		try {
 			Cmd cmd = new Cmd();
 			cmd.loadINI();
 			String rtn = cmd.sendRequest(cmd.toCommand(args));
-			if(rtn.startsWith("[S]")) {
+			if (rtn.startsWith("[S]")) {
 				// success
 				System.out.println(rtn);
-				System.exit(0); //normal
+				System.exit(0); // normal
 			} else {
 				// fail
 				System.out.println(rtn);
-				System.exit(-1); //abnormal
+				System.exit(-1); // abnormal
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public Cmd() throws Exception{
-//		home = new File(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile() + "/../anyframe.oden.bundle";
+
+	public Cmd() throws Exception {
+		// home = new
+		// File(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile()
+		// + "/../anyframe.oden.bundle";
 		home = odenHome().getPath();
 	}
 
@@ -108,33 +108,36 @@ public class Cmd {
 					+ CONFIG_FILE);
 
 		odenURL = "http://localhost:" + port + "/shell";
-		
+
 		String defaultUser = prop.getProperty("console.user");
-		if(defaultUser != null){
+		if (defaultUser != null) {
 			user = userInfo(defaultUser);
 		}
 	}
 
-	private String userInfo(String id){
+	private String userInfo(String id) {
 		String info = null;
 		File f = new File(home, SecurityHandler.ACCOUNT_FILE);
-		if(f.exists()){
+		if (f.exists()) {
 			InputStream in = null;
-			try{
+			try {
 				in = new BufferedInputStream(new FileInputStream(f));
 				Properties prop = new Properties();
 				prop.load(in);
-				info = (String)prop.get(id);
-			}catch(IOException e){
+				info = (String) prop.get(id);
+			} catch (IOException e) {
 				e.printStackTrace();
-			}finally{
-				if(in != null)
-					try { in.close(); } catch (IOException e) { }
+			} finally {
+				if (in != null)
+					try {
+						in.close();
+					} catch (IOException e) {
+					}
 			}
 		}
 		return info;
 	}
-	
+
 	private Properties loadINI(String ini) throws Exception {
 		File iniFile = new File(home, ini);
 		InputStream in = null;
@@ -151,14 +154,14 @@ public class Cmd {
 				prop.load(in);
 			} catch (Exception e) {
 				throw new IOException("Illegal format error: " + ini);
+			} finally {
+				in.close();
 			}
-			in.close();
 		}
 		return prop;
 	}
 
-	private String sendRequest(String msg)
-			throws IOException {
+	private String sendRequest(String msg) throws IOException {
 		PrintWriter writer = null;
 		String result = null;
 		try {
@@ -183,8 +186,8 @@ public class Cmd {
 		String result = null;
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(conn
-					.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(
+					conn.getInputStream(), "utf-8"));
 
 			result = readAll(reader);
 		} finally {
@@ -200,7 +203,7 @@ public class Cmd {
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
-		if(user != null)
+		if (user != null)
 			con.setRequestProperty(HEADER_AUTHORIZATION, "Basic " + user);
 		return con;
 	}
@@ -213,12 +216,13 @@ public class Cmd {
 		}
 		return buf.toString();
 	}
-	
+
 	public static File odenHome() {
-		try{
-			URL url = new URL(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toString());
+		try {
+			URL url = new URL(Cmd.class.getProtectionDomain().getCodeSource()
+					.getLocation().toString());
 			return new File(url.getPath()).getParentFile().getParentFile();
-		}catch(Exception e){
+		} catch (Exception e) {
 			return new File("..");
 		}
 	}

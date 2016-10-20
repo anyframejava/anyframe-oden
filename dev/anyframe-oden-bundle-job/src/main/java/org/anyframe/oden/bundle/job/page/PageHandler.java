@@ -15,16 +15,20 @@
  */
 package org.anyframe.oden.bundle.job.page;
 
+import org.anyframe.oden.bundle.core.command.Cmd;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import org.anyframe.oden.bundle.core.command.Cmd;
-
+/**
+ * This is PageHandler Interface
+ * 
+ * @author Junghwan Hong
+ */
 public interface PageHandler {
-	public JSONObject getCachedData(Cmd cmd, int pgscale, PageHandlerOr or) 
+	public JSONObject getCachedData(Cmd cmd, int pgscale, PageHandlerOr or)
 			throws Exception;
-	
+
 	public JSONObject get(String cmd, int page, int pgscale) throws Exception;
-	
+
 	public void put(String cmd, JSONArray data);
 }

@@ -20,9 +20,8 @@ import java.io.Serializable;
 /**
  * Domain class for mapping info in job.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Mapping implements Serializable {
@@ -31,28 +30,35 @@ public class Mapping implements Serializable {
 	private String checkout;
 	private String hidden;
 	private String hiddenname;
-	
+
 	public String getDir() {
 		return dir;
 	}
+
 	public void setDir(String dir) {
 		this.dir = dir;
 	}
+
 	public String getCheckout() {
 		return checkout;
 	}
+
 	public void setCheckout(String checkout) {
 		this.checkout = checkout;
 	}
+
 	public String getHidden() {
 		return hidden;
 	}
+
 	public void setHidden(String hidden) {
 		this.hidden = hidden;
 	}
+
 	public void setHiddenname(String hiddenname) {
 		this.hiddenname = hiddenname;
 	}
+
 	public String getHiddenname() {
 		return hiddenname;
 	}

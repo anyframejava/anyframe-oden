@@ -26,45 +26,43 @@ import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.deploy.StoppableJob;
 
 /**
- * 
  * Get file list for agents sync.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public class ListFilesJob extends StoppableJob{
+public class ListFilesJob extends StoppableJob {
 	String root;
-	
-	public ListFilesJob(String id, String path){
+
+	public ListFilesJob(String id, String path) {
 		super(id);
 		this.root = path;
 	}
-	
+
 	@Override
 	protected Object execute() throws IOException {
 		File dir = new File(root);
-		if(!dir.isAbsolute())
+		if (!dir.isAbsolute())
 			throw new IOException("Absolute path is allowed only: " + root);
 		return listAllFiles(dir);
 	}
-	
-	private List<FileInfo> listAllFiles(final File dir){
-		if(stop)
+
+	private List<FileInfo> listAllFiles(final File dir) {
+		if (stop)
 			return Collections.EMPTY_LIST;
-		
+
 		List<FileInfo> result = new ArrayList<FileInfo>();
-		if(!dir.exists()) 
+		if (!dir.exists())
 			return result;
 		File[] fs = dir.listFiles();
-		for(File f : fs){
-			if(stop)
+		for (File f : fs) {
+			if (stop)
 				break;
-			if(f.isDirectory())
+			if (f.isDirectory())
 				result.addAll(listAllFiles(f));
 			else
-				result.add(new FileInfo(
-						FileUtil.getRelativePath(root, f.getAbsolutePath()),
-						false, f.lastModified(), f.length()));
+				result.add(new FileInfo(FileUtil.getRelativePath(root,
+						f.getAbsolutePath()), false, f.lastModified(), f
+						.length()));
 		}
 		return result;
 	}

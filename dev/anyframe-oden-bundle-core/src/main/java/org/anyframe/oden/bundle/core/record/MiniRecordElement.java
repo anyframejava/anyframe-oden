@@ -20,10 +20,9 @@ import java.io.Serializable;
 /**
  * This represents each deploy log. policy의 agent 하나당 RecordElement하나가 생김
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
-public class MiniRecordElement implements Serializable{	
+public class MiniRecordElement implements Serializable {
 	private String id;
 	private String user = "";
 	private int nDeploys;
@@ -31,8 +30,9 @@ public class MiniRecordElement implements Serializable{
 	private boolean success = true;
 	private String log = "";
 	private String desc = "";
-		
-	public MiniRecordElement(String id, int nDeploys, String user, long date, boolean success, String errorLog, String desc) {
+
+	public MiniRecordElement(String id, int nDeploys, String user, long date,
+			boolean success, String errorLog, String desc) {
 		this.id = id;
 		this.nDeploys = nDeploys;
 		this.user = user;
@@ -44,7 +44,7 @@ public class MiniRecordElement implements Serializable{
 	public String desc() {
 		return desc;
 	}
-	
+
 	public String getUser() {
 		return user;
 	}
@@ -56,11 +56,11 @@ public class MiniRecordElement implements Serializable{
 	public int getNDeploys() {
 		return nDeploys;
 	}
-	
-	public void setFiles(int nDeploys){
+
+	public void setFiles(int nDeploys) {
 		this.nDeploys = nDeploys;
 	}
-	
+
 	public long getDate() {
 		return date;
 	}
@@ -68,7 +68,7 @@ public class MiniRecordElement implements Serializable{
 	public void setDate(long date) {
 		this.date = date;
 	}
-		
+
 	public boolean isSuccess() {
 		return success;
 	}
@@ -80,12 +80,12 @@ public class MiniRecordElement implements Serializable{
 	public String id() {
 		return id;
 	}
-	
+
 	public String log() {
 		return log;
 	}
-	
-	public void setLog(String s){
+
+	public void setLog(String s) {
 		this.log = s;
 	}
 

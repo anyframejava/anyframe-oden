@@ -20,8 +20,7 @@ import java.io.Serializable;
 /**
  * Domain class for history info.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class CfgHistoryDetail implements Serializable {
 	/**
@@ -41,8 +40,8 @@ public class CfgHistoryDetail implements Serializable {
 
 	private String success;
 
-	public CfgHistoryDetail(String source, String path , String mode, String errorlog,
-			String targets, String success) {
+	public CfgHistoryDetail(String source, String path, String mode,
+			String errorlog, String targets, String success) {
 		this.source = source;
 		this.path = path;
 		this.mode = mode;

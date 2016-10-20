@@ -41,8 +41,7 @@ import org.osgi.framework.BundleContext;
 /**
  * External Undo Job & make cancel available.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong
  */
 public class UndoJob extends DeployJob {
 	protected TransmitterService txmitterService;
@@ -102,26 +101,26 @@ public class UndoJob extends DeployJob {
 	protected void undo() throws OdenException {
 		currentWork = "ready to undo...";
 		if (deployFiles.size() == 0)
-			throw new OdenException("<txid> is not available.");
+			throw new OdenException("<txid> is not available.undo size is 0.");
 		Iterator<DeployFile> it = deployFiles.iterator();
 		Map<String, DeployerService> dsMap = new HashMap<String, DeployerService>();
 		DeployerService ds;
-		
+
 		while (!stop && it.hasNext()) {
 			DeployFile f = it.next();
 			currentWork = f.getPath();
-			
+
 			try {
 				AgentLoc parent = f.getAgent();
-				if(dsMap.containsKey(parent.agentAddr())) {
+				if (dsMap.containsKey(parent.agentAddr())) {
 					ds = dsMap.get(parent.agentAddr());
 				} else {
-					dsMap.put(parent.agentAddr(), txmitterService.getDeployer(parent
-						.agentAddr()));
+					dsMap.put(parent.agentAddr(),
+							txmitterService.getDeployer(parent.agentAddr()));
 					ds = dsMap.get(parent.agentAddr());
 				}
-//				DeployerService ds = txmitterService.getDeployer(parent
-//						.agentAddr());
+				// DeployerService ds = txmitterService.getDeployer(parent
+				// .agentAddr());
 				if (ds == null)
 					throw new OdenException("Couldn't connect to the agent: "
 							+ parent.agentAddr());
@@ -130,8 +129,9 @@ public class UndoJob extends DeployJob {
 				String oldbak = FileUtil.resolveDotNatationPath(FileUtil
 						.combinePath(ds.odenHome(), FileUtil.combinePath(
 								context.getProperty("deploy.undo.loc"), txid)));
-				boolean isbak = ds.exist(FileUtil.combinePath(ds.odenHome(),
-						context.getProperty("deploy.undo.loc")), txid);
+				boolean isbak = ds.exist(
+						FileUtil.combinePath(ds.odenHome(),
+								context.getProperty("deploy.undo.loc")), txid);
 
 				String file = f.getPath();
 				String parentLoc = parent.location();
@@ -144,51 +144,40 @@ public class UndoJob extends DeployJob {
 					if (isbak) {
 						if (f.mode() == Mode.ADD) {
 							// 추가된 파일은 삭제
-							d = ds
-									.backupNRemove(
-											parentLoc,
-											file,
-											FileUtil
-													.combinePath(
-															context
-																	.getProperty("deploy.undo.loc"),
-															id), backupcnt);
+							d = ds.backupNRemove(
+									parentLoc,
+									file,
+									FileUtil.combinePath(context
+											.getProperty("deploy.undo.loc"), id),
+									backupcnt);
 
 							if (d != null)
 								f.setMode(Mode.DELETE);
 						} else if (f.mode() == Mode.DELETE
 								|| f.mode() == Mode.UPDATE) {
 							// 삭제, 갱신 파일은 copy
-							d = ds
-									.backupNCopy(
-											oldbak,
-											file,
-											parentLoc,
-											FileUtil
-													.combinePath(
-															context
-																	.getProperty("deploy.undo.loc"),
-															id), backupcnt);
+							d = ds.backupNCopy(
+									oldbak,
+									file,
+									parentLoc,
+									FileUtil.combinePath(context
+											.getProperty("deploy.undo.loc"), id),
+									backupcnt);
 
 							if (d != null)
-								f
-										.setMode(d.isUpdate() ? Mode.UPDATE
-												: Mode.ADD);
+								f.setMode(d.isUpdate() ? Mode.UPDATE : Mode.ADD);
 							else
 								f.setMode(Mode.NA);
 						}
 					} else {
 						// initial deploy file
 						if (f.mode() == Mode.ADD)
-							d = ds
-									.backupNRemove(
-											parentLoc,
-											file,
-											FileUtil
-													.combinePath(
-															context
-																	.getProperty("deploy.undo.loc"),
-															id), backupcnt);
+							d = ds.backupNRemove(
+									parentLoc,
+									file,
+									FileUtil.combinePath(context
+											.getProperty("deploy.undo.loc"), id),
+									backupcnt);
 						if (d != null)
 							f.setMode(Mode.DELETE);
 					}
@@ -216,8 +205,8 @@ public class UndoJob extends DeployJob {
 
 	protected void done() {
 		try {
-			RecordElement2 r = new RecordElement2(id, deployFiles, user, System
-					.currentTimeMillis(), desc);
+			RecordElement2 r = new RecordElement2(id, deployFiles, user,
+					System.currentTimeMillis(), desc);
 			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);

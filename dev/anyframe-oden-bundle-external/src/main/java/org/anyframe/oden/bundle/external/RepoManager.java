@@ -25,48 +25,53 @@ import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.core.Repository;
 import org.anyframe.oden.bundle.core.repository.RepositoryService;
 
+/**
+ * This is RepoManager Class
+ * 
+ * @author Junghwan Hong
+ */
 public class RepoManager {
 	protected RepositoryService repo;
 	protected String[] repoArgs;
 
-	public RepoManager(RepositoryService repo, String[] repoArgs){
+	public RepoManager(RepositoryService repo, String[] repoArgs) {
 		this.repo = repo;
 		this.repoArgs = repoArgs;
 	}
-	
+
 	public void close() {
 		repo.close(repoArgs);
 	}
-	
+
 	public FileInfo resolveAsFileInfo(ExtRepoFile rf) {
-		return repo.resolveAsFileInfo(makeToRepoArgs(rf.getSubdir()), 
+		return repo.resolveAsFileInfo(makeToRepoArgs(rf.getSubdir()),
 				rf.getFile());
 	}
-	
+
 	public FileInfo resolveAsFileInfo(String s) {
 		return repo.resolveAsFileInfo(repoArgs, s);
 	}
-	
-	public Repository getRepository(){
+
+	public Repository getRepository() {
 		return new Repository(repoArgs);
 	}
-	
-	public Repository getRepository(ExtRepoFile rf){
-		return new Repository(new String[]{rf.getSubdir()});
+
+	public Repository getRepository(ExtRepoFile rf) {
+		return new Repository(new String[] { rf.getSubdir() });
 	}
-	
-	public FatInputStream resolve(ExtRepoFile rf) throws OdenException{
+
+	public FatInputStream resolve(ExtRepoFile rf) throws OdenException {
 		return repo.resolve(makeToRepoArgs(rf.getSubdir()), rf.getFile());
 	}
-	
-	public FatInputStream resolve(String path) throws OdenException{
+
+	public FatInputStream resolve(String path) throws OdenException {
 		return repo.resolve(path);
 	}
-	
-	protected String[] makeToRepoArgs(String subdir){
-		if(StringUtil.empty(subdir))
+
+	protected String[] makeToRepoArgs(String subdir) {
+		if (StringUtil.empty(subdir))
 			return repoArgs;
-		return new String[]{FileUtil.combinePath(repoArgs[0], subdir)};	
+		return new String[] { FileUtil.combinePath(repoArgs[0], subdir) };
 	}
 
 	public String findDir(String dirName, String exclude) {
@@ -76,12 +81,12 @@ public class RepoManager {
 	public List<String> getSourceDirs() {
 		return repo.getSourceDirs(repoArgs);
 	}
-	
-	public boolean isDirExisted(String dirName){
+
+	public boolean isDirExisted(String dirName) {
 		return repo.isDirExisted(repoArgs, dirName);
 	}
-	
-	public String getAbolutePathFromParent(String dir){
+
+	public String getAbolutePathFromParent(String dir) {
 		return repo.getAbsolutePathFromParent(repoArgs, dir);
 	}
 }

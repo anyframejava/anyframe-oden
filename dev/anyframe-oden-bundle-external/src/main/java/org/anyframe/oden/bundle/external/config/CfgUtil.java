@@ -18,6 +18,11 @@ package org.anyframe.oden.bundle.external.config;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.Repository;
 
+/**
+ * This is CfgUtil Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgUtil {
 
 	public static String[] toRepoArg(String s) {
@@ -29,7 +34,8 @@ public class CfgUtil {
 	}
 
 	public static AgentLoc toAgentLoc(CfgTarget t) {
-		return new AgentLoc(t.getName(), t.getAddress().contains(":") ? t
-				.getAddress() : t.getAddress() + ":9872", t.getPath());
+		return new AgentLoc(t.getName(),
+				t.getAddress().contains(":") ? t.getAddress() : t.getAddress()
+						+ ":9872", t.getPath());
 	}
 }

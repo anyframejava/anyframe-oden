@@ -27,8 +27,7 @@ import org.anyframe.oden.bundle.common.FileInfo;
  * handling remote files, register this service to the R-OSGi bundle. Your
  * service can access remote files using that registered service.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public interface DeployerService {
 	/**
@@ -43,10 +42,10 @@ public interface DeployerService {
 	// Exception;
 
 	public void init(String parent, String path, long date, boolean useTmp,
-			int backupcnt) throws Exception;
+			int backupcnt, boolean isCompress) throws Exception;
 
-//	public void zinit(int backupcnt, String backDir, String undo)
-//			throws Exception;
+	// public void zinit(int backupcnt, String backDir, String undo)
+	// throws Exception;
 
 	public boolean write(String parent, String path, ByteArray buf)
 			throws Exception;
@@ -160,7 +159,7 @@ public interface DeployerService {
 	 * @param path
 	 */
 	public void removeDir(File path) throws Exception;
-	
+
 	public void removeDirString(String path) throws Exception;
 
 	/**
@@ -237,13 +236,13 @@ public interface DeployerService {
 
 	public boolean touchAvailable() throws Exception;
 
-	public CfgReturnScript execShellCommand(String command, String dir, long timeout)
-			throws Exception;
+	public CfgReturnScript execShellCommand(String command, String dir,
+			long timeout) throws Exception;
 
 	public String odenHome() throws Exception;
 
 	/**
-	 * get temporary directory which use compressing deployment 
+	 * get temporary directory which use compressing deployment
 	 * 
 	 * @return
 	 * @throws Exception
@@ -253,7 +252,7 @@ public interface DeployerService {
 	public boolean copy(File src, String parent, String path) throws Exception;
 
 	/**
-	 * Oden Server use this method to compress deploy 
+	 * Oden Server use this method to compress deploy
 	 * 
 	 * @param src
 	 * @param dest
@@ -263,7 +262,7 @@ public interface DeployerService {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, FileInfo> zipCopy(String src, String dest, int backupcnt,
-			String backupLocation, String undo) throws Exception;
+	public Map<String, FileInfo> zipCopy(String src, String dest,
+			int backupcnt, String backupLocation, String undo) throws Exception;
 
 }

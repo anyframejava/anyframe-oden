@@ -20,9 +20,8 @@ import java.io.Serializable;
 /**
  * Domain class for command info.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author JungHwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Command implements Serializable {

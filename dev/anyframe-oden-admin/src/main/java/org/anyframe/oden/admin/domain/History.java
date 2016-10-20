@@ -18,9 +18,8 @@ package org.anyframe.oden.admin.domain;
 /**
  * Domain class for history info.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- *
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 public class History {
 	private String id = "";

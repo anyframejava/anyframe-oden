@@ -18,11 +18,9 @@ package org.anyframe.oden.bundle.deploy;
 import org.anyframe.oden.bundle.common.FileInfo;
 
 /**
- * 
  * File informaton about well-done job.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public class DoneFileInfo extends FileInfo {
 

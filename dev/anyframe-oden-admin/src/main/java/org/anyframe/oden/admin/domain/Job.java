@@ -21,9 +21,8 @@ import java.util.List;
 /**
  * Domain class for job info.
  * 
- * @author Hong JungHwan
- * @author LEE Sujeong
- * 
+ * @author Junghwan Hong
+ * @author Sujeong Lee
  */
 @SuppressWarnings("serial")
 public class Job implements Serializable {

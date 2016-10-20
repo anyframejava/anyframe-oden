@@ -21,8 +21,7 @@ import org.osgi.service.log.LogService;
  * To contact the OSGi LogService, this class will be used. This class can convert
  * Throwable instance to the String having its Stack Trace.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Logger {
 	

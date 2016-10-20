@@ -24,12 +24,11 @@ import org.anyframe.oden.bundle.core.DeployFile;
 /**
  * This represents each deploy log. policy의 agent 하나당 RecordElement하나가 생김
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
-public class RecordElement2 implements Serializable{
+public class RecordElement2 implements Serializable {
 	private static final long serialVersionUID = -2377657865000902181L;
-	
+
 	private String id;
 	private String user = "";
 	private Collection<DeployFile> files = Collections.EMPTY_SET;
@@ -38,23 +37,26 @@ public class RecordElement2 implements Serializable{
 	private String log = "";
 	private String desc = "";
 	private int nSuccess = 0;
-	
-	public RecordElement2(){}
-	
-	public RecordElement2(String id, Collection<DeployFile> files, String user, long date, String desc) {
+
+	public RecordElement2() {
+	}
+
+	public RecordElement2(String id, Collection<DeployFile> files, String user,
+			long date, String desc) {
 		this.id = id;
 		this.files = files;
 		this.user = user;
 		this.date = date;
 		this.desc = desc;
-		if(files.size() > 0)
-			for(DeployFile f : files)
+		if (files.size() > 0)
+			for (DeployFile f : files)
 				this.success = this.success & f.isSuccess();
 		else
 			this.success = false;
 	}
-	
-	public RecordElement2(String id, Collection<DeployFile> files, String user, long date, boolean success, String errorLog, String desc) {
+
+	public RecordElement2(String id, Collection<DeployFile> files, String user,
+			long date, boolean success, String errorLog, String desc) {
 		this.id = id;
 		this.files = files;
 		this.user = user;
@@ -62,8 +64,9 @@ public class RecordElement2 implements Serializable{
 		this.success = success;
 		this.desc = desc;
 	}
-	
-	public RecordElement2(String id, Collection<DeployFile> files, int nSuccess, String user, long date, String errorLog, String desc) {
+
+	public RecordElement2(String id, Collection<DeployFile> files,
+			int nSuccess, String user, long date, String errorLog, String desc) {
 		this.id = id;
 		this.files = files;
 		this.nSuccess = nSuccess;
@@ -76,7 +79,7 @@ public class RecordElement2 implements Serializable{
 	public String desc() {
 		return desc;
 	}
-	
+
 	public String getUser() {
 		return user;
 	}
@@ -88,11 +91,11 @@ public class RecordElement2 implements Serializable{
 	public Collection<DeployFile> getDeployFiles() {
 		return files;
 	}
-	
-	public void setFiles(Collection<DeployFile> s){
+
+	public void setFiles(Collection<DeployFile> s) {
 		this.files = s;
 	}
-	
+
 	public long getDate() {
 		return date;
 	}
@@ -100,7 +103,7 @@ public class RecordElement2 implements Serializable{
 	public void setDate(long date) {
 		this.date = date;
 	}
-		
+
 	public boolean isSuccess() {
 		return success;
 	}
@@ -112,20 +115,20 @@ public class RecordElement2 implements Serializable{
 	public String id() {
 		return id;
 	}
-	
+
 	public String log() {
 		return log;
 	}
-	
-	public void setLog(String s){
+
+	public void setLog(String s) {
 		this.log = s;
 	}
 
-	public void setNSuccess(int n){
+	public void setNSuccess(int n) {
 		this.nSuccess = n;
 	}
-	
-	public int getNSuccess(){
+
+	public int getNSuccess() {
 		return nSuccess;
 	}
 }

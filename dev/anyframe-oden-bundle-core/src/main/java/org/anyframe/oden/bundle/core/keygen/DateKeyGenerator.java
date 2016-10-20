@@ -21,37 +21,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This is DateKeyGenerator class.
  * 
+ * @author Junghwan Hong
  * @see anyframe.oden.bundle.core.keygen.KeyGenerator
- * 
- * @author joon1k
- *
  */
 public class DateKeyGenerator implements KeyGenerator {
 
 	private String lastDate;
 	private Map<String, Integer> lastValues = new HashMap<String, Integer>();
-	
+
 	public synchronized String next(String prefix) {
 		String today = today();
-		if(!today.equals(lastDate)){
+		if (!today.equals(lastDate)) {
 			initLastValues();
 			lastDate = today;
 		}
-		
+
 		int seq = 0;
-		if(lastValues.containsKey(prefix))
+		if (lastValues.containsKey(prefix))
 			seq = lastValues.get(prefix);
-		lastValues.put(prefix, seq+1);
+		lastValues.put(prefix, seq + 1);
 		return prefix + today + new DecimalFormat("00000").format(seq);
 	}
-	
-	private void initLastValues(){
+
+	private void initLastValues() {
 		lastValues = new HashMap<String, Integer>();
 	}
-	
-	private String today(){
-		return new SimpleDateFormat("yyMMdd").format(System.currentTimeMillis());
+
+	private String today() {
+		return new SimpleDateFormat("yyMMdd")
+				.format(System.currentTimeMillis());
 	}
 
 }

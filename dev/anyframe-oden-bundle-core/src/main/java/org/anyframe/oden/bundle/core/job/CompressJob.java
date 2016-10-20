@@ -34,13 +34,10 @@ import org.anyframe.oden.bundle.core.DeployFile;
 import org.osgi.framework.BundleContext;
 
 /**
- * 
  * Job to compress deploy files.
  * 
+ * @author Junghwan Hong
  * @see org.anyframe.oden.bundle.core.job.Job
- * 
- * @author junghwan.hong
- * 
  */
 public abstract class CompressJob extends Job {
 
@@ -56,7 +53,7 @@ public abstract class CompressJob extends Job {
 
 	private CompressFileResolver compResolver;
 
-	protected int compressWork = 4; //compress, transfer, extract;
+	protected int compressWork = 4; // compress, transfer, extract;
 
 	public CompressJob(BundleContext context, String desc, String path,
 			DeployFileResolver resolver, CompressFileResolver compResolver) {
@@ -81,12 +78,13 @@ public abstract class CompressJob extends Job {
 
 			for (DeployFile f : compFile) {
 				compTarget = f.getRepo().args()[1];
-				compSrc = FileUtil.replace(f.getRepo().args()[0], "file://", "");
+				compSrc = FileUtil
+						.replace(f.getRepo().args()[0], "file://", "");
 				break;
 			}
 			compTarget = FileUtil.combinePath(compTarget, path);
-//			FileUtil.compress(new File(compSrc), new File(compTarget));
-			compress(deployFiles, compSrc , new File(compTarget));
+			// FileUtil.compress(new File(compSrc), new File(compTarget));
+			compress(deployFiles, compSrc, new File(compTarget));
 
 		} catch (Exception e) {
 			errorMessage = e.getMessage();
@@ -100,44 +98,41 @@ public abstract class CompressJob extends Job {
 	}
 
 	/**
-	 * preview 의 파일들만 압축을 수행
-	 * deployFiles : preview 를 통한 배포 후보 파일
-	 * root : repository root directory
-	 * jar : 압축 파일명
+	 * preview 의 파일들만 압축을 수행 deployFiles : preview 를 통한 배포 후보 파일 root :
+	 * repository root directory jar : 압축 파일명
 	 * 
 	 * @param deployFiles
 	 * @param jar
 	 * @return
 	 * @throws IOException
 	 */
-	private long compress(Collection<DeployFile> deployFiles, String root , File jar)
-			throws IOException {
+	private long compress(Collection<DeployFile> deployFiles, String root,
+			File jar) throws IOException {
 		long total = 0;
 		Map<String, DeployFile> path = new HashMap<String, DeployFile>();
-		
+
 		if (jar.exists()) {
 			jar.delete();
 		}
 
 		ZipOutputStream jout = null;
 		try {
-			
+
 			jout = new ZipOutputStream(new BufferedOutputStream(
 					new FileOutputStream(jar)));
 			for (DeployFile f : deployFiles) {
-				if(path.get(f.getPath()) != null)
+				if (path.get(f.getPath()) != null)
 					continue;
 				path.put(f.getPath(), f);
-				
+
 				InputStream in = null;
 				String src = FileUtil.replace(f.getRepo().args()[0], "file://",
 						"");
 				in = new BufferedInputStream(new FileInputStream(new File(
 						FileUtil.combinePath(src, f.getPath()))));
 
-				
-				ZipEntry entry = new ZipEntry(FileUtil.combinePath(FileUtil
-						.replace(src, root, ""), f.getPath()));
+				ZipEntry entry = new ZipEntry(FileUtil.combinePath(
+						FileUtil.replace(src, root, ""), f.getPath()));
 				jout.putNextEntry(entry);
 				total += FileUtil.copy(in, jout);
 			}
@@ -152,7 +147,7 @@ public abstract class CompressJob extends Job {
 
 		return total;
 	}
-	
+
 	@Override
 	public int todoWorks() {
 		return totalWorks - compressWork;

@@ -26,15 +26,13 @@ import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.deploy.DoneFileInfo;
 
 /**
- * 
  * This class make files with BufferedOutputStream class.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
-public class DeployOutputStream{
+public class DeployOutputStream {
 	private final static String TMP_PREFIX = "oden_";
-	
+
 	private String parentPath;
 	private String filePath;
 	private OutputStream out;
@@ -42,39 +40,45 @@ public class DeployOutputStream{
 	private long date;
 	boolean isUpdated = false;
 
-	public DeployOutputStream(String parent, 
-			String path, long date) throws IOException{		
+	public DeployOutputStream(String parent, String path, long date)
+			throws IOException {
 		this(parent, path, date, true);
 	}
-	
+
 	boolean useTmp = true;
-	public DeployOutputStream(String parent, String path, 
-			long date, boolean useTmp) throws IOException{		
+
+	public DeployOutputStream(String parent, String path, long date,
+			boolean useTmp) throws IOException {
 		this.useTmp = useTmp;
 		this.parentPath = parent;
 		this.filePath = path;
-		
-		try{
-			if(useTmp){
-				tmpfile = File.createTempFile(TMP_PREFIX, 
-						String.valueOf(System.currentTimeMillis()) );
-			}else {
+
+		try {
+			if (useTmp) {
+				tmpfile = File.createTempFile(TMP_PREFIX,
+						String.valueOf(System.currentTimeMillis()));
+			} else {
 				tmpfile = new File(parentPath, filePath);
-				if(tmpfile.exists())
+				if (tmpfile.exists())
 					isUpdated = true;
 				else
 					FileUtil.mkdirs(tmpfile);
 			}
 			this.date = date;
-			
+
 			this.out = new BufferedOutputStream(new FileOutputStream(tmpfile));
-		}catch(IOException e){
-			try{ if(out != null) out.close(); }catch(IOException e2){}
-			if(tmpfile != null && useTmp) tmpfile.delete();
+		} catch (IOException e) {
+			try {
+				if (out != null)
+					out.close();
+			} catch (IOException e2) {
+			}
+			if (tmpfile != null && useTmp)
+				tmpfile.delete();
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * write bytes to this file
 	 * 
@@ -84,19 +88,19 @@ public class DeployOutputStream{
 	 */
 	public boolean write(byte[] buf, int size) {
 		try {
-			if(out != null){
+			if (out != null) {
 				out.write(buf, 0, size);
 				return true;
 			}
-		}catch(IOException e){
+		} catch (IOException e) {
 		}
-		return false;		
+		return false;
 	}
-	
+
 	public boolean write(byte[] buf) {
 		return write(buf, buf.length);
 	}
-	
+
 	/**
 	 * close this stream and copy temp file to original one. Before copying,
 	 * backup original one to the bakdir.
@@ -106,47 +110,43 @@ public class DeployOutputStream{
 	 * @return
 	 * @throws IOException
 	 */
-	public DoneFileInfo close(List<String> updatefiles, String bakdir, int backupcnt) throws IOException {
-		try{				
-			if(this.out != null) this.out.close();
+	public DoneFileInfo close(List<String> updatefiles, String bakdir,
+			int backupcnt) throws IOException {
+		try {
+			if (this.out != null)
+				this.out.close();
 			// tmpfile can have 0 size cause File.createTempFile method.
-			if(tmpfile == null || !tmpfile.exists())
+			if (tmpfile == null || !tmpfile.exists())
 				throw new IOException("Fail to transfer file: " + filePath);
-			if(date > -1) tmpfile.setLastModified(date);
-			
-			if(!useTmp)
-				return new DoneFileInfo(
-						filePath, 
-						false, 
-						tmpfile.lastModified(), 
-						tmpfile.length(), 
-						isUpdated, 
+			if (date > -1)
+				tmpfile.setLastModified(date);
+
+			if (!useTmp)
+				return new DoneFileInfo(filePath, false,
+						tmpfile.lastModified(), tmpfile.length(), isUpdated,
 						true);
-			
+
 			File destfile = new File(parentPath, filePath);
-			
-			// backup			
-			if(destfile.exists()){	
-				isUpdated = DeployerUtils.undoBackup(parentPath, filePath, bakdir, backupcnt);
+
+			// backup
+			if (destfile.exists()) {
+				isUpdated = DeployerUtils.undoBackup(parentPath, filePath,
+						bakdir, backupcnt);
 			} else {
 				FileUtil.mkdirs(destfile);
 			}
-			
+
 			// copy
-			if(updatefiles != null){	// jar update. this is not used
+			if (updatefiles != null) { // jar update. this is not used
 				updatefiles.addAll(FileUtil.updateJar(tmpfile, destfile));
-			}else {
+			} else {
 				FileUtil.copy(tmpfile, destfile);
-			}				
-			return new DoneFileInfo(
-					filePath, 
-					false, 
-					destfile.lastModified(), 
-					destfile.length(), 
-					isUpdated, 
-					true);
-		}finally{
-			if(tmpfile != null && useTmp) tmpfile.delete();	
+			}
+			return new DoneFileInfo(filePath, false, destfile.lastModified(),
+					destfile.length(), isUpdated, true);
+		} finally {
+			if (tmpfile != null && useTmp)
+				tmpfile.delete();
 		}
 	}
 

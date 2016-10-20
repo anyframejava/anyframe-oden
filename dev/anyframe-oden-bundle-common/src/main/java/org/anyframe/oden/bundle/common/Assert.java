@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 package org.anyframe.oden.bundle.common;
+
 /**
- * 
  * If input data is false, occur OdenException.
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class Assert {
-	
+
 	/**
 	 * assert method to reduce the error checking codes.
 	 * 
 	 * @param must
 	 * @throws OdenException
 	 */
-	public static void check(boolean must) throws OdenException{
+	public static void check(boolean must) throws OdenException {
 		check(must, "Assertion failed.");
 	}
-	
+
 	/**
 	 * assert method to reduce the error checking codes.
 	 * 
@@ -40,8 +39,8 @@ public class Assert {
 	 * @param msg
 	 * @throws OdenException
 	 */
-	public static void check(boolean must, String msg) throws OdenException{
-		if(!must)
+	public static void check(boolean must, String msg) throws OdenException {
+		if (!must)
 			throw new OdenException(msg);
 	}
 }

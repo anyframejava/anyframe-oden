@@ -27,31 +27,29 @@ import org.anyframe.oden.bundle.deploy.DeployerService;
 /**
  * This represents agent element in the config.xml
  * 
- * @author joon1k
- *
+ * @author Junghwan Hong
  */
 public class AgentElement {
 	private static final String DEFAULT_LOCATION = null;
-	
+
 	private static final String BACKUP_LOCATION = "\nbackup";
-	
 
 	private String name = "";
-	
+
 	private String host = "";
-	
+
 	private String port = "";
-	
+
 	private List<AgentLocation> locs = new ArrayList<AgentLocation>();
-	
+
 	private String agentHome = null;
-	
+
 	private TransmitterService txmitter;
-	
-	public AgentElement(TransmitterService txmitter){
+
+	public AgentElement(TransmitterService txmitter) {
 		this.txmitter = txmitter;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -79,7 +77,7 @@ public class AgentElement {
 	private AgentLocation getDefaultLoc() {
 		return getLoc(DEFAULT_LOCATION);
 	}
-	
+
 	public String getDefaultLocValue() {
 		AgentLocation l = getDefaultLoc();
 		return l != null ? l.getValue() : null;
@@ -97,97 +95,100 @@ public class AgentElement {
 		AgentLocation l = getBackupLoc();
 		return l != null ? l.getValue() : null;
 	}
-	
+
 	public void setBackupLoc(String value) {
 		addLoc(BACKUP_LOCATION, value);
 	}
-	
-	public void addLoc(String name, String value){
+
+	public void addLoc(String name, String value) {
 		locs.add(new AgentLocation(this, name, value));
 	}
-	
-	public void removeLoc(String name) throws OdenException{
-		if(name == null)	
+
+	public void removeLoc(String name) throws OdenException {
+		if (name == null)
 			throw new OdenException("Can't remove default location");
-		
-		for(AgentLocation loc : locs){
-			if(name.equals(loc.getName())){
+
+		for (AgentLocation loc : locs) {
+			if (name.equals(loc.getName())) {
 				loc.setAgent(null);
 				locs.remove(loc);
 			}
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @param name location variable name. null if it default-location
+	 * @param name
+	 *            location variable name. null if it default-location
 	 * @return
 	 */
-	private AgentLocation _getLoc(String name){
-		for(AgentLocation loc : locs){
-			if((name == null && loc.getName() == null)	/* default */ 
-					|| (name != null && name.equals(loc.getName()) )){
+	private AgentLocation _getLoc(String name) {
+		for (AgentLocation loc : locs) {
+			if ((name == null && loc.getName() == null) /* default */
+					|| (name != null && name.equals(loc.getName()))) {
 				return loc;
 			}
 		}
 		return null;
 	}
-	
-	private AgentLocation getLoc(String name){
+
+	private AgentLocation getLoc(String name) {
 		AgentLocation locsetting = _getLoc(name);
-		if(locsetting == null)
+		if (locsetting == null)
 			return null;
-		if(FileUtil.isAbsolutePath(locsetting.getValue()))
+		if (FileUtil.isAbsolutePath(locsetting.getValue()))
 			return locsetting;
-		
-		try{
-			if(agentHome == null)
+
+		try {
+			if (agentHome == null)
 				agentHome = getAgentHome();
-			
-			String resolved = FileUtil.resolveDotNatationPath(
-					agentHome + "/" + locsetting.getValue());
-			if(resolved == null)
-				throw new Exception("Illegal format: " + agentHome + "/" + locsetting.getValue());
-			
+
+			String resolved = FileUtil.resolveDotNatationPath(agentHome + "/"
+					+ locsetting.getValue());
+			if (resolved == null)
+				throw new Exception("Illegal format: " + agentHome + "/"
+						+ locsetting.getValue());
+
 			locs.remove(locsetting);
-			AgentLocation result = new AgentLocation(this, name, resolved); 
+			AgentLocation result = new AgentLocation(this, name, resolved);
 			locs.add(result);
 			return result;
-		}catch(Exception e){
+		} catch (Exception e) {
 			Logger.error(e);
 		}
 		return null;
 	}
-	
-	private String getAgentHome() throws Exception{
+
+	private String getAgentHome() throws Exception {
 		DeployerService ds = txmitter.getDeployer(getAddr());
-		if(ds == null) throw new Exception("Access Fail: " + getAddr());
-		
+		if (ds == null)
+			throw new Exception("Access Fail: " + getAddr());
+
 		return ds.odenHome();
 	}
-	
+
 	public String getLocValue(String name) {
 		AgentLocation l = getLoc(name);
 		return l != null ? l.getValue() : null;
 	}
-	
+
 	/**
-	 * Get agent's location names except default location(null). 
+	 * Get agent's location names except default location(null).
 	 * 
 	 * @return
 	 */
-	public List<String> getLocNames(){
+	public List<String> getLocNames() {
 		List<String> names = new ArrayList<String>();
-		for(AgentLocation loc : locs){
-			if(loc.getName() != DEFAULT_LOCATION && 
-					loc.getName() != BACKUP_LOCATION)
+		for (AgentLocation loc : locs) {
+			if (loc.getName() != DEFAULT_LOCATION
+					&& loc.getName() != BACKUP_LOCATION)
 				names.add(loc.getName());
 		}
 		return names;
 	}
-	
-	public String getAddr(){
-		String port = getPort().equals("") ? "" :  ":" + getPort();
+
+	public String getAddr() {
+		String port = getPort().equals("") ? "" : ":" + getPort();
 		return getHost() + port;
 	}
 }

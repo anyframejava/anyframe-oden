@@ -18,6 +18,11 @@ package org.anyframe.oden.bundle.external;
 import org.anyframe.oden.bundle.common.Utils;
 import org.anyframe.oden.bundle.job.RepoFile;
 
+/**
+ * This is ExtRepoFile Class
+ * 
+ * @author Junghwan Hong
+ */
 public class ExtRepoFile extends RepoFile{
 	//String subdir;
 	String file;

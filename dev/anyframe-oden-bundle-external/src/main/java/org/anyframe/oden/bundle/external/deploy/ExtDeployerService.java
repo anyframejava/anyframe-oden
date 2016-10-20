@@ -32,8 +32,7 @@ import org.anyframe.oden.bundle.external.config.CfgTarget;
  * handling remote files, register this service to the R-OSGi bundle. Your
  * service can access remote files using that registered service.
  * 
- * @author junghwan.hong
- * 
+ * @author Junghwan Hong 
  */
 public interface ExtDeployerService {
 

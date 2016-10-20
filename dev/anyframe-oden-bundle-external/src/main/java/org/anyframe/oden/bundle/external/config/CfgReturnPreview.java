@@ -19,6 +19,11 @@ import java.io.Serializable;
 
 import org.anyframe.oden.bundle.common.Utils;
 
+/**
+ * This is CfgReturnPreview Class
+ * 
+ * @author Junghwan Hong
+ */
 public class CfgReturnPreview implements Serializable {
 	/**
 	 * 

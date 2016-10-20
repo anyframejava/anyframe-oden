@@ -32,17 +32,23 @@ import org.springframework.stereotype.Service;
 
 import anyframe.common.exception.BaseException;
 
+/**
+ * This is ExceptionTransfer Class
+ * 
+ * @author Junghwan Hong
+ */
 @Aspect
 @Service
 public class ExceptionTransfer {
 
 	@Pointcut("execution(* anyframe.oden.admin..*ServiceImpl.*(..))")
-	public void serviceMethod(){}
+	public void serviceMethod() {
+	}
 
 	@Inject
 	private MessageSource messageSource;
-	
-	@AfterThrowing(pointcut="serviceMethod()", throwing="exception")
+
+	@AfterThrowing(pointcut = "serviceMethod()", throwing = "exception")
 	public void transfer(JoinPoint thisJoinPoint, Exception exception)
 			throws BrokerException {
 		Object target = thisJoinPoint.getTarget();
@@ -65,18 +71,18 @@ public class ExceptionTransfer {
 			BrokerException odenEx = (BrokerException) exception;
 			String msg = messageSource.getMessage(odenEx.getMessage(),
 					new String[] {}, Locale.getDefault());
-			if(! odenEx.getMessage().contains("broker.info"))
+			if (!odenEx.getMessage().contains("broker.info"))
 				logger.error(msg, odenEx);
 			throw new BrokerException(msg, odenEx);
 		}
-		
+
 		// Processing serviceImpl Exception
 		if (exception instanceof BaseException) {
 			BaseException baseEx = (BaseException) exception;
 			logger.error(baseEx.getMessage(), baseEx);
 			throw new BrokerException(messageSource, "error." + className + "."
 					+ opName, new String[] {}, exception);
-		}		
+		}
 
 		logger.error(messageSource.getMessage("error." + className + "."
 				+ opName, new String[] {}, "no messages", Locale.getDefault()),

@@ -15,14 +15,12 @@
  */
 package org.anyframe.oden.bundle.core.prefs;
 
-
 /**
- * This is kind of wrapper of the OSGi Preferences Service. You can
- * access the Preferences Service more simply by this.
+ * This is kind of wrapper of the OSGi Preferences Service. You can access the
+ * Preferences Service more simply by this.
  * 
- * @author Joonil Kim
- *
+ * @author Junghwan Hong
  */
-public interface PrefsService {	
+public interface PrefsService {
 	public Prefs getPrefs(String name);
 }

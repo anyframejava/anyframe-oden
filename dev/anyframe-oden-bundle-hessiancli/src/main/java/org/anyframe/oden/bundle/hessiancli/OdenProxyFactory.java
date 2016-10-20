@@ -21,10 +21,15 @@ import java.net.URLConnection;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 
+/**
+ * This is OdenProxyFactory class.
+ * 
+ * @author Junghwan Hong
+ */
 public class OdenProxyFactory extends HessianProxyFactory {
 	int timeout;
 	long readTimeout;
-	
+
 	public OdenProxyFactory(int timeout, long readTimeout) {
 		this.timeout = timeout;
 		this.readTimeout = readTimeout;

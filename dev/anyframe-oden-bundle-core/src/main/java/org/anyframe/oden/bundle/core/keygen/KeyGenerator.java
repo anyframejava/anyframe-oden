@@ -16,11 +16,9 @@
 package org.anyframe.oden.bundle.core.keygen;
 
 /**
- * 
  * To make unique key using date, sequence and prefix.
  * 
- * @author joon1k
- * 
+ * @author Junghwan Hong
  */
 public interface KeyGenerator {
 	/**

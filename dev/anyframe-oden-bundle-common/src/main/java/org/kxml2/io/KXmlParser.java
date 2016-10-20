@@ -27,9 +27,12 @@ import java.util.*;
 
 import org.xmlpull.v1.*;
 
-/** A simple, pull based XML parser. This classe replaces the kXML 1
-    XmlParser class and the corresponding event classes. */
-
+/**
+ * A simple, pull based XML parser. This classe replaces the kXML 1
+ *  XmlParser class and the corresponding event classes.
+ * 
+ * @author Junghwan Hong
+ */
 public class KXmlParser implements XmlPullParser {
 
     private Object location;
@@ -697,14 +700,14 @@ public class KXmlParser implements XmlPullParser {
         nspCounts[depth] = nspCounts[depth - 1];
 
         /*
-        		if(!relaxed){
+        	if(!relaxed){
                 for (int i = attributeCount - 1; i > 0; i--) {
                     for (int j = 0; j < i; j++) {
                         if (getAttributeName(i).equals(getAttributeName(j)))
                             exception("Duplicate Attribute: " + getAttributeName(i));
                     }
                 }
-        		}
+        	}
         */
         if (processNsp)
             adjustNsp();

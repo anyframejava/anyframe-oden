@@ -21,15 +21,15 @@ import org.anyframe.oden.admin.service.LogService;
 import org.springframework.stereotype.Service;
 
 /**
- * @version 1.0
- * @created 14-7-2010 ���� 10:13:34
- * @author HONG JungHwan
+ * This is LogServiceImpl Class
+ * 
+ * @author Junghwan Hong
  */
 @Service("logService")
 public class LogServiceImpl implements LogService {
-	
+
 	private OdenCommonDao<Log> odenCommonDao = new OdenCommonDao<Log>();
-	
+
 	/**
 	 * Method for getting log with date.
 	 * 
