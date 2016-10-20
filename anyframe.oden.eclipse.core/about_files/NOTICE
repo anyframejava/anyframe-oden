@@ -1,0 +1,38 @@
+
+NOTICE file corresponding to the section 4 d of the Apache License, Version 2.0,
+in this case for the Anyframe Oden Eclipse Plug-In distribution.
+
+
+	Anyframe Oden Eclipse Plug-In
+	Copyright 2009 SAMSUNG SDS Co., Ltd.
+
+	This product includes software developed by SAMSUNG SDS Co., Ltd.
+	(http://www.sds.samsung.com/). The latest distribution of
+	this product and related information is available at
+	http://www.anyframejava.org/.
+
+	Constructing, saving and loading Anyframe Oden Eclipse plug-in specific data in XML file format
+	are built by using dom4j, which is open source software.
+	The original software and related information is available at
+	http://dom4j.org/.
+
+	Some features utilizing a lightweight data-interchange format
+	for Anyframe Oden Eclipse plug-in are built by using JSON, which is open source software.
+	The original software and related information is available at
+	http://www.json.org/.
+	
+	Logging features of Anyframe Oden Eclipse plug-in
+	are built by linking with Apache Commons Logging component,
+	which is the part of open source software project, Apache Commons.
+	The original software and related information is available at
+	http://commons.apache.org/logging/.
+	
+	Some icons are from famfamfam Silk icons,
+	which is licensed under a Creative Commons Attribution 2.5 License.
+	The original icons are available at
+	http://www.famfamfam.com/lab/icons/silk/.
+
+	Some other features may be built by linking
+	with various open source software.
+	The original software and related information is available at
+	each open source software information page.

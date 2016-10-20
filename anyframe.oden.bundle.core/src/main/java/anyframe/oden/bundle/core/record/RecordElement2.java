@@ -17,69 +17,70 @@
 package anyframe.oden.bundle.core.record;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import anyframe.oden.bundle.core.command.CommandUtil;
+import anyframe.oden.bundle.common.ArraySet;
+import anyframe.oden.bundle.core.DeployFile;
 
 /**
  * This represents each deploy log. policy의 agent 하나당 RecordElement하나가 생김
  * 
  * @author joon1k
- *
+ * 
  */
 public class RecordElement2 implements Serializable{
-	private String host = "";
-	private String agent = "";
-	private String rootpath = "";
-	private List<String> paths = new ArrayList<String>();
+	private static final long serialVersionUID = -2377657865000902181L;
+	
+	private String id;
+	private String user = "";
+	private Set<DeployFile> files = new ArraySet<DeployFile>();
 	private long date;
+	private boolean success = true;
+	private String log = "";
+	private String desc = "";
 	
-	public RecordElement2(long date, String record) {
-		String[] records = CommandUtil.split(record);
+	public RecordElement2(String id, Set<DeployFile> files, String user, long date, String desc) {
+		this.id = id;
+		this.files = files;
+		this.user = user;
 		this.date = date;
-		this.host = records.length > 0 ? records[0] : "";
-		this.agent = records.length > 1 ? records[1] : "";
-		this.rootpath = records.length > 2 ? records[2] : "";
-		if(records.length > 3){
-			for(String path : records[3].split(",")){
-				paths.add(path);
-			}
-		}
+		this.desc = desc;
+		if(files.size() > 0)
+			for(DeployFile f : files)
+				this.success = this.success & f.isSuccess();
+		else
+			this.success = false;
 	}
 	
-	public RecordElement2(String host, String agent, String rootpath, List<String> paths, long date) {
-		this.host = host;
-		this.agent = agent;
-		this.rootpath = rootpath;
+	public RecordElement2(String id, Set<DeployFile> files, String user, long date, boolean success, String errorLog, String desc) {
+		this.id = id;
+		this.files = files;
+		this.user = user;
 		this.date = date;
-		this.paths = paths;
+		this.success = success;
+		this.desc = desc;
 	}
 
-	public String getHost() {
-		return host;
+	public String desc() {
+		return desc;
+	}
+	
+	public String getUser() {
+		return user;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
+	public void setUser(String user) {
+		this.user = user;
 	}
 
-	public String getAgent() {
-		return agent;
+	public Set<DeployFile> getDeployFiles() {
+		return files;
 	}
-
-	public void setAgent(String agent) {
-		this.agent = agent;
+	
+	public void setFiles(Set<DeployFile> s){
+		this.files = s;
 	}
-
-	public String getRootpath() {
-		return rootpath;
-	}
-
-	public void setRootpath(String rootpath) {
-		this.rootpath = rootpath;
-	}
-
+	
 	public long getDate() {
 		return date;
 	}
@@ -87,37 +88,24 @@ public class RecordElement2 implements Serializable{
 	public void setDate(long date) {
 		this.date = date;
 	}
-	
-	public List<String> getPaths() {
-		return paths;
-	}
-	
-	/**
-	 * recordElement의 데이터 String으로 리턴.
-	 * date항목 제외. 각 항목 ""로 묶임. host, agent, path순서.
-	 * @return "host" "agent" "path"
-	 */
-	public String getRecordAsString(){
-		return "\"" + host + "\" " +
-			"\"" + agent + "\" " +
-			"\"" + rootpath + "\" " +
-			"\"" + serialize(paths) + "\"";
-	}
-	
-	/**
-	 * make one string by combining list elements
-	 * @param agentRootPath
-	 * @param paths
-	 * @return
-	 */
-	private String serialize(List<String> paths) {
-		StringBuffer buf = new StringBuffer();
-		for(int i=0; i<paths.size(); i++){
-			buf.append(paths.get(i));
-			if(i+1 < paths.size())
-				buf.append(',');
-		}
-		return buf.toString();
+		
+	public boolean isSuccess() {
+		return success;
 	}
 
+	public void setSucccess(boolean success) {
+		this.success = success;
+	}
+
+	public String id() {
+		return id;
+	}
+	
+	public String log() {
+		return log;
+	}
+	
+	public void setLog(String s){
+		this.log = s;
+	}
 }

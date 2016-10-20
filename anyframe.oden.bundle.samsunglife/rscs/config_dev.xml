@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<oden>
+	<agents>
+		<!-- Portal Web Servers(dev) -->
+		<agent name="FLTPOW01">
+			<address host="wb1.xt.portal.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Portal-Web" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Portal AP Servers(dev) -->
+		<agent name="FLTPOA01">
+			<address host="ap1.xt.portal.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Portal-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Core AP Servers(dev) -->
+		<agent name="FLTCOA01">
+			<address host="ap1.xt.core.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Core-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+				
+		<!-- Channel AP Servers(dev) -->
+		<agent name="FLTCHA01">
+			<address host="ap1.xt.channel.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Channel-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Customer AP Servers(dev) -->
+		<agent name="FLTCUA01">
+			<address host="ap1.xt.customer.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Customer-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Call Center AP Servers(dev) -->
+		<agent name="FLTCCA01">
+			<address host="ap1.xt.callcenter.samsunglife.kr" port="9862" />
+			<default-location value="/LIB/FSLP/ccruntime/temp" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="CallCenter-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Product AP Servers(dev) -->
+		<agent name="FLTPRA01">
+			<address host="ap1.xt.product.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Product-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Batch AP Servers(dev) -->
+		<agent name="FLTCOBA1">
+			<address host="ap1.xt.batch.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Batch-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Campaign AP Servers(dev) -->
+		<agent name="FLTCRA01">
+			<address host="ap1.xt.campaign.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="Campaign-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- BPM AP Servers(dev) -->
+		<agent name="FLTBPA01">
+			<address host="ap1.xt.bpm.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="BPM-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- IAM AP Servers(dev) -->
+		<agent name="FLTAMA01">
+			<address host="ap1.xt.iam.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="IAM-AP" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+		
+		<!-- Development Support Servers(dev) -->
+		<agent name="FLTDSE01">
+			<address host="ad1.xt.develop.samsunglife.kr" port="9862" />
+			<default-location value="/" />
+			<backup-location value="/Tools/oden/snapshots" />
+			<location name="SpectrumXML" value="/" />
+			<location name="_RootDirectory" value="/" />
+		</agent>
+	</agents>
+</oden>

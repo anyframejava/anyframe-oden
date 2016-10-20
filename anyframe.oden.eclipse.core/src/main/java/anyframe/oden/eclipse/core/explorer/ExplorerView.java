@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.explorer;
@@ -23,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -36,9 +39,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -53,16 +54,22 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
+import anyframe.oden.eclipse.core.OdenTrees.RepoDirectory;
+import anyframe.oden.eclipse.core.OdenTrees.RepoFile;
+import anyframe.oden.eclipse.core.OdenTrees.RepoParent;
+import anyframe.oden.eclipse.core.OdenTrees.ServerChild;
+import anyframe.oden.eclipse.core.OdenTrees.ServerParent;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
-import anyframe.oden.eclipse.core.alias.Server;
+import anyframe.oden.eclipse.core.alias.DeployNow;
 import anyframe.oden.eclipse.core.alias.ModelListener;
 import anyframe.oden.eclipse.core.alias.Repository;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.explorer.actions.ExplorerRefreshAction;
-import anyframe.oden.eclipse.core.explorer.actions.NewServerAction;
 import anyframe.oden.eclipse.core.explorer.actions.NewRepositoryAction;
+import anyframe.oden.eclipse.core.explorer.actions.NewServerAction;
 import anyframe.oden.eclipse.core.explorer.dialogs.CreateBuildRepositoryDialog;
 import anyframe.oden.eclipse.core.messages.CommandMessages;
 import anyframe.oden.eclipse.core.messages.CommonMessages;
@@ -89,21 +96,21 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 	private static final HashSet<Server> EMPTY_SERVERS = new HashSet<Server>();
 	private static final HashSet<Repository> EMPTY_REPOSITORIES = new HashSet<Repository>();
+	private static final HashSet<DeployNow> EMPTY_REPOSITORIES_Deploynow = new HashSet<DeployNow>();
 
-	private static final String MSG_REPOSITORY_SHOW = CommandMessages.ODEN_EXPLORER_ExplorerView_Msg_RepoShow; 
+	private static final String CMD_REPOSITORY_SHOW = CommandMessages.ODEN_CLI_COMMAND_repository_show + " ";
 
 	// Tree viewer for servers and repositories
 	private TreeViewer treeViewer;
-
 	private Clipboard clipboard;
-
 	private String shellurl;
-
-	private Repository repo;
-
-	private String servername;
-
-	private String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(",");
+	private Server server;
+	private String serverNickname;
+	private Repository repository;
+	private String serverNicknameToUseWithRepository;
+	private String serverParh;
+	private boolean isExpand = false;
+	private String[] hiddenFolder = CommandMessages.ODEN_CLI_OPTION_hiddenfolder.split(",");
 
 	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
 
@@ -148,85 +155,31 @@ public class ExplorerView extends ViewPart implements ModelListener {
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(final DoubleClickEvent event) {
 				ExplorerView view = OdenActivator.getDefault().getExplorerView();
-				Object[] selection = (view == null) ? null : view.getSelected();
-				if (!(selection[0].toString().indexOf("[20") > 0)) { 
-					TreeParent obj = ((TreeParent) selection[0]);
-					if (!(treeViewer.getExpandedState(obj))) {
-						String path = getFullpath(obj);
-						String[] paths = path.split("/");
-						if(!(paths[0].equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)) &&
-								paths.length > 1) {
-							repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-							servername = repo.getServerToUse();
-						}
-						if (obj.getParent().toString().equals(
-								UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel)) {
-							if(paths.length > 1) {
-								repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-								servername = repo.getServerToUse();
-							}
-							if(chkExistServer()) {
-								// not mapping server: opens editing Dialog
-								if (DialogUtil.confirmMessageDialog(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_Title, UIMessages.ODEN_EXPLORER_ExplorerView_Confirm_SelectServer)) {
-									CreateBuildRepositoryDialog dialog =
-										new CreateBuildRepositoryDialog(Display.getCurrent().getActiveShell(),CreateBuildRepositoryDialog.Type.CHANGE, repo);
-									dialog.open();
-								}
-							} else {
-								String serverUrl = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(servername).getUrl();
-								shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverUrl + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
-								//								removeList(obj);
-								try {
-									if(obj.getChildren().length == 0)
-										getChildList(obj);
-								} catch (OdenException odenException) {
+				Object[] selections = (view == null) ? null : view.getSelected();
+				Object element = selections[0];
 
-								} catch (Exception odenException) {
-									OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
-								}
+				if (element instanceof TreeParent) {
+					isExpand = treeViewer.getExpandedState((TreeParent) element);
+					if (!isExpand) {
+						String fullPath = getFullpath((TreeObject) element);
+						String[] paths = fullPath.split("/");
 
-								treeViewer.expandToLevel(obj, 1);
-								treeViewer.refresh();
-							}
-						} else if (!(obj.getParent().toString().equals(""))
-								&& !(obj.getParent().toString().equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel))) {
-							//							removeList(obj);
-							if(paths.length > 1) {
-								String serverUrl = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(servername).getUrl();
-								repo = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(paths[1]);
-								shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverUrl + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
-							}
-							try {
-								if(obj.getChildren().length == 0)
-									getChildList(obj);
-							} catch (OdenException odenException) {
-							} catch (Exception odenException) {
-								OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
-							}
+						serverParh = paths.length > 1 ? paths[1] : "";
 
-							treeViewer.expandToLevel(obj, 1);
+						if (element instanceof ServerParent) {
+							getTreeServer((TreeParent) element);
+						} else if (element instanceof RepoParent || element instanceof RepoDirectory) {
+							getTreeRepository((TreeParent) element);
+						} else if (!(element instanceof RepoFile || element instanceof ServerChild)) {
+							treeViewer.expandToLevel((TreeParent) element, 1);
 							treeViewer.refresh();
-
-						} else if ((obj.getParent().toString().equals(""))) { 
-							treeViewer.expandToLevel(obj, 1);
 						}
 					} else {
-						treeViewer.collapseToLevel(obj, 1);
+						// when double click expanded tree cell
+						treeViewer.collapseToLevel((TreeParent) element, 1);
 						treeViewer.refresh();
 					}
 				}
-			}
-		});
-
-		// Tree expansion event
-		treeViewer.addTreeListener(new ITreeViewerListener() {
-			public void treeCollapsed(final TreeExpansionEvent event) {
-				Object obj = ((TreeParent) event.getElement());
-				treeViewer.collapseToLevel(obj, 1);
-				treeViewer.refresh();
-			}
-
-			public void treeExpanded(final TreeExpansionEvent event) {
 			}
 		});
 
@@ -244,14 +197,65 @@ public class ExplorerView extends ViewPart implements ModelListener {
 		parent.layout();
 
 	}
+	
+	/*
+	 * getAgeent List
+	 */
+	private void getTreeServer(TreeParent element) {
+		server = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverParh);
+		serverNickname = server.getNickname();
+		
+		String serverURL = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverNickname).getUrl();
+		shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverURL + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
+		
+		try {
+			if (element.getChildren().length == 0)
+				getServerChildList(element);
+		} catch (Exception odenException) {
+			OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
+		}
+		treeViewer.expandToLevel(element, 1);
+		treeViewer.refresh();
+		
+	}
+	
+	/*
+	 * getAgeent List
+	 */
+	private void getTreeRepository(TreeParent element) {
+		repository = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(serverParh);
+		serverNicknameToUseWithRepository = repository.getServerToUse();
+		
+		if(chkExistServer()) {
+			if (DialogUtil.confirmMessageDialog(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_Title, UIMessages.ODEN_EXPLORER_ExplorerView_Confirm_SelectServer)) {
+				CreateBuildRepositoryDialog dialog =
+					new CreateBuildRepositoryDialog(Display.getCurrent().getActiveShell(),CreateBuildRepositoryDialog.Type.CHANGE, repository);
+				dialog.open();
+			}
+		} else {
+			String serverUrl = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverNicknameToUseWithRepository).getUrl();
+			shellurl = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP + serverUrl + CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
+	
+			try {
+				if(element.getChildren().length == 0)
+					getRepositoryChildList(element);
+			} catch (OdenException odenException) {
 
+			} catch (Exception odenException) {
+				OdenActivator.error(UIMessages.ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree, odenException);
+			}
+
+			treeViewer.expandToLevel(element, 1);
+			treeViewer.refresh();
+		}
+	}
 	private boolean chkExistServer() {
 		Collection<Server> servers = OdenActivator.getDefault().getAliasManager().getServerManager().getServers();
-		if(servername == null)
+		if(serverNicknameToUseWithRepository == null)
 			return true;
 		else
 			for(Server server : servers){
-				if(servername.equals(server.getNickname())){
+				if(serverNicknameToUseWithRepository.equals(server.getNickname())){
 					return false;
 				}
 			}
@@ -433,6 +437,35 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	}
 
 	/**
+	 * Returns a list of the selected Build Repository deploynow agent info. 
+	 * If recurse is true then the result will include any servers associated 
+	 * with other objects.
+	 * @param recurse
+	 * @return Set of Build Repository deploynow agents, never returns null
+	 */
+	public Set<DeployNow> getSelectedDeployNows(boolean recurse) {
+		IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
+
+		LinkedHashSet<DeployNow> result = new LinkedHashSet<DeployNow>();
+		Iterator<?> iter = selection.iterator();
+		while (iter.hasNext()) {
+			TreeMap<String, DeployNow> obj = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getAgentInfo(iter.next().toString());
+			if (obj == null)
+				return EMPTY_REPOSITORIES_Deploynow;
+			else {
+				Iterator<String> it = obj.keySet().iterator();
+				while(it.hasNext()) {
+					Object o = it.next();
+					result.add((DeployNow) obj.get(o.toString()));
+				}
+			}
+		}
+
+		return result;
+	}
+
+
+	/**
 	 * Returns the first available selected Build Repository; if recurse is
 	 * true, then indirectly selected servers are included
 	 * @param recurse
@@ -441,6 +474,17 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	public Repository getSelectedRepository(boolean recurse) {
 		return (Repository) getFirstOf(getSelectedRepositories(recurse));
 	}
+
+	/**
+	 * Returns the first available selected Build Repository; if recurse is
+	 * true, then indirectly selected servers are included
+	 * @param recurse
+	 * @return
+	 */
+	public Set<DeployNow> getSelectedDeploynow(boolean recurse) {
+		return getSelectedDeployNows(recurse);
+	}
+
 
 	/**
 	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
@@ -484,40 +528,80 @@ public class ExplorerView extends ViewPart implements ModelListener {
 	public final void setClipboard(final Clipboard clipboard) {
 		this.clipboard = clipboard;
 	}
-	
-	private void getChildList(final TreeParent parent) throws OdenException {
+
+	private void getServerChildList(final TreeParent parent) {
+		String agentInfoCMD = CommandMessages.ODEN_CLI_COMMAND_agent_info_json;
+
+		ArrayList<String> agentList = getAgentStatusInfoList(shellurl, agentInfoCMD);
+
+		for (String agentSI : agentList)
+			((ServerParent) parent).addChild(new ServerChild(agentSI));
+	}
+
+	private ArrayList<String> getAgentStatusInfoList(final String shellURL, final String agentInfoCMD) {
+		ArrayList<String> agentStatusInfoList = new ArrayList<String>();
+		String result = "";
+		String child = "";
+
+		try {
+			result = OdenBroker.sendRequest(shellURL, agentInfoCMD);
+			if (result != null) {
+				JSONArray array = new JSONArray(result);
+
+				for (int i = 0; i < array.length(); i++) {
+					String agentName = (String) ((JSONObject) array.get(i)).get("name");
+					String agentAddress = (String) ((JSONObject) array.get(i)).get("host");
+					String agentPort = (String) ((JSONObject) array.get(i)).get("port");
+					String agentStatus = (String) ((JSONObject) array.get(i)).get("status");
+					String agentHealth;
+					
+					if (agentStatus.equals("true"))
+						agentHealth = "O";
+					else
+						agentHealth = "X";
+					
+					child = agentHealth + agentName + " " + agentAddress + ":" + agentPort;
+					agentStatusInfoList.add(child);
+				}
+			}
+
+		} catch (OdenException odenException) {
+		} catch (Exception odenException) {
+			OdenActivator.error("exception while getting agent status info", odenException);
+			odenException.printStackTrace();
+		}
+
+		return agentStatusInfoList;
+	}
+
+	private void getRepositoryChildList(final TreeParent parent) throws OdenException {
 		String repopath = ""; 
 		String command = ""; 
-		if (repo.getProtocol().equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+		
+		if (repository.getProtocol().equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem))
 			// when the protocol is Filesystem
-			repopath = CommonMessages.ODEN_CommonMessages_ProtocolString_File + repo.getPath();
-		} else {
+			repopath = CommonMessages.ODEN_CommonMessages_ProtocolString_File + repository.getPath();
+		else
 			// when the protocol is FTP
-			repopath = repo.getPath();
-		}
+			repopath = repository.getPath();
 
 		String url = CommonUtil.replaceIgnoreCase(getFullpath((TreeParent) parent),
-				UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel + "/" + repo.getNickname(), repopath); 
+				UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel + "/" + repository.getNickname(), repopath); 
 
-		if (repo.getProtocol().equals(
-				CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem)) {
+		if (repository.getProtocol().equals(CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem))
 			// when the protocol is Filesystem
-			command = MSG_REPOSITORY_SHOW + '"' + url + '"'; 
-		} else {
+			command = CMD_REPOSITORY_SHOW + '"' + url + '"'; 
+		else
 			// when the protocol is FTP
-			command = MSG_REPOSITORY_SHOW + CommonMessages.ODEN_CommonMessages_ProtocolString_FTP + repo.getUrl() + " " + '"' + url + '"' + " " + repo.getUser() + " " + repo.getPassword();  
-		}
-		ArrayList<String> FileList = getRepoShowList(shellurl, command);
-
-		for (String file : FileList) {
-			if (file.indexOf(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Directory) == 0) {
+			command = CMD_REPOSITORY_SHOW + CommonMessages.ODEN_CommonMessages_ProtocolString_FTP + repository.getUrl() + " " + '"' + url + '"' + " " + repository.getUser() + " " + repository.getPassword();  
+		
+		for (repoTreeList list : getRepositoryShowList(shellurl, command)) {
+			if(list.getType().equals(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Directory))
 				// Directory
-				TreeParent sub = new TreeParent(CommonUtil.replaceIgnoreCase(file, UIMessages.ODEN_EXPLORER_ExplorerView_Index_Directory, ""));  
-				parent.addChild(sub);
-			} else {
+				parent.addChild(new RepoDirectory(list.getName()));
+			else
 				// File
-				parent.addChild(new TreeObject(CommonUtil.replaceIgnoreCase(file, UIMessages.ODEN_EXPLORER_ExplorerView_Index_File, ""))); 
-			}
+				parent.addChild(new RepoFile(list.getName()));
 		}
 	}
 
@@ -536,11 +620,9 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 	}
 
-	private ArrayList<String> getRepoShowList(final String shellUrl,
-			final String msgRepoList) {
-		ArrayList<String> repoList = new ArrayList<String>();
+	private ArrayList<repoTreeList> getRepositoryShowList(final String shellUrl, final String msgRepoList) {
+		ArrayList<repoTreeList> repoList = new ArrayList<repoTreeList>();
 		String result = ""; 
-		String child = ""; 
 		try {
 			result = OdenBroker.sendRequest(shellUrl, msgRepoList);
 			if(result != null){
@@ -559,8 +641,10 @@ public class ExplorerView extends ViewPart implements ModelListener {
 						}
 
 						String date = (String) ((JSONObject) array.get(i)).get(UIMessages.ODEN_EXPLORER_ExplorerView_Index_Date);
-						child = type + name + (type.equals(UIMessages.ODEN_EXPLORER_ExplorerView_Index_File) ? "[" + date + "]" : "");   
-						repoList.add(child);
+						name = name + (type.equals(UIMessages.ODEN_EXPLORER_ExplorerView_Index_File) ? "[" + date + "]" : "");
+						repoTreeList trees = new repoTreeList(type, name);
+						
+						repoList.add(trees);
 					}
 				}
 			}
@@ -572,7 +656,25 @@ public class ExplorerView extends ViewPart implements ModelListener {
 
 		return repoList;
 	}
-
+	
+	class repoTreeList {
+		String type;
+		String name;
+		
+		public repoTreeList(String type, String name) {
+			this.type = type;
+			this.name = name;
+		}
+		
+		public String getType() {
+			return type;
+		}
+		
+		public String getName() {
+			return name;
+		}
+	}
+	
 	private boolean checkFolderVisible(final String name) {
 		for(String folder : hiddenFolder){
 			if(name.indexOf(folder) > 0) {

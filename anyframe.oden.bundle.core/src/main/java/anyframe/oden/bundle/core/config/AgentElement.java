@@ -28,6 +28,10 @@ import anyframe.oden.bundle.common.OdenException;
  *
  */
 public class AgentElement {
+	private static final String DEFAULT_LOCATION = null;
+	
+	private static final String BACKUP_LOCATION = "\nbackup";
+	
 
 	private String name = "";
 	
@@ -36,6 +40,7 @@ public class AgentElement {
 	private String port = "";
 	
 	private List<AgentLocation> locs = new ArrayList<AgentLocation>();
+	
 	
 	public AgentElement(){
 	}
@@ -65,13 +70,21 @@ public class AgentElement {
 	}
 
 	public AgentLocation getDefaultLoc() {
-		return getLoc(null);
+		return getLoc(DEFAULT_LOCATION);
 	}
 
 	public void setDefaultLoc(String value) {
-		addLoc(null, value);
+		addLoc(DEFAULT_LOCATION, value);
 	}
 
+	public AgentLocation getBackupLoc() {
+		return getLoc(BACKUP_LOCATION);
+	}
+
+	public void setBackupLoc(String value) {
+		addLoc(BACKUP_LOCATION, value);
+	}
+	
 	public void addLoc(String name, String value){
 		locs.add(new AgentLocation(this, name, value));
 	}
@@ -90,13 +103,13 @@ public class AgentElement {
 	
 	/**
 	 * 
-	 * @param name location variable name that can be null.
+	 * @param name location variable name. null if it default-location
 	 * @return
 	 */
 	public AgentLocation getLoc(String name){
 		for(AgentLocation loc : locs){
 			if(name == null){
-				if(loc.getName() == null) return loc;
+				if(loc.getName() == null) return loc;	// default
 			}else {
 				if(name.equals(loc.getName())) return loc;
 			}
@@ -112,7 +125,8 @@ public class AgentElement {
 	public List<String> getLocNames(){
 		List<String> names = new ArrayList<String>();
 		for(AgentLocation loc : locs){
-			if(loc.getName() != null)
+			if(loc.getName() != DEFAULT_LOCATION && 
+					loc.getName() != BACKUP_LOCATION)
 				names.add(loc.getName());
 		}
 		return names;

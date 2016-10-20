@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Anyframe Oden
 Bundle-SymbolicName: anyframe.oden.eclipse.core; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
 Bundle-Vendor: SAMSUNG SDS
 Bundle-Activator: anyframe.oden.eclipse.core.OdenActivator
 Bundle-ActivationPolicy: lazy
@@ -19,3 +19,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.forms,
  anyframe.common.eclipse.core
+Export-Package: anyframe.oden.eclipse.core.explorer,
+ anyframe.oden.eclipse.core.history,
+ anyframe.oden.eclipse.core.jobmanager,
+ anyframe.oden.eclipse.core.snapshot

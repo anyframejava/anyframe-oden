@@ -1,7 +1,7 @@
 <project name="Oden Core" default="all-local" basedir=".">
 	
 	<property name="bundle.name" value="anyframe.oden.bundle.core" />
-	<property name="version" value="1.0.0.PRE1"/>
+	<property name="version" value="1.1.0"/>
 			
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -23,6 +23,7 @@
 				debug="on" debuglevel="lines,vars,source" encoding="utf-8">
 			<classpath>
 				<fileset dir="${bundle.loc}"/>
+				<!--<pathelement location="lib/javasysmon-0.2.1.jar"/>-->
 			</classpath>
 		</javac>
 	</target>
@@ -34,13 +35,36 @@
 		</copy>
 		<jar jarfile="${dist}/${bundle.name}-${version}.jar" basedir="${build}" 
 				manifest="${basedir}/META-INF/MANIFEST.MF" />
-		<delete dir="${bundle.loc}" includes="${bundle.name}-*.jar"/>
 	</target>
-		
+	
+	<target name="dist.src.bundle">
+		<antcall target="compile.bundle"/>
+		<copy todir="${build}/src">
+			<fileset dir="${basedir}/src/main/java" includes="**/*" excludes="**/*.svn"/>
+		</copy>
+		<copy todir="${build}">
+			<fileset dir="${basedir}" includes="OSGI-INF/*.xml"/>
+			<fileset dir="${basedir}" includes="lib/*.jar"/>				
+		</copy>
+		<jar jarfile="${dist}/${bundle.name}-${version}.jar" basedir="${build}" 
+				manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+	
+	<target name="all-local-src">
+		<property name="bundle.loc" value="../anyframe.oden.bundle/bundle"/>
+		<property name="dist" location="${basedir}/dist"/>
+		<antcall target="dist.src.bundle"/>
+		<delete dir="${bundle.loc}" includes="${bundle.name}-*.jar"/>
+		<copy todir="${bundle.loc}">
+			<fileset dir="${dist}"/>
+		</copy>
+	</target>
+			
 	<target name="all-local">
 		<property name="bundle.loc" value="../anyframe.oden.bundle/bundle"/>
 		<property name="dist" location="${basedir}/dist"/>
 		<antcall target="dist.bundle"/>
+		<delete dir="${bundle.loc}" includes="${bundle.name}-*.jar"/>
 		<copy todir="${bundle.loc}">
 			<fileset dir="${dist}"/>
 		</copy>

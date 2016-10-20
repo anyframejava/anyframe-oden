@@ -29,6 +29,13 @@
             id="anyframe.oden.eclipse.core.history.DeploymentHistoryView"
             name="Oden Deployment History">
       </view>
+      <view
+            category="anyframe.common.eclipse.core.views.anyframe"
+            class="anyframe.oden.eclipse.core.jobmanager.JobManagerView"
+            icon="icons/cog.png"
+            id="anyframe.oden.eclipse.core.jobmanager.JobManagerView"
+            name="Oden Job Manager">
+      </view>
    </extension>
 
    <extension
@@ -39,6 +46,13 @@
             icon="icons/script.png"
             id="anyframe.oden.eclipse.core.editors.OdenEditor"
             name="Policy and Task Editor">
+      </editor>
+      <editor
+            class="anyframe.oden.eclipse.core.dashboard.Dashboard"
+            extensions="config"
+            icon="icons/dashboard.png"
+            id="anyframe.oden.eclipse.core.editors.OdenDashboard"
+            name="Oden Dashboard">
       </editor>
    </extension>
 
@@ -59,10 +73,64 @@
       </initializer>
    </extension>
    <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   <extension
          point="org.eclipse.help.contexts">
       <contexts
             file="contexts.xml">
       </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="anyframe.oden.eclipse.core.perspective.Perspective"
+            icon="icons/oden_perspective.png"
+            id="anyframe.oden.eclipse.core.perspective.OdenPerspective"
+            name="Oden Perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="anyframe.oden.eclipse.core.license.handlers.LicenseHandler"
+            id="anyframe.oden.eclipse.core.licenseCommand"
+            name="Anyframe Oden License">
+      </command>
+      <command
+            defaultHandler="anyframe.oden.eclipse.core.license.handlers.TrialHandler"
+            id="anyframe.oden.eclipse.core.trialCommand"
+            name="Anyframe Oden Trial">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="AnyrameLicenseMenu"
+               label="Anyframe"
+               mnemonic="A">
+            <command
+                  commandId="anyframe.oden.eclipse.core.licenseCommand"
+                  label="Anyframe Oden License"
+                  mnemonic="L"
+                  style="push"
+                  tooltip="Confirm and Modify License">
+            </command>
+            <command
+                  commandId="anyframe.oden.eclipse.core.trialCommand"
+                  label="Anyframe Oden Trial"
+                  mnemonic="T"
+                  style="push"
+                  tooltip="Comfirm Trial">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
 </plugin>

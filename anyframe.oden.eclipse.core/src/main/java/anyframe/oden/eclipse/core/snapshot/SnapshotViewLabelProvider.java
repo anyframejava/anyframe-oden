@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.snapshot;
@@ -116,7 +118,7 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 		try {
 			fileInfo = SnapshotViewContentProvider.getInfo(
 					SnapshotView.SHELL_URL,
-					CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile + " " //$NON-NLS-1$
+					CommandMessages.ODEN_CLI_COMMAND_snapshot_fileinfo + " " //$NON-NLS-1$
 							+ text + " -json"); //$NON-NLS-1$
 		} catch (OdenException e) {
 			OdenActivator.error(UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo, e);
@@ -140,17 +142,32 @@ public class SnapshotViewLabelProvider extends StyledCellLabelProvider
 		fileDate = tokenizer.nextToken();
 
 		Long longSize = Long.parseLong(fileSize);
-		double doubleSize = longSize / 1024;
+		String fileSizeComma = "";
+		String resultWithUnit = "";
+		
+		if(longSize<1024){
+			BigDecimal bd = new BigDecimal(longSize);
+			BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
+			
+			DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+			df = new DecimalFormat("###,###,###"); //$NON-NLS-1$
+			Long size = Long.parseLong(fileSizeKB.toString());
+			fileSizeComma = df.format(size);
+			resultWithUnit = fileSizeComma + UIMessages.ODEN_SNAPSHOT_SnapshotView_FileSizeTailBytes;
+		}else{
+			double doubleSize = longSize / 1024;
+			
+			BigDecimal bd = new BigDecimal(doubleSize);
+			BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
+			
+			DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+			df = new DecimalFormat("###,###,###"); //$NON-NLS-1$
+			Long size = Long.parseLong(fileSizeKB.toString());
+			fileSizeComma = df.format(size);
+			resultWithUnit = fileSizeComma + UIMessages.ODEN_SNAPSHOT_SnapshotView_FileSizeTailKB;
+		}
 
-		BigDecimal bd = new BigDecimal(doubleSize);
-		BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
-
-		DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
-		df = new DecimalFormat("###,###,###,###,###,###"); //$NON-NLS-1$
-		Long size = Long.parseLong(fileSizeKB.toString());
-		String fileSizeComma = df.format(size);
-
-		result = " [" + fileDate + ", " + fileSizeComma + "KB]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		result = " [" + fileDate + ", " + resultWithUnit + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return result;
 	}
 

@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.explorer.dialogs;
@@ -20,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -31,6 +34,8 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -47,6 +52,7 @@ import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.OdenTrees.TreeObject;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
+import anyframe.oden.eclipse.core.alias.DeployNow;
 import anyframe.oden.eclipse.core.alias.Repository;
 import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
@@ -57,7 +63,6 @@ import anyframe.oden.eclipse.core.messages.CommonMessages;
 import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.utils.CommonUtil;
 import anyframe.oden.eclipse.core.utils.ImageUtil;
-import anyframe.oden.eclipse.core.utils.JSONUtil;
 import anyframe.oden.eclipse.core.utils.OdenProgress;
 
 /**
@@ -70,6 +75,9 @@ import anyframe.oden.eclipse.core.utils.OdenProgress;
  * 
  */
 public class DeployNowDialog extends TitleAreaDialog {
+	// CommonUtil
+	CommonUtil util = new CommonUtil();
+	
 	// Strings and messages from message properties
 	private String title = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Title;
 	private String subtitle = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_SubTitle;
@@ -82,38 +90,41 @@ public class DeployNowDialog extends TitleAreaDialog {
 	public Object tree;
 
 	private ArrayList<String> relativepath;
+	@SuppressWarnings("unused")
 	private String repoUrl;
 	private String shellurl;
-
+	
+	private Repository repository;
 	Table table;
 	TableViewer tableViewer;
-	TableViewerColumn column1, column2, column3, column4;
+	TableViewerColumn column1, column2, column3, column4 , column5;
 
-	private String col1 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Repo;
-	private String col2 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployPath;
-	private String col3 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployItem;
-	private String col4 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployAgent;
+	private String col1 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Mode;
+	private String col2 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Repo;
+	private String col3 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployPath;
+	private String col4 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployItem;
+	private String col5 = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployAgent;
 
 	private ArrayList<DeployNowInfo> DeployItem;
 	private Label itemCount;
-	private final String tempPolicyName =  CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName + Calendar.getInstance().getTimeInMillis();
-	private final String tempTaskName =  CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName + + Calendar.getInstance().getTimeInMillis();
+	private final String tempPolicyName =  CommandMessages.ODEN_CLI_COMMAND_policy_tempname + util.getMilliseconds();
+	private final String tempTaskName =  CommandMessages.ODEN_CLI_COMMAND_task_tempname + util.getMilliseconds();
 
-	private final String MSG_POLICY_ADD1 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Action
+	private final String MSG_POLICY_ADD1 = CommandMessages.ODEN_CLI_COMMAND_policy_add
 	+ " " + tempPolicyName;
-	private final String MSG_POLICY_OPT = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyOpt;
-	private final String MSG_POLICY_ADD2 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Include;
-	private final String MSG_POLICY_ADD3 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Exclude;
-	private final String MSG_POLICY_DELETE = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyDel + " " + tempPolicyName + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_ADD1 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd1 
+	private final String MSG_POLICY_OPT = CommandMessages.ODEN_CLI_OPTION_repository + " ";
+	private final String MSG_POLICY_ADD2 = CommandMessages.ODEN_CLI_OPTION_include + " ";
+	private final String MSG_POLICY_ADD3 = CommandMessages.ODEN_CLI_OPTION_destination;
+	private final String MSG_POLICY_DELETE = CommandMessages.ODEN_CLI_COMMAND_policy_delete + " " + tempPolicyName + " " + CommandMessages.ODEN_CLI_OPTION_json;
+	private final String MSG_TASK_ADD1 = CommandMessages.ODEN_CLI_COMMAND_task_add + " "
 	+ tempTaskName + " -p ";
-	private final String MSG_TASK_ADD2 = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd2 + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_DELETE = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskDel + " " + tempTaskName + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	private final String MSG_TASK_RUN = CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskRun + " " + tempTaskName  + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+	private final String MSG_TASK_ADD2 = CommandMessages.ODEN_CLI_OPTION_desc_deploynow + " " + CommandMessages.ODEN_CLI_OPTION_json;
+	private final String MSG_TASK_DELETE = CommandMessages.ODEN_CLI_COMMAND_task_delete + " " + tempTaskName + " " + CommandMessages.ODEN_CLI_OPTION_json;
+	private final String MSG_TASK_RUN = CommandMessages.ODEN_CLI_COMMAND_task_run + " " + tempTaskName  + " " + CommandMessages.ODEN_CLI_OPTION_json;
 
 	private Repository repo;
 	private String protocol;
-	private String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder
+	private String[] hiddenFolder = CommandMessages.ODEN_CLI_OPTION_hiddenfolder
 	.split(",");
 	private String exclude = this.returnExclude();
 	private String taskName;
@@ -127,15 +138,14 @@ public class DeployNowDialog extends TitleAreaDialog {
 		DeployItem = new ArrayList<DeployNowInfo>();
 		if (obj != null) {
 			// Deploy now(Selected Tree)
-			Object[] objects = obj;
-			for (Object object : objects) {
-				String fullpath = getFullpath((TreeObject) object);
+			Object[] selections = obj;
+			for (Object selection : selections) {
+				String fullpath = getFullpath((TreeObject) selection);
 				int firstIdx = fullpath.indexOf("/");
 				int secondIdx = fullpath.indexOf("/", firstIdx + 1);
 				String reponame = fullpath.substring(firstIdx + 1, secondIdx);
-				repoUrl = OdenActivator.getDefault().getAliasManager()
-				.getRepositoryManager().getRepository(reponame)
-				.getUrl();
+				repository = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepository(reponame); 
+				this.repoUrl = repository.getUrl();
 				String serverToUse = OdenActivator.getDefault().getAliasManager()
 				.getRepositoryManager().getRepository(reponame)
 				.getServerToUse();
@@ -216,7 +226,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 				.disposeImage(UIMessages.ODEN_EXPLORER_Dialogs_OdenImageURL);
 			}
 		});
-		// TODO 도움말 만든 후 아래 내용을 확인할 것
+		// TODO �룄���留� 留뚮뱺 �썑 �븘�옒 �궡�슜�쓣 �솗�씤�븷 寃�
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				OdenActivator.HELP_PLUGIN_ID + ".oden.odenexplorerview");
 
@@ -243,30 +253,35 @@ public class DeployNowDialog extends TitleAreaDialog {
 				| SWT.BORDER | SWT.V_SCROLL);
 		tableViewer = new TableViewer(table);
 		tableViewer.setContentProvider(new PolicyContentProvider());
-		tableViewer.setSorter(new TableViewerSorter());
+		tableViewer.setSorter(new DeployNowTableViewerSorter());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		table.setLayoutData(data);
 
 		column1 = new TableViewerColumn(tableViewer, SWT.None);
 		column1.getColumn().setText(col1);
-		column1.getColumn().setWidth(200);
-		column1.setLabelProvider(new DeployRepoColumnLabelProvider());
-
+		column1.getColumn().setWidth(50);
+		column1.setLabelProvider(new DeployModeColumnLabelProvider());
+		
 		column2 = new TableViewerColumn(tableViewer, SWT.None);
 		column2.getColumn().setText(col2);
-		column2.getColumn().setWidth(150);
-		column2.setLabelProvider(new DeployPathColumnLabelProvider());
+		column2.getColumn().setWidth(200);
+		column2.setLabelProvider(new DeployRepoColumnLabelProvider());
 
 		column3 = new TableViewerColumn(tableViewer, SWT.None);
 		column3.getColumn().setText(col3);
-		column3.getColumn().setWidth(200);
-		column3.setLabelProvider(new DeployItemColumnLabelProvider());
+		column3.getColumn().setWidth(150);
+		column3.setLabelProvider(new DeployPathColumnLabelProvider());
 
 		column4 = new TableViewerColumn(tableViewer, SWT.None);
 		column4.getColumn().setText(col4);
-		column4.getColumn().setWidth(100);
-		column4.setLabelProvider(new DeployAgentsColumnLabelProvider());
+		column4.getColumn().setWidth(200);
+		column4.setLabelProvider(new DeployItemColumnLabelProvider());
+
+		column5 = new TableViewerColumn(tableViewer, SWT.None);
+		column5.getColumn().setText(col5);
+		column5.getColumn().setWidth(100);
+		column5.setLabelProvider(new DeployAgentsColumnLabelProvider());
 
 		tableViewer.setInput(DeployItem);
 		tableViewer.refresh();
@@ -278,11 +293,99 @@ public class DeployNowDialog extends TitleAreaDialog {
 				+ " "
 				+ UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_ItemStatement);
 
-		((TableViewerSorter) tableViewer.getSorter()).doSort(1);
+		((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(3);
+		
 		tableViewer.refresh();
+		tableEvent();
 		return parentComposite;
 	}
+	/*
+	 * column sorting event
+	 */
+	private void tableEvent() {
+		column1.getColumn().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(1);
+				int dir = tableViewer.getTable().getSortDirection();
+				if (tableViewer.getTable().getSortColumn() == column1.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
 
+					dir = SWT.DOWN;
+				}
+				tableViewer.getTable().setSortDirection(dir);
+				tableViewer.getTable().setSortColumn(column1.getColumn());
+				tableViewer.refresh();
+			}
+
+		});
+		column2.getColumn().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(2);
+				int dir = tableViewer.getTable().getSortDirection();
+				if (tableViewer.getTable().getSortColumn() == column2.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+
+					dir = SWT.DOWN;
+				}
+				tableViewer.getTable().setSortDirection(dir);
+				tableViewer.getTable().setSortColumn(column2.getColumn());
+				tableViewer.refresh();
+			}
+
+		});
+		column3.getColumn().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(3);
+				int dir = tableViewer.getTable().getSortDirection();
+				if (tableViewer.getTable().getSortColumn() == column3.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+
+					dir = SWT.DOWN;
+				}
+				tableViewer.getTable().setSortDirection(dir);
+				tableViewer.getTable().setSortColumn(column3.getColumn());
+				tableViewer.refresh();
+			}
+
+		});
+		column4.getColumn().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(4);
+				int dir = tableViewer.getTable().getSortDirection();
+				if (tableViewer.getTable().getSortColumn() == column4.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+
+					dir = SWT.DOWN;
+				}
+				tableViewer.getTable().setSortDirection(dir);
+				tableViewer.getTable().setSortColumn(column4.getColumn());
+				tableViewer.refresh();
+			}
+
+		});
+		column5.getColumn().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((DeployNowTableViewerSorter) tableViewer.getSorter()).setColumn(5);
+				int dir = tableViewer.getTable().getSortDirection();
+				if (tableViewer.getTable().getSortColumn() == column5.getColumn()) {
+					dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
+				} else {
+
+					dir = SWT.DOWN;
+				}
+				tableViewer.getTable().setSortDirection(dir);
+				tableViewer.getTable().setSortColumn(column5.getColumn());
+				tableViewer.refresh();
+			}
+
+		});
+
+
+	}
 	protected void okPressed() {
 		// Deploy Now
 		try {
@@ -333,7 +436,15 @@ public class DeployNowDialog extends TitleAreaDialog {
 			return ((DeployNowInfo) element).getDeployItem();
 		}
 	}
+	
+	public class DeployModeColumnLabelProvider extends ColumnLabelProvider {
 
+		public String getText(Object element) {
+
+			return ((DeployNowInfo) element).getMode();
+		}
+	}
+	
 	public class DeployRepoColumnLabelProvider extends ColumnLabelProvider {
 
 		public String getText(Object element) {
@@ -352,6 +463,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 	private ArrayList<DeployNowInfo> searchDeployItem(String url) throws Exception {
 		ArrayList<DeployNowInfo> returnList = new ArrayList<DeployNowInfo>();
+		String[] includeArr = new String[2];
 		String commnd = "";
 		String includes = "";
 
@@ -380,8 +492,9 @@ public class DeployNowDialog extends TitleAreaDialog {
 				// 1. add temp policy
 				for(String include : relativepath){
 					include = CommonUtil.replaceIgnoreCase(include, repo_root, "");
-					if (include.indexOf("[20") > 0)
-						include = '"' + include.substring(1, include.indexOf("[20")) + '"'  + " ";
+					includeArr = util.getTreeObjectSplitElement(include);
+					if (includeArr[0] != null)
+						include = '"' + includeArr[1].substring(1) + '"'  + " ";
 					else
 						include = '"' + include.substring(1) + "/*" + '"' + " " + '"' + include.substring(1)
 						+ "/**" + '"' + " ";
@@ -404,7 +517,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 					+ exclude + MSG_POLICY_ADD3 + " " + agents
 					+ "-desc deploynow";
 				}
-				msgaddpoicy = msgaddpoicy + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+				msgaddpoicy = msgaddpoicy + " " + CommandMessages.ODEN_CLI_OPTION_json;
 				try {
 					runCommand(msgaddpoicy);
 				} catch (OdenException odenException) {
@@ -462,6 +575,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 		return returnList;
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<DeployNowInfo> returnList(String commnd) {
 		ArrayList<DeployNowInfo> returnList = new ArrayList<DeployNowInfo>();
 
@@ -471,35 +585,30 @@ public class DeployNowDialog extends TitleAreaDialog {
 				JSONArray array = new JSONArray(result);
 				String path = "";
 				String item = "";
-				String agents_ = "";
-				String repos = "";
+				String agent = "";
+				String repo = "";
+				String mode = "";
 				for (int i = 0; i < array.length(); i++) {
-					for (Iterator<String> it = ((JSONObject) array.get(i)).keys(); it.hasNext();) {
-						String key = it.next();
-						JSONArray jsonArr = new JSONArray(key);
-
-						repos = CommonUtil.replaceIgnoreCase(JSONUtil.toString(jsonArr), "\n", ",");
-						String[] repoArr = repos.split(",");
-						if(repoArr.length > 1) {
-							// ftp
-							repos = repoArr[0] + repoArr[1]; 
-						} else {
-							// file system
-							repos = repoArr[0];
-						}
-
-						JSONObject files = (JSONObject) ((JSONObject) array.get(i))
-						.get(key);
-						for (Iterator<String> it2 = files.keys(); it2.hasNext();) {
-							String file = it2.next();
-							files.getJSONArray(file);
-
-							agents_ = CommonUtil.replaceIgnoreCase(JSONUtil
-									.toString(files.getJSONArray(file)), "\n", ",");
-							if (agents_.lastIndexOf(",") > 0)
-								agents_ = agents_.substring(0, agents_
-										.lastIndexOf(","));
-
+					JSONObject full = (JSONObject) array.get(i);
+					for(Iterator<String> it = full.keys() ; it.hasNext();) {
+						String keys = it.next();
+						if(keys.equals("agent")) {
+							JSONObject agents = new JSONObject(full.getString("agent"));
+							agent = agents.getString("name");
+						} else if(keys.equals("repo")) {
+							JSONArray repos = new JSONArray(full.getString("repo"));
+							if(repos.length() > 0)
+								repo = repos.getString(0);
+						} else if(keys.equals("mode")) {
+							mode = full.getString("mode");
+							if(mode.equals("A"))
+								mode = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Add;
+							else if(mode.equals("U"))
+								mode = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Update;
+							else if(mode.equals("D"))
+								mode = UIMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_Delete;
+						} else if(keys.equals("path")) {
+							String file = full.getString("path");
 							if (file.indexOf("/") > 0) {
 								// unix
 								path = file.substring(0, file.lastIndexOf("/"));
@@ -516,12 +625,10 @@ public class DeployNowDialog extends TitleAreaDialog {
 								path = "";
 								item = file;
 							}	
-							DeployNowInfo DeployItem = new DeployNowInfo(repos, path, item,
-									agents_);
-							returnList.add(DeployItem);
 						}
-
 					}
+					DeployNowInfo DeployItem = new DeployNowInfo(repo, path, item,agent,mode);
+					returnList.add(DeployItem);
 				}
 			}
 		} catch (OdenException odenException) {
@@ -554,8 +661,8 @@ public class DeployNowDialog extends TitleAreaDialog {
 				String commnd;
 				// 1. task run
 				if (taskName != null) {
-					commnd = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskRun
-					+ " " + '"' + taskName + '"' + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+					commnd = CommandMessages.ODEN_CLI_COMMAND_task_run
+					+ " " + '"' + taskName + '"' + " " + CommandMessages.ODEN_CLI_OPTION_json;
 				} else {
 					commnd = msg;
 				}
@@ -587,26 +694,40 @@ public class DeployNowDialog extends TitleAreaDialog {
 
 	private String getAgents() throws Exception {
 		String dest = "";
-		String commnd = CommandMessages.ODEN_EDITORS_PolicyPage_MsgAgentInfo;
-
-		String result = OdenBroker.sendRequest(shellurl, commnd);
-		if( result != null) {	
-			JSONArray array = new JSONArray(result);
-			if(array.length() > 0) {
-				for (int i = 0; i < array.length(); i++) {
-					String name = (String) ((JSONObject) array.get(i)).get("name");
-					dest = dest + name + " ";
+		if(repository.isAllToDefault()) {
+			// All to the default location
+			String commnd = CommandMessages.ODEN_CLI_COMMAND_agent_info_json;
+	
+			String result = OdenBroker.sendRequest(shellurl, commnd);
+			if( result != null) {	
+				JSONArray array = new JSONArray(result);
+				if(array.length() > 0) {
+					for (int i = 0; i < array.length(); i++) {
+						String name = (String) ((JSONObject) array.get(i)).get("name");
+						dest =  dest + '"' + name + ":~" + '"' +  " ";
+					}
+				} else {
+					OdenActivator.warning("You shoud add" +  '"' + "config.xml" + '"');
 				}
 			} else {
-				OdenActivator.warning("You shoud add" +  '"' + "config.xml" + '"');
+				OdenActivator.warning(CommonMessages.ODEN_CommonMessages_UnableToConnectServer);
 			}
 		} else {
-			OdenActivator.warning(CommonMessages.ODEN_CommonMessages_UnableToConnectServer);
+			 TreeMap<String, DeployNow> deployMap = repository.getDeployNowMap();
+			 String locationVar = "";
+			 for(DeployNow deploynow : deployMap.values()) {
+				 if(deploynow.getDestinedLocation().equals(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault))
+					 locationVar = "~";
+				 else 
+					 locationVar = "$" + deploynow.getDestinedLocation();
+				 dest = dest + '"' + deploynow.getDestinedAgentName() + ":"+ locationVar + '"' + " ";
+			 }
 		}
 		return dest;
 	}
 
 	private void runCommand(String commnd) throws Exception {
+		@SuppressWarnings("unused")
 		String result = OdenBroker.sendRequest(shellurl, commnd);
 	}
 
@@ -652,6 +773,7 @@ public class DeployNowDialog extends TitleAreaDialog {
 	 */
 	public boolean close() {
 		deleteTemp();
+		util = null;
 		return super.close();
 	}
 

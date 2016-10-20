@@ -46,8 +46,10 @@ public class CommandUtil {
 				continue;
 			}else if(c == ' '){
 				if(!quote){ 
-					args.add(arg.toString());
-					arg.delete(0, arg.length());
+					if(arg.length() >0){
+						args.add(arg.toString());
+						arg.delete(0, arg.length());
+					}
 					continue;
 				}
 			}
@@ -58,4 +60,5 @@ public class CommandUtil {
 		
 		return args.toArray(new String[args.size()] );
 	}
+	
 }

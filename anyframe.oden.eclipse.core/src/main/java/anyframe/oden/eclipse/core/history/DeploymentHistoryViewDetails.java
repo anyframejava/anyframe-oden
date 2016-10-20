@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.history;
@@ -26,88 +28,122 @@ package anyframe.oden.eclipse.core.history;
  */
 public class DeploymentHistoryViewDetails {
 
-	private String DeployId;
+	private String deployId;
 
-	private String DeployItem;
+	private String deployItem;
 
-	private String DeployServer;
+	private String deployItemSize;
+	
+	private String deployItemMode;
+	
+	private String deployServer;
 
-	private String DeployPath;
+	private String deployPath;
 
-	private String DeployDate;
+	private String deployDate;
 
-	private String DeployerIp;
+	private String deployerIp;
 
-	private String DeployStatus;
+	private String deployStatus;
 
 	private String totalQuery;
+	
+	private String undoAbsolutePath;
+	
+	private String undoFilePath;
+	
+	private String deployLog;
+	
+	public String getUndoFilePath() {
+		return undoFilePath;
+	}
+
+	public void setUndoFilePath(String undoFilePath) {
+		this.undoFilePath = undoFilePath;
+	}
 
 	public DeploymentHistoryViewDetails() {
 
 	}
 
-	public DeploymentHistoryViewDetails(String DeployId, String DeployItem, String DeployPath,
-			String DeployDate, String DeployerIp, String DeployStatus,
-			String totalQuery, String deployServer) {
+	public DeploymentHistoryViewDetails(String deployId, String deployItem, String deployItemSize , String deployItemMode ,
+			String deployPath, String deployDate, String deployerIp, String deployStatus, String totalQuery, String deployServer) {
+			
+		this.deployId = deployId;
+		this.deployItem = deployItem;
+		this.deployItemSize = deployItemSize;
+		this.deployItemMode = deployItemMode;
+		this.deployPath = deployPath;
+		this.deployDate = deployDate;
 
-		this.DeployId = DeployId;
-		this.DeployItem = DeployItem;
-		this.DeployPath = DeployPath;
-		this.DeployDate = DeployDate;
-
-		this.DeployerIp = DeployerIp;
-		this.DeployStatus = DeployStatus;
+		this.deployerIp = deployerIp;
+		this.deployStatus = deployStatus;
 		this.totalQuery = totalQuery;
-		this.totalQuery = totalQuery;
-		this.DeployServer = deployServer;
+		this.deployServer = deployServer;
 	}
 
 	public String getDeployId() {
-		return DeployId;
+		return deployId;
 	}
 
 	public void setDeployId(String deployId) {
-		this.DeployId = deployId;
+		this.deployId = deployId;
 	}
 
 	public String getDeployItem() {
-		return DeployItem;
+		return deployItem;
 	}
 
 	public void setDeployItem(String deployItem) {
-		this.DeployItem = deployItem;
+		this.deployItem = deployItem;
+	}
+	
+	public String getDeployItemSize() {
+		return deployItemSize;
 	}
 
+	public void setDeployItemSize(String deployItemSize) {
+		this.deployItemSize = deployItemSize;
+	}
+	
+	public String getDeployItemMode() {
+		return deployItemMode;
+	}
+
+	public void setDeployItemMode(String deployItemMode) {
+		this.deployItemMode = deployItemMode;
+	}
+	
 	public String getDeployPath() {
-		return DeployPath;
+		return deployPath;
 	}
 
 	public void setDeployPath(String deployPath) {
-		this.DeployPath = deployPath;
+		this.deployPath = deployPath;
 	}
 
 	public String getDeployDate() {
-		return DeployDate;
+		return deployDate;
 	}
 
 	public void setDeployDate(String deployDate) {
-		this.DeployDate = deployDate;
+		this.deployDate = deployDate;
 	}
 
 	public String getDeployerIp() {
-		return DeployerIp;
+		return deployerIp;
 	}
 
 	public void setDeployerIp(String deployerIp) {
-		this.DeployerIp = deployerIp;
+		this.deployerIp = deployerIp;
 	}
 
 	public String getDeployStatus() {
-		return DeployStatus;
+		return deployStatus;
 	}
 
 	public void setDeployStatus(String deployStatus) {
-		this.DeployStatus = deployStatus;
+		this.deployStatus = deployStatus;
 	}
 
 	public String getTotalQuery() {
@@ -119,10 +155,26 @@ public class DeploymentHistoryViewDetails {
 	}
 
 	public String getDeployServer() {
-		return DeployServer;
+		return deployServer;
 	}
 
 	public void setDeployServer(String deployServer) {
-		DeployServer = deployServer;
+		this.deployServer = deployServer;
+	}
+	
+	public String getUndoAbsolutePath() {
+		return undoAbsolutePath;
+	}
+
+	public void setUndoAbsolutePath(String undoAbsolutePath) {
+		this.undoAbsolutePath = undoAbsolutePath;
+	}
+
+	public String getDeployLog() {
+		return deployLog;
+	}
+
+	public void setDeployLog(String deployLog) {
+		this.deployLog = deployLog;
 	}
 }

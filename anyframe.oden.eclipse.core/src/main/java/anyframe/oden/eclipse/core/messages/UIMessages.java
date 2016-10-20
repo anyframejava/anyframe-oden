@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.messages;
@@ -29,6 +31,43 @@ import org.eclipse.osgi.util.NLS;
 public abstract class UIMessages extends NLS {
 	private static final String BUNDLE_NAME = UIMessages.class.getName();
 
+	public static String ODEN_DASHBOARD_Actions_DashboardRefreshAction_Refresh;
+	public static String ODEN_DASHBOARD_Actions_DashboardRefreshAction_RefreshIcon;
+	public static String ODEN_DASHBOARD_Actions_DashboardRefreshAction_RefreshToolTip;
+	public static String ODEN_DASHBOARD_Actions_TransferResultAction_Transfer;
+	public static String ODEN_DASHBOARD_Actions_TransferResultAction_TransferIcon;
+	public static String ODEN_DASHBOARD_Actions_TransferResultAction_TransferToolTip;
+	public static String ODEN_DASHBOARD_DashboardPage_ButtonDateSearch;
+	public static String ODEN_DASHBOARD_DashboardPage_CheckDeployFail;
+	public static String ODEN_DASHBOARD_DashboardPage_CheckFetchlogFail;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnDate;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnDeploy;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnDeployFail;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnFetchlogFail;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnItem;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnTxID;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardDesc;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardIcon;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardPageDesc;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardPageTitle;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardSuf;
+	public static String ODEN_DASHBOARD_DashboardPage_DashboardTitle;
+	public static String ODEN_DASHBOARD_DashboardPage_DateFormat;
+	public static String ODEN_DASHBOARD_DashboardPage_ColumnDateFormat;
+	public static String ODEN_DASHBOARD_DashboardPage_DateFrom;
+	public static String ODEN_DASHBOARD_DashboardPage_DateTo;
+	public static String ODEN_DASHBOARD_DashboardPage_DateWarningMsg;
+	public static String ODEN_DASHBOARD_DashboardPage_DeployFailMark;
+	public static String ODEN_DASHBOARD_DashboardPage_DeploySuccessMark;
+	public static String ODEN_DASHBOARD_DashboardPage_Exception_SearchingDeploy;
+	public static String ODEN_DASHBOARD_DashboardPage_Exception_SendFetchlog;
+	public static String ODEN_DASHBOARD_DashboardPage_Exception_ShowingHistory;
+	public static String ODEN_DASHBOARD_DashboardPage_FetchlogDone;
+	public static String ODEN_DASHBOARD_DashboardPage_FetchlogFailIds;
+	public static String ODEN_DASHBOARD_DashboardPage_FetchlogNotyet;
+	public static String ODEN_DASHBOARD_DashboardPage_LabelDateFromTo;
+	public static String ODEN_DASHBOARD_DashboardPage_MenuManager;
+	public static String ODEN_DASHBOARD_DashboardPage_ResultTotal;
 	public static String ODEN_EDITORS_PolicyPage_Build_Img;
 	public static String ODEN_EDITORS_PolicyPage_BuildRepositoryProtocol_Tooltip;
 	public static String ODEN_EDITORS_PolicyPage_BuildRepositoryUrl_Tooltip;
@@ -36,7 +75,9 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EDITORS_PolicyPage_DeployLabelDesc;
 	public static String ODEN_EDITORS_PolicyPage_DeployTable_col1;
 	public static String ODEN_EDITORS_PolicyPage_DeployTable_col2;
+	public static String ODEN_EDITORS_PolicyPage_DeployTable_col3;
 	public static String ODEN_EDITORS_PolicyPage_Desc;
+	public static String ODEN_EDITORS_PolicyPage_DialogAgent_ComboAbsolutePath;
 	public static String ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault;
 	public static String ODEN_EDITORS_PolicyPage_DialogAgent_Statement;
 	public static String ODEN_EDITORS_PolicyPage_DialogMsg_ConfirmDeleteDeploy_MessagePre;
@@ -73,6 +114,7 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EDITORS_PolicyPage_Title;
 	public static String ODEN_EDITORS_PolicyPage_TitleImage;
 	public static String ODEN_EDITORS_PolicyPage_Update_Option;
+	public static String ODEN_EDITORS_PolicyPage_Delete_Option;
 	public static String ODEN_EDITORS_TaskPage_DialogMsg_ConfirmDeleteTask_MessagePre;
 	public static String ODEN_EDITORS_TaskPage_DialogMsg_FirstSave;
 	public static String ODEN_EDITORS_TaskPage_DialogMsg_InputTaskName;
@@ -100,6 +142,13 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EDITORS_TaskPage_TaskPageTitleImage;
 	public static String ODEN_EDITORS_TaskPage_TempTaskDesc;
 	public static String ODEN_EDITORS_TaskPage_TempTaskName;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_CompareAgent;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_CompareAgentIcon;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_CompareAgentSuccessMsg;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_CompareAgentToolTip;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_Exception_CompareAgent;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_WarningDefaultLocationCheck;
+	public static String ODEN_EXPLORER_Actions_CompareAgentAction_WarningTitle;
 	public static String ODEN_EXPLORER_Actions_DeleteServerAction_ConfirmDelete_MessagePre;
 	public static String ODEN_EXPLORER_Actions_DeleteServerAction_RemoveServer;
 	public static String ODEN_EXPLORER_Actions_DeleteServerAction_RemoveServerIcon;
@@ -132,11 +181,24 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepository;
 	public static String ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryIcon;
 	public static String ODEN_EXPLORER_Actions_NewRepositoryAction_CreateRepositoryToolTip;
+	public static String ODEN_EXPLORER_Actions_OpenDashboardAction_DashboardEditorId;
+	public static String ODEN_EXPLORER_Actions_OpenDashboardAction_Exception_OpenDashbaord;
+	public static String ODEN_EXPLORER_Actions_OpenDashboardAction_OpenDashboard;
+	public static String ODEN_EXPLORER_Actions_OpenDashboardAction_OpenDashboardIcon;
+	public static String ODEN_EXPLORER_Actions_OpenDashboardAction_OpenDashboardToolTip;
 	public static String ODEN_EXPLORER_Actions_OpenPolicyTaskAction_EditorExists;
 	public static String ODEN_EXPLORER_Actions_OpenPolicyTaskAction_Exception;
 	public static String ODEN_EXPLORER_Actions_RunDeployAction_DeployNow;
 	public static String ODEN_EXPLORER_Actions_RunDeployAction_DeployNowIcon;
 	public static String ODEN_EXPLORER_Actions_RunDeployAction_DeployNowToolTip;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialog23;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialog30;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialog31;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialogButtonOnlyFailFile;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialogColumnDirectory;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialogColumnFileName;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialogDialogTitle;
+	public static String ODEN_EXPLORER_Dialogs_CompareResultReportDialogItemResult;
 	public static String ODEN_EXPLORER_Dialogs_CreateServerDialog_AddSubtitle;
 	public static String ODEN_EXPLORER_Dialogs_CreateServerDialog_AddTitle;
 	public static String ODEN_EXPLORER_Dialogs_CreateServerDialog_DuplicateSubtitle;
@@ -154,6 +216,8 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_EditTitle;
 	public static String ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_PathFieldName;
 	public static String ODEN_EXPLORER_Dialogs_CreateBuildRepositoryDialog_ProtocolComboName;
+	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Add;
+	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Delete;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployAgent;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployItem;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_DeployPath;
@@ -166,9 +230,13 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SaveTask;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Exception_SearchDeployItem;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_ItemStatement;
+	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Mode;
+	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Nothing;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Repo;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_SubTitle;
 	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Title;
+	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_Update;
+	public static String ODEN_EXPLORER_Dialogs_SetDeployNowDialog_AllToDefaultLocation;
 	public static String ODEN_EXPLORER_Dialogs_SetDeployNowDialog_SubTitle;
 	public static String ODEN_EXPLORER_Dialogs_SetDeployNowDialog_Title;
 	public static String ODEN_EXPLORER_Dialogs_SelectAgentsDialog_Title;
@@ -188,6 +256,9 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_EXPLORER_ExplorerView_Msg_ExceptionRepoList;
 	public static String ODEN_EXPLORER_ExplorerView_Msg_ExceptionTree;
 	public static String ODEN_EXPLORER_ExplorerView_Msg_Title;
+	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_AgentAbnormalIcon;
+	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_AgentNormalIcon;
+	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_AgentUnknownIcon;
 	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_ServerIcon;
 	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootIcon;
 	public static String ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel;
@@ -201,6 +272,12 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearch;
 	public static String ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchIcon;
 	public static String ODEN_HISTORY_Actions_AdvancedSearchAction_AdvancedSearchToolTip;
+	public static String ODEN_HISTORY_Actions_ReDeployAction_ReDeploy;
+	public static String ODEN_HISTORY_Actions_ReDeployAction_ReDeployIcon;
+	public static String ODEN_HISTORY_Actions_ReDeployAction_ReDeployToolTip;
+	public static String ODEN_HISTORY_Actions_UndoAction_Undo;
+	public static String ODEN_HISTORY_Actions_UndoAction_UndoIcon;
+	public static String ODEN_HISTORY_Actions_UndoAction_UndoToolTip;
 	public static String ODEN_HISTORY_DeploymentHistoryView_ServerSelect;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Condition_After;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Condition_Before;
@@ -212,9 +289,11 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_HISTORY_DeploymentHistoryView_Condition_S;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Conditon_DeployStatus;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Condtion_Success;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Icon;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Agent;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Date;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_DeployDate;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Fail;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Found;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Host;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_IP;
@@ -222,7 +301,11 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Path;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Root;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Success;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Item_Transaction;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Items;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Label_TxIdLabel;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Label_ItemNameLabel;
+	public static String ODEN_HISTORY_DeploymentHistoryView_Label_OnlyFailLabel;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelCaseSensitive;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol1;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol2;
@@ -230,8 +313,76 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol4;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol5;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol6;
+	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol7;
+	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol8;
+	public static String ODEN_HISTORY_DeploymentHistoryView_LabelGridCol9;
 	public static String ODEN_HISTORY_DeploymentHistoryView_LabelSearchView;
 	public static String ODEN_HISTORY_DeploymentHistoryView_Message_Title;
+	
+	public static String ODEN_JOBMANAGER_Actions_JobManagerRefreshAction_JobManagerRefresh;
+	public static String ODEN_JOBMANAGER_Actions_JobManagerRefreshAction_JobManagerRefreshIcon;
+	public static String ODEN_JOBMANAGER_Actions_JobManagerRefreshAction_JobManagerRefreshToolTip;
+	public static String ODEN_JOBMANAGER_Actions_JobManagerCancelAction_JobManagerCancel;
+	public static String ODEN_JOBMANAGER_Actions_JobManagerCancelAction_JobManagerCancelIcon;
+	public static String ODEN_JOBMANAGER_Actions_JobManagerCancelAction_JobManagerCancelToolTip;
+	public static String ODEN_JOBMANAGER_Actions_NewFileRequestAction_NewFileRequest;
+	public static String ODEN_JOBMANAGER_Actions_NewFileRequestAction_NewFileRequestIcon;
+	public static String ODEN_JOBMANAGER_Actions_NewFileRequestAction_NewFileRequestToolTip;
+	public static String ODEN_JOBMANAGER_Actions_NewTaskListAction_NewTaskList;
+	public static String ODEN_JOBMANAGER_Actions_NewTaskListAction_NewTaskListIcon;
+	public static String ODEN_JOBMANAGER_Actions_NewTaskListAction_NewTaskListToolTip;
+	public static String ODEN_JOBMANAGER_Actions_SetFileReqPathAction_SetFileReqPath;
+	public static String ODEN_JOBMANAGER_Actions_SetFileReqPathAction_SetFileReqPathIcon;
+	public static String ODEN_JOBMANAGER_Actions_SetFileReqPathAction_SetFileReqPathToolTip;
+	public static String ODEN_JOBMANAGER_Dialogs_AddSetFileReqDialog_AddTitle;
+	public static String ODEN_JOBMANAGER_Dialogs_AddSetFileReqDialog_AddSubTitle;
+	public static String ODEN_JOBMANAGER_Dialogs_AddSetFileReqDialog_Description;
+	public static String ODEN_JOBMANAGER_Dialogs_AddSetFileReqDialog_EditTitle;
+	public static String ODEN_JOBMANAGER_Dialogs_AddSetFileReqDialog_EditSubTitle;
+	public static String ODEN_JOBMANAGER_Dialogs_SetFileReqDialog_Title;
+	public static String ODEN_JOBMANAGER_Dialogs_SetFileReqDialog_SubTitle;
+	public static String ODEN_JOBMANAGER_Wizards_AddFileReq_Title;
+	public static String ODEN_JOBMANAGER_Wizards_FileRequest_CofirmCancel;
+	public static String ODEN_JOBMANAGER_Wizards_FileRequest_CofirmFinish;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryPreView_Title;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryPreView_Description;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryPreView_DeployedItem;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryPreView_TotalItemCount;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryTree_Title;
+	public static String ODEN_JOBMANAGER_Wizards_RepositoryTree_Description;
+	public static String ODEN_JOBMANAGER_JobManagerView_TreeRoot_CurrentJob;
+	public static String ODEN_JOBMANAGER_JobManagerView_TreeRoot_CurrentJobIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_TreeRoot_FinishedJob;
+	public static String ODEN_JOBMANAGER_JobManagerView_TreeRoot_FinishedJobIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_CurrentJob_Run;
+	public static String ODEN_JOBMANAGER_JobManagerView_CurrentJob_Wait;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_Today;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_TodayIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_Week;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_WeekIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_Month;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_MonthIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_Long;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_LongIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_SuccessIcon;
+	public static String ODEN_JOBMANAGER_JobManagerView_FinishedJob_FailIcon;
+
+	public static String ODEN_LICENSE_LoginLicenseDialog_ButtonLicneseSave;
+	public static String ODEN_LICENSE_LoginLicenseDialog_ButtonTrial;
+	public static String ODEN_LICENSE_LoginLicenseDialog_ColumnID;
+	public static String ODEN_LICENSE_LoginLicenseDialog_ColumnLicense;
+	public static String ODEN_LICENSE_LoginLicenseDialog_ColumnName;
+	public static String ODEN_LICENSE_LoginLicenseDialog_ColumnOrg;
+	public static String ODEN_LICENSE_LoginLicenseDialog_LabelEnterLicense;
+	public static String ODEN_LICENSE_LoginLicenseDialog_LoginLicenseDialogDecription;
+	public static String ODEN_LICENSE_LoginLicenseDialog_LoginLicenseDialogTitle;
+	public static String ODEN_LICENSE_LoginLicenseDialog_LoginLicenseTitle;
+	public static String ODEN_LICENSE_LoginLicenseDialog_MsgAuthenticationFail;
+	public static String ODEN_LICENSE_LoginLicenseDialog_MsgAuthenticationFailDesc;
+	public static String ODEN_LICENSE_ModyfyLicense_ModifyLicenseDialogDesc;
+	public static String ODEN_LICENSE_ModyfyLicense_MsgLicenseAvailable;
+	public static String ODEN_LICENSE_ModyfyLicense_MsgLicenseNotAvailable;
+	public static String ODEN_LICENSE_ModyfyLicense_MsgLicenseNotExsit;
 
 	public static String ODEN_PREFERENCES_PreferencePage_Description_1;
 	public static String ODEN_PREFERENCES_PreferencePage_Description_2;
@@ -305,6 +456,8 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_SNAPSHOT_Dialogs_TextDlgMainInfo;
 	public static String ODEN_SNAPSHOT_Dialogs_TextDlgSubInfo;
 	public static String ODEN_SNAPSHOT_Dialogs_TextDlgTitle;
+	public static String ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText;
+	public static String ODEN_SNAPSHOT_SnapshotView_AgentLocSeperateSign;
 	public static String ODEN_SNAPSHOT_SnapshotView_ServerSelect;
 	public static String ODEN_SNAPSHOT_SnapshotView_ButtonAddPlan;
 	public static String ODEN_SNAPSHOT_SnapshotView_ButtonPlanDelete;
@@ -319,6 +472,7 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_SNAPSHOT_SnapshotView_ButtonTooltipTakeSnapshot;
 	public static String ODEN_SNAPSHOT_SnapshotView_ComboAgentDefault;
 	public static String ODEN_SNAPSHOT_SnapshotView_ContextManager;
+	public static String ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText;
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_CheckConnection;
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_ConnectBroker;
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_GetInfo;
@@ -331,7 +485,8 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotInfo;
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotDetailInfo;
 	public static String ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotPlanInfo;
-	public static String ODEN_SNAPSHOT_SnapshotView_FileSizeTail;
+	public static String ODEN_SNAPSHOT_SnapshotView_FileSizeTailKB;
+	public static String ODEN_SNAPSHOT_SnapshotView_FileSizeTailBytes;
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelDestAgent;
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelDestination;
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelFileDate;
@@ -342,17 +497,20 @@ public abstract class UIMessages extends NLS {
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelPlanName;
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelSourceLocation;
 	public static String ODEN_SNAPSHOT_SnapshotView_LabelUserInfo;
+	public static String ODEN_SNAPSHOT_SnapshotView_Exception_MsgAgentInfo;
 	public static String ODEN_SNAPSHOT_SnapshotView_MsgDlgRollback;
 	public static String ODEN_SNAPSHOT_SnapshotView_PlanGroupTitle;
 	public static String ODEN_SNAPSHOT_SnapshotView_RefreshURL;
 	public static String ODEN_SNAPSHOT_SnapshotView_RollbackIcon;
 	public static String ODEN_SNAPSHOT_SnapshotView_SnapshotGroupTitle;
+	public static String ODEN_SNAPSHOT_SnapshotView_SourceMapKeyAgent;
+	public static String ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar;
+	public static String ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath;
 	public static String ODEN_SNAPSHOT_SnapshotView_StatusMsg;
 	public static String ODEN_SNAPSHOT_SnapshotView_TakeSnapshotIcon;
 	public static String ODEN_SNAPSHOT_SnapshotView_TypeFilterText;
 	public static String ODEN_SNAPSHOT_SnapshotViewLabelProvider_PlanIcon;
 	public static String ODEN_SNAPSHOT_SnapshotViewLabelProvider_SnpahotIcon;
-
 	public static String ODEN_SNAPSHOT_TakeSnapshotPlanAction_1;
 
 	static {

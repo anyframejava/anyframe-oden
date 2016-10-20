@@ -16,20 +16,8 @@
  */
 package anyframe.oden.bundle.core.txmitter;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.log.LogService;
-
-import anyframe.oden.bundle.common.FatInputStream;
-import anyframe.oden.bundle.common.FileInfo;
-import anyframe.oden.bundle.common.FileUtil;
+import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.common.PairValue;
-import anyframe.oden.bundle.core.Logger;
 import anyframe.oden.bundle.deploy.DeployerService;
 import ch.ethz.iks.r_osgi.RemoteOSGiService;
 import ch.ethz.iks.r_osgi.RemoteServiceReference;
@@ -42,20 +30,10 @@ import ch.ethz.iks.r_osgi.URI;
  *
  */
 public class TransmitterImpl implements TransmitterService {
-	private BundleContext context;
-	
 	private RemoteOSGiService remoteService;
-	
-	protected void activate(ComponentContext context){
-		this.context = context.getBundleContext();
-	}
 	
 	protected void setRemoteOSGiService(RemoteOSGiService remote){
 		this.remoteService = remote;
-	}
-	
-	protected void unsetRemoteOSGiService(RemoteOSGiService remote){
-		this.remoteService = null;
 	}
 	
 	public TransmitterImpl() {
@@ -70,112 +48,46 @@ public class TransmitterImpl implements TransmitterService {
 	 * @throws OdenException 
 	 * @throws Exception 
 	 */
-	private DeployerService getDeployer(String addr) throws OdenException{
-		try{
-			if(remoteService != null){ 
-				final RemoteServiceReference[] refs = 
-					remoteService.getRemoteServiceReferences(
-						new URI("r-osgi://" + addr), DeployerService.class.getName(), null);
+	public DeployerService getDeployer(String addr){
+		URI uri = new URI("r-osgi://" + addr);
 		
-				if(refs != null && refs.length > 0)
-					return (DeployerService) remoteService.getRemoteService(refs[0]);
-			}		
+		// check if connection is available really
+		DeployerService ds = null;
+		try{
+			ds = getDeployer(uri);
+			if(ds == null) return null;
+			ds.alive();
 		}catch(Exception e){
-			throw new OdenException(e);
+			// try one more
+			try{
+				ds = getDeployer(uri);
+				if(ds == null) return null;
+				ds.alive();
+			}catch(Exception e2){
+				Logger.error(e2);
+				return null;
+			}
+		}
+		return ds;
+	}
+	
+//	private DeployerService getDeployer(URI uri) throws Exception{
+//		return new DeployerImpl();
+//	}
+	
+	private DeployerService getDeployer(URI uri) throws Exception{
+		if(remoteService != null){
+			final RemoteServiceReference[] refs = 
+				remoteService.getRemoteServiceReferences(uri, DeployerService.class.getName(), null);
+	
+			if(refs != null && refs.length > 0)
+				return (DeployerService) remoteService.getRemoteService(refs[0]);
 		}
 		return null;
 	}
 	
-	public boolean available(String addr){
-		try {
-			if(getDeployer(addr) != null)
-				return true;
-		} catch (OdenException e) {
-		}
-		return false;
+	public void disconnect(String addr) throws Exception{
+		if(remoteService != null)
+			remoteService.disconnect(new URI("r-osgi://" + addr));
 	}
-	
-	public List<String> deploy(String ip, String root, FatInputStream in, boolean update)
-			throws OdenException{
-		List<String> updatedfiles = Collections.EMPTY_LIST;
-		
-		DeployerService deployer = getDeployer(ip);
-		Logger.log(LogService.LOG_DEBUG, "Deployer for deploy: " + deployer);
-		try {
-			String destpath = FileUtil.combinePath(root, in.getFileInfo().getPath()); 
-			deployer.init(destpath, in.getFileInfo().lastModified(), update);
-			byte[] buf = new byte[1024*8];
-			int size = 0;
-			while((size = in.read(buf)) != -1){
-				deployer.write(buf, size);
-			}
-		} catch(Exception e){
-			throw new OdenException(e);
-		}finally {
-			try {
-				long sz = deployer.close(updatedfiles);
-				 if(sz != in.size())
-					 throw new OdenException("Fail to deploy file: " + in.getPath());
-			} catch (IOException e) {
-				throw new OdenException(e);
-			}
-		}	
-		return updatedfiles;
-	}
-
-	/**
-	 * get date for path on which ip's destRoot.
-	 * 
-	 * @throws OdenException 
-	 */
-	public long getDate(String ip, String destRoot, String path) throws OdenException {
-		DeployerService deployer = getDeployer(ip);
-		return deployer.getDate(destRoot, path);
-	}
-
-	
-	/**
-	 * @param ip
-	 * @param srcLoc
-	 * @param repoFile
-	 * @return size of the archive
-	 */
-	public FileInfo backup(String ip, String srcLoc, String repoLoc) 
-			throws OdenException {
-		DeployerService deployer = getDeployer(ip);
-		Logger.log(LogService.LOG_DEBUG, "Deployer for backup: " + deployer);
-		try{
-			return deployer.compress(srcLoc, repoLoc);
-		}catch (Exception e){
-			throw new OdenException(e);
-		}
-	}
-
-	public void removeSnapshot(String ip, String repoLoc, String snapshot)
-			throws OdenException {
-		DeployerService deployer = getDeployer(ip);
-		try {
-			deployer.removeFile(repoLoc, snapshot);	
-		} catch (Exception e) {
-			throw new OdenException(e);
-		}
-	}
-
-	/**
-	 * @return relative paths of deployed files.
-	 */
-	public List<PairValue<String, Boolean>> restore(String ip, String repoLoc, String snapshot,
-			String dest) throws OdenException {
-		List<PairValue<String, Boolean>> restoredfiles = null;
-		DeployerService deployer = getDeployer(ip);
-		try {
-			restoredfiles = deployer.extract(repoLoc, snapshot, dest);
-		} catch(OdenException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new OdenException(e);
-		}	
-		return restoredfiles;
-	}
-	
 }

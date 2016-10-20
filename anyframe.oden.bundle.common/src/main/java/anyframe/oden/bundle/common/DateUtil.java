@@ -29,10 +29,23 @@ import java.util.Date;
 public class DateUtil {
 	public final static String DATE_PATTERN = "yyyy.MM.dd HH:mm:ss";
 	
+	/**
+	 * convert long date to String date with the format yyyy.MM.dd HH:mm:ss
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public static String toStringDate(long date) {
 		return new SimpleDateFormat(DATE_PATTERN).format(new Date(date));
 	}
 	
+	/**
+	 * convert the string which is formated with yyy.MM.dd HH:mm:ss to long date.
+	 * 
+	 * @param s
+	 * @return
+	 * @throws ParseException
+	 */
 	public static long toLongDate(String s) throws ParseException {
 		return new SimpleDateFormat(DATE_PATTERN).parse(s).getTime();
 	}

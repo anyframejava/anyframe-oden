@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.editors.actions;
@@ -46,7 +48,7 @@ public class SavePolicyAction extends AbstractEditorsAction {
 	/**
 	 * 
 	 */
-	private static final String MSG_POLICY_SAVE = CommandMessages.ODEN_EDITORS_PolicyPage_MsgPolicySave;
+	private static final String MSG_POLICY_SAVE = CommandMessages.ODEN_CLI_COMMAND_policy_add;
 	private static final String FTP_PROT = "ftp://";
 	private static final String FILE_PROT = "file://";
 	protected OdenBrokerService OdenBroker = new OdenBrokerImpl();
@@ -64,45 +66,68 @@ public class SavePolicyAction extends AbstractEditorsAction {
 	public void run(String title) {
 		PolicyPage page = OdenEditor.getDefault(title).getPolicypage();
 		String commnd = "";
+		String repoType = "";
 		PolicyDetails details = null;
 
-		String repoType = page.getRepoKind().getText().equals(
-				CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem) ? "fs"
-						: "ftp";
-
+		if(! page.getRepoKind().getText().equals("")) 
+			repoType = page.getRepoKind().getText().equals(
+			CommonMessages.ODEN_ALIAS_RepositoryManager_ProtocolSet_FileSystem) ? "file server" : "ftp";
+		
 		String deployUrl = "";
 		String dCommand = "";
 		String locationVal = "";
+		String location = "";
 		String updateOpt = "-u";
 		int size = page.getDeployViewer().getTable().getItemCount();
-		
+		// agent info
 		for (int i = 0; i < size; i++) {
 			TableItem item = page.getDeployViewer().getTable().getItem(i);
 			details = (PolicyDetails) item.getData();
 			deployUrl = details.getDeployUrl();
-
 			locationVal = details.getLocationVar();
-			if(!(locationVal == null))
-				dCommand = dCommand + deployUrl + "/"+ locationVal + " ";
-			else
-				dCommand = dCommand + deployUrl + " ";
+			location = details.getLocation()==null ?"" : details.getLocation();
+			
+			if(locationVal.equals(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault)) { 
+				// Default Location
+				if(location.equals("")){
+					dCommand = dCommand + '"' + deployUrl + ":~" + '"' + " ";
+				} else {
+					// using Location path
+					dCommand = dCommand + '"' + deployUrl + ":~" + "/" + location + '"'  + " ";
+				}
+			} else if(locationVal.equals(UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboAbsolutePath)) {
+				// absolute path
+				dCommand = dCommand + '"' + deployUrl + ":/"+ details.getLocation() + '"'  + " ";
+			} else {
+				// using location variable
+				if(location.equals("")){
+					dCommand = dCommand + '"' + deployUrl + ":$"+ locationVal + '"'  + " ";
+				} else {
+					// using Location path
+					dCommand = dCommand + '"' + deployUrl + ":$"+ locationVal + "/" + location + '"'  + " ";
+				}
+			}
 		}
 
 		if (repoType
-				.equals(UIMessages.ODEN_EDITORS_PolicyPage_Repo_Kind1))
+				.equals(UIMessages.ODEN_EDITORS_PolicyPage_Repo_Kind1) && ! page.getDeleteOptionRequired().getSelection())
 			commnd = MSG_POLICY_SAVE + " " + '"' + page.getPolicyNameText().getText() + '"' + " "
 			+ "-r " + FTP_PROT + page.getBuildRepoUriText().getText() + " "
 			+ page.getBuildRepoRootText().getText() + " "
 			+ '"' + page.getUserField().getText() + '"' + " " + '"' + page.getPasswordField().getText() + '"' 
 			+ " " + "-d" + " " + dCommand ;
-		else
+		else if (repoType
+				.equals(UIMessages.ODEN_EDITORS_PolicyPage_Repo_Kind2) && ! page.getDeleteOptionRequired().getSelection() )
 			commnd = MSG_POLICY_SAVE + " " + '"' + page.getPolicyNameText().getText()
 			+ '"' + " " + "-r " + FILE_PROT
-			+ page.getBuildRepoRootText().getText() + " " + "-d" + " " + dCommand;
-
+			+ page.getBuildRepoRootText().getText() + " " + "-d" + " "  + dCommand ;
+		else if(repoType.equals("") && page.getDeleteOptionRequired().getSelection())
+			commnd = MSG_POLICY_SAVE + " " + '"' + page.getPolicyNameText().getText()
+			+ '"' + " " + "-d" + " "  + dCommand + " " + CommandMessages.ODEN_CLI_OPTION_delete;
+		
 		if (!(page.getDescriptionText().getText().equals(""))) {
-			commnd = commnd + "-desc" + " " + '"' + page.getDescriptionText().getText() + '"';
-		}
+			commnd = commnd + " " + "-desc" + " " + '"' + page.getDescriptionText().getText() + '"';
+		} 
 
 		if (!(page.getIncludeText().getText().equals(""))) {
 			String include = " " + "-i" + " " + changeCludeValue(page.getIncludeText().getText());
@@ -112,13 +137,13 @@ public class SavePolicyAction extends AbstractEditorsAction {
 			String exclude = " " + "-e" + " " + changeCludeValue(page.getExcludeText().getText());
 			commnd = commnd + exclude;
 			// default exclude (.svn, CVS)
-			String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(",");
+			String[] hiddenFolder = CommandMessages.ODEN_CLI_OPTION_hiddenfolder.split(",");
 			for(String val : hiddenFolder) {
 				commnd = commnd + " " + '"' + "**/" + val + "/**" + '"' ; 
 			}
 		} else {
 			// default exclude (.svn, CVS)
-			String[] hiddenFolder = CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(",");
+			String[] hiddenFolder = CommandMessages.ODEN_CLI_OPTION_hiddenfolder.split(",");
 			commnd = commnd + " " + "-e" ;
 			for(String val : hiddenFolder) {
 				commnd = commnd  + " " + '"' + "**/" + val + "/**" + '"'; 
@@ -126,9 +151,9 @@ public class SavePolicyAction extends AbstractEditorsAction {
 		}
 		// update option check
 		if(page.getUpdateOptionRequired().getSelection()){
-			commnd = commnd + " " + updateOpt + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+			commnd = commnd + " " + updateOpt + " " + CommandMessages.ODEN_CLI_OPTION_json;
 		} else {
-			commnd = commnd + " " + CommandMessages.ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
+			commnd = commnd + " " + CommandMessages.ODEN_CLI_OPTION_json;
 		}
 		try {
 			OdenBroker.sendRequest(page.getShellUrl(), commnd);

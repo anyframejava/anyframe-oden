@@ -1,28 +1,37 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 
 import anyframe.oden.eclipse.core.OdenActivator;
+import anyframe.oden.eclipse.core.OdenException;
 import anyframe.oden.eclipse.core.alias.Server;
 
 /**
@@ -43,7 +52,15 @@ public class CommonUtil {
 	public void setSHELL_URL(String sHELLURL) {
 		SHELL_URL = sHELLURL;
 	}
-
+	
+	public void setSHELL_URL(final Combo serverCombo) {
+		SHELL_URL = "http://" 
+			+ OdenActivator.getDefault().getAliasManager()
+			.getServerManager().getServer(
+					serverCombo.getText()).getUrl()
+					+ "/shell"; 
+	}
+	
 	public CommonUtil() {}
 
 	/**
@@ -106,5 +123,65 @@ public class CommonUtil {
 						+ "/shell"; 
 		} 
 	}
-
+	
+	/*
+	 * Oden Explorer view TreeObject TreeObject filename & Date return 
+	 */
+	public String[] getTreeObjectSplitElement ( String treeobject ) {
+		String[] returnArr = new String[2];
+		Pattern pattern = Pattern.compile("\\p{Punct}\\d{4}.\\d{1,2}.\\d{1,2} \\d{2}:\\d{2}:\\d{2}\\p{Punct}");
+		Matcher matcher = pattern.matcher(treeobject);
+		
+		
+		if(matcher.find()) {
+			returnArr[0] = matcher.group();
+			returnArr[1] = matcher.replaceAll("");
+			
+			return  returnArr;
+		} else	
+			return returnArr;
+		
+	}
+	/**
+	 * return today's date  
+	 */
+	public String getDateFormat(String argFormat) throws OdenException {
+		if (argFormat == null || argFormat.length() == 0)
+			throw new OdenException();
+	
+		String returnStr = null;
+		DateFormat df = new SimpleDateFormat(argFormat);
+		Calendar cal = Calendar.getInstance();
+		returnStr = df.format(cal.getTime());
+	
+		return returnStr;
+	}
+	
+	/**
+	 * return the date 1week ago  
+	 */
+	public String getWeekDateFormat(String argFormat) {
+		DateFormat df = new SimpleDateFormat(argFormat);
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, -7);
+		
+		return df.format(cal.getTime());
+	}
+	
+	/**
+	 * return the date 1week ago  
+	 */
+	public Date getWeekDate() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, -7);
+		
+		return cal.getTime();
+	}
+	
+	/**
+	 * return  millisecond value
+	 */
+	public long getMilliseconds() {
+		return Calendar.getInstance().getTimeInMillis();
+	}
 }

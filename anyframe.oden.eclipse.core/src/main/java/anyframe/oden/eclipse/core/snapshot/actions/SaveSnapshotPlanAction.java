@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.snapshot.actions;
@@ -64,45 +66,48 @@ public class SaveSnapshotPlanAction extends AbstractSnapshotViewAction {
 
 			String selection = OdenActivator.getDefault().getSnapshotView()
 					.getSelected()[0].toString();
-			String target = SnapshotView.targetLocation;
+			String source = SnapshotView.sourceLocation;
 			String destAgent = SnapshotView.destAgent;
-			String dest = SnapshotView.destination;
 			String desc = SnapshotView.description;
 
-			if(target.equalsIgnoreCase(dest)){
-				DialogUtil.openMessageDialog(
-						UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoAddPlan,
-						UIMessages.ODEN_SNAPSHOT_Actions_MsgInfoSameDestSource,
-						MessageDialog.INFORMATION);
-			}else{
-				String msg = CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdHead
+			String msg = "";
+			if(source.equals("") || source==null){ //default-location
+				msg = CommandMessages.ODEN_CLI_COMMAND_snapshot_add + " " 
 				+ "\"" //$NON-NLS-1$
 				+ selection
-				+ "\"" + " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdSource + " /" //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-6$
-				+ target
-				+ " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDest + " " + destAgent + "/" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				+ dest
-				+ " " + CommandMessages.ODEN_SNAPSHOT_Dialogs_NewPlanCmdDesc + " " + "\"" + desc + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ "\"" + " " + CommandMessages.ODEN_CLI_OPTION_plansource + " " + destAgent //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-6$
+				+ " "
+				+ CommandMessages.ODEN_CLI_OPTION_desc + " " + "\"" + desc + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ " -json"; //$NON-NLS-1$
-				
-				if (DialogUtil.confirmMessageDialog(
-						CommonMessages.ODEN_CommonMessages_Title_ConfirmSave,
-						UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgAlertSavePlan)) {
-					try {
-						SnapshotViewContentProvider.doOdenBroker(SnapshotView.SHELL_URL,
-								msg);
-					} catch (OdenException e) {
-						OdenActivator
-						.error(
-								UIMessages.ODEN_SNAPSHOT_Actions_Exception_SaveSnapshotPlan,
-								e);
-						SnapshotView.clearComposite();
-					}
-				}
-				
-				SnapshotView.refreshTree();
+			}else{ //non default-location
+				msg = CommandMessages.ODEN_CLI_COMMAND_snapshot_add + " " 
+				+ "\"" //$NON-NLS-1$
+				+ selection
+				+ "\"" + " " + CommandMessages.ODEN_CLI_OPTION_plansource + " " + destAgent //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-6$
+				+ ":"
+				+ source
+				+ " " + CommandMessages.ODEN_CLI_OPTION_desc + " " + "\"" + desc + "\"" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ " -json"; //$NON-NLS-1$
 			}
 			
+
+			if (DialogUtil.confirmMessageDialog(
+					CommonMessages.ODEN_CommonMessages_Title_ConfirmSave,
+					UIMessages.ODEN_SNAPSHOT_Actions_MsgDlgAlertSavePlan)) {
+				try {
+					SnapshotViewContentProvider.doOdenBroker(
+							SnapshotView.SHELL_URL, msg);
+				} catch (OdenException e) {
+					OdenActivator
+							.error(
+									UIMessages.ODEN_SNAPSHOT_Actions_Exception_SaveSnapshotPlan,
+									e);
+					SnapshotView.clearComposite();
+				}
+
+				SnapshotView.refreshTree();
+			}
+
 		}
 	}
 

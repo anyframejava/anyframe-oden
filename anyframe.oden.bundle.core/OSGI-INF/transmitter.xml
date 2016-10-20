@@ -9,7 +9,6 @@
          cardinality="0..1"
          policy="dynamic"
          bind="setRemoteOSGiService"
-         unbind="unsetRemoteOSGiService"
    />
 </component>   
 

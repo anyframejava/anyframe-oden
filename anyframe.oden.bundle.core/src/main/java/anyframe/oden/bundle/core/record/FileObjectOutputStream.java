@@ -36,6 +36,12 @@ public class FileObjectOutputStream extends FileOutputStream {
 		super(file, append);
 	}
 
+	/**
+	 * append object to the file
+	 * 
+	 * @param o
+	 * @throws IOException
+	 */
 	public void writeObject(Object o) throws IOException{
 		ObjectOutputStream oos = null;
 		try{

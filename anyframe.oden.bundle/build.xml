@@ -1,6 +1,6 @@
 <project name="Oden" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe.oden.bundle" />
-	<property name="version" value="1.0.0.PRE1"/>
+	<property name="version" value="1.1.0"/>
 	
 	<property name="service.src" location="${basedir}/src/main/java"/>
 	<property name="service.build" location="${basedir}/build"/>		
@@ -31,6 +31,24 @@
 		<copy todir="${dist}">
 			<fileset dir="${basedir}/bundle" excludes="anyframe*"/>
 		</copy>
+	</target>
+	
+	<target name="dist.src.bundle">
+		<antcall target="compile.service"/>
+		<copy todir="${service.build}/src">
+			<fileset dir="${basedir}/src/main/java" includes="**/*" excludes="**/*.svn"/>
+		</copy>
+		<jar destfile="${dist}/oden-${version}.jar" basedir="${service.build}" 
+			manifest="${basedir}/META-INF/MANIFEST.MF" />
+		<copy todir="${dist}">
+			<fileset dir="${basedir}/bundle" excludes="anyframe*"/>
+		</copy>
+	</target>
+	
+	<target name="all-local-src">
+		<property name="bundle.loc" value="../anyframe.oden.bundle/bundle"/>
+		<property name="dist" location="${basedir}/dist"/>
+		<antcall target="dist.src.bundle"/>
 	</target>
 	
 	<target name="all-local">

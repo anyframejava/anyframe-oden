@@ -2,27 +2,30 @@
 <component name="PolicyCommand" immediate="true" >
 	<implementation class="anyframe.oden.bundle.core.command.PolicyCommandImpl"/>
 	<service>
-		<provide interface="org.ungoverned.osgi.service.shell.Command"/>
+		<provide interface="anyframe.common.bundle.gate.CustomCommand"/>
 	</service>
-	<reference name="DELEGATE_SERVICE"
-         interface="anyframe.oden.bundle.core.DelegateService"
-         cardinality="0..1"
+	<reference name="REPOSITORY_PROVIDER_SERVICE"
+         interface="anyframe.oden.bundle.core.RepositoryProviderService"
+         cardinality="1..1"
          policy="dynamic"
-         bind="setDelegateService"
-         unbind="unsetDelegateService"
+         bind="setRepositoryProvider"
    />
    <reference name="PERSISTENCE_SERVICE"
-         interface="anyframe.oden.bundle.prefs.PrefsService"
-         cardinality="0..1"
+         interface="anyframe.oden.bundle.core.prefs.PrefsService"
+         cardinality="1..1"
          policy="dynamic"
          bind="setPrefsService"
-         unbind="unsetPrefsService"
    />	
    <reference name="ODEN_CONFIG_SERVICE"
          interface="anyframe.oden.bundle.core.config.OdenConfigService"
-         cardinality="0..1"
+         cardinality="1..1"
          policy="dynamic"
          bind="setConfigService"
-         unbind="unsetConfigService"
+   />
+   <reference name="TRANSMITTER_SERVICE"
+         interface="anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
    />
 </component>

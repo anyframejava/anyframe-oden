@@ -41,7 +41,7 @@ public class PropertiesUtil {
 		InputStream in = null;
 		try {
 			File f = new File(name);
-			if(!f.exists()) createNewFile(f);
+			FileUtil.mkdirs(f);
 			
 			in = new BufferedInputStream(
 					new FileInputStream(f));
@@ -66,20 +66,12 @@ public class PropertiesUtil {
 		return buf.toString();
 	}
 	
-	private static boolean createNewFile(File f) throws IOException {
-		File parent = f.getParentFile();
-		if (!parent.exists()) {
-			parent.mkdirs();
-		}
-		return f.createNewFile();
-	}
-	
 	public static void storeProperties(String name, Properties prop) 
 			throws FileNotFoundException, IOException {
 		OutputStream out = null;
 		try {
 			File f = new File(name);
-			if(!f.exists()) createNewFile(f);
+			FileUtil.mkdirs(f);
 			
 			out = new BufferedOutputStream(
 					new FileOutputStream(f));

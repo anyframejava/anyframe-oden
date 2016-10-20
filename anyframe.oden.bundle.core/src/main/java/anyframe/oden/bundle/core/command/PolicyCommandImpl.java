@@ -16,26 +16,38 @@
  */
 package anyframe.oden.bundle.core.command;
 
+import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
+import anyframe.oden.bundle.common.ArraySet;
+import anyframe.oden.bundle.common.Assert;
+import anyframe.oden.bundle.common.FatInputStream;
+import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.JSONUtil;
+import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
-import anyframe.oden.bundle.core.FileMap;
-import anyframe.oden.bundle.core.Logger;
-import anyframe.oden.bundle.core.Policy;
-import anyframe.oden.bundle.prefs.Prefs;
+import anyframe.oden.bundle.core.AgentLoc;
+import anyframe.oden.bundle.core.DeployFile;
+import anyframe.oden.bundle.core.DeployFileUtil;
+import anyframe.oden.bundle.core.Repository;
+import anyframe.oden.bundle.core.RepositoryProviderService;
+import anyframe.oden.bundle.core.DeployFile.Mode;
+import anyframe.oden.bundle.core.prefs.Prefs;
+import anyframe.oden.bundle.core.repository.RepositoryService;
+import anyframe.oden.bundle.core.txmitter.DeployerHelper;
+import anyframe.oden.bundle.core.txmitter.TransmitterService;
+import anyframe.oden.bundle.deploy.DeployerService;
 
 /**
  * Oden shell command to manipulate Oden's Policies.
@@ -59,6 +71,28 @@ public class PolicyCommandImpl extends OdenCommand {
 	public final static String[] DEST_OPT = {"dest", "d"};
 	
 	public final static String[] DESC_OPT = {"desc"};
+	
+	public final static String[] DELETE_OPT = {"del"};
+
+	
+	private BundleContext context;
+	
+	protected void activate(ComponentContext context){
+		this.context = context.getBundleContext();
+	}
+	
+	
+	protected RepositoryProviderService repositoryProvider;
+	
+	protected void setRepositoryProvider(RepositoryProviderService r){
+		this.repositoryProvider = r;
+	}
+
+	private TransmitterService txmitterService;
+	
+	protected void setTransmitterService(TransmitterService tx){
+		this.txmitterService = tx;
+	}
 
 	public PolicyCommandImpl(){
 	}
@@ -110,9 +144,18 @@ public class PolicyCommandImpl extends OdenCommand {
 					throw new OdenException("Couldn't execute command.");
 				
 				String policyName = cmd.getActionArg();
-				ja = doTestAction(policyName);
-				if(!isJSON)
-					consoleResult = formatTest(ja);
+				Set<DeployFile> dfiles = doTestAction(policyName);
+				if(isJSON){
+					ja.put(dfiles);
+				} else {
+					StringBuffer buf = new StringBuffer();
+					for(DeployFile dfile : dfiles){
+						buf.append(DeployFileUtil.modeToString(dfile.mode()) +  ": " + 
+								dfile.getRepo().toString() + " " + dfile.getPath() + 
+								" >> " + dfile.getAgent().agentName() + "\n");
+					}
+					consoleResult = buf.toString();
+				}
 			}else if(action.length() == 0 || Cmd.HELP_ACTION.equals(action)){
 				consoleResult = getFullUsage();
 			}else {
@@ -148,7 +191,7 @@ public class PolicyCommandImpl extends OdenCommand {
 	}
 
 	private void addPolicy(String policyName, String args) throws OdenException {
-		Cmd policyInfo = new Cmd(policyName, args);
+		Cmd policyInfo = new Cmd("c a \"" + policyName + "\" " + args);
 		
 		// dests is defined in config.xml ?
 		String[] destargs = policyInfo.getOptionArgArray(PolicyCommandImpl.DEST_OPT);
@@ -156,8 +199,10 @@ public class PolicyCommandImpl extends OdenCommand {
 			new AgentLoc(destarg, configService);
 		}
 		
-		if(!delegateService.availableRepository(
-				policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT)))
+		String[] repos = policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT);
+		if(repos.length == 0 && policyInfo.getOption(PolicyCommandImpl.DELETE_OPT) == null)
+			throw new OdenException("-repo or -del option is required.");
+		if(repos.length > 0 && !repositoryProvider.availableRepository(repos))
 			throw new OdenException("Invalid repository arguments: " + policyInfo.getOption(
 					PolicyCommandImpl.REPO_OPT).toString());
 		
@@ -167,16 +212,16 @@ public class PolicyCommandImpl extends OdenCommand {
 	private void validateDestination(String[] destargs) throws OdenException {
 		for(String destarg : destargs){
 			AgentLoc agent = new AgentLoc(destarg, configService);
-			if(!delegateService.availableAgent(agent))
+			if(txmitterService.getDeployer(agent.agentAddr()) == null)
 				throw new OdenException("Couldn't access the agent: " + destarg);
 		}
 	}
 
-	private void validateRepository(String[] repoargs) throws OdenException {
+	private void availableRepository(Repository repo) throws OdenException {
 		try {
-			delegateService.getFilesFromRepo(repoargs);
+			repositoryProvider.getFilesFromRepo(repo.args());
 		} catch (OdenException e) {
-			throw new OdenException("Couldn't access the repository: " + Arrays.toString(repoargs));
+			throw new OdenException("Couldn't access the repository: " + repo);
 		}
 	}
 	
@@ -206,50 +251,119 @@ public class PolicyCommandImpl extends OdenCommand {
 		return arr;
 	}	
 	
-	public void preview(Map<List<String>, FileMap> repomap, Cmd policyInfo) throws OdenException{
-		String[] repo = policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT);
+	public void preview(Set<DeployFile> dfiles, Cmd policyInfo) throws OdenException {
+		Repository repo = new Repository(
+				policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT));
 		List<String> includes = policyInfo.getOptionArgList(PolicyCommandImpl.INCLUDE_OPT);
 		List<String> excludes = policyInfo.getOptionArgList(PolicyCommandImpl.EXCLUDE_OPT);
 		boolean update = policyInfo.getOption(PolicyCommandImpl.UPDATE_OPT) != null;
 		List<String> dests = policyInfo.getOptionArgList(PolicyCommandImpl.DEST_OPT);
+		boolean del = policyInfo.getOption(PolicyCommandImpl.DELETE_OPT) != null;
 		if(includes.size() <1 || dests.size() <1)
 			throw new OdenParseException(policyInfo.toString());
 					
-		List<AgentLoc> agents = new ArrayList<AgentLoc>();
+		Set<AgentLoc> agents = new ArraySet<AgentLoc>();
 		for(String destargs : dests){
 			AgentLoc ra = new AgentLoc(destargs, configService);
 			if(!agents.contains(ra))
 				agents.add(ra);
 		}
-		
-		validateRepository(repo);
-		
-		delegateService.preview(repomap, repo, includes, excludes, update, agents);
-	}
-	
-	public void deploy(Map<List<String>, FileMap> repomap, Cmd policyInfo, 
-			String user, PrintStream out) throws OdenException {
-		String[] repo = policyInfo.getOptionArgArray(PolicyCommandImpl.REPO_OPT);
-		boolean update = policyInfo.getOption(PolicyCommandImpl.UPDATE_OPT) != null;
 
-		FileMap files = repomap.get(Arrays.asList(repo));
-		if(files == null)
-			throw new OdenException("Couldn't find any files to deploy from: " + Arrays.toString(repo));
-		
-		delegateService.deploy(new Policy(repo, files, update, user), System.currentTimeMillis(), out);
+		if(del){
+			Assert.check(repo.args().length == 0, "When removing files, -r option is not allowed.");
+			previewToRemove(dfiles, includes, excludes, agents);
+		} else{
+			availableRepository(repo);
+			preview(dfiles, repo, includes, excludes, update, agents);
+		}
 	}
 	
-	private JSONArray doTestAction(String policyName) throws OdenException{
-		Map<List<String>, FileMap> repomap = new HashMap<List<String>, FileMap>();
-		preview(repomap, infoCmd(policyName));
-		
-		JSONArray ja = new JSONArray();
-		try {
-			ja = JSONUtil.jsonArray(repomap);
-		} catch (JSONException e) {
-			throw new OdenException(e);
+	private void previewToRemove(Set<DeployFile> dfiles, List<String> includes, 
+			List<String> excludes, Set<AgentLoc> agents) throws OdenException {
+		for(AgentLoc agent : agents) {		
+			try{
+				DeployerService ds = txmitterService.getDeployer(agent.agentAddr());			
+				if(ds == null)
+					throw new OdenException("Couldn't connect to the agent: " + 
+							agent.agentName() + "(" + agent.agentAddr() + ")");
+				
+				List<String> fs = ds.resolveFileRegex(agent.location(), includes, excludes);
+				for(String path : fs){
+					FileInfo f = ds.fileInfo(agent.location(), path);
+					if(!ds.writable(agent.location(), path))
+						throw new OdenException("Not writable file.");
+					DeployFileUtil.updateDeployFiles(dfiles, 
+							DeployFileUtil.beRemovedFile(
+									agent, path, f.size(), f.lastModified()));
+				}
+			}catch(Exception e){
+				// put files which will not be removed.
+				for(String s : includes){
+					DeployFileUtil.updateDeployFiles(dfiles, 
+							DeployFileUtil.notBeRemovedFile(agent, s, e));			
+				}
+				Logger.error(e);
+			}
 		}
-		return ja;
+	}
+	
+	private void preview(Set<DeployFile> dfiles, 
+			Repository repo, List<String> includes, List<String> excludes,
+			boolean update, Set<AgentLoc> agents) throws OdenException {
+		RepositoryService reposvc = repositoryProvider.getRepoServiceByURI(repo.args());
+		if(reposvc == null)
+			throw new OdenException("Couldn't find a RepositoryService for " + repo.toString());
+		
+		DeployerManager deployerMgr = new DeployerManager(context, null, false);
+		
+		List<String> files = reposvc.resolveFileRegex(repo.args(), includes, excludes);
+		for(String file : files){
+			FatInputStream in = null;
+			try{
+				in = reposvc.resolve(repo.args(), file);			
+				if(in == null)
+					throw new OdenException("Couldn't find that file: " + file);
+				
+				for(AgentLoc agent : agents) {	
+					try{
+						DeployerService ds = deployerMgr.getDeployer(agent.agentAddr());
+						if(ds == null)
+							throw new OdenException("Couldn't connect to the agent: " + 
+									agent.agentName() + "(" + agent.agentAddr() + ")");
+						Mode m = Mode.NA;
+						if(ds.exist(agent.location(), in.getPath()) ) {
+							if(!ds.writable(agent.location(), in.getPath()))
+								throw new OdenException("Not writable file.");
+							if(update && !DeployerHelper.isNewFile(ds, in.getLastModified(), 
+									agent.location(), in.getPath()))
+								continue;
+							m = Mode.UPDATE;
+						}else {
+							m = Mode.ADD;
+						}
+						DeployFileUtil.updateDeployFiles(dfiles, 
+								new DeployFile(repo, file, agent, in.size(), in.getLastModified(), m) );
+					}catch(Exception e){
+						DeployFileUtil.updateDeployFiles(dfiles, 
+								DeployFileUtil.notBeDeployedFile(repo, in.getPath(), agent, e) );
+					}
+				}
+			}catch(OdenException e){
+				for(AgentLoc agent : agents) {	
+					DeployFileUtil.updateDeployFiles(dfiles, 
+							DeployFileUtil.notBeDeployedFile(repo, file, agent, e) );
+				}
+			}finally{
+				try { if(in != null) in.close(); } catch (IOException e) { }
+			}
+		}
+		reposvc.close(repo.args());
+	}
+	
+	private Set<DeployFile> doTestAction(String policyName) throws OdenException{
+		Set<DeployFile> dfiles = new ArraySet<DeployFile>();
+		preview(dfiles, infoCmd(policyName));
+		return dfiles;
 	}
 	
 	private String formatTest(JSONArray ja) throws JSONException {
@@ -283,11 +397,11 @@ public class PolicyCommandImpl extends OdenCommand {
 	
 	public String getFullUsage() throws OdenException {
 		return getName() + " " + Cmd.ADD_ACTION + " <policy-name> " + 
-				"\n\t-r[epo] " + getRepositoryUsages() + " " + 
+				"\n\t[-r[epo] " + getRepositoryUsages() + "] " + 
 				"\n\t-i[nclude]" + " <wildcard-location> ... " +
 				"[" + "-e[xclude]" + " <wildcard-location> ...] " + 
-				"\n\t[" + "-u[pdate]" + "] " + 
-				"\n\t-d[est]" + " <agent-name>[/<location-variable-name>] ... " + 
+				"\n\t[" + "-u[pdate] | -del" + "] " + 
+				"\n\t-d[est]" + " <agent-name>:<$<location-var>[/<path> | ~[/<path>] | <absolute-path>]> ... " + 
 				"\n\t[" + "-desc" + " <description>]" + "\n" +
 				getName() + " " + Cmd.INFO_ACTION + " [<policy-name>]" + "\n" +
 				getName() + " " + Cmd.REMOVE_ACTION + " <policy-name>" + "\n" + 
@@ -296,7 +410,7 @@ public class PolicyCommandImpl extends OdenCommand {
 	
 	private String getRepositoryUsages() throws OdenException {
 		StringBuffer usages = new StringBuffer();
-		for(Iterator<String> it = delegateService.getRepositoryUsages().iterator(); it.hasNext();) {
+		for(Iterator<String> it = repositoryProvider.getRepositoryUsages().iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");
 			if(it.hasNext())
 				usages.append(" | ");

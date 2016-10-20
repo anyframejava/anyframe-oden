@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core;
@@ -55,6 +57,7 @@ public class OdenTrees {
 			return getName();
 		}
 
+		@SuppressWarnings("unchecked")
 		public Object getAdapter(Class adapter) {
 			return null;
 		}
@@ -88,5 +91,53 @@ public class OdenTrees {
 		}
 
 	}
+	
+	public static class ServerRootParent extends TreeParent {
+		
+		public ServerRootParent(String name) {
+			super(name);
+		}
+	}
+	
+	public static class ServerParent extends TreeParent {
+		
+		public ServerParent(String name) {
+			super(name);
+		}
+	}
+	
+	public static class ServerChild extends TreeObject {
+		
+		public ServerChild(String name) {
+			super(name);
+		}
+	}
+	
+	public static class RepoRootParent extends TreeParent {
+		
+		public RepoRootParent(String name) {
+			super(name);
+		}
+	}
 
+	public static class RepoParent extends TreeParent {
+		
+		public RepoParent(String name) {
+			super(name);
+		}
+	}
+	
+	public static class RepoDirectory extends TreeParent {
+		
+		public RepoDirectory(String name) {
+			super(name);
+		}
+	}
+
+	public static class RepoFile extends TreeObject {
+		
+		public RepoFile(String name) {
+			super(name);
+		}
+	}
 }

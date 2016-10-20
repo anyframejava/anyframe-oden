@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.snapshot;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
@@ -41,6 +44,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -77,6 +81,7 @@ import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.messages.CommandMessages;
+import anyframe.oden.eclipse.core.messages.CommonMessages;
 import anyframe.oden.eclipse.core.messages.UIMessages;
 import anyframe.oden.eclipse.core.snapshot.actions.DeleteSnapshotAction;
 import anyframe.oden.eclipse.core.snapshot.actions.DeleteSnapshotPlanAction;
@@ -103,13 +108,19 @@ public class SnapshotView extends ViewPart {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = OdenActivator.PLUGIN_ID + ".snapshot.SnapshotView";
+	public static final String ID = OdenActivator.PLUGIN_ID
+			+ ".snapshot.SnapshotView"; //$NON-NLS-1$
 
 	protected static OdenBrokerService OdenBroker = new OdenBrokerImpl();
 
 	private static Composite compositeWhole;
 	private static Combo serverCombo;
 	private static Composite compositeCombo;
+	private HashMap<String, String> hm;
+	private HashMap<String, String> locVariable;
+	private Combo agentCombo;
+	private Combo locationVar;
+	private Text sourceLocPathText;
 
 	protected static Composite compositeDetail;
 	protected static String inputText;
@@ -120,14 +131,13 @@ public class SnapshotView extends ViewPart {
 	public static TreeViewer viewer;
 	public static String SHELL_URL;
 	public static String selectedName;
-	public static String targetLocation;
+	public static String sourceLocation;
 	public static String destAgent;
 	public static String destination;
 	public static String description;
 
 	public String agentChosen;
 
-	private static String[] DEST_OPT = { "dest", "d" }; //$NON-NLS-1$ //$NON-NLS-2$
 	private static String[] SOURCE_OPT = { "source", "s" }; //$NON-NLS-1$ //$NON-NLS-2$
 	private static String[] SIZE_OPT = { "size" }; //$NON-NLS-1$
 	private static String[] USER_OPT = { "_user" }; //$NON-NLS-1$
@@ -167,10 +177,11 @@ public class SnapshotView extends ViewPart {
 		if (platformVer.substring(0, 3).equals("3.5") //$NON-NLS-1$
 				|| productVer.substring(0, 3).equals("3.5")) { //$NON-NLS-1$
 			filter = new FilteredTree(composite, SWT.NONE | SWT.H_SCROLL
-					| SWT.V_SCROLL | SWT.BORDER, patternFilter, true);
+					| SWT.V_SCROLL | SWT.BORDER | SWT.MULTI, patternFilter,
+					true);
 		} else {
 			filter = new FilteredTree(composite, SWT.NONE | SWT.H_SCROLL
-					| SWT.V_SCROLL | SWT.BORDER, patternFilter);
+					| SWT.V_SCROLL | SWT.BORDER | SWT.MULTI, patternFilter);
 		}
 
 		viewer = filter.getViewer();
@@ -183,10 +194,11 @@ public class SnapshotView extends ViewPart {
 		compositeWhole.setLayoutData(data1);
 
 		// Right-Top Composite(Server)
-		GridLayout layoutLeft = new GridLayout();
+		GridLayout layoutLeft = new GridLayout(2, true);
 		Composite compositeServer = new Composite(compositeWhole, SWT.NONE);
 		compositeServer.setLayout(layoutLeft);
 		GridData data2 = new GridData(GridData.FILL_HORIZONTAL);
+		data2.horizontalSpan = 2;
 		compositeServer.setLayoutData(data2);
 
 		selectOdenServer(compositeServer);
@@ -198,20 +210,17 @@ public class SnapshotView extends ViewPart {
 		GridData dataLine = new GridData(GridData.FILL_HORIZONTAL);
 		compositeLine.setLayoutData(dataLine);
 
-		Label separator1 = new Label(compositeLine,  SWT.SEPARATOR
-				|SWT.HORIZONTAL);
-		separator1.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Label separator1 = new Label(compositeLine, SWT.SEPARATOR
+				| SWT.HORIZONTAL);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		separator1.setLayoutData(data);
 
 		// Right-Bottom Composite(Detail)
 		compositeDetail = new Composite(compositeWhole, SWT.NONE);
 		compositeDetail.setLayout(layoutLeft);
 		GridData data3 = new GridData(GridData.FILL_BOTH);
 		compositeDetail.setLayoutData(data3);
-
-		Composite compositeTemp = new Composite(compositeWhole, SWT.NONE);
-		compositeTemp.setLayout(layoutLeft);
-		GridData data4 = new GridData(GridData.FILL_HORIZONTAL);
-		compositeTemp.setLayoutData(data4);
 
 		addContextMenu();
 		contributeToActionBars();
@@ -236,22 +245,32 @@ public class SnapshotView extends ViewPart {
 	private void showSnapshotTreeView() {
 
 		getSnapshotTree();
+		// setAgentInformation();
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
+
 				/*
 				 * event.getSelection ex> [selectName]
 				 */
 				String selectedName = event.getSelection().toString()
-				.substring(1,
-						event.getSelection().toString().length() - 1);
+						.substring(1,
+								event.getSelection().toString().length() - 1);
+
+				ArrayList<String> selected = new ArrayList<String>();
+				int n = 0;
+				while ((n = selectedName.indexOf(",")) != -1) { //$NON-NLS-1$
+					// int n = selectedName.indexOf(",");
+					selected.add(selectedName.substring(0, n));
+					selectedName = selectedName.substring(n + 2);
+				}
 
 				new SnapshotViewContentProvider();
 				ArrayList<String> snapshotPlanList = SnapshotViewContentProvider
-				.getSnaphotPlanList(
-						SHELL_URL,
-						CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoPlan
-						+ " -json"); //$NON-NLS-1$
+						.getSnaphotPlanList(
+								SHELL_URL,
+								CommandMessages.ODEN_CLI_COMMAND_snapshot_planinfo
+										+ " -json"); //$NON-NLS-1$
 
 				for (int i = 0; i < snapshotPlanList.size(); i++) {
 					String name = snapshotPlanList.get(i);
@@ -262,10 +281,10 @@ public class SnapshotView extends ViewPart {
 				}
 
 				JSONArray snapshotFileList = SnapshotViewContentProvider
-				.getSnaphotFileList(
-						SHELL_URL,
-						CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile
-						+ " -json"); //$NON-NLS-1$
+						.getSnaphotFileList(
+								SHELL_URL,
+								CommandMessages.ODEN_CLI_COMMAND_snapshot_fileinfo
+										+ " -json"); //$NON-NLS-1$
 
 				/*
 				 * when selectedName is file
@@ -284,9 +303,9 @@ public class SnapshotView extends ViewPart {
 
 					} catch (JSONException e) {
 						OdenActivator
-						.error(
-								UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo,
-								e);
+								.error(
+										UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo,
+										e);
 					}
 				}
 				compositeWhole.layout(true);
@@ -297,7 +316,7 @@ public class SnapshotView extends ViewPart {
 			public void doubleClick(DoubleClickEvent event) {
 
 				Object obj = ((TreeSelection) event.getSelection())
-				.getFirstElement();
+						.getFirstElement();
 
 				if (obj instanceof TreeParent) {
 					if (viewer.getExpandedState(obj)) {
@@ -334,13 +353,13 @@ public class SnapshotView extends ViewPart {
 		String result = ""; //$NON-NLS-1$
 		try {
 			result = SnapshotViewContentProvider.getInfo(SHELL_URL,
-					CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoPlan
-					+ " \"" + plan + "\" " + "-json"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					CommandMessages.ODEN_CLI_COMMAND_snapshot_planinfo
+							+ " \"" + plan + "\" " + "-json"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (OdenException e) {
 			OdenActivator
-			.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotPlanInfo,
-					e);
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotPlanInfo,
+							e);
 		}
 
 		try {
@@ -349,21 +368,18 @@ public class SnapshotView extends ViewPart {
 			planInfo = jo.getString(plan);
 		} catch (JSONException e) {
 			OdenActivator
-			.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotPlanInfo,
-					e);
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotPlanInfo,
+							e);
 		}
 
 		Cmd cmd = new Cmd("\"" + plan + "\"" + " = " + planInfo); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		String source = cmd.getOptionArg(SOURCE_OPT);
-		String dest = cmd.getOptionArg(DEST_OPT);
+		final String source = cmd.getOptionArg(SOURCE_OPT);
 		String user = cmd.getOptionArg(USER_OPT);
 		String date = cmd.getOptionArg(DATE_OPT);
 		String[] desc = cmd.getOptionArgArray(DESC_OPT);
 
-		StringTokenizer token = new StringTokenizer(dest, "\n"); //$NON-NLS-1$
-		dest = token.nextToken();
 		String strDesc = "";//$NON-NLS-1$
 		if (desc == null || desc.equals("")) { //$NON-NLS-1$
 			StringTokenizer tokenizer = new StringTokenizer(date, "\n"); //$NON-NLS-1$
@@ -379,6 +395,13 @@ public class SnapshotView extends ViewPart {
 			StringTokenizer tokenizer = new StringTokenizer(date, "\n"); //$NON-NLS-1$
 			date = tokenizer.nextToken();
 		}
+
+		final HashMap<String, String> mapStrSrc = parsingSource(source);
+
+		final String agentName = mapStrSrc
+				.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyAgent);
+		String locVar = mapStrSrc
+				.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar);
 
 		compositeDetail.setLayout(new GridLayout());
 		GridData detailData = new GridData(GridData.FILL_HORIZONTAL);
@@ -409,8 +432,7 @@ public class SnapshotView extends ViewPart {
 		userInfo.setLayoutData(gridData5);
 
 		Label enrollDate = new Label(group, SWT.SINGLE);
-		enrollDate
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelPlanDate);
+		enrollDate.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelPlanDate);
 
 		final Text dateInfo = new Text(group, SWT.SINGLE | SWT.READ_ONLY);
 		GridData gridData6 = new GridData(GridData.FILL_HORIZONTAL);
@@ -420,48 +442,100 @@ public class SnapshotView extends ViewPart {
 		Label agent = new Label(group, SWT.SINGLE);
 		agent.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelDestAgent);
 
-		final Text agentText = new Text(group, SWT.SINGLE | SWT.BORDER);
+		agentCombo = new Combo(group, SWT.SINGLE | SWT.BORDER | SWT.DROP_DOWN
+				| SWT.LEFT | SWT.READ_ONLY);
 		GridData gridData10 = new GridData(GridData.FILL_HORIZONTAL);
-		int temp = dest.indexOf("/"); //ex> dest = agent1/location1 //$NON-NLS-1$
-		String strAgent = dest.substring(0, temp);
-		agentText.setText(strAgent);
-		agentText.setLayoutData(gridData10);
+		setAgentVar();
+		Object[] comboAgentItem = agentCombo.getItems();
+		for (int i = 0; i < comboAgentItem.length; i++) {
+			if (comboAgentItem[i].equals(agentName)) {
+				agentCombo.select(i);
+			}
+		}
+		agentCombo.setLayoutData(gridData10);
+
+		agentCombo.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				setLocationVar();
+				sourceLocPathText.setText(""); //$NON-NLS-1$
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				setLocationVar();
+				sourceLocPathText.setText(""); //$NON-NLS-1$
+			}
+		});
 
 		Label sourceLabel = new Label(group, SWT.SINGLE);
 		sourceLabel
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelSourceLocation);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelSourceLocation);
 
-		final Text sourceLocText = new Text(group, SWT.SINGLE | SWT.BORDER);
-		GridData gridData4 = new GridData(GridData.FILL_HORIZONTAL);
-		if (source.length() == 1 || source == null) {
-			source = ""; //$NON-NLS-1$
-		} else {
-			source = source.substring(1);
-		}
-		sourceLocText.setText(source);
-		sourceLocText.setLayoutData(gridData4);
-
-		Label labelDest = new Label(group, SWT.SINGLE);
-		labelDest
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelDestination);
-
-		final Text destText = new Text(group, SWT.SINGLE | SWT.BORDER);
+		locationVar = new Combo(group, SWT.SINGLE | SWT.BORDER | SWT.DROP_DOWN
+				| SWT.READ_ONLY);
 		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
-		String strDest = dest.substring(temp + 1);
-		destText.setText(strDest);
-		destText.setLayoutData(gridData2);
+		setLocationVar();
+
+		Object[] comboLocItem = locationVar.getItems();
+		if (locVar.length() > 1) {
+			for (int i = 0; i < comboLocItem.length; i++) {
+				if (comboLocItem[i].equals(locVar.substring(1))) {
+					locationVar.select(i);
+				}
+			}
+		} else if (locVar
+				.equals(CommandMessages.ODEN_CLI_OPTION_locvarsign)) {
+			for (int i = 0; i < comboLocItem.length; i++) {
+				if (comboLocItem[i]
+						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText)) {
+					locationVar.select(i);
+				}
+			}
+		} else {
+			for (int i = 0; i < comboLocItem.length; i++) {
+				if (comboLocItem[i]
+						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText)) {
+					locationVar.select(i);
+				}
+			}
+		}
+		locationVar.setLayoutData(gridData2);
+
+		locationVar.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+
+				if (!(locationVar.getText().equals(""))) { //$NON-NLS-1$
+					if (locationVar
+							.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText)) {
+						sourceLocPathText.setText(""); //$NON-NLS-1$
+					} else if (locationVar
+							.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText)) {
+						sourceLocPathText.setText(""); //$NON-NLS-1$
+					} else {
+						sourceLocPathText.setText(""); //$NON-NLS-1$
+					}
+				} else {
+					//					
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		Label hideLabel = new Label(group, SWT.SINGLE | SWT.RIGHT);
+		hideLabel.setText(""); //$NON-NLS-1$
+
+		sourceLocPathText = new Text(group, SWT.SINGLE | SWT.BORDER);
+		GridData gridDataPath = new GridData(GridData.FILL_HORIZONTAL);
+		setLocPathText(mapStrSrc);
+		sourceLocPathText.setLayoutData(gridDataPath);
 
 		Label labelDesc = new Label(group, SWT.SINGLE);
 		labelDesc
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelPlanDescription);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_LabelPlanDescription);
 
-		// final Text descText = new Text(group, SWT.MULTI | SWT.V_SCROLL |
-		// SWT.BORDER);
 		final Text descText = new Text(group, SWT.SINGLE | SWT.BORDER);
 		GridData gridData3 = new GridData(GridData.FILL_HORIZONTAL);
-		// int lineHeight = descText.getLineHeight();
-		// gridData3.verticalSpan = 2;
-		// gridData3.heightHint = lineHeight*3; //textbox 3line fix
 		descText.setText(strDesc);
 		descText.setLayoutData(gridData3);
 
@@ -478,24 +552,39 @@ public class SnapshotView extends ViewPart {
 
 		Button buttonSave = new Button(compositeButton, SWT.PUSH);
 		buttonSave
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonPlanSave);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonPlanSave);
 		buttonSave
-		.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipPlanSave);
+				.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipPlanSave);
 		buttonSave.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
-				targetLocation = sourceLocText.getText();
-				destAgent = agentText.getText();
-				destination = destText.getText();
+				destAgent = agentCombo.getText();
+				sourceLocation = distinctionLoc(locationVar.getText())
+						+ sourceLocPathText.getText();
 				description = descText.getText();
 				new SaveSnapshotPlanAction().run();
+			}
+
+			private String distinctionLoc(String text) {
+				String result = ""; //$NON-NLS-1$
+				if (text
+						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText)) {
+					result = CommandMessages.ODEN_CLI_OPTION_locvarsign;
+				} else if (text
+						.equals(UIMessages.ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText)) {
+					result = ""; //$NON-NLS-1$
+				} else {
+					result = CommandMessages.ODEN_CLI_OPTION_locvarsign
+							+ text;
+				}
+				return result;
 			}
 		});
 
 		Button buttonDelete = new Button(compositeButton, SWT.PUSH);
 		buttonDelete
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonPlanDelete);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonPlanDelete);
 		buttonDelete
-		.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipPlanDelete);
+				.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipPlanDelete);
 		buttonDelete.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				new DeleteSnapshotPlanAction().run();
@@ -503,14 +592,14 @@ public class SnapshotView extends ViewPart {
 		});
 
 		ImageDescriptor planImageDescriptor = ImageUtil
-		.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotView_TakeSnapshotIcon);
+				.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotView_TakeSnapshotIcon);
 		Image takeSnapshotImage = ImageUtil.getImage(planImageDescriptor);
 
 		Button buttonTakeSnapshot = new Button(compositeButton, SWT.PUSH);
 		buttonTakeSnapshot
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTakeSnapshot);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTakeSnapshot);
 		buttonTakeSnapshot
-		.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipTakeSnapshot);
+				.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipTakeSnapshot);
 		buttonTakeSnapshot.setImage(takeSnapshotImage);
 		GridData gridDataTake = new GridData(GridData.FILL_BOTH);
 		gridDataTake.horizontalAlignment = GridData.END;
@@ -520,10 +609,161 @@ public class SnapshotView extends ViewPart {
 				new TakeSnapshotPlanAction().run();
 			}
 		});
-
 		compositeButton.setLayoutData(buttonData);
-
 		compositeDetail.setLayoutData(detailData);
+	}
+
+	private void setLocPathText(HashMap<String, String> mapStrSrc) {
+		// String agent = mapStrSrc.get("agent-name");
+		String locVar = mapStrSrc.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar);
+		String locVarPath = mapStrSrc
+				.get(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath);
+
+		if (locVar.length() > 0) {
+			if (locVar.substring(0, 1).equals(
+					CommandMessages.ODEN_CLI_OPTION_locvarsign)) {
+				sourceLocPathText.setText(locVarPath);
+			} else if (locVar.substring(0, 1).equals(
+					CommandMessages.ODEN_CLI_OPTION_defaultlocsign)) {
+				sourceLocPathText.setText(locVarPath);
+			} else {
+
+			}
+		} else {
+			sourceLocPathText.setText(locVarPath);
+		}
+	}
+
+	private HashMap<String, String> parsingSource(String source) {
+		HashMap<String, String> result = new HashMap<String, String>();
+
+		int numAgent = source
+				.indexOf(UIMessages.ODEN_SNAPSHOT_SnapshotView_AgentLocSeperateSign);
+		String agent = source.substring(0, numAgent);
+		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyAgent, agent); 
+		String tempLoc = source.substring(numAgent + 1);
+
+		String locVar = ""; //$NON-NLS-1$
+		String location = ""; //$NON-NLS-1$
+
+		if (tempLoc
+				.indexOf(CommandMessages.ODEN_CLI_OPTION_locvarsign) == 0) { // location-variable
+			int numLocVar = tempLoc.indexOf("/"); //$NON-NLS-1$
+			if (numLocVar != -1) {
+				locVar = tempLoc.substring(0, numLocVar); // $location-variable
+				location = tempLoc.substring(numLocVar);
+			} else {
+				locVar = tempLoc;
+				location = ""; //$NON-NLS-1$
+			}
+		} else if (tempLoc
+				.indexOf(CommandMessages.ODEN_CLI_OPTION_defaultlocsign) == 0) { // default-location
+			int numLocVar = tempLoc.indexOf("/"); //$NON-NLS-1$
+
+			if (numLocVar != -1) {
+				locVar = tempLoc.substring(0, numLocVar); // ~
+				location = tempLoc.substring(numLocVar);
+			} else {
+				locVar = tempLoc;
+				location = ""; //$NON-NLS-1$
+			}
+		} else { // absolute-path
+			locVar = ""; //$NON-NLS-1$
+			location = tempLoc;
+		}
+		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVar, locVar);
+		result.put(UIMessages.ODEN_SNAPSHOT_SnapshotView_SourceMapKeyLocVarAddedPath, location);
+
+		return result;
+	}
+
+	private void setAgentVar() {
+		String result = ""; //$NON-NLS-1$
+		String commnd = CommandMessages.ODEN_CLI_COMMAND_agent_info_json;
+		hm = new HashMap<String, String>();
+
+		try {
+			result = OdenBroker.sendRequest(SHELL_URL, commnd);
+			if (result != null) {
+				JSONArray array = new JSONArray(result);
+				if (array.length() > 0) {
+					for (int i = 0; i < array.length(); i++) {
+						String name = (String) ((JSONObject) array.get(i))
+								.get("name"); //$NON-NLS-1$
+						String urlRoot = (String) ((JSONObject) array.get(i))
+								.get("loc"); //$NON-NLS-1$
+
+						agentCombo.add(name);
+						hm.put(name, urlRoot);
+					}
+					// agentCombo.select(0);
+					// locationVar.removeAll();
+					// setLocationVar();
+				} else {
+					OdenActivator
+							.warning(CommonMessages.ODEN_CommonMessages_SetConfigXML);
+				}
+			} else {
+				// no connection
+				OdenActivator
+						.warning(CommonMessages.ODEN_CommonMessages_UnableToConnectServer);
+			}
+		} catch (Exception odenException) {
+			OdenActivator
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MsgAgentInfo,
+							odenException);
+			odenException.printStackTrace();
+		}
+		// HashMap aa =hm;
+		// System.out.println();
+	}
+
+	private void setLocationVar() {
+		String result = ""; //$NON-NLS-1$
+		String commnd = CommandMessages.ODEN_CLI_COMMAND_agent_info_json;
+		locVariable = new HashMap<String, String>();
+		try {
+			locationVar.removeAll();
+			locationVar
+					.add(UIMessages.ODEN_SNAPSHOT_SnapshotView_DefaultLocComboText);
+			locationVar
+					.add(UIMessages.ODEN_SNAPSHOT_SnapshotView_AbsolutePathComboText);
+			result = OdenBroker.sendRequest(SHELL_URL, commnd);
+			if (result != null) {
+				JSONArray array = new JSONArray(result);
+				if (array.length() > 0) {
+					for (int i = 0; i < array.length(); i++) {
+						String name = (String) ((JSONObject) array.get(i))
+								.get("name"); //$NON-NLS-1$
+						if (name.equals(agentCombo.getText())) {
+							JSONObject locs = (JSONObject) ((JSONObject) array
+									.get(i)).get("locs"); //$NON-NLS-1$
+							Iterator it = locs.keys();
+							while (it.hasNext()) {
+								Object o = it.next();
+								String locUri = locs.getString(o.toString());
+								locationVar.add(o.toString());
+								locVariable.put(o.toString(), locUri);
+							}
+							// root = (String) ((JSONObject)
+							// array.get(i)).get("host");
+						}
+					}
+
+					locationVar.redraw();
+					// locationVar.select(0);
+					// setagentUrl();
+				}
+			}
+			// HashMap aa =locVariable;
+			// System.out.println();
+		} catch (Exception odenException) {
+			OdenActivator.error(
+					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_MsgAgentInfo,
+					odenException);
+			odenException.printStackTrace();
+		}
 	}
 
 	private void displayFile(Composite composite, final String string) {
@@ -538,13 +778,13 @@ public class SnapshotView extends ViewPart {
 		String fileInfo = ""; //$NON-NLS-1$
 		try {
 			fileInfo = SnapshotViewContentProvider.getInfo(SHELL_URL,
-					CommandMessages.ODEN_SNAPSHOT_SnapshotView_MsgInfoFile
-					+ " " + string + " -json"); //$NON-NLS-1$ //$NON-NLS-2$
+					CommandMessages.ODEN_CLI_COMMAND_snapshot_fileinfo
+							+ " " + string + " -json"); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (OdenException e) {
 			OdenActivator
-			.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo,
-					e);
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_GetSnapshotDetailInfo,
+							e);
 		}
 
 		String info = ""; //$NON-NLS-1$
@@ -553,9 +793,9 @@ public class SnapshotView extends ViewPart {
 			info = jo.getString(string);
 		} catch (JSONException e) {
 			OdenActivator
-			.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotDetailInfo,
-					e);
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_ParseSnapshotDetailInfo,
+							e);
 		}
 
 		Cmd cmd = null;
@@ -565,22 +805,38 @@ public class SnapshotView extends ViewPart {
 
 		// comma setting
 		Long longSize = Long.parseLong(strFileSize);
-		double doubleSize = longSize / 1024;
+		String fileSizeComma = ""; //$NON-NLS-1$
+		String resultWithUnit = ""; //$NON-NLS-1$
 
-		BigDecimal bd = new BigDecimal(doubleSize);
-		BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
+		if (longSize < 1024) {
+			BigDecimal bd = new BigDecimal(longSize);
+			BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
 
-		DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
-		df = new DecimalFormat("###,###,###"); //$NON-NLS-1$
-		Long size = Long.parseLong(fileSizeKB.toString());
-		String fileSizeComma = df.format(size);
+			DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+			df = new DecimalFormat("###,###,###"); //$NON-NLS-1$
+			Long size = Long.parseLong(fileSizeKB.toString());
+			fileSizeComma = df.format(size);
+			resultWithUnit = fileSizeComma
+					+ UIMessages.ODEN_SNAPSHOT_SnapshotView_FileSizeTailBytes;
+		} else {
+			double doubleSize = longSize / 1024;
+
+			BigDecimal bd = new BigDecimal(doubleSize);
+			BigDecimal fileSizeKB = bd.setScale(0, BigDecimal.ROUND_UP);
+
+			DecimalFormat df = (DecimalFormat) NumberFormat.getInstance();
+			df = new DecimalFormat("###,###,###"); //$NON-NLS-1$
+			Long size = Long.parseLong(fileSizeKB.toString());
+			fileSizeComma = df.format(size);
+			resultWithUnit = fileSizeComma
+					+ UIMessages.ODEN_SNAPSHOT_SnapshotView_FileSizeTailKB;
+		}
 
 		compositeDetail.setLayout(new GridLayout());
 		GridData detailData = new GridData(GridData.FILL_HORIZONTAL);
 
 		Group group = new Group(compositeDetail, SWT.SHADOW_ETCHED_IN);
-		group
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_SnapshotGroupTitle);
+		group.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_SnapshotGroupTitle);
 
 		group.setLayout(new GridLayout(2, false));
 		GridData gridData = new GridData(GridData.FILL_BOTH);
@@ -601,8 +857,7 @@ public class SnapshotView extends ViewPart {
 
 		Text fileSize = new Text(group, SWT.SINGLE | SWT.READ_ONLY);
 		GridData gridData2 = new GridData(GridData.FILL_HORIZONTAL);
-		fileSize.setText(fileSizeComma
-				+ UIMessages.ODEN_SNAPSHOT_SnapshotView_FileSizeTail);
+		fileSize.setText(resultWithUnit);
 		fileSize.setLayoutData(gridData2);
 
 		Label date = new Label(group, SWT.SINGLE);
@@ -626,9 +881,9 @@ public class SnapshotView extends ViewPart {
 
 		Button buttonDelete = new Button(compositeButton, SWT.PUSH);
 		buttonDelete
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonSnapshotDelete);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonSnapshotDelete);
 		buttonDelete
-		.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipSnapshotDelete);
+				.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipSnapshotDelete);
 		buttonDelete.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				new DeleteSnapshotAction().run();
@@ -636,14 +891,14 @@ public class SnapshotView extends ViewPart {
 		});
 
 		ImageDescriptor rollbackImageDescriptor = ImageUtil
-		.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotView_RollbackIcon);
+				.getImageDescriptor(UIMessages.ODEN_SNAPSHOT_SnapshotView_RollbackIcon);
 		Image rollbackImage = ImageUtil.getImage(rollbackImageDescriptor);
 
 		Button buttonRollback = new Button(compositeButton, SWT.PUSH);
 		buttonRollback
-		.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonRollback);
+				.setText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonRollback);
 		buttonRollback
-		.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipRollback);
+				.setToolTipText(UIMessages.ODEN_SNAPSHOT_SnapshotView_ButtonTooltipRollback);
 		buttonRollback.setImage(rollbackImage);
 		GridData gridDataTake = new GridData(GridData.FILL_BOTH);
 		gridDataTake.horizontalAlignment = GridData.END;
@@ -687,7 +942,7 @@ public class SnapshotView extends ViewPart {
 		new CommonUtil().initServerCombo(serverCombo);
 
 		if (selectedName == null) {
-			compositeDetail = new Composite(compositeWhole, SWT.NONE);
+//			compositeDetail = new Composite(compositeWhole, SWT.NONE | SWT.BORDER);
 			listenCombo();
 		}
 		serverCombo.addSelectionListener(new SelectionAdapter() {
@@ -696,12 +951,19 @@ public class SnapshotView extends ViewPart {
 			}
 		});
 	}
-
+	
 	private static void listenCombo() {
-		selectedName = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(serverCombo.getText()).getNickname();
-		SnapshotNewPlanDialog.server = selectedName;
-		Server server = OdenActivator.getDefault().getAliasManager().getServerManager().getServer(selectedName);
-		showServerList(server);
+		if (serverCombo.getItemCount() == 0) {
+
+		} else {
+			selectedName = OdenActivator.getDefault().getAliasManager()
+					.getServerManager().getServer(serverCombo.getText())
+					.getNickname();
+			SnapshotNewPlanDialog.server = selectedName;
+			Server server = OdenActivator.getDefault().getAliasManager()
+					.getServerManager().getServer(selectedName);
+			showServerList(server);
+		}
 	}
 
 	/**
@@ -710,38 +972,32 @@ public class SnapshotView extends ViewPart {
 	public static void refreshServerList() {
 		serverCombo.removeAll();
 		new CommonUtil().initServerCombo(serverCombo);
+		listenCombo();
 	}
 
 	private static void showServerList(Server server) {
-		SHELL_URL = "http://" + server.getUrl() + "/shell"; //$NON-NLS-1$ //$NON-NLS-2$
+		SHELL_URL = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP
+				+ server.getUrl()
+				+ CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf;
 		if (!checkConnect()) {
 			SHELL_URL = null;
-		}else{}
+		} else {
+		}
 		invisibleRoot = null;
 		refreshTree();
-		clearComposite();
+//		clearComposite();
 	}
 
 	/**
 	 * Refresh Snapshot treeviewer.
 	 */
-	//	public static void refreshTree() {
-	//		Display display = viewer.getTree().getDisplay();
-	//		display.asyncExec(new Runnable() {
-	//			public void run() {
-	//				viewer.setContentProvider(new SnapshotViewContentProvider());
-	//				viewer.setLabelProvider(new SnapshotViewLabelProvider());
-	//				viewer.refresh();
-	//			}
-	//		});
-	//	}
-
 	public static void refreshTree() {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				if (!viewer.getTree().isDisposed()) {
 					invisibleRoot = null;
-					viewer.setContentProvider(new SnapshotViewContentProvider());
+					viewer
+							.setContentProvider(new SnapshotViewContentProvider());
 				}
 				viewer.refresh();
 			}
@@ -754,9 +1010,9 @@ public class SnapshotView extends ViewPart {
 			result = OdenBroker.sendRequest(SHELL_URL, "snapshot -json"); //$NON-NLS-1$
 		} catch (OdenException e) {
 			OdenActivator
-			.error(
-					UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_CheckConnection,
-					e);
+					.error(
+							UIMessages.ODEN_SNAPSHOT_SnapshotView_Exception_CheckConnection,
+							e);
 		}
 		if (result == null) {
 			return false;
@@ -781,7 +1037,7 @@ public class SnapshotView extends ViewPart {
 		if (actionBars == null)
 			return;
 		IStatusLineManager statusLineManager = actionBars
-		.getStatusLineManager();
+				.getStatusLineManager();
 		if (statusLineManager == null)
 			return;
 		statusLineManager.setMessage(message);
@@ -810,7 +1066,9 @@ public class SnapshotView extends ViewPart {
 	 */
 	public static void clearComposite() {
 		compositeDetail.dispose();
-		compositeDetail = drawEmptyComposite(compositeWhole);
+		compositeDetail = new Composite(compositeWhole, SWT.NONE);
+		compositeDetail.setLayout(new GridLayout(2, true));
+		compositeDetail.setLayoutData(new GridData());
 	}
 
 	private static Composite drawEmptyComposite(Composite parent) {
@@ -827,7 +1085,7 @@ public class SnapshotView extends ViewPart {
 	 */
 	public Object[] getSelected() {
 		IStructuredSelection selection = (IStructuredSelection) viewer
-		.getSelection();
+				.getSelection();
 		if (selection == null)
 			return null;
 		Object[] result = selection.toArray();

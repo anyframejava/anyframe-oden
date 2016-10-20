@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Enterprise Misc
+Bundle-SymbolicName: anyframe.oden.bundle.ent.misc
+Bundle-Version: 1.0.0
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: anyframe.common.bundle.gate,
+ anyframe.oden.bundle.common,
+ anyframe.oden.bundle.core,
+ anyframe.oden.bundle.core.command,
+ anyframe.oden.bundle.core.config,
+ anyframe.oden.bundle.core.job,
+ anyframe.oden.bundle.core.txmitter,
+ anyframe.oden.bundle.deploy,
+ anyframe.oden.bundle.ent.http,
+ org.json,
+ org.osgi.framework,
+ org.osgi.service.component
+Service-Component: OSGI-INF/agent_command.xml
+Export-Package: anyframe.oden.bundle.ent.misc
+

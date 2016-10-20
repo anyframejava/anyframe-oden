@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.snapshot.actions;
@@ -23,46 +25,49 @@ import anyframe.oden.eclipse.core.snapshot.AbstractSnapshotViewAction;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 
 /**
- * Refresh Snapshot view's tree, detail information, server combo'x data.
- * This class extends AbstractSnapshotViewAction class.
+ * Refresh Snapshot view's tree, detail information, server combo'x data. This
+ * class extends AbstractSnapshotViewAction class.
  * 
  * @author LEE Sujeong
  * @version 1.0.0 RC2
- *
+ * 
  */
-public class RefreshAction  extends AbstractSnapshotViewAction {
+public class RefreshAction extends AbstractSnapshotViewAction {
 
 	/**
-	 * Constructor of RefreshAction
-	 * forward actionId, actionTooltipText, actionIconId to AbstractSnapshotViewAction
+	 * Constructor of RefreshAction forward actionId, actionTooltipText,
+	 * actionIconId to AbstractSnapshotViewAction
 	 */
 	public RefreshAction() {
-		super(UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh, UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip, UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
+		super(UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_Refresh,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshTooltip,
+				UIMessages.ODEN_SNAPSHOT_Actions_RefreshAction_RefreshIcon);
 	}
-	
+
 	/**
 	 * Run this Action
 	 */
-	public void run(){
+	public void run() {
 		new SnapshotView();
-		SnapshotView.setStatusMessage(UIMessages.ODEN_SNAPSHOT_Actions_MsgRefreshTree);
+		SnapshotView
+				.setStatusMessage(UIMessages.ODEN_SNAPSHOT_Actions_MsgRefreshTree);
 		SnapshotView.clearComposite();
 		SnapshotView.refreshServerList();
 		SnapshotView.invisibleRoot = null;
 		SnapshotView.refreshTree();
 	}
-	
+
 	/**
 	 * Available check this method
 	 */
 	public boolean isAvailable() {
 		if (getView() == null) {
-			return false;			
+			return false;
 		}
 
 		return true;
 	}
-	
+
 	class NameSorter extends ViewerSorter {
 	}
 }

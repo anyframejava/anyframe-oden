@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.explorer;
@@ -23,6 +25,10 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import anyframe.oden.eclipse.core.OdenActivator;
+import anyframe.oden.eclipse.core.OdenTrees.RepoParent;
+import anyframe.oden.eclipse.core.OdenTrees.RepoRootParent;
+import anyframe.oden.eclipse.core.OdenTrees.ServerParent;
+import anyframe.oden.eclipse.core.OdenTrees.ServerRootParent;
 import anyframe.oden.eclipse.core.OdenTrees.TreeParent;
 import anyframe.oden.eclipse.core.alias.AliasManager;
 import anyframe.oden.eclipse.core.alias.Repository;
@@ -109,31 +115,32 @@ public class ExplorerViewContentProvider implements ITreeContentProvider,IStruct
 	}
 
 	private void initialize(Object inputElement) {
-		// 1 Level TreeContents
-		String[] roots = {UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel, UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel};
-		invisibleRoot = new TreeParent("");
-		for(String rootnm : roots){
-			TreeParent root = new TreeParent(rootnm);
-			invisibleRoot.addChild(root);
 
-			if(rootnm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)){
-				// 2 Level Servers 
-				Collection<Server> col = OdenActivator.getDefault().getAliasManager()
-				.getServerManager().getServers();
-				for (Server server : col){
-					TreeParent sub = new TreeParent(server.getNickname());
-					root.addChild(sub);
-				}
+		String[] roots = {
+				UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel,
+				UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_BuildRepositoriesRootLabel };
+		invisibleRoot = new TreeParent("");
+		for (String rootnm : roots) {
+
+			if (rootnm.equals(UIMessages.ODEN_EXPLORER_ExplorerViewLabelProvider_ServersRootLabel)) {
+				ServerRootParent root = new ServerRootParent(rootnm);
+				// 1 Level TreeContents
+				invisibleRoot.addChild(root);
+
+				// 2 Level Servers
+				Collection<Server> col = OdenActivator.getDefault().getAliasManager().getServerManager().getServers();
+				for (Server server : col) 
+					root.addChild(new ServerParent(server.getNickname()));
+				
 			} else {
+				RepoRootParent root = new RepoRootParent(rootnm);
+				invisibleRoot.addChild(root);
+
 				// 2 Level Repositories
-				Collection<Repository> col = OdenActivator.getDefault().getAliasManager()
-				.getRepositoryManager().getRepositories();
-				for (Repository repo : col){
-					TreeParent sub = new TreeParent(repo.getNickname());
-					root.addChild(sub);
-				}
+				Collection<Repository> col = OdenActivator.getDefault().getAliasManager().getRepositoryManager().getRepositories();
+				for (Repository repo : col) 
+					root.addChild(new RepoParent(repo.getNickname()));
 			}
 		}
-
 	}
 }

@@ -51,9 +51,9 @@ public class Cmd {
 		parse(line);
 	}
 	
-	public Cmd(String cmdName, String args) throws OdenException {
-		parse(cmdName + " " + args);
-	}
+//	public Cmd(String cmdName, String args) throws OdenException {
+//		parse("\"" + cmdName + "\" " + args);
+//	}
 	
 //	private void parse(String line) throws OdenException {
 //		String[] args = CommandUtil.split(line);
@@ -132,20 +132,49 @@ public class Cmd {
 	}
 	
 	
+	/**
+	 * get the command's name
+	 * 
+	 * @return
+	 */
 	
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * get the command's action name
+	 * 
+	 * @return
+	 */
 	public String getAction() {
 		return action;
 	}
+	
+	/**
+	 * get command's action's argument
+	 * 
+	 * @return
+	 */
 	public String getActionArg() {
 		return actionArg;
 	}
+	
+	/**
+	 * get all option objects
+	 * 
+	 * @return
+	 */
 	public List<Opt> getOptions() {
 		return options;
 	}
 	
+	/**
+	 * get the specified option object
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public Opt getOption(String name){
 		for(Opt op : options){
 			if(name.equals(op.getName()))
@@ -154,6 +183,12 @@ public class Cmd {
 		return null;
 	}
 	
+	/**
+	 * get the specified option object
+	 * 
+	 * @param names
+	 * @return
+	 */
 	public Opt getOption(String[] names){
 		for(Opt op : options){
 			for(String name : names)
@@ -176,6 +211,12 @@ public class Cmd {
 		return "";
 	}
 	
+	/**
+	 * get the specified option's arguments
+	 * 
+	 * @param names
+	 * @return
+	 */
 	public List<String> getOptionArgList(String[] names) {
 		Opt op = getOption(names);
 		if(op != null) {
@@ -184,6 +225,12 @@ public class Cmd {
 		return Collections.EMPTY_LIST;
 	}
 	
+	/**
+	 * get the specified option's arguments
+	 * 
+	 * @param names
+	 * @return
+	 */
 	public String[] getOptionArgArray(String[] names) {
 		Opt op = getOption(names);
 		if(op != null) {
@@ -192,6 +239,11 @@ public class Cmd {
 		return new String[0];
 	}
 	
+	/**
+	 * remove specified option from this command
+	 * 
+	 * @param names
+	 */
 	public void removeOption(String[] names) {
 		for(Opt op : options){
 			for(String name : names){

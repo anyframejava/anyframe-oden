@@ -35,6 +35,13 @@ public class FileObjectInputStream extends FileInputStream {
 		super(file);
 	}
 
+	/**
+	 * read next object from the file
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public Object readObject() throws IOException, ClassNotFoundException{
 		// get size
 		byte[] bsize = new byte[4];

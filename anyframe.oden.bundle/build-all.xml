@@ -1,56 +1,74 @@
 <project name="_Oden Full" default="build.all" basedir=".">
-	<property name="version" value="1.0.0.PRE1"/>
+	<property name="version" value="1.1.0"/>
 	
 	<target name="build.all">
-		<ant antfile="../anyframe.oden.bundle/build.xml" inheritall="false" />
+		<condition property="todo" else="all-local">
+			<isset property="todo"/>
+		</condition>
+		<ant antfile="../anyframe.oden.bundle/build.xml" target="${todo}" inheritall="false" />
 			
-		<ant antfile="../anyframe.common.bundle.gate/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.common.bundle.gate/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.common.bundle.log/build.xml" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.common/build.xml" inheritall="false" />
-		
-		<ant antfile="../anyframe.oden.bundle.prefs/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.common/build.xml" target="${todo}" inheritall="false" />
 				
-		<ant antfile="../anyframe.oden.bundle.deploy/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.deploy/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.repository/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.core/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.core/build.xml" inheritall="false" />
+		<ant antfile="../anyframe.oden.bundle.ent.misc/build.xml" target="${todo}" inheritall="false" />
+
+		<ant antfile="../anyframe.oden.bundle.ent.repository/build.xml" target="${todo}" inheritall="false" />
+
+		<ant antfile="../anyframe.oden.bundle.ent.snapshot/build.xml" target="${todo}" inheritall="false" />
+
+		<ant antfile="../anyframe.oden.bundle.ent.http/build.xml" target="${todo}" inheritall="false" />
+		
+		<ant antfile="../anyframe.oden.bundle.ent.auth/build.xml" target="${todo}" inheritall="false" />
+		
 	</target>
 	
-	<target name="pack.agent" depends="pack.all"
-			description="package oden agent">
-		<delete dir="${basedir}/pack" excludes="*.zip"/>
-		<mkdir dir="${basedir}/pack/bin"/>
-		<mkdir dir="${basedir}/pack/bundle"/>
-		
-		<copy todir="${basedir}/pack/bin">
-			<fileset dir="dist" includes="oden-*.jar"/>
-		</copy>
-		<copy todir="${basedir}/pack/bundle">
-			<fileset dir="${basedir}/bundle" 
-				includes=
-					"anyframe.oden.bundle.deploy-*.jar
-					anyframe.oden.bundle.common-*.jar
-					org.apache.felix.eventadmin-*.jar
-					org.apache.felix.log-*.jar
-					org.apache.felix.scr-*.jar
-					remote-*.jar
-					felix*.jar"/>
-		</copy>
-		<copy todir="${basedir}/pack">
-			<fileset dir="${basedir}"
-				includes="readme,oden-agent.cmd"/>
-		</copy>
-		
-		<zip destfile="${basedir}/pack/oden-agent-${version}.zip"
-			basedir="${basedir}/pack" excludes="*.zip,**/*.svn,conf"/>
-	</target>
+	<target name="_pack.agent" depends="build.all">
+			<delete dir="${basedir}/pack" excludes="*.zip,*.tar.gz"/>
+			<mkdir dir="${basedir}/pack/bin"/>
+			<mkdir dir="${basedir}/pack/bundle"/>
 			
-	<target name="pack.all" depends="build.all"
-			description="package oden">
-		<delete dir="${basedir}/pack" excludes="*.zip"/>		<!-- exclude zip to prevent to remove previous versions and agent packages.-->
+			<copy todir="${basedir}/pack/bin">
+				<fileset dir="dist" includes="oden-*.jar"/>
+			</copy>
+			<copy todir="${basedir}/pack/bundle">
+				<fileset dir="${basedir}/bundle" 
+					includes=
+						"anyframe.oden.bundle.deploy-*.jar,
+						anyframe.oden.bundle.common-*.jar,
+						org.apache.felix.configadmin-*.jar,
+						org.apache.felix.eventadmin-*.jar,
+						org.apache.felix.log-*.jar,
+						org.apache.felix.scr-*.jar,
+						org.json_*.jar,
+						remote-*.jar,
+						felix*.jar"/>
+			</copy>
+			<copy todir="${basedir}/pack">
+				<fileset dir="pkrsc" includes="readme,startup-agent.sh,startup-agent.cmd"/>
+			</copy>
+		</target>
+	
+	<target name="pack.agent" depends="_pack.agent">
+		<zip destfile="${basedir}/pack/Anyframe-Oden-Agent-${version}.zip"
+			basedir="${basedir}/pack" excludes="*.zip,*.tar,*.tar.gz,**/*.svn"/>
+	</target>
+	
+	<target name="pack.agent.gzip" depends="_pack.agent">
+		<tar destfile="${basedir}/pack/Anyframe-Oden-Agent-${version}.tar" basedir="${basedir}/pack" excludes="*.zip,*.tar,*.tar.gz,**/*.svn"/>
+		<gzip destfile="${basedir}/pack/Anyframe-Oden-Agent-${version}.tar.gz" src="${basedir}/pack/Anyframe-Oden-Agent-${version}.tar"/>
+		<delete file="${basedir}/pack/Anyframe-Oden-Agent-${version}.tar"/>
+	</target>
+	
+	<target name="_pack.server" depends="build.all">
+		<condition property="pkname" else="Anyframe-Oden-${version}.zip">
+			<isset property="pkname"/>
+		</condition>
+		<delete dir="${basedir}/pack" excludes="*.zip,*tar.gz"/>		<!-- exclude zip to prevent to remove previous versions and agent packages.-->
 		<mkdir dir="${basedir}/pack/bin"/>
 		<mkdir dir="${basedir}/pack/bundle"/>
 		<mkdir dir="${basedir}/pack/conf"/>
@@ -60,13 +78,152 @@
 		</copy>
 		<copy todir="${basedir}/pack/bundle">
 			<fileset dir="${basedir}/bundle" 
-				includes="*.jar" excludes="oden-*.jar" />
+				includes="anyframe.common.bundle.gate-*.jar,
+					anyframe.oden.bundle.common-*.jar,
+					anyframe.oden.bundle.core-*.jar,
+					anyframe.oden.bundle.deploy-*jar,
+					felix.jar,
+					org.apache.felix.configadmin-*.jar,
+					org.apache.felix.eventadmin-*.jar,
+					org.apache.felix.log-*.jar,
+					org.apache.felix.prefs-*.jar,
+					org.apache.felix.scr-*.jar,
+					org.apache.felix.shell.remote-*.jar,
+					org.json_*.jar,
+					remote-*.jar"/>
 		</copy>
 		<copy todir="${basedir}/pack/conf">
-			<fileset dir="${basedir}/conf"
-				includes="*.ini,*.xml"/>
+			<fileset dir="pkrsc" includes="config.xml,oden.ini"/>
 		</copy>
-		<zip destfile="${basedir}/pack/oden-${version}.zip"
-			basedir="${basedir}/pack" excludes="*.zip,**/*.svn"/>
+		<copy todir="${basedir}/pack">
+			<fileset dir="pkrsc" includes="readme,startup.cmd,startup.sh,*.pdf"/>
+		</copy>
 	</target>
+	
+	<target name="pack.server" depends="_pack.server" description="package oden">
+		<zip destfile="${basedir}/pack/${pkname}"
+			basedir="${basedir}/pack" excludes="*.zip,*.tar,*.tar.gz,**/*.svn"/>
+	</target>
+	
+	<target name="pack.src.server">
+		<property name="pkname" value="Anyframe-Oden-${version}-src.zip"/>
+		<property name="todo" value="all-local-src"/>
+		<antcall target="_pack.server"/>
+		<zip destfile="${basedir}/pack/${pkname}"
+			basedir="${basedir}/pack" excludes="*.zip,*.tar,*.tar.gz,**/*.svn,*.pdf"/>
+	</target>
+	
+	<target name="pack.server.gzip" depends="_pack.server">
+		<tar destfile="${basedir}/pack/Anyframe-Oden-${version}.tar" basedir="${basedir}/pack" excludes="*.zip,*.tar.gz,**/*.svn"/>
+		<gzip destfile="${basedir}/pack/Anyframe-Oden-${version}.tar.gz" src="${basedir}/pack/Anyframe-Oden-${version}.tar"/>
+		<delete file="${basedir}/pack/Anyframe-Oden-${version}.tar"/>
+	</target>
+	
+	<target name="_pack.ent.server" depends="build.all">
+		<condition property="pkname" else="Anyframe-Oden-${version}.zip">
+			<isset property="pkname"/>
+		</condition>
+		<delete dir="${basedir}/pack" excludes="*.zip,*tar.gz"/>		<!-- exclude zip to prevent to remove previous versions and agent packages.-->
+		<mkdir dir="${basedir}/pack/bin"/>
+		<mkdir dir="${basedir}/pack/bundle"/>
+		<mkdir dir="${basedir}/pack/conf"/>
+		
+		<copy todir="${basedir}/pack/bin">
+			<fileset dir="dist" includes="oden-*.jar"/>
+		</copy>
+		<copy todir="${basedir}/pack/bundle">
+			<fileset dir="${basedir}/bundle" 
+				includes="anyframe.common.bundle.gate-*.jar,
+					anyframe.oden.bundle.common-*.jar,
+					anyframe.oden.bundle.core-*.jar,
+					anyframe.oden.bundle.deploy-*jar,
+					anyframe.oden.bundle.ent.misc-*.jar,
+					anyframe.oden.bundle.ent.repository-*.jar,
+					anyframe.oden.bundle.ent.snapshot-*.jar,
+					anyframe.oden.bundle.ent.http-*.jar,
+					anyframe.oden.bundle.ent.auth-*.jar,
+					felix.jar,
+					org.apache.felix.configadmin-*.jar,
+					org.apache.felix.eventadmin-*.jar,
+					org.apache.felix.http.jetty-*.jar,
+					org.apache.felix.log-*.jar,
+					org.apache.felix.prefs-*.jar,
+					org.apache.felix.scr-*.jar,
+					org.apache.felix.shell.remote-*.jar,
+					org.json_*.jar,
+					remote-*.jar"/>
+		</copy>
+		<copy todir="${basedir}/pack/conf">
+			<fileset dir="pkrsc" includes="config.xml,oden.ini"/>
+		</copy>
+		<copy todir="${basedir}/pack">
+			<fileset dir="pkrsc" includes="readme,startup.cmd,acc.cmd,runc.cmd,startup.sh,acc.sh,runc.sh,*.pdf"/>
+		</copy>
+	</target>
+	
+	<target name="pack.ent.server" depends="_pack.ent.server" description="package oden">
+		<zip destfile="${basedir}/pack/Anyframe-Oden-Enterprise-${version}.zip"
+			basedir="${basedir}/pack" excludes="*.zip,*.tar,*.tar.gz,**/*.svn"/>
+	</target>
+	
+	<target name="pack.ent.server.gzip" depends="_pack.ent.server">
+		<tar destfile="${basedir}/pack/Anyframe-Oden-Enterprise-${version}.tar" basedir="${basedir}/pack" excludes="*.zip,*.tar.gz,**/*.svn"/>
+		<gzip destfile="${basedir}/pack/Anyframe-Oden-Enterprise-${version}.tar.gz" src="${basedir}/pack/Anyframe-Oden-Enterprise-${version}.tar"/>
+		<delete file="${basedir}/pack/Anyframe-Oden-Enterprise-${version}.tar"/>
+	</target>
+	
+<!--	
+	<target name="jdepend">
+	  <jdepend format="xml" outputfile="docs/jdepend-report.xml">
+	  	  <exclude name="org.*"/>
+	  	  <exclude name="java.*"/>
+	  	  <exclude name="javax.*"/>
+	      <classespath>
+	        <pathelement location="bundle" />
+	      	<pathelement location="build"/>
+	      </classespath>
+	  	<classpath location="build" />
+	  </jdepend>
+
+	  <style basedir="docs" destdir="docs"
+	         includes="jdepend-report.xml" 
+	         style="${ant.home}/etc/jdepend.xsl" />
+	</target>
+	
+	<target name="jdepend2">
+		<jdepend classpathref="base.path" outputfile="depend.xml" format="xml">
+			<exclude name="org.*"/>
+			<exclude name="anyframe.*"/>
+			<exclude name="ch.*"/>
+			<exclude name="com.*"/>
+		  	  <exclude name="javax.*"/>
+			<exclude name="sun.*"/>
+		    <classespath>
+		        <pathelement location="E:\dev\bin\jdk1.5.0.16\jre\lib\rt.jar"/>
+		    </classespath>
+		</jdepend>
+		
+		<style basedir="." destdir="."
+		         includes="depend.xml" 
+		         style="${ant.home}/etc/jdepend.xsl" />
+	</target>
+
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+	
+	<target name="findbugs" >
+			<findbugs home="E:/dev/3rd/findbugs-1.3.9"
+		              output="html"
+					  stylesheet="fancy.xsl"
+		              outputFile="findbugs.html" >
+				<auxClasspath><fileset dir="bundle" excludes="anyframe*.jar"/></auxClasspath>
+		      <class location="bundle/anyframe.common.bundle.gate-1.0.0.jar" />
+		      	<class location="bundle/anyframe.common.bundle.log-1.0.0.jar" />
+				<class location="bundle/anyframe.oden.bundle.common-1.0.0.jar" />
+				<class location="bundle/anyframe.oden.bundle.core-1.0.0.jar" />
+				<class location="bundle/anyframe.oden.bundle.deploy-1.0.0.jar" />
+				<class location="bundle/anyframe.oden.bundle.prefs-1.0.0.jar" />
+				<class location="bundle/anyframe.oden.bundle.repository-1.0.0.jar" />
+		    </findbugs>
+		  </target>
+-->
 </project>

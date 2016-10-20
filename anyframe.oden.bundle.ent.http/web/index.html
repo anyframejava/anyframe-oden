@@ -1,0 +1,148 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="addins/admin.css" type="text/css">
+	<title>Run Oden Command</title>
+	<script type="text/javascript" src="addins/joon1k.js"></script>
+	<script type="text/javascript">
+	var xreq; 
+	
+	function cbAgentInfo(req){
+		if(req.readyState !=4 || req.status != 200) return;
+		var list = eval(req.responseText);
+		var buf = '';
+		buf+='<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">';
+		buf+='<tr>';
+		buf+='<td class="ct_list_b" width="100">No</td>';
+		buf+='<td class="ct_line02"></td>';
+		buf+='<td class="ct_list_b" width="150">Name</td>';
+		buf+='<td class="ct_line02"></td>';
+		buf+='<td class="ct_list_b" width="150">Addr</td>';	
+		buf+='</tr>';
+		buf+='<tr>';
+		buf+='<td colspan="5" bgcolor="808285" height="1"></td>';
+		buf+='</tr>';
+		for(var i=0; i<list.length; i++){
+			buf+='<tr class="ct_list_pop">';
+			buf+='<td align="center">' + i + '</td>';
+			buf+='<td></td>';
+			buf+='<td align="center">' + list[i].name + '</td>';
+			buf+='<td></td>';
+			buf+='<td align="center">' + list[i].addr + '</td>';
+			buf+='</tr>';
+			buf+='<tr>';
+			buf+='<td colspan="5" bgcolor="D6D7D6" height="1"></td>';
+			buf+='</tr>';
+		}
+		buf+='</table>';
+		document.getElementById("list1").innerHTML = buf;
+	}
+
+	function cbAgentCompare(req){
+		if(req.readyState !=4 || req.status != 200) return;
+		var list = eval(req.responseText);
+		var buf = '';
+		buf+='<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">';
+		buf+='<tr>';
+		buf+='<td class="ct_list_b" width="100">path</td>';
+		buf+='<td class="ct_line02"></td>';
+		buf+='<td class="ct_list_b" width="150">match</td>';
+		buf+='<td class="ct_line02"></td>';
+		buf+='<td class="ct_list_b" width="150">agents</td>';	
+		buf+='</tr>';
+		buf+='<tr>';
+		buf+='<td colspan="5" bgcolor="808285" height="1"></td>';
+		buf+='</tr>';
+		for(var i=0; i<list.length; i++){
+			buf+='<tr class="ct_list_pop">';
+			buf+='<td>' + list[i].path + '</td>';
+			buf+='<td></td>';
+			buf+='<td align="center">' + list[i].match + '</td>';
+			buf+='<td></td>';
+			buf+='<td align="center">' + list2String(list[i].agents) + '</td>';
+			buf+='</tr>';
+			buf+='<tr>';
+			buf+='<td colspan="5" bgcolor="D6D7D6" height="1"></td>';
+			buf+='</tr>';
+		}
+		buf+='</table>';
+		document.getElementById("list1").innerHTML = buf;
+	}
+
+	function list2String(list){
+		var buf = '';
+		for(var i=0; i<list.length; i++){
+			buf+=list[i].agent;
+			if(i < list.length-1)
+				buf+=", ";
+		}
+		return buf;
+	}
+	
+	function showList(){
+		xreq = xreq || new grr.XRequest();
+	}
+	
+	function doRun(){
+		var sel = document.getElementById("cmd_sel");
+		var cmd = sel.options[sel.selectedIndex].value;
+		var arg = document.getElementById("arg_text").value;
+		var fullcmd = cmd + " " + arg + " -json";
+		switch(sel.selectedIndex){
+		case 0:
+			xreq.send('shell', fullcmd, cbAgentInfo);
+			break;
+		case 1:
+			xreq.send('shell', fullcmd, cbAgentCompare);
+		}
+	}
+	
+	window.onload=function(){
+		showList();
+		document.getElementById("run_link").onclick=doRun;
+	}
+	</script>
+</head>
+
+<body bgcolor="#ffffff" text="#000000">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td width="15" height="37"><img src="addins/ct_ttl_img01.gif" width="15" height="37"></td>
+			<td background="addins/ct_ttl_img02.gif" width="100%" style="padding-left:10px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td width="93%" class="ct_ttl01">Oden Command</td>
+					</tr>
+				</table>
+			</td>
+			<td width="12" height="37"><img src="addins/ct_ttl_img03.gif" width="12" height="37"></td>
+		</tr>
+	</table>
+	
+	<table width="50%" border="0" cellspacing="0" cellpadding="0" style="margin-top:10px;">
+		<tr>
+			<td>
+				<select id="cmd_sel" class="ct_input_g" style="width:80px">
+					<option value="agent info">Agent Info</option>
+					<option value="agent compare -t">Agent Compare</option>
+				</select>
+				<input type="text" id="arg_text" style="width:200px; height:19px" maxLength="40" />
+				&nbsp;&nbsp;
+			</td>
+			<td>
+				<table border="0" cellspacing="0" cellpadding="0">
+					<tr>
+						<td width="17" height="23"><img src="addins/ct_btnbg01.gif" width="17" height="23"></td>
+						<td background="addins/ct_btnbg02.gif" class="ct_btn01" style="padding-top:3px;">
+							<a href="#" id="run_link">Run</a>
+						</td>
+						<td width="14" height="23"><img src="addins/ct_btnbg03.gif" width="14" height="23"></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+	<div id="list1"></div>
+</body>
+</html>

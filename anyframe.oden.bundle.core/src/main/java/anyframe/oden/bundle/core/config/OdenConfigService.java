@@ -16,7 +16,6 @@
  */
 package anyframe.oden.bundle.core.config;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import anyframe.oden.bundle.common.OdenException;
@@ -28,13 +27,29 @@ import anyframe.oden.bundle.common.OdenException;
  *
  */
 public interface OdenConfigService {
+	/**
+	 * add agent to the oden config file
+	 */
+	public void addAgent(AgentElement agent) throws OdenException;
 	
-	public void addAgent(AgentElement agent) throws FileNotFoundException, OdenException;
+	/**
+	 * remove the agent from the config file 
+	 */
+	public void removeAgent(String name) throws OdenException;
 	
-	public void removeAgent(String name) throws FileNotFoundException, OdenException;
+	/**
+	 * get agent information by name
+	 */
+	public AgentElement getAgent(String name);
 	
-	public AgentElement getAgent(String name) throws FileNotFoundException, OdenException;
+	/**
+	 * get all agent's names
+	 */
+	public List<String> getAgentNames() throws OdenException;
 	
-	public List<String> getAgentNames() throws FileNotFoundException, OdenException;
+	/**
+	 * get backup location for the agent
+	 */
+	public String getBackupLocation(String agentName) throws OdenException;
 	
 }

@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.editors;
@@ -19,7 +21,6 @@ package anyframe.oden.eclipse.core.editors;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -66,8 +67,8 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
-import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.alias.Repository;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerImpl;
 import anyframe.oden.eclipse.core.brokers.OdenBrokerService;
 import anyframe.oden.eclipse.core.editors.actions.DeleteDeployAction;
@@ -106,15 +107,15 @@ public class PolicyPage implements Page {
 	private TableViewer policyViewer;
 	private TableViewer deployViewer;
 
-	TableViewerColumn policyName, desc, targetUri, targetRoot, locvar;
+	TableViewerColumn policyName, desc, agentName, targetRoot, locvar, addloc;
 	// Command line
-	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_EDITORS_PolicyPage_MsgPolicyShow;
-	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_EDITORS_PolicyPage_MsgDetailShow;
+	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_CLI_COMMAND_policy_info_json;
+	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_CLI_COMMAND_policy_info;
 	private String noUsernameRequiredName = UIMessages.ODEN_EXPLORER_Dialogs_UserNameBooleanString;
 	private String shellUrl;
 	private Server server;
 
-	private final String HTTP_PROT = "http://";
+	private final String HTTP_PROT = CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP;
 
 	private Button addPolicy;
 	private Button removePolicy;
@@ -123,7 +124,8 @@ public class PolicyPage implements Page {
 	private Button removeDeploy;
 	private Button noUsernameRequired;
 	private Button updateOptionRequired;
-
+	private Button deleteOptionRequired;
+	
 	// Label
 	private Label policy;
 	private Label repo;
@@ -169,7 +171,7 @@ public class PolicyPage implements Page {
 		public boolean select(Viewer viewer1, Object parentElement,
 				Object element) {
 			String text = ".*" + filterText.getText() + ".*";
-			if (text == null || text.length() == 0) {
+			if (text == null || text.length() == 0 || filterText.getText().trim().equals("")) {
 				return true;
 			}
 			String details = ((PolicyDetails) element).getPolicyName();
@@ -281,6 +283,7 @@ public class PolicyPage implements Page {
 
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createAllPolicySection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent ) {
 		createSpacer(toolkit, form.getBody(), 2, 4);
@@ -431,13 +434,22 @@ public class PolicyPage implements Page {
 		setExcludeText(new StyledText(client, SWT.LEFT | SWT.BORDER | SWT.MULTI
 				| SWT.V_SCROLL));
 		getExcludeText().setLayoutData(gd);
-
-		new Label(client,SWT.NONE);
+		
+		// deploy options(update and delete)
+		createSpacer(toolkit, client, 6, 2);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
 		setUpdateOptionRequired(new Button(client, SWT.CHECK));
 		getUpdateOptionRequired().setText(UIMessages.ODEN_EDITORS_PolicyPage_Update_Option);
 		getUpdateOptionRequired().setLayoutData(gd);
 
-
+		// delete option
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		setDeleteOptionRequired(new Button(client, SWT.CHECK));
+		getDeleteOptionRequired().setText(UIMessages.ODEN_EDITORS_PolicyPage_Delete_Option);
+		getDeleteOptionRequired().setLayoutData(gd);
+		
 		// Section title & Description
 		section.setText(title);
 		section
@@ -447,9 +459,27 @@ public class PolicyPage implements Page {
 		gd = new GridData(GridData.FILL_HORIZONTAL
 				| GridData.VERTICAL_ALIGN_BEGINNING);
 		section.setLayoutData(gd);
-
+		
+		// check if "delete option" check box is checked or not
+		getDeleteOptionRequired().addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(final SelectionEvent e) {
+//				boolean checked = getNoUsernameRequired().getSelection();
+//				getUserField().setEnabled(!checked);
+//				getPasswordField().setEnabled(!checked);
+//				if (checked) {
+//					getUserField().setText("anonymous");
+//					getPasswordField().setText("");
+//				}
+				boolean checked = getDeleteOptionRequired().getSelection();
+				
+				setEnableBuildRepoSection(checked);
+				
+				
+			}
+		});
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createRepoSection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent) {
 		repo_section = toolkit.createSection(parent, Section.TWISTIE
@@ -459,14 +489,14 @@ public class PolicyPage implements Page {
 		repo_section.setToggleColor(toolkit.getColors().getColor(
 				FormColors.SEPARATOR));
 		Composite client = toolkit.createComposite(repo_section, SWT.WRAP);
-
+		
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 6;
 		layout.marginHeight = 10;
 		layout.marginWidth = 10;
 
 		client.setLayout(layout);
-
+		
 		// Build Repository
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.heightHint = 10;
@@ -610,6 +640,7 @@ public class PolicyPage implements Page {
 		});
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createDepolySection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent) {
 		agent_section = toolkit.createSection(parent, Section.TWISTIE
@@ -650,17 +681,24 @@ public class PolicyPage implements Page {
 		DeployTable.setHeaderVisible(true);
 		DeployTable.setLinesVisible(true);
 
-		targetUri = new TableViewerColumn(getDeployViewer(), SWT.None);
-		targetUri.getColumn().setText(
+		agentName = new TableViewerColumn(getDeployViewer(), SWT.None);
+		agentName.getColumn().setText(
 				UIMessages.ODEN_EDITORS_PolicyPage_DeployTable_col1);
-		targetUri.getColumn().setWidth(150);
-		targetUri.setLabelProvider(new DeployUriColumnLabelProvider());
+		agentName.getColumn().setWidth(80);
+		agentName.setLabelProvider(new DeployUriColumnLabelProvider());
 
 		locvar = new TableViewerColumn(getDeployViewer(), SWT.None);
 		locvar.getColumn().setText(
 				UIMessages.ODEN_EDITORS_PolicyPage_DeployTable_col2);
-		locvar.getColumn().setWidth(150);
+		locvar.getColumn().setWidth(100);
 		locvar.setLabelProvider(new LocVarColumnLabelProvider());
+		
+		addloc = new TableViewerColumn(getDeployViewer(), SWT.None);
+		addloc.getColumn().setText(
+				UIMessages.ODEN_EDITORS_PolicyPage_DeployTable_col3);
+		addloc.getColumn().setWidth(150);
+		addloc.setLabelProvider(new LocationColumnLabelProvider());
+		
 		DeployTable.setLayoutData(gd);
 
 		// add & remove Deploy
@@ -743,9 +781,18 @@ public class PolicyPage implements Page {
 		}
 	}
 	
+	private class LocationColumnLabelProvider extends ColumnLabelProvider {
+		
+		public String getText(Object element) {
+
+			return ((PolicyDetails) element).getLocation();
+		}
+	}
+
 	/**
 	 * policy data loading
 	 */
+	@SuppressWarnings("unchecked")
 	public void loadInitData(String url) {
 		String commnd = "";
 		String result = "";
@@ -770,9 +817,9 @@ public class PolicyPage implements Page {
 								.get(o.toString()).toString());
 						String name = o.toString();
 						String desc = result_.getOptionArg(new String[] { "desc" });
-						if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
+						if(!(name.matches(CommandMessages.ODEN_CLI_COMMAND_policy_tempname+".*"))){
 							++index;
-							details = new PolicyDetails(name, desc, null, null, null);
+							details = new PolicyDetails(name, desc, null, null, null, null);
 							policyList.add(details);
 							originPolicy.add(name);
 							if(name.equals(policyNameText.getText())){
@@ -796,6 +843,7 @@ public class PolicyPage implements Page {
 	/**
 	 * policy detail data loading
 	 */
+	@SuppressWarnings("unchecked")
 	public void showPolicyDetail(String policyName) {
 		String commnd = "";
 		String result = "";
@@ -824,7 +872,8 @@ public class PolicyPage implements Page {
 			String[] exclude = result_.getOptionArgArray(new String[] { "e", "exclude" });
 
 			Boolean update = result.indexOf("-u") > 0 ? true : false;
-
+			Boolean delete = result.indexOf(CommandMessages.ODEN_CLI_OPTION_delete) > 0 ? true : false;
+			
 			// clear text Filed
 			clearText();
 
@@ -833,56 +882,87 @@ public class PolicyPage implements Page {
 			includeText.setText(changeIncludeValue(include));
 			excludeText.setText(changeExcludeValue(exclude));
 
-			String protocol = repo[0].substring(0, repo[0].lastIndexOf("://"));
-
-			if (protocol.equals("file")) {
-				// fileserver
-				getRepoKind().select(0);
-				getBuildRepoUriText().setText(server.getUrl());
-				getBuildRepoRootText().setText(repo[0].substring(repo[0]
-				                                                      .lastIndexOf("://") + 3));
-				noUsernameRequired.setEnabled(false);
-				getBuildRepoUriText().setEnabled(false);
-			} else {
-				// ftp protocol
-				getRepoKind().select(1);
-				getBuildRepoUriText().setText(repo[0].substring(repo[0]
-				                                                     .lastIndexOf("://") + 3));
-				getBuildRepoRootText().setText(repo[1]);
-			}
-			if( repo.length == 3 ) {
-				getUserField().setText(repo[2]);
-				getUserField().setEnabled(true);
-				getPasswordField().setEnabled(true);
-			} else if ( repo.length == 4 ) {
-				getUserField().setText(repo[2]);
-				getPasswordField().setText(repo[3]);
-				if(repo[2].equals("anonymous")){
-					getNoUsernameRequired().setSelection(true);
-					getUserField().setEnabled(false);
-					getPasswordField().setEnabled(false);
+			if(! delete) {
+				String protocol = repo[0].substring(0, repo[0].lastIndexOf("://"));
+				if (protocol.equals("file")) {
+					// fileserver
+					getRepoKind().select(0);
+					getBuildRepoUriText().setText(server.getUrl());
+					getBuildRepoRootText().setText(repo[0].substring(repo[0]
+					                                                      .lastIndexOf("://") + 3));
+					noUsernameRequired.setEnabled(false);
+					getBuildRepoUriText().setEnabled(false);
 				} else {
+					// ftp protocol
+					getRepoKind().select(1);
+					getBuildRepoUriText().setText(repo[0].substring(repo[0]
+					                                                     .lastIndexOf("://") + 3));
+					getBuildRepoRootText().setText(repo[1]);
+				}
+				if( repo.length == 3 ) {
+					getUserField().setText(repo[2]);
 					getUserField().setEnabled(true);
 					getPasswordField().setEnabled(true);
+				} else if ( repo.length == 4 ) {
+					getUserField().setText(repo[2]);
+					getPasswordField().setText(repo[3]);
+					if(repo[2].equals("anonymous")){
+						getNoUsernameRequired().setSelection(true);
+						getUserField().setEnabled(false);
+						getPasswordField().setEnabled(false);
+					} else {
+						getUserField().setEnabled(true);
+						getPasswordField().setEnabled(true);
+					}
+				} else {
+					// anonymous
+					getNoUsernameRequired().setSelection(true);
+					getUserField().setText("anonymous");
+					getUserField().setEnabled(false);
+					getPasswordField().setEnabled(false);
 				}
-			} else {
-				// anonymous
-				getNoUsernameRequired().setSelection(true);
-				getUserField().setText("anonymous");
-				getUserField().setEnabled(false);
-				getPasswordField().setEnabled(false);
-			}
+			} 
 			// update option
 			if(update)
 				getUpdateOptionRequired().setSelection(true);
+			// delete option
+			if(delete) {
+				getDeleteOptionRequired().setSelection(true);
+				setEnableBuildRepoSection(true);
+			}
+			
 			for (int i = 0; i < dest.length; i++) {
 				String d = dest[i];
-				if(d.indexOf('/') > 0)
+				
+				if(d.indexOf(":~") > 0) 
+					// using default location
+					details = new PolicyDetails(
+							null,
+							null,
+							d.substring(0, d.indexOf(":~")),
+							null,
+							UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboDefault,
+							d.indexOf("/") > 0 ? d.substring(d.indexOf("/") + 1) : null);
+				else if(d.indexOf(":$") > 0) 
+					// using location variable
 					details = new PolicyDetails(null, null, d.substring(0, d
-							.indexOf('/')), null, d
-							.substring(d.indexOf('/') + 1));
+							.indexOf(":$")), null, d.indexOf("/") > 0 ? d
+							.substring(d.indexOf(":$") + 2,d.indexOf("/")) : d
+							.substring(d.indexOf(":$") + 2,d.length()), d
+							.indexOf("/") > 0 ? d.substring(d.indexOf("/") + 1)
+							: null);
+				
 				else
-					details = new PolicyDetails(null, null, d, null, null);
+					// using absolute path
+					details = new PolicyDetails(
+							null,
+							null,
+							d.substring(0, d.indexOf(":/")),
+							null,
+							UIMessages.ODEN_EDITORS_PolicyPage_DialogAgent_ComboAbsolutePath,
+							d.indexOf(":/") > 0 ? d.substring(d.indexOf(":/")+2)
+									: null);
+				
 				deployList.add(details);
 			}
 
@@ -911,7 +991,7 @@ public class PolicyPage implements Page {
 		}
 	}
 	private String changeExcludeValue(String[] inputArr) {
-		ArrayList<String> exepts = arrToChange(CommandMessages.ODEN_EXPLORER_ExplorerView_HiddenFolder.split(","));
+		ArrayList<String> exepts = arrToChange(CommandMessages.ODEN_CLI_OPTION_hiddenfolder.split(","));
 		String returnVal="";
 		if(inputArr.length > 0) {
 			for(String exclude : inputArr)
@@ -942,6 +1022,11 @@ public class PolicyPage implements Page {
 		return returnList;
 	}
 	
+	private void setEnableBuildRepoSection(boolean checked) {
+		buildRepoInfoDisable(! checked);
+		repoNickname.setEnabled(! checked);
+		repo.setEnabled(! checked);
+	}
 	/**
 	 * initialize policy detail data
 	 */
@@ -956,6 +1041,7 @@ public class PolicyPage implements Page {
 		repoNickname.deselectAll();
 		getRepoKind().deselectAll();
 		getUpdateOptionRequired().setSelection(false);
+		getDeleteOptionRequired().setSelection(false);
 		getDeployViewer().getTable().clearAll();
 		PolicyDetails details = null;
 		getDeployViewer().setInput(details);
@@ -1049,11 +1135,11 @@ public class PolicyPage implements Page {
 	/**
 	 * Add deploy grid
 	 */
-	public void addDeploy(String agent , String location) {
+	public void addDeploy(String agent , String locationvar , String location) {
 		// Deploy Text reset
 		PolicyDetails details = null;
 
-		details = new PolicyDetails(null, null, agent, null, location);
+		details = new PolicyDetails(null, null, agent, null, locationvar , location);
 		getDeployViewer().add(details);
 	}
 
@@ -1079,7 +1165,7 @@ public class PolicyPage implements Page {
 					MessageDialog.INFORMATION);
 			includeText.setFocus();
 			return false;
-		} else if (getRepoKind().getText().equals("")){
+		} else if (getRepoKind().getText().equals("") && ! getDeleteOptionRequired().getSelection()){
 			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
 					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
 					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
@@ -1087,7 +1173,7 @@ public class PolicyPage implements Page {
 			repo_section.setExpanded(true);
 			getRepoKind().setFocus();
 			return false;
-		} else if (getBuildRepoUriText().getText().equals("")){
+		} else if (getBuildRepoUriText().getText().equals("") && ! getDeleteOptionRequired().getSelection()){
 			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
 					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
 					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRepo,
@@ -1095,7 +1181,7 @@ public class PolicyPage implements Page {
 			repo_section.setExpanded(true);
 			getBuildRepoUriText().setFocus();
 			return false;		
-		} else if (getBuildRepoRootText().getText().equals("")){
+		} else if (getBuildRepoRootText().getText().equals("") && ! getDeleteOptionRequired().getSelection()){
 			DialogUtil.openMessageDialog(CommonMessages.ODEN_CommonMessages_Title_Warning,
 					UIMessages.ODEN_EDITORS_PolicyPage_DialogMsg_InputValue + " " 
 					+ UIMessages.ODEN_EDITORS_PolicyPage_Opt_BuildRoot,
@@ -1117,7 +1203,6 @@ public class PolicyPage implements Page {
 			getPolicyNameText().setFocus();
 			return false;
 		} 
-
 		return true;
 	}
 	private Boolean checkRemove(Object obj) {
@@ -1128,7 +1213,7 @@ public class PolicyPage implements Page {
 	}
 	
 	/**
-	 * check when add agent information
+	 * check when add agent information , must input 1 agentname
 	 * @return duplicate server name and location variable
 	 */
 	public Boolean checkAddDeploy(String addAgent, String addLocation) {
@@ -1139,8 +1224,7 @@ public class PolicyPage implements Page {
 				TableItem item = getDeployViewer().getTable().getItem(i);
 				details = (PolicyDetails) item.getData();
 				String agent = details.getDeployUrl();
-				String location = details.getLocationVar();
-				if(addAgent.equals(agent)&&addLocation.equals(location)){
+				if(addAgent.equals(agent)){
 					return false;
 				}
 			}
@@ -1225,7 +1309,7 @@ public class PolicyPage implements Page {
 			getPasswordField().setText("");
 
 		} else {
-			buildRepoInfoDisable();
+			buildRepoInfoDisable(false);
 			if (repo.isHasNoUserName()) {
 				getNoUsernameRequired().setSelection(true);
 				getUserField().setText("");
@@ -1255,17 +1339,30 @@ public class PolicyPage implements Page {
 
 	}
 
-	private void buildRepoInfoDisable() {
-		getRepoKind().setEnabled(false);
-		repoPath.setEnabled(false);
-		getBuildRepoUriText().setEnabled(false);
-		getBuildRepoRootText() .setEnabled(false);
-		getNoUsernameRequired().setEnabled(false);
-		getUserField().setEnabled(false);
-		userName.setEnabled(false);
-		userPassword.setEnabled(false);
-		getPasswordField().setEnabled(false);
+	private void buildRepoInfoDisable(boolean checked) {
+		getRepoKind().setEnabled(checked);
+		repoPath.setEnabled(checked);
+		getBuildRepoUriText().setEnabled(checked);
+		getBuildRepoRootText() .setEnabled(checked);
+		getNoUsernameRequired().setEnabled(checked);
+		getUserField().setEnabled(checked);
+		userName.setEnabled(checked);
+		userPassword.setEnabled(checked);
+		getPasswordField().setEnabled(checked);
+		if(! checked) {
+			repoNickname.deselectAll();
+			getRepoKind().deselectAll();
+			
+			getBuildRepoUriText().setText("");
+			getBuildRepoRootText().setText("");
+			
+			getUserField().setText("");
+			getNoUsernameRequired().setSelection(false);
+			getPasswordField().setText("");
+			
+		}
 	}
+	
 	private Boolean dupPolicyNameCheck() {
 		String commnd = "";
 		String result = "";
@@ -1278,6 +1375,7 @@ public class PolicyPage implements Page {
 				for (int i = 0; i < array.length(); i++) {
 					Object o = ((JSONObject) array.get(i)).keys().next();
 					if(!(o.toString().equals("KnownException"))){ // no data
+						@SuppressWarnings("unused")
 						Cmd result_ = new Cmd("foo", "fooAction \""
 								+ o.toString()
 								+ "\" "
@@ -1310,7 +1408,7 @@ public class PolicyPage implements Page {
 
 			public void keyReleased(KeyEvent ke) {
 				// filter.setSearchText(filterText.getText());
-				if(!(filterText.getText().equals("type filter text")) && !(filterText.getText().equals(""))){
+				if(!(filterText.getText().equals("type filter text"))){
 					PolicyPage.this.getPolicyViewer().addFilter(PolicyPage.this.filter);
 					getPolicyViewer().refresh();
 				}
@@ -1443,7 +1541,7 @@ public class PolicyPage implements Page {
 		String tempPolicyDesc = getDescriptionText().getText();
 
 		PolicyDetails details = null;
-		details = new PolicyDetails(tempPolicyName, tempPolicyDesc, null, null, null);
+		details = new PolicyDetails(tempPolicyName, tempPolicyDesc, null, null, null, null);
 		getPolicyViewer().insert(details, num );
 		getPolicyViewer().getTable().select(num );
 	}
@@ -1566,6 +1664,14 @@ public class PolicyPage implements Page {
 
 	public  Button getUpdateOptionRequired() {
 		return updateOptionRequired;
+	}
+	
+	public void setDeleteOptionRequired(Button deleteOptionRequired) {
+		this.deleteOptionRequired = deleteOptionRequired;
+	}
+	
+	public Button getDeleteOptionRequired() {
+		return deleteOptionRequired;
 	}
 
 	public void setShellUrl(String shellUrl) {

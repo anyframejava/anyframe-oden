@@ -1,0 +1,394 @@
+<project name="install 2 samsunglife" basedir=".">
+	
+	<property name="local.oden.home" location="../anyframe.oden.bundle"/>
+	<property name="id" value="d25222" />
+	<property name="pwd" value=""/>
+	
+	<macrodef name="send-file">
+		<attribute name="svr"/>
+		<attribute name="id" default="${id}"/>
+		<attribute name="pwd" default="${pwd}"/>
+		<attribute name="src.root"/>
+		<attribute name="src.path"/>
+		<attribute name="src.file"/>
+		<sequential>
+			<ftp server="@{svr}" userid="@{id}" password="@{pwd}" binary="yes">
+				<fileset dir="@{src.root}/@{src.path}" includes="@{src.file}"/>
+			</ftp>
+			<telnet userid="@{id}" password="@{pwd}" server="@{svr}">
+				<read>/home/@{id}</read>
+				<write>chmod 755 .</write>
+				<read>/home/@{id}</read>
+				<write>sudo su - oden</write>
+				<read>/Tools/oden</read>
+				<write>mkdir -p @{src.path}</write>
+				<read>/Tools/oden</read>
+				<write>cp /home/@{id}/@{src.file} @{src.path}</write>
+				<read>/Tools/oden</read>
+				<write>exit</write>
+				<read>/home/@{id}</read>
+				<write>rm /home/@{id}/@{src.file}</write>
+			</telnet>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="send-file2">
+		<attribute name="svr"/>
+		<attribute name="id" default="${id}"/>
+		<attribute name="pwd" default="${pwd}"/>
+		<attribute name="src.root"/>
+		<attribute name="src.path"/>
+		<attribute name="src.file"/>
+		<sequential>
+			<ftp server="@{svr}" userid="@{id}" password="@{pwd}" binary="yes">
+				<fileset dir="@{src.root}/@{src.path}" includes="@{src.file}"/>
+			</ftp>
+			<telnet userid="@{id}" password="@{pwd}" server="@{svr}">
+				<read>/Tools/oden</read>
+				<write>mkdir -p @{src.path}</write>
+				<read>/Tools/oden</read>
+				<write>cp @{src.file} @{src.path}</write>
+				<read>/Tools/oden</read>
+				<write>rm @{src.file}</write>
+			</telnet>
+		</sequential>
+	</macrodef>
+			
+	<macrodef name="install-agent">
+		<attribute name="svr"/>
+		<attribute name="id" default="${id}"/>
+		<attribute name="pwd" default="${pwd}"/>
+		<attribute name="src.path" default="pack"/>
+		<attribute name="src.file" default="oden-agent-1.0.0.tar.gz"/>
+		<attribute name="desc" default=""/>
+		<sequential>
+			<send-file svr="@{svr}" src.root="${basedir}" 
+				src.path="@{src.path}" src.file="@{src.file}" />
+			<telnet userid="@{id}" password="@{pwd}" server="@{svr}">
+				<read>/home/@{id}</read>
+				<write>sudo su - oden</write>
+<!--				<read>/Tools/oden</read>-->
+<!--				<write>./shutdown.sh</write>-->
+				<read>/Tools/oden</read>
+				<write>gunzip &lt; @{src.path}/@{src.file} | tar xf -</write>
+<!--				<read>/Tools/oden</read>-->
+<!--				<write>chmod 755 shutdown.sh</write>-->
+<!--				<read>/Tools/oden</read>-->
+<!--				<write>chmod 755 startup.sh</write>-->
+<!--				<read>/Tools/oden</read>-->
+<!--				<write>rm @{src.path}/@{src.file}</write>-->
+<!--				<read>/Tools/oden</read>-->
+<!--				<write>./startup.sh</write>-->
+<!--				<read>All rights reserved.</read>-->
+				<write>chmod -R 775 .</write>
+				<read>/Tools/oden</read>
+			</telnet>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="install-agent2">
+		<attribute name="svr"/>
+		<attribute name="id" default="${id}"/>
+		<attribute name="pwd" default="${pwd}"/>
+		<attribute name="src.path" default="pack"/>
+		<attribute name="src.file" default="oden-agent-1.0.0.tar.gz"/>
+		<attribute name="desc" default=""/>
+		<sequential>
+			<send-file2 svr="@{svr}" id="@{id}" pwd="@{pwd}" src.root="${basedir}" 
+				src.path="@{src.path}" src.file="@{src.file}" />
+			<telnet userid="@{id}" password="@{pwd}" server="@{svr}">
+				<read>/Tools/oden</read>
+				<write>./shutdown.sh</write>
+				<read>/Tools/oden</read>
+				<write>gunzip &lt; @{src.path}/@{src.file} | tar xf -</write>
+				<read>/Tools/oden</read>
+				<write>chmod 755 shutdown.sh</write>
+				<read>/Tools/oden</read>
+				<write>chmod 755 startup.sh</write>
+				<read>/Tools/oden</read>
+				<write>rm @{src.path}/@{src.file}</write>
+				<read>/Tools/oden</read>
+				<write>./startup.sh</write>
+				<read>All rights reserved.</read>
+				<write>ls</write>
+				<read>/Tools/oden</read>
+			</telnet>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="reset-agent">
+		<attribute name="svr"/>
+		<attribute name="id" default="${id}"/>
+		<attribute name="pwd" default="${pwd}"/>
+		<attribute name="desc" default=""/>
+		<sequential>
+			<telnet userid="@{id}" password="@{pwd}" server="@{svr}">
+				<read>/home/@{id}</read>
+				<write>sudo su - oden</write>
+				<read>/Tools/oden</read>
+				<write>./shutdown.sh</write>
+				<read>/Tools/oden</read>
+				<write>./startup.sh</write>
+				<read>All rights reserved.</read>
+				<write>ls</write>
+				<read>/Tools/oden</read>
+			</telnet>
+		</sequential>
+	</macrodef>
+	
+	<target name="installT.oden">
+		<tstamp>
+	    	<format property="TODAY" pattern="yyMMdd" locale="en,KOREA"/>
+	  	</tstamp>
+		<property name="svr" value="ad1.xt.develop.samsunglife.kr"/>
+		
+		<ftp server="${svr}" userid="${id}" password="${pwd}" binary="yes">
+			<fileset file="pack/oden-1.0.0.tar.gz"/>
+		</ftp>
+		<telnet userid="${id}" password="${pwd}" server="${svr}">
+			<read>/home/${id}</read>
+			<write>chmod 755 .</write>
+			<read>/home/${id}</read>
+			<write>sudo su - oden</write>
+			
+			<read>/Tools/oden</read>
+			<write>mkdir -p install/1.0.0.${TODAY}</write>
+			<read>/Tools/oden</read>
+			<write>mkdir snapshots</write>
+			
+			<read>/Tools/oden</read>
+			<write>cp /home/${id}/oden-1.0.0.tar.gz install/1.0.0.${TODAY}</write>
+			
+			<read>/Tools/oden</read>
+			<write>./shutdown.sh</write>
+			
+			<read>/Tools/oden</read>
+			<write>gunzip &lt; install/1.0.0.${TODAY}/oden-1.0.0.tar.gz | tar xf -</write>
+			
+			<read>/Tools/oden</read>
+			<write>rm conf/config.xml</write>
+			<read>/Tools/oden</read>
+			<write>mv conf/config_dev.xml conf/config.xml</write>
+			<read>/Tools/oden</read>
+			<write>rm conf/oden.ini</write>
+			<read>/Tools/oden</read>
+			<write>mv conf/oden_dev.ini conf/oden.ini</write>
+			
+			<read>/Tools/oden</read>
+			<write>chmod 755 shutdown.sh</write>
+			<read>/Tools/oden</read>
+			<write>chmod 755 startup.sh</write>
+			
+			<read>/Tools/oden</read>
+			<write>./startup.sh</write>
+			<read>All rights reserved.</read>
+			<write>ls</write>
+			
+			<read>/Tools/oden</read>
+			<write>exit</write>
+			
+			<read>/home/${id}</read>
+			<write>rm /home/${id}/oden-1.0.0.tar.gz</write>
+			<read>/home/${id}</read>
+			<write>ls /Tools/oden</write>
+			<read>/home/${id}</read>
+		</telnet>
+		<reset-agent svr="ad1.xt.develop.samsunglife.kr"/>
+	</target>
+	
+	<target name="installP.oden">
+		<tstamp>
+	    	<format property="TODAY" pattern="yyMMdd" locale="en,KOREA"/>
+	  	</tstamp>
+		<property name="svr" value="ad1.xp.develop.samsunglife.kr"/>
+		
+		<ftp server="${svr}" userid="${id}" password="${pwd}" binary="yes">
+			<fileset file="pack/oden-1.0.0.tar.gz"/>
+		</ftp>
+		<telnet userid="${id}" password="${pwd}" server="${svr}">
+			<read>/home/${id}</read>
+			<write>chmod 755 .</write>
+			<read>/home/${id}</read>
+			<write>sudo su - oden</write>
+			
+			<read>/Tools/oden</read>
+			<write>mkdir -p install/1.0.0.${TODAY}</write>
+			<read>/Tools/oden</read>
+			<write>mkdir snapshots</write>
+			
+			<read>/Tools/oden</read>
+			<write>cp /home/${id}/oden-1.0.0.tar.gz install/1.0.0.${TODAY}</write>
+			
+			<read>/Tools/oden</read>
+			<write>./shutdown.sh</write>
+			
+			<read>/Tools/oden</read>
+			<write>gunzip &lt; install/1.0.0.${TODAY}/oden-1.0.0.tar.gz | tar xf -</write>
+			
+			<read>/Tools/oden</read>
+			<write>chmod 755 shutdown.sh</write>
+			<read>/Tools/oden</read>
+			<write>chmod 755 startup.sh</write>
+			
+			<read>/Tools/oden</read>
+			<write>./startup.sh</write>
+			<read>All rights reserved.</read>
+			<write>ls</write>
+			
+			<read>/Tools/oden</read>
+			<write>exit</write>
+			
+			<read>/home/${id}</read>
+			<write>rm /home/${id}/oden-1.0.0.tar.gz</write>
+			<read>/home/${id}</read>
+			<write>ls /Tools/oden</write>
+			<read>/home/${id}</read>
+		</telnet>
+		<reset-agent svr="ad1.xp.develop.samsunglife.kr"/>
+	</target>
+	
+	<target name="send.01">
+		<property name="svr" value="ad1.xp.develop.samsunglife.kr"/>
+		<send-file svr="${svr}" src.root="${local.oden.home}" 
+			src.path="conf" src.file="config.xm" />
+	</target>
+	
+	<target name="send.02">
+		<property name="svr" value="ad1.xt.develop.samsunglife.kr"/>
+		<send-file svr="${svr}" src.root="${local.oden.home}" 
+			src.path="bundle" src.file="remote-1.0.0.RC4.jar" />
+		<property name="svr" value="ad1.xp.develop.samsunglife.kr"/>
+		<send-file svr="${svr}" src.root="${local.oden.home}" 
+			src.path="bundle" src.file="remote-1.0.0.RC4.jar" />
+	</target>
+	
+	<target name="send.03">
+		<property name="svr" value="wb1.xp.portal.samsunglife.kr"/>
+		<send-file svr="${svr}" src.root="${local.oden.home}" 
+			src.path="bundle" src.file="anyframe.common.bundle.log-1.0.0.jar" />
+	</target>
+	
+	<target name="send.04">
+		<property name="svr" value="wb1.xp.portal.samsunglife.kr"/>
+		<send-file svr="${svr}" src.root="${local.oden.home}" 
+			src.path="bundle" src.file="anyframe.oden.bundle.samsunglife-1.0.0.jar" />
+	</target>
+	
+	<target name="install.agents">
+		<!-- FLPP0W -->
+		<install-agent svr="wb1.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb2.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb3.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb4.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb5.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb6.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb7.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb8.xp.portal.samsunglife.kr"/>
+		<install-agent svr="wb9.xp.portal.samsunglife.kr"/>
+
+		<!-- FLPP0A -->
+		<install-agent svr="ap1.xp.portal.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.portal.samsunglife.kr"/>
+		<install-agent svr="ap3.xp.portal.samsunglife.kr"/>
+		<install-agent svr="ap4.xp.portal.samsunglife.kr"/>
+		
+		<!-- FLPC0A (NA)-->
+		<!--<install-agent svr="ap1.xp.core.samsunglife.kr" desc="conn fail"/>
+		<install-agent svr="ap2.xp.core.samsunglife.kr" desc="conn fail"/>
+		<install-agent svr="ap3.xp.core.samsunglife.kr" desc="conn fail"/>
+		<install-agent svr="ap4.xp.core.samsunglife.kr" desc="conn fail"/>
+		<install-agent svr="ap5.xp.core.samsunglife.kr" desc="conn fail"/>
+		<install-agent svr="ap6.xp.core.samsunglife.kr" desc="conn fail"/>-->
+		
+		<!-- FLPCHA -->
+		<install-agent svr="ap1.xp.channel.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.channel.samsunglife.kr"/>
+		<install-agent svr="ap3.xp.channel.samsunglife.kr"/>
+		<install-agent svr="ap4.xp.channel.samsunglife.kr"/>
+		<install-agent svr="ap5.xp.channel.samsunglife.kr"/>
+		<install-agent svr="ap6.xp.channel.samsunglife.kr"/>
+		
+		<!-- FLPCUA -->
+		<install-agent svr="ap1.xp.customer.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.customer.samsunglife.kr"/>
+		
+		<!-- FLPCCA -->
+		<install-agent svr="ap1.xp.callcenter.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.callcenter.samsunglife.kr"/>
+		
+		<!-- FLPPRA -->
+		<install-agent svr="ap1.xp.product.samsunglife.kr"/>
+		
+		<!-- FLPC0BA -->
+		<install-agent svr="ap1.xp.batch.samsunglife.kr"/>
+		
+		<!-- FLPCRA -->
+		<install-agent svr="ap1.xp.campaign.samsunglife.kr"/>
+		
+		<!-- FLPBPA (NA)-->
+		<!-- <install-agent svr="ap1.xp.bpm.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.bpm.samsunglife.kr"/> -->
+		
+		<!-- FLPAMA -->
+		<install-agent svr="ap1.xp.iam.samsunglife.kr"/>
+		<install-agent svr="ap2.xp.iam.samsunglife.kr"/>
+		
+		<!-- IFRS  -->
+		<install-agent svr="100.254.19.81"/>
+		
+		<!-- FLPREA  -->
+		<install-agent2 svr="100.254.161.55" id="oden" pwd="imsi00"/>
+		
+		<!-- FLVPOW -->
+		<install-agent svr="wb1.xv.portal.samsunglife.kr"/>
+		<install-agent svr="wb2.xv.portal.samsunglife.kr"/>
+		
+		<!-- FLVPOA -->
+		<install-agent svr="ap1.xv.portal.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.portal.samsunglife.kr"/>
+		
+		<!-- FLVCOA -->
+		<install-agent svr="ap1.xv.core.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.core.samsunglife.kr"/>
+		
+		<!-- FLVCHA -->
+		<install-agent svr="ap1.xv.channel.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.channel.samsunglife.kr"/>
+		
+		<!-- FLVCUA -->
+		<install-agent svr="ap1.xv.customer.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.customer.samsunglife.kr"/>
+		
+		<!-- FLVCUA -->
+		<install-agent svr="ap1.xv.callcenter.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.callcenter.samsunglife.kr"/>
+		
+		<!-- FLVPRA -->
+		<install-agent svr="ap1.xv.product.samsunglife.kr"/>
+		
+		<!-- FLVCRA (NA)-->
+		<!--<install-agent svr="ap1.xv.campaign.samsunglife.kr"/>-->
+		
+		<!-- FLVBPA (NA)-->
+		<!-- <install-agent svr="ap1.xv.bpm.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.bpm.samsunglife.kr"/> -->
+		
+		<!-- FLVAMA -->
+		<install-agent svr="ap1.xv.iam.samsunglife.kr"/>
+		<install-agent svr="ap2.xv.iam.samsunglife.kr"/>
+	</target>
+	
+	<target name="send.deploy">
+		
+	</target>
+	
+	<target name="main">
+		<send-file svr="ad1.xp.develop.samsunglife.kr" src.root="${local.oden.home}" src.path="bundle" src.file="anyframe.oden.bundle.core-1.0.0.jar"/>
+		<send-file svr="ad1.xp.develop.samsunglife.kr" src.root="${local.oden.home}" src.path="bundle" src.file="anyframe.oden.bundle.deploy-1.0.0.jar"/>
+
+		<send-file svr="ad1.xt.develop.samsunglife.kr" src.root="${local.oden.home}" src.path="bundle" src.file="anyframe.oden.bundle.core-1.0.0.jar"/>
+		<send-file svr="ad1.xt.develop.samsunglife.kr" src.root="${local.oden.home}" src.path="bundle" src.file="anyframe.oden.bundle.deploy-1.0.0.jar"/>
+	
+		<send-file2 svr="100.254.161.55" src.root="${local.oden.home}" src.path="bundle" src.file="anyframe.oden.bundle.deploy-1.0.0.jar" id="oden" pwd="imsi00"/>
+	</target>
+</project>

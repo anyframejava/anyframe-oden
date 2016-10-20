@@ -17,6 +17,7 @@
 package anyframe.oden.bundle.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,9 @@ public class JSONUtil {
 	public final static String KNOWN_EXCEPTION = "KnownException";	
 	public final static String UNKNOWN_EXCEPTION = "UnknownException";
 	
-	private static JSONArray toJsonArray(List list) throws JSONException {
+	private static JSONArray toJsonArray(Collection c) throws JSONException {
 		JSONArray ja = new JSONArray();
-		for(Object o : list){
+		for(Object o : c){
 			ja.put(jsonize(o));
 		}
 		return ja;
@@ -51,12 +52,19 @@ public class JSONUtil {
 		
 		return jo;
 	}
-	
+
+	/**
+	 * convert object to json format object
+	 * 
+	 * @param o
+	 * @return
+	 * @throws JSONException
+	 */
 	public static Object jsonize(Object o) throws JSONException{
 		if(o == null)
 			throw new JSONException("Couldn't jsonize the object: " + o);
-		if(o instanceof List){
-			return toJsonArray((List)o);
+		if(o instanceof Collection){
+			return toJsonArray((Collection)o);
 		}else if(o instanceof Map){
 			return toJsonObject((Map)o);
 		}else if(o instanceof JSONizable){
@@ -65,6 +73,13 @@ public class JSONUtil {
 		return o.toString();
 	}
 	
+	/**
+	 * convert object to json array
+	 * 
+	 * @param m
+	 * @return
+	 * @throws JSONException
+	 */
 	public static JSONArray jsonArray(Object m) throws JSONException {
 		List<Object> l = new ArrayList<Object>();
 		l.add(m);
@@ -85,14 +100,32 @@ public class JSONUtil {
 		return jarr.toString();
 	}
 	
+	/**
+	 * convert exception to json object
+	 * 
+	 * @param e
+	 * @return
+	 */
 	public static String jsonizedUnknowException(Exception e) {
 		return jsonizedException(UNKNOWN_EXCEPTION, e);
 	}
 	
+	/**
+	 * convert exception to json object
+	 * 
+	 * @param e
+	 * @return
+	 */
 	public static String jsonizedKnownException(Exception e){
 		return jsonizedException(KNOWN_EXCEPTION, e);
 	}
 	
+	/**
+	 * convert exception to json object
+	 * 
+	 * @param e
+	 * @return
+	 */
 	public static String jsonizedException(Exception e) {
 		if(e instanceof OdenException){
 			return jsonizedKnownException(e);
@@ -100,6 +133,12 @@ public class JSONUtil {
 		return jsonizedUnknowException(e);
 	}
 	
+	/**
+	 * json array to string
+	 * 
+	 * @param jArr
+	 * @return
+	 */
 	public static String toString(JSONArray jArr) {
 		StringBuffer buf = new StringBuffer();
 		try{
@@ -142,7 +181,13 @@ public class JSONUtil {
 		return buf.toString();
 	}
 	
-	private static String toString(JSONObject jObj) {
+	/**
+	 * json object to string
+	 * 
+	 * @param jObj
+	 * @return
+	 */
+	public static String toString(JSONObject jObj) {
 		StringBuffer buf = new StringBuffer();
 		try{
 			for(Iterator<String> i = jObj.keys();i.hasNext();){

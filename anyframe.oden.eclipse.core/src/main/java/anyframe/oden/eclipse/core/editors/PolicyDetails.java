@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.editors;
@@ -25,97 +27,107 @@ package anyframe.oden.eclipse.core.editors;
  */
 public class PolicyDetails {
 
-	private String PolicyName;
+	private String policyName;
 
-	private String Description;
+	private String description;
 
-	private String BuildRepo;
+	private String buildRepo;
 
-	private String IncludeItem;
+	private String includeItem;
 
-	private String ExcludeItem;
+	private String excludeItem;
 
-	private String DeployUrl;
+	private String deployUrl;
 
-	private String DeployRoot;
+	private String deployRoot;
 	
-	private String LocationVar;
+	private String locationVar;
+	
+	private String location;
 
 	public PolicyDetails() {
 
 	}
 
-	public PolicyDetails(String PolicyName, String Description,
-			String DeployUrl, String DeployRoot, String LocationVar) {
-		this.PolicyName = PolicyName;
-		this.Description = Description;
-		this.DeployUrl = DeployUrl;
-		this.DeployRoot = DeployRoot;
-		this.LocationVar = LocationVar;
+	public PolicyDetails(String policyName, String description,
+			String deployUrl, String deployRoot, String locationVar , String location) {
+		this.policyName = policyName;
+		this.description = description;
+		this.deployUrl = deployUrl;
+		this.deployRoot = deployRoot;
+		this.locationVar = locationVar;
+		this.location = location;
 	}
 
 	public String getPolicyName() {
-		return PolicyName;
+		return policyName;
 	}
 
 	public void setPolicyName(String policyName) {
-		this.PolicyName = policyName;
+		this.policyName = policyName;
 	}
 
 	public String getDescription() {
-		return Description;
+		return description;
 	}
 
 	public void setDescription(String description) {
-		this.Description = description;
+		this.description = description;
 	}
 
 	public String getBuildRepo() {
-		return BuildRepo;
+		return buildRepo;
 	}
 
 	public void setBuildRepo(String buildRepo) {
-		this.BuildRepo = buildRepo;
+		this.buildRepo = buildRepo;
 	}
 
 	public String getIncludeItem() {
-		return IncludeItem;
+		return includeItem;
 	}
 
 	public void setIncludeItem(String includeItem) {
-		this.IncludeItem = includeItem;
+		this.includeItem = includeItem;
 	}
 
 	public String getExcludeItem() {
-		return ExcludeItem;
+		return excludeItem;
 	}
 
 	public void setExcludeItem(String excludeItem) {
-		this.ExcludeItem = excludeItem;
+		this.excludeItem = excludeItem;
 	}
 
 	public String getDeployUrl() {
-		return DeployUrl;
+		return deployUrl;
 	}
 
 	public void setDeployUrl(String deployUrl) {
-		this.DeployUrl = deployUrl;
+		this.deployUrl = deployUrl;
 	}
 
 	public String getDeployRoot() {
-		return DeployRoot;
+		return deployRoot;
 	}
 
 	public void setDeployRoot(String deployRoot) {
-		this.DeployRoot = deployRoot;
+		this.deployRoot = deployRoot;
 	}
 
 	public String getLocationVar() {
-		return LocationVar;
+		return locationVar;
 	}
 
 	public void setLocationVar(String locationVar) {
-		LocationVar = locationVar;
+		this.locationVar = locationVar;
+	}
+	
+	public String getLocation() {
+		return location;
 	}
 
+	public void setLocation(String location) {
+		this.location = location;
+	}
 }

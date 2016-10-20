@@ -1,20 +1,24 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core;
+
+import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +35,8 @@ import org.osgi.framework.BundleContext;
 import anyframe.oden.eclipse.core.alias.AliasManager;
 import anyframe.oden.eclipse.core.explorer.ExplorerView;
 import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
+import anyframe.oden.eclipse.core.jobmanager.JobManagerView;
+import anyframe.oden.eclipse.core.jobmanager.dialogs.SetFileReqPathDialog;
 import anyframe.oden.eclipse.core.snapshot.SnapshotView;
 
 /**
@@ -39,7 +45,7 @@ import anyframe.oden.eclipse.core.snapshot.SnapshotView;
  * @author RHIE Jihwan
  * @version 1.0.0
  * @since 1.0.0 M3
- *
+ * 
  */
 public class OdenActivator extends AbstractUIPlugin {
 
@@ -50,12 +56,15 @@ public class OdenActivator extends AbstractUIPlugin {
 	// The shared instance
 	private static OdenActivator plugin;
 
-	private static final Log odenLogger = LogFactory.getLog(OdenActivator.class);
+	private static final Log odenLogger = LogFactory
+			.getLog(OdenActivator.class);
 
 	// Cached views
 	private ExplorerView explorerView;
 	private SnapshotView snapshotView;
 	private DeploymentHistoryView deploymentHistoryView;
+	private JobManagerView jobmanagerView;
+	private SetFileReqPathDialog setfilereqpathDialog;
 
 	// AliasManager type for setInput() of "Oden Explorer view"
 	private AliasManager aliasManager;
@@ -64,19 +73,22 @@ public class OdenActivator extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public OdenActivator() {
-
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 
-		// There is no need to get preference store for this plugin - nothing is there ;-)
-		//		PreferencePage.setCurrent(getPreferenceStore());
+		// There is no need to get preference store for this plugin - nothing is
+		// there ;-)
+		// PreferencePage.setCurrent(getPreferenceStore());
 
 		try {
 			getLog().addLogListener(new ILogListener() {
@@ -90,7 +102,8 @@ public class OdenActivator extends AbstractUIPlugin {
 				}
 			});
 
-			// Creates aliasManager and initialize it with stored ServerManager and RepositoryManager in each XML file
+			// Creates aliasManager and initialize it with stored ServerManager
+			// and RepositoryManager in each XML file
 			aliasManager = new AliasManager();
 			aliasManager.load();
 
@@ -102,21 +115,26 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
 	 */
 	public void stop(BundleContext context) throws Exception {
 
-		// Termination process, which stores working configuration of ServerManager and RepositoryManager in each XML file
+		// Termination process, which stores working configuration of
+		// ServerManager and RepositoryManager in each XML file
 		aliasManager.save();
 
 		// Set current plugin to null
-		//		plugin = null;
+		// plugin = null;
 
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
+	 * 
 	 * @return the shared instance
 	 */
 	public static OdenActivator getDefault() {
@@ -125,6 +143,7 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets AliasManager which has ServerManager and RepositoryManager
+	 * 
 	 * @return aliasManager
 	 */
 	public AliasManager getAliasManager() {
@@ -133,8 +152,10 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets Oden Explorer view
+	 * 
 	 * @return getExplorerView(true)
-	 * @see anyframe.oden.eclipse.core.OdenActivator#getExplorerView(boolean create)
+	 * @see anyframe.oden.eclipse.core.OdenActivator#getExplorerView(boolean
+	 *      create)
 	 */
 	public ExplorerView getExplorerView() {
 		return getExplorerView(true);
@@ -142,8 +163,10 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets Oden Snapshot view
+	 * 
 	 * @return getSnapshotView(true)
-	 * @see anyframe.oden.eclipse.core.OdenActivator#getSnapshotView(boolean create)
+	 * @see anyframe.oden.eclipse.core.OdenActivator#getSnapshotView(boolean
+	 *      create)
 	 */
 	public SnapshotView getSnapshotView() {
 		return getSnapshotView(true);
@@ -151,15 +174,40 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets Oden Deployment History view
+	 * 
 	 * @return getDeploymentHistoryView(true)
-	 * @see anyframe.oden.eclipse.core.OdenActivator#getDeploymentHistoryView(boolean create)
+	 * @see anyframe.oden.eclipse.core.OdenActivator#getDeploymentHistoryView(boolean
+	 *      create)
 	 */
 	public DeploymentHistoryView getDeploymentHistoryView() {
 		return getDeploymentHistoryView(true);
 	}
 
 	/**
+	 * Gets Oden Deployment History view
+	 * 
+	 * @return getDeploymentHistoryView(true)
+	 * @see anyframe.oden.eclipse.core.OdenActivator#getDeploymentHistoryView(boolean
+	 *      create)
+	 */
+	public JobManagerView getJObManagerView() {
+		return getJobManagerView(true);
+	}
+
+	/**
+	 * Gets Oden Deployment History view
+	 * 
+	 * @return getDeploymentHistoryView(true)
+	 * @see anyframe.oden.eclipse.core.OdenActivator#getDeploymentHistoryView(boolean
+	 *      create)
+	 */
+	public SetFileReqPathDialog getSetFileReqPathDialog() {
+		return getSetFileReqPathDialog(true);
+	}
+
+	/**
 	 * Gets Oden Explorer view
+	 * 
 	 * @param create
 	 * @return explorerView
 	 */
@@ -167,10 +215,12 @@ public class OdenActivator extends AbstractUIPlugin {
 		if (explorerView == null) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				explorerView = (ExplorerView)page.findView(ExplorerView.class.getName());
+				explorerView = (ExplorerView) page.findView(ExplorerView.class
+						.getName());
 				if (explorerView == null && create) {
 					try {
-						explorerView = (ExplorerView)page.showView(ExplorerView.class.getName());
+						explorerView = (ExplorerView) page
+								.showView(ExplorerView.class.getName());
 					} catch (PartInitException partInitException) {
 						partInitException.printStackTrace();
 					}
@@ -183,6 +233,7 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets Oden Snapshot view
+	 * 
 	 * @param create
 	 * @return snapshotView
 	 */
@@ -190,10 +241,12 @@ public class OdenActivator extends AbstractUIPlugin {
 		if (snapshotView == null) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				snapshotView = (SnapshotView)page.findView(SnapshotView.class.getName());
+				snapshotView = (SnapshotView) page.findView(SnapshotView.class
+						.getName());
 				if (snapshotView == null && create) {
 					try {
-						snapshotView = (SnapshotView)page.showView(SnapshotView.class.getName());
+						snapshotView = (SnapshotView) page
+								.showView(SnapshotView.class.getName());
 					} catch (PartInitException partInitException) {
 						partInitException.printStackTrace();
 					}
@@ -206,6 +259,7 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Gets Oden DeploymentHistory view
+	 * 
 	 * @param create
 	 * @return deploymentHistoryView
 	 */
@@ -213,10 +267,12 @@ public class OdenActivator extends AbstractUIPlugin {
 		if (deploymentHistoryView == null) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				deploymentHistoryView = (DeploymentHistoryView)page.findView(DeploymentHistoryView.class.getName());
+				deploymentHistoryView = (DeploymentHistoryView) page
+						.findView(DeploymentHistoryView.class.getName());
 				if (deploymentHistoryView == null && create) {
 					try {
-						deploymentHistoryView = (DeploymentHistoryView)page.showView(DeploymentHistoryView.class.getName());
+						deploymentHistoryView = (DeploymentHistoryView) page
+								.showView(DeploymentHistoryView.class.getName());
 					} catch (PartInitException partInitException) {
 						partInitException.printStackTrace();
 					}
@@ -225,6 +281,59 @@ public class OdenActivator extends AbstractUIPlugin {
 		}
 
 		return deploymentHistoryView;
+	}
+
+	/**
+	 * Gets Oden JobManager view
+	 * 
+	 * @param create
+	 * @return jobmanagerView
+	 */
+	public JobManagerView getJobManagerView(boolean create) {
+		if (jobmanagerView == null) {
+			IWorkbenchPage page = getActivePage();
+			if (page != null) {
+				jobmanagerView = (JobManagerView) page
+						.findView(JobManagerView.class.getName());
+				if (jobmanagerView == null && create) {
+					try {
+						jobmanagerView = (JobManagerView) page
+								.showView(JobManagerView.class.getName());
+					} catch (PartInitException partInitException) {
+						partInitException.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return jobmanagerView;
+	}
+
+	/**
+	 * Gets Oden SetFileReqPath dialog
+	 * 
+	 * @param create
+	 * @return jobmanagerView
+	 */
+	public SetFileReqPathDialog getSetFileReqPathDialog(boolean create) {
+		if (setfilereqpathDialog == null) {
+			IWorkbenchPage page = getActivePage();
+			if (page != null) {
+				setfilereqpathDialog = (SetFileReqPathDialog) page
+						.findView(SetFileReqPathDialog.class.getName());
+
+				if (setfilereqpathDialog == null && create) {
+					try {
+						setfilereqpathDialog = (SetFileReqPathDialog) page
+								.showView(SetFileReqPathDialog.class.getName());
+					} catch (PartInitException partInitException) {
+						partInitException.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return setfilereqpathDialog;
 	}
 
 	/**
@@ -244,9 +353,19 @@ public class OdenActivator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 * @param path the path
+	 * 
+	 * @param jobmanagerView
+	 */
+	public void setJobManagerView(JobManagerView jobmanagerView) {
+		this.jobmanagerView = jobmanagerView;
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path
+	 * 
+	 * @param path
+	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
@@ -255,27 +374,36 @@ public class OdenActivator extends AbstractUIPlugin {
 
 	/**
 	 * Error handling
+	 * 
 	 * @param message
 	 * @param throwable
 	 */
 	public static void error(String message, Throwable throwable) {
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, String.valueOf(message), throwable));
+		getDefault().getLog().log(
+				new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, String
+						.valueOf(message), throwable));
 		odenLogger.error(message, throwable);
 	}
-	
+
 	/**
 	 * Warning handling
+	 * 
 	 * @param message
 	 * @param throwable
 	 */
 	public static void warning(String message) {
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, String.valueOf(message)));
+		getDefault().getLog()
+				.log(
+						new Status(IStatus.WARNING, PLUGIN_ID, String
+								.valueOf(message)));
 		odenLogger.warn(message);
 	}
+
 	/**
 	 * @see anyframe.oden.eclipse.core.OdenActivator#getExplorerView()
 	 * @see anyframe.oden.eclipse.core.explorer.ExplorerView#getSite()
-	 * @return null if getExplorerView() is null, otherwise explorerView.getSite()
+	 * @return null if getExplorerView() is null, otherwise
+	 *         explorerView.getSite()
 	 */
 	public IWorkbenchSite getSite() {
 		if (getExplorerView() == null) {
@@ -285,7 +413,8 @@ public class OdenActivator extends AbstractUIPlugin {
 	}
 
 	private IWorkbenchPage getActivePage() {
-		if (getWorkbench() != null && getWorkbench().getActiveWorkbenchWindow() != null)
+		if (getWorkbench() != null
+				&& getWorkbench().getActiveWorkbenchWindow() != null)
 			return getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		return null;
 	}

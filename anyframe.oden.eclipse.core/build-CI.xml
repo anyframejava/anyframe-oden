@@ -14,8 +14,9 @@
 	<!-- Plug-in Information -->
 	<property name="bundle.id" value="anyframe.oden.eclipse.core" />
 	<property name="bundle.version" value="1.0.0" />
-	<property name="bundle.about" location="${basedir}/about" />
+	<property name="bundle.about" location="${basedir}/about_files" />
 	<property name="bundle.src" location="${basedir}/src/main/java" />
+	<property name="bundle.doc" location="${basedir}/doc" />
 	<property name="bundle.lib" location="${basedir}/lib" />
 	<property name="bundle.build" location="${basedir}/build" />
 	<property name="bundle.dist" location="${basedir}/dist" />
@@ -91,6 +92,8 @@
 		<antcall target="create.icons" />
 		<available file="${basedir}/template" type="dir" property="template.available" />
 		<antcall target="create.template" />
+		<available file="${basedir}/doc" type="dir" property="doc.available" />
+		<antcall target="create.doc" />
 	</target>
 	
 	<target name="create.lib" if="lib.available" description="Create a lib directory and copy its contents if required.">
@@ -150,6 +153,17 @@
 		</copy>
 	</target>
 	
+	<target name="create.doc" if="doc.available" description="Create a doc directory if required.">
+		<echo>------------------------------------------------------------</echo>
+		<echo>Adding doc.</echo>
+		<echo>------------------------------------------------------------</echo>
+		<echo />
+		<!-- <mkdir dir="${bundle.build}/doc" /> -->
+		<copy todir="${bundle.build}/doc">
+			<fileset dir="${basedir}/doc" />
+		</copy>
+	</target>
+	
 	<!-- Target: Make a jar -->
 	<target name="make.bundle.jar" depends="compile.bundle.resources,check.bundle.structure" description="Make jar archive file(s) for executables.">
 		<echo>************************************************************</echo>
@@ -158,7 +172,10 @@
 		<echo>************************************************************</echo>
 		<echo />
 		<copy todir="${bundle.build}">
-			<fileset dir="${basedir}" includes="plugin.xml"></fileset>
+			<fileset dir="${basedir}">
+				<include name="plugin.xml"/>
+				<include name="toc.xml"/>
+			</fileset>
 		</copy>
 		<jar jarfile="${bundle.dist}/anyframe/eclipse/plugins/${bundle.id}_${bundle.version}.jar" basedir="${bundle.build}" manifest="${basedir}/META-INF/MANIFEST.MF" />
 	</target>

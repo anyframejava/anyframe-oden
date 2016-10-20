@@ -23,13 +23,13 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.ungoverned.osgi.service.shell.Command;
 
+import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.DateUtil;
-import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.FileInfo;
+import anyframe.oden.bundle.common.JSONUtil;
 import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.core.DelegateService;
+import anyframe.oden.bundle.core.RepositoryProviderService;
 
 /**
  * JSON 으로 output을 출력하는 명령어 구현
@@ -38,21 +38,17 @@ import anyframe.oden.bundle.core.DelegateService;
  * @author joon1k
  *
  */
-public class RepositoryCommandImpl implements Command {
+public class RepositoryCommandImpl implements CustomCommand {
 	public final static String[] REPO_OPT = {"repo", "r"};
 	
 	public final static String[] ACCOUNT_OPT = {"account", "a"};
 	
 	public final static String PROTOCOL_ACTION = "protocol";
 	
-	private DelegateService delegateService;
+	private RepositoryProviderService repositoryProvider;
 	
-	protected void setDelegateService(DelegateService ds){
-		this.delegateService = ds;
-	}
-	
-	protected void unsetDelegateService(DelegateService ds){
-		this.delegateService = null;
+	protected void setRepositoryProvider(RepositoryProviderService ds){
+		this.repositoryProvider = ds;
 	}
 	
 	/**
@@ -72,7 +68,7 @@ public class RepositoryCommandImpl implements Command {
 				if(repoArgs == null)
 					throw new OdenException("Couldn't execute command.");
 				ja = getRepositoryStructure(repoArgs);
-			}else if(action.length() == 0){
+			}else if(action.length() == 0 || "help".equals(action)){
 				out.println(getFullUsage());
 			}else {
 				throw new OdenException("Couldn't execute specified action: " + action);
@@ -87,7 +83,7 @@ public class RepositoryCommandImpl implements Command {
 	}
 
 	private JSONArray getRepositoryStructure(String[] repoArgs) throws OdenException {
-		List<FileInfo> files = delegateService.getFilesFromRepo(repoArgs);
+		List<FileInfo> files = repositoryProvider.getFilesFromRepo(repoArgs);
 		return jsonizedFileList(files);
 	}
 
@@ -114,7 +110,7 @@ public class RepositoryCommandImpl implements Command {
 	}
 
 	private JSONArray getRepositoryProtocols() {
-		List<String> types = delegateService.getRepositoryProtocols();
+		List<String> types = repositoryProvider.getRepositoryProtocols();
 		return new JSONArray(types);
 	}
 
@@ -134,7 +130,7 @@ public class RepositoryCommandImpl implements Command {
 	
 	private String getRepositoryUsages() throws OdenException {
 		StringBuffer usages = new StringBuffer();
-		for(Iterator<String> it = delegateService.getRepositoryUsages().iterator(); it.hasNext();) {
+		for(Iterator<String> it = repositoryProvider.getRepositoryUsages().iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");
 			if(it.hasNext())
 				usages.append(" | ");

@@ -22,11 +22,10 @@ import java.net.UnknownHostException;
 
 import anyframe.common.bundle.gate.CustomCommand;
 import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.core.DelegateService;
 import anyframe.oden.bundle.core.config.AgentElement;
 import anyframe.oden.bundle.core.config.OdenConfigService;
-import anyframe.oden.bundle.prefs.Prefs;
-import anyframe.oden.bundle.prefs.PrefsService;
+import anyframe.oden.bundle.core.prefs.Prefs;
+import anyframe.oden.bundle.core.prefs.PrefsService;
 
 /**
  * abstract command to provides convenient methods to access DelegateService,
@@ -35,37 +34,19 @@ import anyframe.oden.bundle.prefs.PrefsService;
  * @author joon1k
  *
  */
-abstract class OdenCommand implements CustomCommand {
-	protected DelegateService delegateService;
-
+public abstract class OdenCommand implements CustomCommand {
 	protected PrefsService prefsService;
 	
 	protected OdenConfigService configService;
-	
-	public void setDelegateService(DelegateService ds){
-		this.delegateService = ds;
-	}
-	
-	public void unsetDelegateService(DelegateService ds){
-		this.delegateService = null;
-	}
-	
+		
 	public void setPrefsService(PrefsService prefsService){
 		this.prefsService = prefsService;
-	}
-	
-	public void unsetPrefsService(PrefsService prefsService){
-		this.prefsService = null;
 	}
 	
 	public void setConfigService(OdenConfigService configService) {
 		this.configService = configService;
 	}
 	
-	public void unsetConfigService(OdenConfigService configService) {
-		this.configService = null;
-	}
-		
 	protected Prefs getPrefs(String name){
 		return prefsService.getPrefs(name);
 	}
@@ -81,7 +62,7 @@ abstract class OdenCommand implements CustomCommand {
 		String info = getPrefs(prefs).get(name);
 		if(info.length() == 0 )
 			return null;
-		return new Cmd("foo", "fooAction \"" + name + "\" " + info);
+		return new Cmd("foo fooAction \"" + name + "\" " + info);
 	}
 	
 	/**
@@ -92,8 +73,7 @@ abstract class OdenCommand implements CustomCommand {
 	 * @throws FileNotFoundException
 	 * @throws OdenException
 	 */
-	protected String getURIFromAgent(String agentName) 
-			throws FileNotFoundException, OdenException {
+	protected String getURIFromAgent(String agentName) throws OdenException {
 		AgentElement agent = configService.getAgent(agentName);
 		if(agent != null){
 			return agent.getHost() + ":" + agent.getPort();

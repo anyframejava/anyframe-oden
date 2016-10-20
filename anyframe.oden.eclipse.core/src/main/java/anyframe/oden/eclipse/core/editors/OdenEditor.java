@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.editors;
@@ -76,7 +78,7 @@ public class OdenEditor extends MultiPageEditorPart implements IResourceChangeLi
 	}
 
 	public void setEditor(IEditorPart editor) {
-		editor = editor;
+		this.editor = editor;
 	}
 
 	private static IProject currentProject;
@@ -148,12 +150,13 @@ public class OdenEditor extends MultiPageEditorPart implements IResourceChangeLi
 	public void init(IEditorSite site, IEditorInput editorInput)
 	throws PartInitException {
 		shell = site.getShell();
+		@SuppressWarnings("unused")
 		IResource selectionResource = null;
 		ISelection selection = site.getPage().getSelection();
 		if (selection != null)
 			selectionResource = getSelectedResource(selection);
 
-		Locale.setDefault(new Locale("en"));
+//		Locale.setDefault(new Locale("en"));
 
 		super.init(site, editorInput);
 
@@ -165,6 +168,7 @@ public class OdenEditor extends MultiPageEditorPart implements IResourceChangeLi
 		if (type == IResourceChangeEvent.PRE_CLOSE) {
 			Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
+					@SuppressWarnings("unused")
 					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
 					.getPages();
 				}
@@ -242,6 +246,7 @@ public class OdenEditor extends MultiPageEditorPart implements IResourceChangeLi
 	 * Returns the shared instance
 	 * @return the shared instance
 	 */
+	@SuppressWarnings("deprecation")
 	public static OdenEditor getDefault(String title) {
 		IWorkbenchPage Page = PlatformUI.getWorkbench()
 		.getActiveWorkbenchWindow().getActivePage();

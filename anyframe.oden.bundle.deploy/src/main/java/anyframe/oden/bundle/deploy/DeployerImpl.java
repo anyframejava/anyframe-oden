@@ -16,24 +16,21 @@
  */
 package anyframe.oden.bundle.deploy;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipException;
 
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
-import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.common.PairValue;
+import anyframe.oden.bundle.common.Utils;
 
 /**
+ * all methods are throws Exception to catch
+ * ROSGiException(RuntimeExcetpion) on the remote caller.
  * @see DeployerService
+ * @ThreadSafe
  * 
  * @author joon1k
  *
@@ -41,146 +38,262 @@ import anyframe.oden.bundle.common.PairValue;
 public class DeployerImpl implements DeployerService, Serializable {
 	
 	private static final long serialVersionUID = -2192884775487476693L;
+	
+	private Object lock = new Object();
+	
+	public String jvmStat(){
+		return Utils.jvmStat();
+	}
+	
+	/**
+	 * this method is used to check if connection is available.
+	 */
+	public boolean alive(){
+		return true;
+	}
+	
+	public boolean exist(String parent, String child) throws Exception{
+		return new File(parent, child).exists();
+	}
 
-	private final static String TMP_PREFIX = "oden_";
+	public boolean writable(String parent, String child) throws Exception{
+		File f = new File(parent, child);
+		return !f.exists() || f.canWrite();
+	}
 	
-	private String fpath;
-	private long date;
-	private boolean updatejar = false;
-	private OutputStream out;
-	private File tmpfile;
+	public FileInfo fileInfo(String parent, String child) throws Exception{
+		File f = new File(parent, child);
+		if(f.exists())
+			return new FileInfo(child, f.isDirectory(), f.lastModified(), f.length());
+		return null;
+	}
 	
-	public void init(String fpath, long date, boolean update) 
-			throws IOException {
+	public List<String> resolveFileRegex(String parent, List<String> includes, 
+			List<String> excludes) throws Exception{
+		boolean recursive = hasRecursive(includes);
+		String common = FileUtil.commonParent(includes);
+		if(common != null){
+			List<String> _incs = new ArrayList<String>(includes);
+			for(String inc : includes)
+				_incs.add(FileUtil.getRelativePath(common, inc));
+			return getMatchedFiles(parent, FileUtil.combinePath(parent, common), _incs, excludes, recursive);
+		}
+		return getMatchedFiles(parent, parent, includes, excludes, recursive);
+	}
+	
+	private boolean hasRecursive(List<String> includes) {
+		for(String s : includes)
+			if(s.contains("**"))
+				return true;
+		return false;
+	}
+	
+	private List<String> getMatchedFiles(final String root, String parent, 
+			List<String> includes, List<String> excludes, boolean recursive) {
+		
+		List<String> matched = new ArrayList<String>();
+		
+		File[] files = new File(parent).listFiles();
+		if(files != null){
+			for(File file : files) {				
+				String path = new File(parent, file.getName()).getPath(); 
+				if(file == null || file.isHidden() || !file.canRead()) 
+					continue;
+
+				String rpath = FileUtil.getRelativePath(root, path);				
+				if(file.isDirectory() && recursive)
+					matched.addAll(getMatchedFiles(root, path, includes, excludes, recursive));
+				else
+					if(FileUtil.matched(rpath, includes, excludes))
+						matched.add(rpath);				
+			}
+		}
+		return matched;
+	}
+	
+	/**
+	 * @return date of the file (parentpath/path). -1 if there's no such file.
+	 */
+	public long getDate(String parentpath, String path) throws Exception{
+		File f = new File(parentpath, path);
+		if(!f.isAbsolute())
+			return -1L;
+		return f.lastModified();
+	}
+	
+	
+	private DeployOutputStream out = null;
+	
+	public void init(String parent, String path, long date) throws Exception{
+		if(out != null)
+			try{ close(null, null); }catch(IOException e){}
+		out = new DeployOutputStream(parent, path, date);
+	}
+	
+	public boolean write(byte[] buf) throws Exception{
+		return out.write(buf, buf.length);
+	}
+
+	public boolean write(byte[] buf, int size) throws Exception{
+		return out.write(buf, size);
+	}
+	
+	/**
+	 * @param updatefiles updated files when updating jar. null if you do not want to update jar.
+	 * @param bakdir dir for backup. null if you don't want backup.
+	 * @throws IOException 
+	 */
+	public DoneFileInfo close(List<String> updatefiles, String bakdir) throws Exception {
+		if(out == null) return null;
 		try{
-			this.fpath = new File(fpath).getPath();		// to get normilized one.
-			this.date = date;
-			this.updatejar = updatejar(fpath, update);
-			
-			tmpfile = File.createTempFile(TMP_PREFIX, String.valueOf(System.currentTimeMillis()) );
-			tmpfile.deleteOnExit();
-			
-			this.out = new BufferedOutputStream(new FileOutputStream(tmpfile));
-		}catch(RuntimeException e){
-			throw new IOException(e.getMessage());
+			return out.close(updatefiles, bakdir);
+		}finally{
+			out = null;
+		}
+	}
+	
+	
+	private StoppableJob job;
+	
+	public void stop(String id) throws Exception{
+		if(job != null && job.isAlive() && job.id().equals(id)) {
+			job.stop();
+		}
+	}
+	
+	public DoneFileInfo compress(String id, String srcdir, String destFile) throws Exception {
+		synchronized (lock) {
+			job = new CompressJob(id, srcdir, destFile);
+			return (DoneFileInfo) job.start();
 		}
 	}
 
-	private boolean updatejar(String path, boolean update) {
-    	return update && path.endsWith(".jar") && new File(path).exists();
-	}
-	
-	public void write(byte[] buf) throws IOException {
-		out.write(buf);
+	public List<DoneFileInfo> extract(String id, String srcdir, String zipname, String destdir) throws Exception {
+		synchronized (lock) {
+			job = new ExtractJob(id, srcdir, zipname, destdir);
+			return (List<DoneFileInfo>) job.start();
+		}
 	}
 
-	public void write(byte[] buf, int size) throws IOException {
-		out.write(buf, 0, size);
+	public void removeFile(String dir, String filename) throws Exception{
+		synchronized (lock) {
+			File s = new File(dir, filename);
+			if(!s.isAbsolute())
+				throw new IOException("Absolute path is allowed only: " + s);
+			if(s.exists() && !s.delete())
+				throw new IOException("Fail to remove file: " + s);	
+		}
+	}
+
+	public List<DoneFileInfo> backupNRemoveDir(String id, String dir, String bak) throws Exception {
+		synchronized (lock) {
+			job = new RemoveDirJob(id, dir, bak);
+			return (List<DoneFileInfo>) job.start();
+		}
 	}
 	
-	public long close(List<String> updatefiles) throws IOException {
-		if(this.out != null)
-			this.out.close();
-		
-		if(tmpfile == null || !tmpfile.exists())
-			return 0;
-		
-		try{
-			File destfile = new File(fpath);
-			FileUtil.createNewFile(destfile);
-			destfile.setLastModified(date);
-			
-			try{
-				if(updatejar){
-					updatefiles.addAll(FileUtil.updateJar(destfile, tmpfile));
+	public List<FileInfo> listAllFiles(String id, String path) throws Exception{
+		job = new ListFilesJob(id, path);
+		return (List<FileInfo>) job.start();
+	}
+	
+	
+	
+	/**
+	 * used before restoring snapshots.
+	 * 
+	 * @param infos
+	 * @param dir
+	 * @param root
+	 * @param bak
+	 * @throws IOException
+	 */
+	private void backupRemoveDir(List<DoneFileInfo> infos, File dir, final String root, final String bak) throws IOException {
+		if(dir != null && dir.exists() && dir.isDirectory()) {
+			File[] files = dir.listFiles();
+			for(int i=0; i<files.length; i++) {
+				if(files[i].isDirectory()) {
+					backupRemoveDir(infos, files[i], root, bak);
 				}else {
-					FileUtil.copy(tmpfile, destfile);
+					DoneFileInfo info = new DoneFileInfo(
+							FileUtil.getRelativePath(root, files[i].getPath()), 
+							false, 
+							files[i].lastModified(), 
+							files[i].length(), false, false);
+					infos.add(info);
+					
+					info.setUpdate(DeployerUtils.undoBackup(root, info.getPath(), bak));
+					info.setSuccess(files[i].delete());
 				}
-				tmpfile.delete();
-			}catch(ZipException e){
-				throw new IOException("Fail to update jar: " + fpath);
 			}
-			return destfile.length();
-		}catch(RuntimeException e){
-			throw new IOException(e.getMessage());
+	        dir.delete();
+        }
+	}
+		
+	/**
+	 * make destination's backup & copy src to dest
+	 * 
+	 * @param parentPath
+	 * @param filePath
+	 * @param destPath
+	 * @param bakPath null if no backup
+	 * @return fileinfo copied
+	 * @throws IOException 
+	 */
+	public DoneFileInfo backupNCopy(String srcPath, String filePath, 
+			String destPath, String bakPath) throws Exception {
+		synchronized (lock) {
+			if(!new File(srcPath).isAbsolute() || 
+					!new File(destPath).isAbsolute() ||
+					!new File(srcPath, filePath).exists())
+				throw new IOException("Wrong path: " + srcPath + " or " + destPath);
+			
+			boolean success = true;
+			boolean srcExist = false;
+			
+			//backup
+			if(bakPath != null ){
+				if(!new File(bakPath).isAbsolute())
+					throw new IOException("Absolute path is allowed only: " + bakPath); 
+				srcExist = DeployerUtils.undoBackup(destPath, filePath, bakPath);
+			}
+				
+			//copy
+			DeployerUtils.copy(srcPath, filePath, destPath);
+			
+			File copied = new File(destPath, filePath); 
+			return new DoneFileInfo(FileUtil.combinePath(srcPath, filePath), false, copied.lastModified(), copied.length(), srcExist, success);
 		}
 	}
 	
 	/**
-	 * @deprecated
+	 * make source's backup & remove
+	 * 
+	 * @param srcPath
+	 * @param filePath
+	 * @param bakPath
+	 * @return fileinfo removed
+	 * @throws IOException 
 	 */
-	public DeployerOutputStream getDeployerOutputStream(String fpath,  
-			long date, boolean update) throws IOException {
-		return new DeployerOutputStream(fpath, date, update);
-	}
-	
-	public synchronized FileInfo compress(String srcdir, String destdir) 
-			throws OdenException {
-		try{
-			return compress(new File(srcdir), new File(destdir));
-		}catch(RuntimeException e){
-			throw new OdenException(e);
-		}
-	}
-
-	private synchronized FileInfo compress(File srcdir, File destdir) 
-			throws OdenException {
-		File uniquef = null;
-		try {
-			uniquef = FileUtil.uniqueFile(destdir, "ss" + today(), "");
-			FileUtil.createNewFile(uniquef);
-			FileUtil.compress(srcdir, uniquef);
-			return new FileInfo(uniquef.getName(), false, uniquef.lastModified(), uniquef.length());
-		} catch (IOException e) {
-			if(uniquef != null && uniquef.exists())
-				FileUtil.removeFile(uniquef);
-			throw new OdenException("Fail to compress: " + srcdir.getPath(), e);
-		}
-	}
-
-	private String today(){
-		return new SimpleDateFormat("yyMMdd").format(System.currentTimeMillis());
-	}
-	
-	public List<PairValue<String, Boolean>> extract(String srcdir, String zipname, String destdir)
-			throws OdenException {
-		try{
-			cleanRollbackDestination(new File(destdir));
-			return extractSnapshot(new File(srcdir, zipname), new File(destdir));
-		}catch(RuntimeException e){
-			throw new OdenException(e.getMessage());
-		}
-	}
-
-	private List<PairValue<String, Boolean>> extractSnapshot(File src, File dest) throws OdenException {
-		List<PairValue<String, Boolean>> extractedfiles = null;
-		try {
-			extractedfiles = FileUtil.extractZip(src, dest);
-		} catch (ZipException e) {
-			throw new OdenException("Illegal snapshot format: " + src.getPath(), e);
-		} catch (Exception e) {
-			throw new OdenException("Fail to restore snapshot: " + src.getPath(), e);
-		}
-		return extractedfiles;
-	}
-
-	public void removeFile(String dir, String filename) throws OdenException {
-		try{
-			FileUtil.removeFile(new File(dir, filename));
-		}catch(RuntimeException e){
-			throw new OdenException("Fail to remove the file: " + filename, e);
-		}
-	}
-
-	private void cleanRollbackDestination(File dir) {
-		FileUtil.removeDir(dir);
-	}
-	
-	public long getDate(String parentpath, String path) throws OdenException {
-		try{
-			return new File(parentpath, path).lastModified();
-		}catch(RuntimeException e){
-			throw new OdenException("Fail to get the date of the file: " + path, e);
+	public DoneFileInfo backupNRemove(String srcPath, String filePath, String bakPath) throws Exception {
+		synchronized (lock) {
+			if(!new File(srcPath).isAbsolute() || (bakPath != null &&
+					!new File(bakPath).isAbsolute()) )
+				throw new IOException("Wrong path: " + srcPath + " or " + bakPath);
+			
+			boolean success = true;
+			boolean srcExist = false;
+			
+			srcExist = DeployerUtils.undoBackup(srcPath, filePath, bakPath);
+			
+			//remove
+			File f = new File(srcPath, filePath);
+			long srcdate = f.lastModified();
+			long srcsz = f.length();
+			if(f.exists() && !f.delete())
+				throw new IOException("Fail to remove file: " + new File(srcPath, filePath));
+			
+			return new DoneFileInfo(FileUtil.combinePath(srcPath, filePath), false, srcdate, srcsz, srcExist, success);
 		}
 	}
 	

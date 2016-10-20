@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.brokers;
@@ -20,11 +22,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONArray;
@@ -33,7 +38,10 @@ import org.json.JSONObject;
 
 import anyframe.oden.eclipse.core.OdenActivator;
 import anyframe.oden.eclipse.core.OdenException;
+import anyframe.oden.eclipse.core.alias.Server;
 import anyframe.oden.eclipse.core.messages.CommonMessages;
+import anyframe.oden.eclipse.core.utils.CommonUtil;
+
 
 /**
  * This class provides some methods to interface server 
@@ -44,16 +52,16 @@ import anyframe.oden.eclipse.core.messages.CommonMessages;
 public class OdenBrokerImpl implements OdenBrokerService {
 	private final int TIMEOUT = 15000; // millis
 	public final String KNOWN_EXCEPTION = "KnownException";
-	public final String UNKNOWN_EXCEPTION = "java.lang.Exception";
-	
+	public final String UNKNOWN_EXCEPTION = "UnknownException";
+	protected CommonUtil util;
 	/**
 	 * Send request and get response, Interface server with http protocol
 	 */
 	public String sendRequest(String shellUrl, String msg) throws OdenException {
 		PrintWriter writer = null;
 		String result = null;
-
-		if(shellUrl != null){
+		
+		if(shellUrl != null && ! (shellUrl.equals(""))){
 			try {
 				
 				URLConnection conn = init(shellUrl);
@@ -173,13 +181,43 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	private URLConnection init(String url) throws MalformedURLException,
 			IOException {
 		URLConnection con = new URL(url).openConnection();
+		
+		Server server = getServer(url);
+		
 		con.setUseCaches(false);
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
 		con.setRequestProperty("Accept-Charset","utf-8");
 		
+		// Base 64 encoding using encode method
+		if(server != null)
+			con.addRequestProperty("Authorization", "Basic "
+				+ encode(server.getUser(), server.getPassword()));
+		
 		return con;
 	}
 
+	private Server getServer(String url) {
+		Collection<Server> servers = OdenActivator.getDefault().getAliasManager().getServerManager().getServers();
+		
+		for(Server server : servers) {
+			String parseUrl = CommonUtil.replaceIgnoreCase(url, CommonMessages.ODEN_CommonMessages_ProtocolString_HTTP, "");
+			parseUrl = CommonUtil.replaceIgnoreCase(parseUrl, CommonMessages.ODEN_CommonMessages_ProtocolString_HTTPsuf, "");
+			
+			if(server.getUrl().equals(parseUrl))
+				return server;
+		}
+		
+		return null;
+	}
+	private static String encode(String id, String pwd) {
+		try {
+			return new String(
+					Base64.encodeBase64((id + ":" + pwd).getBytes()), "ASCII");
+			
+		} catch (UnsupportedEncodingException e) {
+		}
+		return null;
+	}
 }

@@ -1,0 +1,47 @@
+<project name="oden-install" default="install" basedir=".">
+	<!-- 
+		ask if embedded agent is install or not. 
+		if install is selected, ask agent's name and its default-location
+	-->
+			
+	<target name="pre-question">
+		<input
+		    message="Do you want to config agent (y/n)?"
+		    validargs="y,n"
+		    addproperty="do.config.yn"
+		  />
+		<condition property="do.config">
+			<equals arg1="y" arg2="${do.config.yn}"/>
+		</condition>
+	</target>
+	
+	<target name="question" if="do.config" depends="pre-question">
+		<input message="Agent name: " addproperty="agent.name"/>
+		<input message="Agent IP(xx.xx.xx.xx): " addproperty="agent.host"/>
+		<input message="Default location to be deployed: (C:/xx/xx)" addproperty="agent.loc"/>
+	</target>
+	
+	<target name="unzip" depends="question">
+		<unzip dest="oden">
+			<fileset dir="." includes="oden*.zip"/>
+		</unzip>
+	</target>
+	
+	<target name="config" depends="unzip" if="do.config">
+		<replaceregexp file="conf/config.xml"
+             match="%agentName%"
+             replace="${agent.name}"
+             byline="true"/>
+		<replaceregexp file="conf/config.xml"
+             match="%agentHost%"
+             replace="${agent.host}"
+             byline="true"/>
+		<replaceregexp file="conf/config.xml"
+             match="%agentLoc%"
+             replace="${agent.loc}"
+             byline="true"/>
+	</target>
+	
+	<target name="install" depends="config">
+	</target>
+</project>

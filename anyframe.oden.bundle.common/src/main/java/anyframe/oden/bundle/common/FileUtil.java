@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
@@ -41,18 +43,26 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class FileUtil {
-	public static boolean createNewFile(File f) throws IOException {
+	
+	/**
+	 * method to create directory
+	 * 
+	 * @param f
+	 * @throws IOException
+	 */
+	public static void mkdirs(File f) throws IOException {
 		File parent = f.getParentFile();
-		if (!parent.exists()) {
+		if (parent != null && !parent.exists()) {
 			if(parent.mkdirs() == false)
 				throw new IOException("Fail to create dir: " + parent.getPath());
 		}
-		return f.createNewFile();
+//		return f.createNewFile();
 	}
 	
 	/**
 	 * dir을 jar로 묶음.
 	 * jar가 이미 존재하면, 기존꺼 새걸로 바꿈.
+	 * 
 	 * @param dir
 	 * @param jar
 	 * @return size of the compressed file
@@ -60,8 +70,14 @@ public class FileUtil {
 	 */
 	public static long compress(File dir, File jar) 
 			throws IOException{
-		if(jar.exists())
+		if(!dir.exists() || !dir.isDirectory())
+			throw new IOException("Couldn't find: " + dir);
+		if(jar.exists()){
+			if(jar.isDirectory() || !jar.canWrite())
+				throw new IOException("Fail to write: " + jar.getPath());
 			jar.delete();
+		}
+			
 		
 		ZipOutputStream jout = null;
 		try{
@@ -77,6 +93,7 @@ public class FileUtil {
 	/**
 	 * dir의 파일들을 out으로 압축. root는 dir과 동일하게 적으면 됨
 	 * 파일들의 시간 그대로 유지.
+	 * 
 	 * @param root
 	 * @param dir
 	 * @param out
@@ -128,12 +145,16 @@ public class FileUtil {
 	 * @throws IOException 
 	 * @throws ZipException 
 	 */
-	public static List<String> updateJar(File target, File ref) 
-			throws ZipException, IOException {
+	public static List<String> updateJar(File ref, File target) 
+			throws IOException {
+		if(!ref.exists() || ref.isDirectory())
+			throw new IOException("Couldn't find: " + ref);
+		if(target.exists() && (!target.canWrite() || target.isDirectory()))
+			throw new IOException("Fail to write: " + target);
+		
 		List<String> updatedfiles = null;
 		
 		File tmpdir = temporaryDir();
-		
 		try{
 			// extract target to tmp
 			extractZip(target, tmpdir);
@@ -150,6 +171,12 @@ public class FileUtil {
 		return updatedfiles;
 	}
 	
+	/**
+	 * method to get the temp directory which is vary from OS.
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	public static File temporaryDir() throws IOException {
 		Random random = new Random();
 		for (int maxAttempts = 100; maxAttempts > 0; --maxAttempts) {
@@ -163,6 +190,12 @@ public class FileUtil {
 		throw new java.io.IOException("Can't create temporary directory.");
 	}
 	
+	/**
+	 * convert patht to String. dot is replaced with underline.
+	 * 
+	 * @param file
+	 * @return
+	 */
 	private static String pathName(File file) {
 		String sfile = file.getName();
 		int idot = sfile.lastIndexOf('.');
@@ -228,51 +261,63 @@ public class FileUtil {
 	 * 
 	 * @param src
 	 * @param dest dir
+	 * @throws IOException 
+	 * @throws ZipException 
 	 * @throws ZipException
 	 * @throws IOException
 	 */
-	public static List<PairValue<String, Boolean>> extractZip(File src, File dest) 
-			throws ZipException, IOException {
-		List<PairValue<String, Boolean>> extractedfiles = new ArrayList<PairValue<String, Boolean>>();
-		InputStream in = null;
-		OutputStream out = null;
+	public static Map<FileInfo, Boolean> extractZip(File src, File dest) 
+			throws IOException {
+		if(!src.exists() || src.isDirectory())
+			throw new IOException("Couldn't find: " + src);
+		
+		Map<FileInfo, Boolean> extractedfiles = new HashMap<FileInfo, Boolean>();
 		
 		ZipFile zip = new ZipFile(src);
 		Enumeration<? extends ZipEntry> e = zip.entries();
 		while(e.hasMoreElements()){
-			File f = null;
-			long time = 0;
-			try {				
-				ZipEntry entry = (ZipEntry) e.nextElement();
-				time = entry.getTime();
-				if(entry.isDirectory()) {
-					f = new File(dest, entry.getName());
-					f.mkdirs();
-				} else {
+			ZipEntry entry = (ZipEntry) e.nextElement();
+			File f = new File(dest, entry.getName());
+			if(entry.isDirectory()) {
+				f.mkdirs();
+			} else {
+				InputStream in = null;
+				OutputStream out = null;
+			
+				boolean success = false;
+				long time = entry.getTime();
+				try{
 					in = new BufferedInputStream(zip.getInputStream(entry)); 
 					
 					f = new File(dest, entry.getName());
 					File fparent = f.getParentFile();
-					if(!fparent.exists())
-						fparent.mkdirs();
+					fparent.mkdirs();
 										
 					out = new BufferedOutputStream(new FileOutputStream(f));
 					
 					copy(in, out);
-					extractedfiles.add(new PairValue(f.getPath(), true));
+					success = true;
+				}catch(Exception e2){
+				}finally {
+					// do u wanna read this?
+					try{ if(out != null) out.close(); }catch(IOException x){}
+					try{ if(in != null) in.close(); }catch(IOException x){}
+					if(f != null) f.setLastModified(time);
 				}
-			}catch(Exception exc) {
-				extractedfiles.add(new PairValue(f.getPath(), false));
-			}finally {
-				// do u wanna read this?
-				try{ if(out != null) out.close(); }catch(IOException x){}
-				try{ if(in != null) in.close(); }catch(IOException x){}
-				if(f != null) f.setLastModified(time);
+				extractedfiles.put(
+						new FileInfo(entry.getName(), false, f.lastModified(), f.length()), success);
 			}
 		}
 		return extractedfiles;
 	}
 	
+	/**
+	 * method to get the relative path from the root.
+	 * 
+	 * @param root
+	 * @param file
+	 * @return
+	 */
 	public static String getRelativePath(final String root, String file) {
 		String root_ = normalize(root);
 		root_ = root_.startsWith("/") ? root_.substring(1) : root_;
@@ -289,51 +334,80 @@ public class FileUtil {
 	}
 	
 	/**
-	 * change path to normized path. it's separator is '/'.  it is not end with '/'.
+	 * change path to normized path. it's separator is '/'. 
 	 * 
-	 * @param path
-	 * @return
+	 * @param path 
+	 * @return path with separated '/'.  it is not end with '/'.
 	 */
 	public static String normalize(String path){
 		if(path == null)
 			return null;
 		
 		path = path.replaceAll("\\\\", "/");
-		if(path.endsWith("/"))
+		if(!path.equals("/") && path.endsWith("/"))
 			path = path.substring(0, path.length()-1);
 		return path;
 	}
 	
 	/**
 	 * path is combined and normalized.
+	 * 
 	 * @param parent
 	 * @param child
 	 * @param sep
 	 * @return
 	 */
 	public static String combinePath(String parent, String child){
-		String _parent = normalize(parent);
-		String _child = normalize(child);
-	
-		return _parent + "/" + _child;
+		if(parent == null && child == null)
+			return null;
+		else if(parent == null || parent.length() == 0)
+			return normalize(child);
+		else if(child == null || child.length() == 0)
+			return normalize(parent);
+		return normalize(parent) + "/" + normalize(child);
 	}
 	
+	/**
+	 * get the parent path of the 'path';
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public static String parentPath(String path){
 		path = normalize(path);
 		return path.substring(0, path.lastIndexOf('/'));
 	}
 	
+	/**
+	 * extract a file name from 'path'
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public static String fileName(String path) {
 		path = normalize(path);
 		// after normalized, can not be end with '/'.
 		return path.substring(path.lastIndexOf('/')+1);
 	}
 	
-	public static void removeFile(File file) {
-		if(file.exists())
-			file.delete();
+	/**
+	 * get the file name whose extensions will be ignored.
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static String nameOnly(String file) {
+		int dot = file.indexOf(".");
+		if(dot == -1)
+			return file;
+		return file.substring(0, dot);
 	}
-
+	
+	/**
+	 * remove directory which are located on the path.
+	 * 
+	 * @param path
+	 */
 	public static void removeDir(File path) {
 		if(path != null && path.isFile()) {
 			path.delete();
@@ -353,7 +427,19 @@ public class FileUtil {
         }
 	}
 	
+	/**
+	 * copy the src file to dest. orignal file's date is preserved.
+	 * 
+	 * @param src
+	 * @param dest
+	 * @return
+	 * @throws IOException
+	 */
 	public static long copy(File src, File dest) throws IOException{
+		if(!src.exists() || 
+				(dest.exists() && (dest.isDirectory() || !dest.canWrite())) )
+			throw new IOException();
+		
 		long size = 0;
 		InputStream in = null;
 		OutputStream out = null;
@@ -365,9 +451,20 @@ public class FileUtil {
 			if(out != null) out.close();
 			if(in != null) in.close();
 		}
+		
+		if(size > 0 && !dest.setLastModified(src.lastModified()))
+			throw new IOException("Fail to set date: " + dest);
 		return size;
 	}
 	
+	/**
+	 * copy the in to out
+	 * 
+	 * @param in
+	 * @param out
+	 * @return
+	 * @throws IOException
+	 */
 	public static long copy(InputStream in, OutputStream out) 
 			throws IOException {
 		byte[] buf = new byte[1024*8];
@@ -397,10 +494,25 @@ public class FileUtil {
 		return tokens;
 	}
 	
+	/**
+	 * match if path is included in the includes and is not included in the excludes.
+	 * 
+	 * @param path
+	 * @param includes
+	 * @param excludes
+	 * @return
+	 */
 	public static boolean matched(String path, List<String> includes, List<String> excludes) {		
 		return matched(path, includes) && !matched(path, excludes);
 	}
 	
+	/**
+	 * match if path is matched one of the wildcard.
+	 *  
+	 * @param path
+	 * @param wildcards
+	 * @return
+	 */
 	public static boolean matched(String path, List<String> wildcards) {		
 		String _file = path.replaceAll("\\\\", "/");
 		for(String wildcard : wildcards){
@@ -451,6 +563,9 @@ public class FileUtil {
 		return buf.toString();
 	}
 	
+	/**
+	 * method to extract a same parent directory 
+	 */
 	private static String commonParent(String wc0, String wc1){
 		wc0 = normalize(wc0);
 		wc1 = normalize(wc1);
@@ -476,7 +591,9 @@ public class FileUtil {
 		return buf.append(tok).toString();
 	}
 	
-	// TODO 빈 와일드카드 문제.  *  문제 
+	/**
+	 * convert wild card to regular expression
+	 */
 	public static String toRegex(String wildcard) {		
 		// **/ >> (.*/)?
 		// ** >> (.*/)?
@@ -488,35 +605,15 @@ public class FileUtil {
 		return converted;
 	}
 	
-	public static void writeToFile(File target, byte[] contents) throws IOException {
-		OutputStream out = null;
-		try {
-			FileUtil.createNewFile(target);
-			out = new BufferedOutputStream(new FileOutputStream(target));
-			out.write(contents);
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			try {
-				if(out != null) out.close();
-			} catch (IOException e) {
-			}
-		}
-	}
-
-	public static void main(String[] args) throws ZipException, IOException {
-		final String JAR ="/Users/joon1k/dev_rscs/anyframe-sample/build/anyframe-sample-services.jar";
-		final String REF="/Users/joon1k/dev_rscs/anyframe-sample/src/webapps/WEB-INF/lib/anyframe-sample-services.jar";
-		
-		File jar = new File(JAR);
-		if(!jar.exists())
-			jar.createNewFile();
-		
-//		compress(new File(DIR), JAR);
-		
-		updateJar(new File(JAR), new File(REF) );
-	}
-	
+	/**
+	 * get the file name which are not duplicated others in the same directory.
+	 * 
+	 * @param path
+	 * @param prefix
+	 * @param postfix
+	 * @return
+	 * @throws IOException
+	 */
 	public static File uniqueFile(File path, String prefix, String postfix)
 			throws IOException{
 		final int maxAttempts = 300;

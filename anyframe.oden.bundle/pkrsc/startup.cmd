@@ -1,0 +1,1 @@
+java -jar bin/oden-1.1.0.jar

@@ -1,20 +1,25 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.alias;
+
+import java.util.List;
+import java.util.TreeMap;
 
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultElement;
@@ -38,15 +43,18 @@ public class Repository extends Alias {
 	static final String SERVER_TO_USE = "server-to-use"; //$NON-NLS-1$
 	static final String PROTOCOL = "protocol"; //$NON-NLS-1$
 	static final String PATH = "path"; //$NON-NLS-1$
-	
-	static final String DEPLOY_NOW = "deploynow";
-	static final String WITH_ZERO_CONFIG = "with-zero-config";
+
+	static final String DEPLOY_NOW = "deploynow"; //$NON-NLS-1$
+	static final String ALL_TO_DEFAULT = "all-to-default"; //$NON-NLS-1$
 
 	private static int repositorySerialNo = 0;
 
-	private String serverToUse;
-	private String protocol;
-	private String path;
+	protected String serverToUse;
+	protected String protocol;
+	protected String path;
+
+	private boolean allToDefault = true;
+	private TreeMap<String, DeployNow> deployNowMap = new TreeMap<String, DeployNow>();
 
 	/**
 	 * Constructs a new Build Repository with a given nickname
@@ -67,11 +75,12 @@ public class Repository extends Alias {
 	 * Constructs a Build Repository from stored XML
 	 * @param root
 	 */
+	@SuppressWarnings("unchecked")
 	public Repository(Element root) {
 		serverToUse = root.attributeValue(SERVER_TO_USE);
-		String string = root.attributeValue(HAS_NO_USER_NAME);
-		if (string != null)
-			hasNoUserName = Boolean.parseBoolean(string);
+		String hasNoUserNameString = root.attributeValue(HAS_NO_USER_NAME);
+		if (hasNoUserNameString != null)
+			hasNoUserName = Boolean.parseBoolean(hasNoUserNameString);
 		nickname = root.elementText(NICKNAME);
 		url = root.elementText(URL);
 		protocol = root.elementText(PROTOCOL);
@@ -85,6 +94,19 @@ public class Repository extends Alias {
 			password = root.elementText(PASSWORD);
 		}
 
+		Element deployNowElements = root.element(DEPLOY_NOW);
+		if (deployNowElements != null) {
+			String allToDefaultString = deployNowElements.attributeValue(ALL_TO_DEFAULT);
+			if (allToDefaultString != null)
+				allToDefault = Boolean.parseBoolean(allToDefaultString);
+			List<Element> list = deployNowElements.elements(DeployNow.DESTINATION);
+			if (list != null)
+				for (Element deployNowElement : list) {
+					DeployNow deployNow = new DeployNow(deployNowElement);
+					if (deployNow.getDestinedAgentName() != null && deployNow.getDestinedAgentName().trim().length() > 0)
+						addDestination(deployNow);
+				}
+		}
 	}
 
 	/**
@@ -102,7 +124,29 @@ public class Repository extends Alias {
 		root.addElement(USER).setText(user);
 		root.addElement(PASSWORD).setText(password);
 
+		Element deployNowElement = root.addElement(DEPLOY_NOW);
+		deployNowElement.addAttribute(ALL_TO_DEFAULT, Boolean.toString(allToDefault));
+		
+		for (DeployNow deployNow : deployNowMap.values())
+			deployNowElement.add(deployNow.expressDeployNowInXML());
+
 		return root;
+	}
+	
+	/**
+	 * Gets DeployNow Objects for Deploy-Now action
+	 * @return
+	 */
+	public TreeMap<String, DeployNow> getDeployNowMap() {
+		return deployNowMap;
+	}
+	
+	/**
+	 * Sets DeployNow Objects for Deploy-Now action
+	 * @return
+	 */
+	public void setDeployNowMap(TreeMap<String, DeployNow> deployNowMap) {
+		this.deployNowMap = deployNowMap;
 	}
 
 	/**
@@ -171,4 +215,41 @@ public class Repository extends Alias {
 		this.path = path;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean isAllToDefault() {
+		return allToDefault;
+	}
+
+	/**
+	 * @param allToDefault
+	 */
+	public void setAllToDefault(boolean allToDefault) {
+		this.allToDefault = allToDefault;
+	}
+
+	/**
+	 * Adds a Deploy-Now destination
+	 * @param deployNow
+	 * @return
+	 */
+	public DeployNow addDestination(DeployNow deployNow) {
+		if (deployNow.getDestinedAgentName() == null || deployNow.getDestinedAgentName().length() == 0)
+			throw new IllegalArgumentException("Destined Agent name is invalid.");
+		deployNowMap.put(deployNow.getDestinedAgentName(), deployNow);
+		deployNow.setRepository(this);
+		OdenActivator.getDefault().getAliasManager().getRepositoryManager().modelChanged();
+		return deployNow;
+	}
+
+	/**
+	 * Removes the Deploy-Now destination with a given destined Agent name
+	 * @param deployNow
+	 */
+	public void removeDestination(DeployNow deployNow) {
+		deployNow.setRepository(null);
+		deployNowMap.remove(deployNow.getDestinedAgentName());
+	}
+	
 }

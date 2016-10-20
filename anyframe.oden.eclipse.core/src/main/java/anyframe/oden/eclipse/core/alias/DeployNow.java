@@ -1,20 +1,25 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.alias;
+
+import org.dom4j.Element;
+import org.dom4j.tree.DefaultElement;
 
 /**
  * Represents the combination of an Agent name and a location variable 
@@ -24,101 +29,110 @@ package anyframe.oden.eclipse.core.alias;
  * will be used for Deploy Now action.
  * 
  * @author RHIE Jihwan
- * @author HONG Junghwan
+ * @author HONG JungHwan
  * @version 1.0.0
  *
  */
 public class DeployNow {
 
 	// XML tag strings for Deploy-Now destination
-	static final String DESTINATION = "destination";
-	static final String AGENT = "agent";
-	static final String LOCATION = "location";
+	static final String DESTINATION = "destination"; //$NON-NLS-1$
+	static final String AGENT = "agent"; //$NON-NLS-1$
+	static final String LOCATION = "location"; //$NON-NLS-1$
 
 	// agent name and location variable name to use as Deploy-Now destination
-	private String destinedAgent;
+	private String destinedAgentName;
 	private String destinedLocation;
+	
+	// The Build Repository profile alias which destination info belongs to
+	private Repository repository;
 
 	/**
-	 * Constructor
+	 * Default Constructor
 	 */
 	public DeployNow() {
-		
-	}
-
-	public DeployNow(String destinedAgent, String destinedLocation) {
 		super();
-		this.destinedAgent = destinedAgent;
+	}
+	
+	/**
+	 * Constructor
+	 * @param destinedAgentName
+	 * @param destinedLocation
+	 */
+	public DeployNow(String destinedAgent, String destinedLocation ) {
+		super();
+		this.destinedAgentName = destinedAgent;
 		this.destinedLocation = destinedLocation;
 	}
 
+	/**
+	 * Constructs a destined Agent, from a user defined configuration 
+	 * stored by expressDeployNowInXML()
+	 * @param root
+	 */
+	public DeployNow(Element root) {
+		super();
+		this.destinedAgentName = root.elementText(AGENT);
+		this.destinedLocation = root.elementText(LOCATION);
+	}
 
+	/**
+	 * Expresses this Deploy-Now destination information in XML expression
+	 * @return
+	 */
+	public Element expressDeployNowInXML() {
+		Element root = new DefaultElement(DESTINATION);
+		root.addElement(AGENT).setText(destinedAgentName);
+		root.addElement(LOCATION).setText(destinedLocation);
+		return root;
+	}
 
+	/**
+	 * Gets a destined Agent name for Deploy-Now action
+	 * @return
+	 */
+	public String getDestinedAgentName() {
+		return destinedAgentName;
+	}
 
+	/**
+	 * Sets the destined Agent name for Deploy-Now action
+	 * @param destinedAgent
+	 */
+	public void setDestinedAgentName(String destinedAgent) {
+		this.destinedAgentName = destinedAgent;
+	}
 
-	// 여기부터 홍선임이 작업했던  기존 것들
-	//
-	//	private String DeployPath;
-	//
-	//	private String DeployAgent;
-	//
-	//	private String DeployItem;
-	//
-	//	private String DeployRepo;
-	//
-	//
-	//
-	//	private String totalDeploy;
-	//
-	//	public DeployNow() {
-	//
-	//	}
-	//
-	//	public DeployNow(String DeployRepo , String DeployPath ,String DeployItem,
-	//			String DeployAgent) {
-	//		this.DeployRepo = DeployRepo;
-	//		this.DeployItem = DeployItem;
-	//		this.DeployPath = DeployPath;
-	//		this.DeployAgent = DeployAgent;
-	//	}
-	//
-	//	public String getDeployPath() {
-	//		return DeployPath;
-	//	}
-	//
-	//	public void setDeployPath(String deployPath) {
-	//		DeployPath = deployPath;
-	//	}
-	//
-	//	public String getDeployAgent() {
-	//		return DeployAgent;
-	//	}
-	//
-	//	public void setDeployAgent(String deployAgent) {
-	//		DeployAgent = deployAgent;
-	//	}
-	//
-	//	public String getDeployItem() {
-	//		return DeployItem;
-	//	}
-	//
-	//	public void setDeployItem(String deployItem) {
-	//		DeployItem = deployItem;
-	//	}
-	//
-	//	public String getDeployRepo() {
-	//		return DeployRepo;
-	//	}
-	//
-	//	public void setDeployRepo(String deployRepo) {
-	//		DeployRepo = deployRepo;
-	//	}
-	//	public String getTotalDeploy() {
-	//		return totalDeploy;
-	//	}
-	//
-	//	public void setTotalDeploy(String totalDeploy) {
-	//		this.totalDeploy = totalDeploy;
-	//	}
+	/**
+	 * Gets a destined location variable for Deploy-Now action
+	 * @return
+	 */
+	public String getDestinedLocation() {
+		return destinedLocation;
+	}
+
+	/**
+	 * Sets the destined location variable for Deploy-Now action
+	 * @param destinedLocation
+	 */
+	public void setDestinedLocation(String destinedLocation) {
+		this.destinedLocation = destinedLocation;
+	}
+
+	/**
+	 * Returns the Build Repository for this Deploy-Now destination information
+	 * @return
+	 */
+	public Repository getRepository() {
+		return repository;
+	}
+
+	/**
+	 * Sets the Build Repository for this Deploy-Now destination information
+	 * @param repository
+	 */
+	public void setRepository(Repository repository) {
+		this.repository = repository;
+	}
 
 }

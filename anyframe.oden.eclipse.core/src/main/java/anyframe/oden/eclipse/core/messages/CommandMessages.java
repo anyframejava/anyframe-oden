@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.messages;
@@ -29,56 +31,76 @@ import org.eclipse.osgi.util.NLS;
 public abstract class CommandMessages extends NLS {
 	private static final String BUNDLE_NAME = CommandMessages.class.getName();
 
-	public static String ODEN_EDITORS_PolicyPage_MsgAgentInfo;
-	public static String ODEN_EDITORS_PolicyPage_MsgDetailShow;
-	public static String ODEN_EDITORS_PolicyPage_MsgPolicyDele;
-	public static String ODEN_EDITORS_PolicyPage_MsgPolicySave;
-	public static String ODEN_EDITORS_PolicyPage_MsgPolicyShow;
-	public static String ODEN_EDITORS_TaskPage_MsgPolicyInfo;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskAdd;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskDel;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskDescOpt;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskInfo;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskPolicyOpt;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskRun;
-	public static String ODEN_EDITORS_TaskPage_MsgTaskShow;
-
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Action;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Exclude;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyAddCommand_Include;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyDel;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_PolicyOpt;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_RepoShow;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd1;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskAdd2;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskDel;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TaskRun;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName;
-	public static String ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName;
-	public static String ODEN_EXPLORER_ExplorerView_HiddenFolder;
-	public static String ODEN_EXPLORER_ExplorerView_Msg_RepoShow;
-	public static String ODEN_EXPLORER_ExplorerViewContentProvider_MsgRepsitoryShow;
-
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Json_Opt;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Agent;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Date;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Host;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Name;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Path;
-	public static String ODEN_HISTORY_DeploymentHistoryView_History_Opt_Status;
-	public static String ODEN_HISTORY_DeploymentHistoryView_Msg_History_Show;
-
-	public static String ODEN_SNAPSHOT_Actions_MsgDelFile;
-	public static String ODEN_SNAPSHOT_Actions_MsgDelPlan;
-	public static String ODEN_SNAPSHOT_Actions_MsgRollback;
-	public static String ODEN_SNAPSHOT_Actions_MsgRun;
-	public static String ODEN_SNAPSHOT_Dialogs_NewPlanCmdDesc;
-	public static String ODEN_SNAPSHOT_Dialogs_NewPlanCmdDest;
-	public static String ODEN_SNAPSHOT_Dialogs_NewPlanCmdHead;
-	public static String ODEN_SNAPSHOT_Dialogs_NewPlanCmdSource;
-	public static String ODEN_SNAPSHOT_SnapshotView_MsgInfoFile;
-	public static String ODEN_SNAPSHOT_SnapshotView_MsgInfoPlan;
-
+	// 1. agent command
+	public static String ODEN_CLI_COMMAND_agent_info_json;
+	
+	// 2. history command
+	public static String ODEN_CLI_COMMAND_history_info;
+	public static String ODEN_CLI_COMMAND_history_redeploy;
+	public static String ODEN_CLI_COMMAND_history_show;
+	public static String ODEN_CLI_COMMAND_history_undo;
+	
+	// 3. command option
+	public static String ODEN_CLI_OPTION_agent;
+	public static String ODEN_CLI_OPTION_date;
+	public static String ODEN_CLI_OPTION_locvarsign;
+	public static String ODEN_CLI_OPTION_defaultlocsign;
+	public static String ODEN_CLI_OPTION_desc;
+	public static String ODEN_CLI_OPTION_desc_deploynow;
+	public static String ODEN_CLI_OPTION_destination;
+	public static String ODEN_CLI_OPTION_detail;
+	public static String ODEN_CLI_OPTION_fetchloglistid;
+	public static String ODEN_CLI_OPTION_hiddenfolder;
+	public static String ODEN_CLI_OPTION_include;
+	public static String ODEN_CLI_OPTION_json;
+	public static String ODEN_CLI_OPTION_path;
+	public static String ODEN_CLI_OPTION_plansource;
+	public static String ODEN_CLI_OPTION_policy;
+	public static String ODEN_CLI_OPTION_repository;
+	public static String ODEN_CLI_OPTION_status;
+	public static String ODEN_CLI_OPTION_targetagent;
+	public static String ODEN_CLI_OPTION_userip;
+	public static String ODEN_CLI_OPTION_delete;
+	
+	// 4. policy command
+	public static String ODEN_CLI_COMMAND_policy_add;
+	public static String ODEN_CLI_COMMAND_policy_delete;
+	public static String ODEN_CLI_COMMAND_policy_info;
+	public static String ODEN_CLI_COMMAND_policy_info_json;
+	public static String ODEN_CLI_COMMAND_policy_tempname;
+	
+	// 5. repository command
+	public static String ODEN_CLI_COMMAND_repository_show;
+	
+	// 6. snapshot command
+	public static String ODEN_CLI_COMMAND_snapshot_add;
+	public static String ODEN_CLI_COMMAND_snapshot_filedel;
+	public static String ODEN_CLI_COMMAND_snapshot_fileinfo;
+	public static String ODEN_CLI_COMMAND_snapshot_plandel;
+	public static String ODEN_CLI_COMMAND_snapshot_planinfo;
+	public static String ODEN_CLI_COMMAND_snapshot_rollback;
+	public static String ODEN_CLI_COMMAND_snapshot_run;
+	
+	// 7. task command
+	public static String ODEN_CLI_COMMAND_task_add;
+	public static String ODEN_CLI_COMMAND_task_delete;
+	public static String ODEN_CLI_COMMAND_task_info;
+	public static String ODEN_CLI_COMMAND_task_info_json;
+	public static String ODEN_CLI_COMMAND_task_run;
+	public static String ODEN_CLI_COMMAND_task_tempname;
+	public static String ODEN_CLI_COMMAND_task_test;
+	
+	// 8. status command
+	public static String ODEN_CLI_COMMAND_status_info;
+	public static String ODEN_CLI_COMMAND_status_stop;
+	
+	// 9. spectrum command
+	public static String ODEN_CLI_COMMAND_spectrum_test;
+	public static String ODEN_CLI_COMMAND_spectrum_run;
+	public static String ODEN_CLI_COMMAND_spectrum_fetchlist;
+	public static String ODEN_CLI_COMMAND_spectrum_fetchlog;
+	public static String ODEN_CLI_COMMAND_spectrum_compare;
+	
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, CommandMessages.class);

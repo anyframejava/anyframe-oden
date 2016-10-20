@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.editors;
@@ -101,7 +103,8 @@ public class TaskPage implements Page {
 
 	private Text descText;
 	private Text filterText;
-
+	private Text policyFilterText;
+	
 	// Table list
 	private Table taskTable;
 	private TableViewer taskViewer;
@@ -119,19 +122,18 @@ public class TaskPage implements Page {
 	private Button runTask_;
 
 	private String shellUrl;
-
+	private String policiesData;
 	private int lastNum;
 	private ArrayList<String> originTask;
 	private boolean newTask;
-	private ImageDescriptor _titleImageDescriptor = ImageUtil
-	.getImageDescriptor("icons/form_banner.gif");
+	private ImageDescriptor _titleImageDescriptor = ImageUtil.getImageDescriptor("icons/form_banner.gif");
 	private Image _TitleImage = ImageUtil.getImage(_titleImageDescriptor);
 
 	TableViewerColumn taskName, desc, check, policy, description;
 
-	private final String MSG_TASK_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskShow;
-	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgTaskInfo;
-	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_EDITORS_TaskPage_MsgPolicyInfo;
+	private final String MSG_TASK_SHOW = CommandMessages.ODEN_CLI_COMMAND_task_info_json;
+	private final String MSG_DETAIL_SHOW = CommandMessages.ODEN_CLI_COMMAND_task_info;
+	private final String MSG_POLICY_SHOW = CommandMessages.ODEN_CLI_COMMAND_policy_info_json;
 
 	private final int leftWidth = 120;
 	private final int rightWidth = 150;
@@ -149,10 +151,25 @@ public class TaskPage implements Page {
 		public boolean select(Viewer viewer1, Object parentElement,
 				Object element) {
 			String text = ".*" + filterText.getText() + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
-			if (text == null || text.length() == 0) {
+			if (text == null || text.length() == 0 || filterText.getText().trim().equals("")) {
 				return true;
 			}
 			String details = ((TaskDetails) element).getTaskName();
+			if (details.matches(text)) {
+				return true;
+			}
+			return false;
+		}
+	};
+	
+	ViewerFilter policyfilter = new ViewerFilter() {
+		public boolean select(Viewer viewer1, Object parentElement,
+				Object element) {
+			String text = ".*" + policyFilterText.getText() + ".*"; //$NON-NLS-1$ //$NON-NLS-2$
+			if (text == null || text.length() == 0 || policyFilterText.getText().trim().equals("")) {
+				return true;
+			}
+			String details = ((TaskDetails) element).getPolicyName();
 			if (details.matches(text)) {
 				return true;
 			}
@@ -197,6 +214,8 @@ public class TaskPage implements Page {
 
 		// Event
 		filterEvent();
+		policyfilterEvent();
+		
 		tableEvent();
 		temporaryEvent();
 		setNewTask(false);
@@ -260,6 +279,7 @@ public class TaskPage implements Page {
 		spacer.setLayoutData(gd);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void createAllTaskSection(final ScrolledForm form, FormToolkit toolkit,
 			String title , Composite parent ) {
 		createSpacer(toolkit, form.getBody(), 2, 4);
@@ -267,8 +287,7 @@ public class TaskPage implements Page {
 		Section section = toolkit.createSection(parent ,Section.DESCRIPTION | Section.TITLE_BAR);
 
 		section.setActiveToggleColor(toolkit.getHyperlinkGroup().getActiveForeground());
-		section.setToggleColor(toolkit.getColors().getColor(
-				FormColors.SEPARATOR));
+		section.setToggleColor(toolkit.getColors().getColor(FormColors.SEPARATOR));
 
 		Composite client = toolkit.createComposite(section, SWT.WRAP);
 
@@ -279,7 +298,7 @@ public class TaskPage implements Page {
 
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		client.setLayoutData(gd);
-		//		gd.heightHint = 10;
+
 		gd.widthHint = leftWidth;
 		// type filter text
 		filterText = new Text(client, SWT.LEFT | SWT.BORDER);
@@ -294,7 +313,7 @@ public class TaskPage implements Page {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.verticalSpan = 5;
 		gridData.widthHint = 200;
-		gridData.heightHint = 200;
+		gridData.heightHint = 225;
 		// Task Table
 		taskTable = new Table(client, SWT.SINGLE | SWT.FULL_SELECTION
 				| SWT.BORDER | SWT.V_SCROLL);
@@ -437,11 +456,18 @@ public class TaskPage implements Page {
 		gd.widthHint = rightWidth;
 
 		client.setLayoutData(gd);
+		
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		policyFilterText = new Text(client, SWT.LEFT | SWT.BORDER);
+		gd.horizontalSpan = 6;
 
-		createSpacer(toolkit, client, 6, 1);
+		policyFilterText.setLayoutData(gd);
+		policyFilterText.setText("type filter text");
+
+		createSpacer(toolkit, client , 6, 1);
 
 		gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 5;
+		gd.horizontalSpan = 6;
 		gd.verticalSpan = 2;
 		gd.heightHint = 110;
 
@@ -500,8 +526,6 @@ public class TaskPage implements Page {
 				| GridData.VERTICAL_ALIGN_BEGINNING);
 		section.setLayoutData(gd);
 
-
-
 	}
 
 	private void chageLabel() {
@@ -519,6 +543,7 @@ public class TaskPage implements Page {
 	/**
 	 * task data loading
 	 */
+	@SuppressWarnings("unchecked")
 	public void loadInitData()  {
 		String commnd = ""; 
 		String result = ""; 
@@ -536,7 +561,7 @@ public class TaskPage implements Page {
 				for (int i = 0; i < array.length(); i++) {
 					Object o = ((JSONObject) array.get(i)).keys().next();
 					if(!(o.toString().equals("KnownException"))){ // no data
-						Cmd result_ = new Cmd("foo", "fooAction \""  //$NON-NLS-2$
+						Cmd result_ = new Cmd("foo", "fooAction \""  
 								+ o.toString()
 								+ "\" " 
 								+ (String) ((JSONObject) array.get(i)).get(
@@ -544,7 +569,7 @@ public class TaskPage implements Page {
 						String name = o.toString();
 
 						String desc = result_.getOptionArg(new String[] { "desc" }); 
-						if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempTaskName+".*"))){
+						if(!(name.matches(CommandMessages.ODEN_CLI_COMMAND_task_tempname+".*"))){
 							++index;
 							details = new TaskDetails(name, desc, null, null);
 							taskList.add(details);
@@ -568,6 +593,7 @@ public class TaskPage implements Page {
 	/**
 	 * the policy data of running task  
 	 */
+	@SuppressWarnings("unchecked")
 	public void loadInitPolicyData() {
 		String commnd = ""; 
 		String result = ""; 
@@ -581,14 +607,14 @@ public class TaskPage implements Page {
 
 				for (int i = 0; i < array.length(); i++) {
 					Object o = ((JSONObject) array.get(i)).keys().next();
-					Cmd result_ = new Cmd("foo", "fooAction \""  //$NON-NLS-2$
+					Cmd result_ = new Cmd("foo", "fooAction \""  
 							+ o.toString()
 							+ "\" " 
 							+ (String) ((JSONObject) array.get(i)).get(
 									o.toString()).toString());
 					String name = o.toString();
 					String desc = result_.getOptionArg(new String[] { "desc" }); 
-					if(!(name.matches(CommandMessages.ODEN_EXPLORER_Dialogs_DeployItemDialog_TempPolicyName+".*"))){
+					if(!(name.matches(CommandMessages.ODEN_CLI_COMMAND_policy_tempname+".*"))){
 						details = new TaskDetails(null, null, name, desc);
 						policyList.add(details);
 					}
@@ -621,7 +647,7 @@ public class TaskPage implements Page {
 					DialogUtil
 					.openMessageDialog(
 							CommonMessages.ODEN_CommonMessages_Title_Warning,
-							CommonMessages.ODEN_CommonMessages_SelectItemFirst,  //$NON-NLS-2$
+							CommonMessages.ODEN_CommonMessages_SelectItemFirst,  
 							MessageDialog.WARNING);
 				}
 			} else if (event.widget == saveTask) {
@@ -655,11 +681,10 @@ public class TaskPage implements Page {
 		String commnd = ""; 
 		String result = ""; 
 		String desc = "";
-//		String[] descs = null;
+
 		String policies = ""; 
 		String[] policy = null;
-//		PolicyDetails details = new PolicyDetails();
-//		ArrayList deployList = new ArrayList();
+
 		commnd = MSG_DETAIL_SHOW + " " + '"' + taskName + '"' + " " + "-json";   
 		try {
 			result = OdenBroker.sendRequest(getShellUrl(), commnd);
@@ -683,7 +708,8 @@ public class TaskPage implements Page {
 			clearText();
 			taskNameText.setText(taskName);
 			getDescText().setText(desc);
-			checkRuntable(policies.substring(0, policies.lastIndexOf(",")));
+			policiesData = policies.substring(0, policies.lastIndexOf(",")); 
+			checkRuntable(policiesData);
 
 		} catch (OdenException e) {
 		} catch (Exception odenException) {
@@ -779,26 +805,6 @@ public class TaskPage implements Page {
 			return false;
 	}
 
-//	private static String getOptionArgs(String full, String optionName) {
-//		// remove '-' from option name
-//		String _opt = optionName.startsWith("-") ? optionName.substring(1)
-//				: optionName;
-//
-//		String[] options = full.split("^-| -");
-//		for (String option : options) {
-//			if (option.startsWith(_opt)) {
-//				int idx = _opt.length();
-//				if (option.length() > idx + 1
-//						&& Character.isWhitespace(option.charAt(idx))
-//						&& !Character.isWhitespace(option.charAt(idx + 1)))
-//					return option.substring(idx + 1);
-//				else
-//					return "";
-//			}
-//		}
-//		return null;
-//	}
-	
 	/**
 	 * initialize task detail data
 	 */
@@ -812,19 +818,16 @@ public class TaskPage implements Page {
 	private void checkRuntable(String ckPolicy) {
 		loadInitPolicyData();
 		TableItem[] tia = runViewer.getTable().getItems();
-		for (int i = 0; i < tia.length; i++) {
-			if (chkMatch(tia[i].getText(0) , ckPolicy )) {
+		for (int i = 0; i < tia.length; i++)
+			if (chkMatch(tia[i].getText(0) , ckPolicy ))
 				tia[i].setChecked(true);
-			}
-		}
 	}
 
 	private boolean chkMatch(String tableValue , String policyValue) {
 		String[] values = policyValue.split(",");
-		for(String value : values) {
+		for(String value : values) 
 			if(value.equals(tableValue))
 				return true;
-		}
 		return false;
 	}
 	
@@ -832,14 +835,14 @@ public class TaskPage implements Page {
 		// filter Text Event
 		filterText.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent event) {
-
+				
 			}
 
 			public void keyReleased(KeyEvent ke) {
-				if(!(filterText.getText().equals("type filter text")) && !(filterText.getText().equals(""))){
+				if(!(filterText.getText().equals("type filter text"))){
 					TaskPage.this.getTaskViewer().addFilter(TaskPage.this.filter);
 					getTaskViewer().refresh();
-				}
+				} 
 
 			}
 		});
@@ -860,7 +863,42 @@ public class TaskPage implements Page {
 
 		});
 	}
+	
+	private void policyfilterEvent() {
+		// filter Text Event
+		policyFilterText.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent event) {
+				
+			}
 
+			public void keyReleased(KeyEvent ke) {
+				if(!(policyFilterText.getText().equals("type filter text"))){
+					TaskPage.this.getRunViewer().addFilter(TaskPage.this.policyfilter);
+					if(! chkNewTask())
+						checkRuntable(policiesData);
+					getRunViewer().refresh();
+				} 
+
+			}
+		});
+		policyFilterText.addMouseListener(new MouseListener() {
+			public void mouseUp(MouseEvent event) {
+
+			}
+
+			public void mouseDown(MouseEvent event) {
+				if (policyFilterText.getText().equals("type filter text"))
+					policyFilterText.setSelection(0, 16);
+
+			}
+
+			public void mouseDoubleClick(MouseEvent event) {
+
+			}
+
+		});
+	}
+	
 	private void tableEvent() {
 		// task table viewer event
 		getTaskViewer().getTable().addMouseListener(new MouseAdapter() {
@@ -951,7 +989,6 @@ public class TaskPage implements Page {
 	}
 
 	private void tempProcess () {
-//		ISelection selection = getTaskViewer().getSelection();
 		if(chkNewTask()) {
 			removeTempcell();
 			inputTempcell(getLastNum());

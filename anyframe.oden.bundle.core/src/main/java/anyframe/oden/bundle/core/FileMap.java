@@ -17,10 +17,9 @@
 package anyframe.oden.bundle.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 
-import anyframe.oden.bundle.core.command.AgentLoc;
 
 /**
  * This class has file list to be deployed and save the agent information
@@ -29,11 +28,18 @@ import anyframe.oden.bundle.core.command.AgentLoc;
  * @author joon1k
  *
  */
-public class FileMap extends TreeMap<String, List<AgentLoc>>{
-	public void append(String file, AgentLoc agent){
-		List<AgentLoc> agents = get(file);
+public class FileMap extends HashMap<String, List<AgentFile>>{
+	
+	/**
+	 * append a AgentFile to the list having same file path. 
+	 * 
+	 * @param file
+	 * @param agent
+	 */
+	public synchronized void append(String file, AgentFile agent){
+		List<AgentFile> agents = get(file);
 		if(agents == null)
-			put(file, agents = new ArrayList<AgentLoc>());
+			put(file, agents = new ArrayList<AgentFile>());
 		if(!agents.contains(agent))
 			agents.add(agent);
 	}

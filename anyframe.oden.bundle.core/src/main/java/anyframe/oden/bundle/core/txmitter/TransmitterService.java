@@ -16,12 +16,7 @@
  */
 package anyframe.oden.bundle.core.txmitter;
 
-import java.util.List;
-
-import anyframe.oden.bundle.common.FatInputStream;
-import anyframe.oden.bundle.common.FileInfo;
-import anyframe.oden.bundle.common.OdenException;
-import anyframe.oden.bundle.common.PairValue;
+import anyframe.oden.bundle.deploy.DeployerService;
 
 /**
  * Oden Service to communicate with remote DeployerService. This sends 
@@ -32,28 +27,18 @@ import anyframe.oden.bundle.common.PairValue;
  */
 public interface TransmitterService {
 	/**
+	 * get the DeployerService from addr 
 	 * 
-	 * @param ip
-	 * @param loc
-	 * @param in
-	 * @param updatejar if this is true and loc is jar, jar will be updated.
+	 * @param addr
 	 * @return
+	 */
+	public DeployerService getDeployer(String addr);
+	
+	/**
+	 * disconnect to the DeployerService
+	 * 
+	 * @param addr
 	 * @throws Exception
 	 */
-	public List<String> deploy(String ip, String loc, FatInputStream in, boolean update)
-			throws OdenException;
-	
-	public FileInfo backup(String ip, String srcLoc, String repoLoc) 
-			throws OdenException;
-
-	public void removeSnapshot(String repoUri, String repoLoc, String snapshot) 
-			throws OdenException;
-
-	public List<PairValue<String, Boolean>> restore(String repoUri, String repoLoc, String snapshot,
-			String dest) throws OdenException;
-
-	public long getDate(String destUri, String destRoot, String path)
-			throws OdenException;
-	
-	public boolean available(String addr);
+	public void disconnect(String addr) throws Exception;
 }

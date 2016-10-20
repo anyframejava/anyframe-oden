@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 SAMSUNG SDS Co., Ltd.
+ * Copyright 2009, 2010 SAMSUNG SDS Co., Ltd. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * No part of this "source code" may be reproduced, stored in a retrieval
+ * system, or transmitted, in any form or by any means, mechanical,
+ * electronic, photocopying, recording, or otherwise, without prior written
+ * permission of SAMSUNG SDS Co., Ltd., with the following exceptions:
+ * Any person is hereby authorized to store "source code" on a single
+ * computer for personal use only and to print copies of "source code"
+ * for personal use provided that the "source code" contains SAMSUNG SDS's
+ * copyright notice.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * No licenses, express or implied, are granted with respect to any of
+ * the technology described in this "source code". SAMSUNG SDS retains all
+ * intellectual property rights associated with the technology described
+ * in this "source code".
  *
  */
 package anyframe.oden.eclipse.core.history.dialogs;
@@ -64,6 +66,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
 
 import anyframe.oden.eclipse.core.history.DeploymentHistoryView;
+import anyframe.oden.eclipse.core.messages.UIMessages;
 
 /**
  * AdvancedSearchDialog,
@@ -87,16 +90,17 @@ public class AdvancedSearchDialog extends Dialog {
 	private String[] attributeRelationArrayForIp;
 
 	private String[] attributeRelationArrayForDate;
-
+	
+	private String[] attributeRelationArrayForAgent;
+	
+	private String[] attributeRelationArrayForStatus;
+	
 	private DeploymentHistoryView view;
 
 	private Label msg;
 
+	@SuppressWarnings("unchecked")
 	private ArrayList advancedList;
-
-	private ArrayList<String[]> inputList = new ArrayList<String[]>();
-
-	//	private Button caseSensitive;
 
 	public AdvancedSearchDialog(Shell shell, DeploymentHistoryView view) {
 		super(shell);
@@ -114,7 +118,8 @@ public class AdvancedSearchDialog extends Dialog {
 		newShell.setBounds(300, 200, 550, 320);
 	}
 
-	protected Control createDialogArea(Composite parent) {
+	@SuppressWarnings("unchecked")
+	protected Control createDialogArea(final Composite parent) {
 
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 1;
@@ -192,7 +197,7 @@ public class AdvancedSearchDialog extends Dialog {
 		if (AdvancedSearchInputAttribute.getInputParamVect().size() < 1) {
 			AdvancedSearchInputAttribute input = new AdvancedSearchInputAttribute();
 			input.setAttributeName("Item Name");
-			input.setAttributeRelation("contains");
+			input.setAttributeRelation("is");
 			input.setAttributeValue("");
 			viewer.add(input);
 			AdvancedSearchInputAttribute.addElementToInputParamVect(input);
@@ -213,7 +218,7 @@ public class AdvancedSearchDialog extends Dialog {
 
 				String tempStr = ((AdvancedSearchInputAttribute) obj)
 						.getAttributeName();
-				// 
+				
 				if (tempStr.equals("Item Name")) {
 					((ComboBoxCellEditor) cellEditors[1])
 							.setItems(attributeRelationArrayForName);
@@ -223,6 +228,14 @@ public class AdvancedSearchDialog extends Dialog {
 				} else if (tempStr.equals("Deployed Date")) {
 					((ComboBoxCellEditor) cellEditors[1])
 							.setItems(attributeRelationArrayForDate);
+				} else if (tempStr.equals("Agent")) {
+					((ComboBoxCellEditor) cellEditors[1])
+					.setItems(attributeRelationArrayForAgent);
+				} else if (tempStr.equals("Deployment Status")) {
+					((ComboBoxCellEditor) cellEditors[1])
+					.setItems(attributeRelationArrayForStatus);
+					((TextCellEditor) cellEditors[2]).deactivate();
+					((TextCellEditor) cellEditors[2]).setValue("");
 				}
 			}
 		});
@@ -247,6 +260,13 @@ public class AdvancedSearchDialog extends Dialog {
 						} else if (tempStr.equals("Deployed Date")) {
 							((ComboBoxCellEditor) cellEditors[1])
 									.setItems(attributeRelationArrayForDate);
+						} else if (tempStr.equals("Agent")) {
+							((ComboBoxCellEditor) cellEditors[1])
+							.setItems(attributeRelationArrayForAgent);
+						} else if (tempStr.equals("Deployment Status")) {
+							((ComboBoxCellEditor) cellEditors[1]).setItems(attributeRelationArrayForStatus);
+							((TextCellEditor) cellEditors[2]).deactivate();
+							((TextCellEditor) cellEditors[2]).setValue("");
 						}
 					}
 
@@ -265,7 +285,7 @@ public class AdvancedSearchDialog extends Dialog {
 			public void widgetSelected(SelectionEvent arg0) {
 				AdvancedSearchInputAttribute input = new AdvancedSearchInputAttribute();
 				input.setAttributeName("Item Name");
-				input.setAttributeRelation("contains");
+				input.setAttributeRelation("is");
 				input.setAttributeValue("");
 				viewer.add(input);
 				AdvancedSearchInputAttribute.addElementToInputParamVect(input);
@@ -285,11 +305,9 @@ public class AdvancedSearchDialog extends Dialog {
 				int selectedIndex = table.getSelectionIndex();
 				if (selectedIndex > -1) {
 					table.remove(selectedIndex);
-					AdvancedSearchInputAttribute.getInputParamVect().remove(
-							selectedIndex);
+					AdvancedSearchInputAttribute.getInputParamVect().remove(selectedIndex);
 				} else
-					msg
-							.setText(" Please select the criteria you want to remove.");
+					msg.setText(" Please select the criteria you want to remove.");
 			}
 
 			public void widgetDefaultSelected(SelectionEvent arg0) {
@@ -400,11 +418,13 @@ public class AdvancedSearchDialog extends Dialog {
 	 *            The composite object
 	 */
 	private void attachCellEditors(final TableViewer viewerObj, Composite parent) {
-		attributeNameArray = new String[] { "Item Name", "IP", "Deployed Date" };
-		attributeRelationArrayForName = new String[] { "contains" };
+		attributeNameArray = new String[] { "Item Name", "IP", "Deployed Date" , "Agent" , "Deployment Status"};
+		attributeRelationArrayForName = new String[] { "is" };
 		attributeRelationArrayForIp = new String[] { "is" };
 		attributeRelationArrayForDate = new String[] { "is", "before", "after" };
-
+		attributeRelationArrayForAgent = new String[] { "is" };
+		attributeRelationArrayForStatus = new String[] { "Failure" };
+		
 		viewerObj.setCellModifier(new ICellModifier() {
 
 			public boolean canModify(Object element, String property) {
@@ -429,6 +449,14 @@ public class AdvancedSearchDialog extends Dialog {
 												.getAttributeRelation());
 					if (i == -1)
 						i = Arrays.asList(attributeRelationArrayForIp).indexOf(
+								((AdvancedSearchInputAttribute) element)
+										.getAttributeRelation());
+					if (i == -1)
+						i = Arrays.asList(attributeRelationArrayForAgent).indexOf(
+								((AdvancedSearchInputAttribute) element)
+										.getAttributeRelation());
+					if (i == -1)
+						i = Arrays.asList(attributeRelationArrayForStatus).indexOf(
 								((AdvancedSearchInputAttribute) element)
 										.getAttributeRelation());
 					return i == -1 ? null : new Integer(i);
@@ -492,6 +520,17 @@ public class AdvancedSearchDialog extends Dialog {
 									.equals("Deployed Date")) {
 						advSearchInputAttribute
 								.setAttributeRelation(attributeRelationArrayForDate[i]);
+					} else if (i != -1
+							&& advSearchInputAttribute.getAttributeName()
+							.equals("Agent")) {
+						advSearchInputAttribute
+							.setAttributeRelation(attributeRelationArrayForAgent[i]);
+					} else if (i != -1
+							&& advSearchInputAttribute.getAttributeName()
+							.equals("Deployment Status")) {
+						advSearchInputAttribute
+							.setAttributeRelation(attributeRelationArrayForStatus[i]);
+						
 					}
 				} else if (property.equals("attributeValue")) {
 					advSearchInputAttribute.setAttributeValue(value.toString());
@@ -518,8 +557,8 @@ public class AdvancedSearchDialog extends Dialog {
 	}
 
 	protected void okPressed() {
-		view.getTableViewer().setInput(null);
-
+		view.getTree().removeAll();
+		
 		final Job creatingMarkersJob = new Job("Creating Markers...") {
 
 			protected IStatus run(IProgressMonitor monitor) {
@@ -536,6 +575,7 @@ public class AdvancedSearchDialog extends Dialog {
 		creatingMarkersJob.setUser(false);
 
 		Job gettingQueryIdsJob = new Job("Searching Queries...") {
+			@SuppressWarnings("unchecked")
 			protected IStatus run(IProgressMonitor monitor) {
 
 				monitor.beginTask("Searching Queries...", 1000);
@@ -555,15 +595,19 @@ public class AdvancedSearchDialog extends Dialog {
 					List.add(inputArr);
 				}
 
-				final ArrayList arrayList = view
-						.gettingHistories(monitor, List);
+				final ArrayList arrayList = view.gettingHistories(monitor, List);
 
 				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
 					public void run() {
-						view.getHistorySearchView().setText(
-								"Found " + arrayList.size() + " queries.");
-						view.getTableViewer().setInput(arrayList);
+						view.setHistoryList(arrayList);
+						view.setTreeData();
+
+						view.getHistorySearchView().setText(UIMessages.ODEN_HISTORY_DeploymentHistoryView_Item_Found
+								+ view.getTree().getItemCount() + " "
+								+ "transactions" + " "
+								+ view.getCount() + " "
+								+ UIMessages.ODEN_HISTORY_DeploymentHistoryView_Items);
 
 					}
 				});
