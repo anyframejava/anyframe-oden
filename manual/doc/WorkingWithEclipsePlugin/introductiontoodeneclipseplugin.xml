@@ -1,0 +1,45 @@
+<section id="workingwitheclipseplugin_introductiontoodenecipseplugin">
+	<title>Introduction to Oden Eclipse Plug-in</title>
+
+	<para>
+		Oden Eclipse Plug-in은 배포관리를 위한 Oden Server와 연계 하여 배포관리를 지원하는
+		플러그인으로, 다음과 같은 주요 특장점을 통해 배포 용이성 및 높은 신뢰성을 기대하게 해 준다. 
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				배포/이관 담당자에게 친숙한 Eclipse Plug-in UI를 제공하여 사용자 이용 용이성을 제공함
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				배포 이력 관리를 통한 배포의 정합성 및 무결성을 확보하여 해당 응용프로그램의 연속성을 보장함
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Update 옵션 및 Snapshot 기능 제공으로 불필요한 리소스 낭비요소를 제거하고 배포에 관한 신뢰성을
+				보장함
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Build Repository를 트리 구조로 제공하고 즉시 배포가 가능하게 하여 신속한 장애 복구가 가능하게 함
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<para>
+		Oden Eclipse Plug-in은 Oden Explorer, Oden Policy and Task Editor, 
+		Oden Job Manager, Oden Deployment History, Oden Dashboard, Oden Snapshot 등으로 구성된다.
+	</para>
+
+	<mediaobject>
+		<imageobject>
+			<title>Oden Eclipse Plug-in </title>
+			<imagedata fileref="../image/WorkingWithEclipsePlugin/eclipse_viewsandeditor.png"
+				align="left" width="6in"/>
+		</imageobject>
+	</mediaobject>
+</section>

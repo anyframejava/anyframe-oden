@@ -1,0 +1,16 @@
+<section id="workingwithcommandline_introductiontoodenshell">
+	<title>Introduction to Oden Command Line</title>
+	
+	<section id="workingwithcommandline_100">
+		<title>How to run Oden Commands</title>
+		<para>
+		Oden command can be executed in command line through runc.sh(or runc.cmd) command of bin folder.
+		</para> 
+		<programlisting><![CDATA[bin/runc.sh history info
+(In Windows, bin/runc.cmd history info)]]></programlisting>
+		
+		<para>Command can be executed through web console.</para>
+		<programlisting><![CDATA[http://localhost:9860/wconsole.html]]></programlisting>
+		<para>9860 is the basic port of Oden Server. Web console is provided in Oden Server not Oden Admin.</para>
+	</section>
+</section>

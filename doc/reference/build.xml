@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--
+  - 
+  -->
+<project name="Anyframe_Docbook" default="all">
+
+	<description>
+            This Ant build.xml file is used to transform DocBook XML to various
+    </description>
+
+
+
+	<!--
+      - Configure basic properties that will be used in the file.
+      -->
+	<property name="docbook.xsl.dir" value="stylesheet/docbook-xsl" />
+	<property name="css.dir" value="docs/css" />
+	<property name="html.dir" value="docs/html" />
+	<property name="htmlsingle.dir" value="docs/htmlsingle" />
+	<property name="pdf.dir" value="docs/pdf" />
+	<property name="src.dir" value="docs/src" />
+	<property name="src.tmp" value="docs/src/temp" />
+	<property name="image.dir" value="docs/image" />
+	<property name="xalan.lib.dir" value="software/fop/lib" />
+
+	<!--
+		- Usage of the differect style sheets which will be used for the transformation
+	-->
+	<property name="eclipse.stylesheet" value="${docbook.xsl.dir}/eclipse/eclipse.xsl" />
+	<property name="html.stylesheet" value="${docbook.xsl.dir}/html/docbook.xsl" />
+	<property name="fo.stylesheet" value="${docbook.xsl.dir}/fo/docbook.xsl" />
+	<property name="javahelp.stylesheet" value="${docbook.xsl.dir}/javahelp/javahelp.xsl" />
+	<property name="chunk-html.stylesheet" value="${docbook.xsl.dir}/html/chunk.xsl" />
+	<property name="dbk.fo.stylesheet" value="stylesheet/dbk-fo.xsl" />
+
+
+	<!--
+      - Sets up the classpath for the Xalan and Xerces implementations
+      - that are to be used in this script, since the versions that ship
+      - with Ant may be out of date.
+      -->
+	<path id="xalan.classpath">
+		<fileset dir="${xalan.lib.dir}" id="xalan.fileset" />
+	</path>
+
+	<!--
+      - target:  usage
+      -->
+	<target name="usage" description="Prints the Ant build.xml usage">
+		<echo message="Use -projecthelp to get a list of the available targets." />
+	</target>
+
+	<!--
+      - target:  clean
+      -->
+	<target name="clean" description="Cleans up generated files.">
+		<delete dir="${html.dir}" />
+		<delete dir="${htmlsingle.dir}" />
+		<delete dir="${pdf.dir}" />
+	</target>
+
+	<!--
+      - target:  depends
+      -->
+	<target name="depends">
+		<mkdir dir="${html.dir}" />
+		<mkdir dir="${htmlsingle.dir}" />
+		<mkdir dir="${pdf.dir}" />
+	</target>
+
+	<!--
+	- target:  copy 
+	- Copies the images from the subdirectories to the target folder
+	-->
+	<target name="copy">
+		<echo message="Copy the images" />
+		<copy todir="${doc.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/images/*.*" />
+			</fileset>
+		</copy>
+	</target>
+	<!--
+      - target:  build-html
+      - description:  Iterates through a directory and transforms
+      -     .xml files into .html files using the DocBook XSL.
+      -->
+	<target name="build-html" depends="depends" description="Generates HTML files from DocBook XML">
+		<xslt style="${html.stylesheet}" extension=".html" basedir="${src.dir}" destdir="${htmlsingle.dir}">
+			<include name="**/Anyframe_Oden.xml" />
+			<!--<include name="**/*.xml"/>-->
+			<param name="html.stylesheet" expression="oden.css" />
+			<param name="admon.graphics.path" expression="../../stylesheet/docbook-xsl/images/" />
+			<param name="callout.graphics.path" expression="../image/common/callouts/" />
+			<param name="table.borders.with.css" expression="1" />
+			<!--<param name="generate.toc" expression="book toc, title" />-->
+			<classpath refid="xalan.classpath" />
+		</xslt>
+		<copy todir="${htmlsingle.dir}">
+			<fileset dir="${css.dir}/">
+				<include name="oden.css" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!--
+			- target:  chunks-html
+			- description:  Iterates through a directory and transforms
+			-     .xml files into separate .html files using the DocBook XSL.
+		-->
+	<target name="build-chunks" depends="depends" description="Generates chunk HTML files from DocBook XML">
+		<xslt style="${chunk-html.stylesheet}" extension=".html" basedir="${src.dir}" destdir="${html.dir}">
+			<include name="**/Anyframe_Oden.xml" />
+			<!--<include name="**/*.xml"/>-->
+			<param name="html.stylesheet" expression="oden.css" />
+			<param name="part.autolabel" expression="1" />
+			<param name="html.cleanup" expression="1" />
+			<param name="chunk.first.selection" expression="1" />
+			<param name="chunk.section.depth" expression="0" />
+			<param name="admon.graphics.path" expression="../../stylesheet/docbook-xsl/images/" />
+			<param name="callout.graphics.path" expression="../image/common/callouts/" />
+			<param name="table.borders.with.css" expression="1" />
+			<!--<param name="generate.toc" expression="book toc, title" />-->
+
+			<classpath refid="xalan.classpath" />
+		</xslt>
+		<!-- Copy the stylesheet to the same directory as the HTML files -->
+		<copy todir="${html.dir}">
+			<fileset dir="${css.dir}/">
+				<include name="oden.css" />
+			</fileset>
+		</copy>
+
+	</target>
+
+	<target name="build-pdf" depends="depends" description="Generates HTML files from DocBook XML">
+
+		<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop">
+			<classpath>
+				<fileset dir="software/fop/lib">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="software/fop/build">
+					<include name="*.jar" />
+				</fileset>
+
+			</classpath>
+		</taskdef>
+
+		<!-- get new fop-config.xml 
+		<exec executable="cmd">
+			<arg value="/c ${basedir}/configure.bat" />
+		</exec>-->
+
+		<!-- Convert DocBook Files into FO -->
+		<xslt style="${dbk.fo.stylesheet}" extension=".fo" basedir="${src.dir}" destdir="${src.dir}" force="true">
+
+			<include name="**/Anyframe_Oden.xml" />
+			<param name="generate.toc" expression="book toc, title" />
+			<param name="admon.graphics" expression="1" />
+			<param name="admon.graphics.path" expression="${docbook.xsl.dir}/images/" />
+			<param name="img.src.path" expression="${image.dir}/" />
+			<param name="callout.graphics.path" expression="${image.dir}/common/callouts/" />
+			<!--<include name="**/*.xml"/>-->
+			<classpath refid="xalan.classpath" />
+		</xslt>
+
+		<!-- Convert FO Files into pdf -->
+		<fop format="application/pdf" outdir="${pdf.dir}" userconfig="conf/fop-config.xml" force="true">
+			<fileset dir="${src.dir}">
+				<include name="**/*.fo" />
+			</fileset>
+		</fop>
+	</target>
+<!--
+	<target name="configure">
+		<exec dir="${basedir}" executable="cmd" output="result.txt">
+			<arg value="/c dbkshell.bat " />
+		</exec>
+	</target>
+-->
+
+	<target name="all" depends="clean, build-html, build-chunks, build-pdf" />
+
+</project>

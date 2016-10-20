@@ -1,0 +1,234 @@
+<html><head><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Anyframe Manual Title</title><link href="oden.css" rel="stylesheet" type="text/css"><meta content="DocBook XSL Stylesheets V1.73.2" name="generator"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="N10002"></a>Anyframe Manual Title</h1></div><div><div class="authorgroup"><h3 class="corpauthor">corpauthor</h3></div></div><div><p class="releaseinfo">version</p></div><div><p class="copyright">Copyright &copy; 2009 holder</p></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="part"><a href="#//AK/ODEN/aboutanyframe4">I. About Anyframe 4.0</a></span></dt><dt><span class="part"><a href="#//AK/ODEN/aboutgen">II. About Anyframe Gen</a></span></dt><dd><dl><dt><span class="chapter"><a href="#//AK/GEN/callback">1. Callout</a></span></dt></dl></dd><dt><span class="part"><a href="#//AK/ODEN/aboutoden">III. &#50724;&#45957;</a></span></dt><dd><dl><dt><span class="chapter"><a href="#//AK/ODEN/concepts">2. Concepts</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/concepts-architecture">Architecture</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-list">List</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-serverandagent">Servers and Agents</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/userinterface">3. User Interface</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/userinterface-cli">Command Line Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-gui">Graphical User Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-resource">Resource</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/backupandrestore">4. Backup and Restore</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/backupandrestore-snapshotplans">Snapshot Plans</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/deployingitems">5. Deploying Items</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/deployingitems-policies">Policies</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/deployingitems-tasks">Tasks</a></span></dt></dl></dd></dl></dd></dl></div><div class="list-of-figures"><p><b>List of Figures</b></p><dl><dt>1.1. <a href="#N10044">About Callout</a></dt><dt>2.1. <a href="#N1009E">&#44536;&#47548;&#48264;&#54840;&#46020; &#50508;&#50500;&#49436; &#47564;&#46308;&#50612; &#51469;&#45768;&#45796;.</a></dt><dt>5.1. <a href="#N101B7">Adding a new docbook document</a></dt></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>4.1. <a href="#N10112">DocBook Framework properties</a></dt></dl></div><div class="part" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="//AK/ODEN/aboutanyframe4"></a>Part&nbsp;I.&nbsp;About Anyframe 4.0</h1></div></div></div><div class="partintro" lang="en"><div></div><p>
+				The Spring Framework is a lightweight solution and a potential
+				one-stop-shop for building your enterprise-ready applications.
+				However, Spring is modular, allowing you to use only those parts
+				that you need,
+				without having to bring in the rest. You can use the
+				IoC container,
+				with Struts on top, but you can also use only the
+				<a class="link" href="#">Hibernate integration code</a>
+				or the
+				<a class="link" href="#">JDBC abstraction layer</a>
+				. The Spring
+				Framework supports declarative transaction management,
+				remote access to your
+				logic through RMI or web services, and various
+				options for persisting your
+				data. It offers a full-featured
+				<a class="link" href="#">MVC framework</a>
+				, and enables you to integrate
+				<a class="link" href="#">AOP</a>
+				transparently into your software.
+			</p><p>Spring is designed to be non-intrusive, meaning that your
+				domain logic
+				code generally has no dependencies on the framework
+				itself. In your
+				integration layer (such as the data access layer),
+				some dependencies
+				on the
+				data access technology and the Spring
+				libraries will exist. However, it
+				should be easy to isolate these
+				dependencies from the rest of your
+				code
+				base.</p><p>
+				This document is a reference guide to Spring Framework features. If
+				you have any requests, comments, or questions on this document,
+				please post
+				them on the user mailing list or on the support forums at
+				<a class="ulink" href="http://forum.springsource.org/" target="_top">http://forum.springsource.org/</a>
+				.
+			</p></div></div><div class="part" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="//AK/ODEN/aboutgen"></a>Part&nbsp;II.&nbsp;About Anyframe Gen</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#//AK/GEN/callback">1. Callout</a></span></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="//AK/GEN/callback"></a>Chapter&nbsp;1.&nbsp;Callout</h2></div></div></div><p>
+				callout&#50640; &#44288;&#54620; &#44163;&#51008; &#45796;&#51020;&#44284; &#44057;&#51060; &#49324;&#50857;&#54624; &#49688; &#51080;&#45796;.
+			</p><div class="figure"><a name="N10044"></a><p class="title"><b>Figure&nbsp;1.1.&nbsp;About Callout</b></p><div class="figure-contents"><pre class="programlisting">&lt;root&gt;
+  |
+  +---- build.xml <a class="co" name="co-build-xml" href="#ca-build-xml"><img border="0" alt="1" src="../image/common/callouts/1.png"></a>
+  +---- project.properties <a class="co" name="co-project-properties" href="#ca-project-properties"><img border="0" alt="2" src="../image/common/callouts/2.png"></a>
+  |
+  +-- src
+       |
+       +-- docbook <a class="co" name="co-docbook-sources" href="#ca-docbook-sources"><img border="0" alt="3" src="../image/common/callouts/3.png"></a>
+       |
+       +-- styles
+       |     |
+       |     +-- pdf <a class="co" name="co-styles-pdf" href="#ca-styles-pdf"><img border="0" alt="4" src="../image/common/callouts/4.png"></a>
+       |     |
+       |     +-- html <a class="co" name="co-styles-html" href="#ca-styles-html"><img border="0" alt="5" src="../image/common/callouts/5.png"></a>
+       |
+       +-- css
+       |    |
+       |    +-- html <a class="co" name="co-css-html" href="#ca-css-html"><img border="0" alt="6" src="../image/common/callouts/6.png"></a>
+       |
+       +-- images <a class="co" name="co-src-images" href="#ca-src-images"><img border="0" alt="7" src="../image/common/callouts/7.png"></a></pre><div class="calloutlist"><table summary="Callout list" border="0"><tr><td align="left" valign="top" width="5%"><p><a name="ca-build-xml"></a><a href="#co-build-xml"><img border="0" alt="1" src="../image/common/callouts/1.png"></a> </p></td><td align="left" valign="top"><p>ant build file</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-project-properties"></a><a href="#co-project-properties"><img border="0" alt="2" src="../image/common/callouts/2.png"></a> </p></td><td align="left" valign="top"><p>custom settings for your build</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-docbook-sources"></a><a href="#co-docbook-sources"><img border="0" alt="3" src="../image/common/callouts/3.png"></a> </p></td><td align="left" valign="top"><p>Docbook sources</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-styles-pdf"></a><a href="#co-styles-pdf"><img border="0" alt="4" src="../image/common/callouts/4.png"></a> </p></td><td align="left" valign="top"><p>Custom styles for PDF</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-styles-html"></a><a href="#co-styles-html"><img border="0" alt="5" src="../image/common/callouts/5.png"></a> </p></td><td align="left" valign="top"><p>Custom styles for HTML</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-css-html"></a><a href="#co-css-html"><img border="0" alt="6" src="../image/common/callouts/6.png"></a> </p></td><td align="left" valign="top"><p>CSS files for HTML</p></td></tr><tr><td align="left" valign="top" width="5%"><p><a name="ca-src-images"></a><a href="#co-src-images"><img border="0" alt="7" src="../image/common/callouts/7.png"></a> </p></td><td align="left" valign="top"><p>Image files for PDF/HTML</p></td></tr></table></div></div></div><br class="figure-break"></div></div><div class="part" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="//AK/ODEN/aboutoden"></a>Part&nbsp;III.&nbsp;&#50724;&#45957;</h1></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#//AK/ODEN/concepts">2. Concepts</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/concepts-architecture">Architecture</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-list">List</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-serverandagent">Servers and Agents</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/userinterface">3. User Interface</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/userinterface-cli">Command Line Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-gui">Graphical User Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-resource">Resource</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/backupandrestore">4. Backup and Restore</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/backupandrestore-snapshotplans">Snapshot Plans</a></span></dt></dl></dd><dt><span class="chapter"><a href="#//AK/ODEN/deployingitems">5. Deploying Items</a></span></dt><dd><dl><dt><span class="section"><a href="#//AK/ODEN/deployingitems-policies">Policies</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/deployingitems-tasks">Tasks</a></span></dt></dl></dd></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="//AK/ODEN/concepts"></a>Chapter&nbsp;2.&nbsp;Concepts</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#//AK/ODEN/concepts-architecture">Architecture</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-list">List</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/concepts-serverandagent">Servers and Agents</a></span></dt></dl></div><p>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit, set
+				eiusmod
+				tempor incidunt et labore et dolore magna aliquam. Ut enim ad
+				minim
+				veniam, quis nostrud exerc. Irure dolor in reprehend incididunt
+				ut
+				labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+				nostrud
+				exercitation ullamco laboris nisi ut aliquip ex ea commodo
+				consequat.
+				<sup>[<a href="#ftn.N10094" name="N10094" class="footnote">1</a>]</sup>
+				Duis aute irure dolor in reprehenderit in voluptate velit
+				esse
+				molestaie cillum. Tia non ob ea soluad incom dereud facilis est
+				er
+				expedit distinct. Nam liber te conscient to factor tum poen legum
+				odioque civiuda et tam. Neque pecun modut est neque nonor et imper
+				ned libidig met, consectetur adipiscing elit, sed ut labore et
+				dolore
+				magna aliquam is nostrud exercitation ullam mmodo consequet.
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/concepts-architecture"></a>Architecture</h2></div></div></div><p>
+					&#44536;&#47548;&#51008; &#45796;&#51020;&#44284; &#44057;&#51060; &#45347;&#49845;&#45768;&#45796;.
+					</p><div class="figure"><a name="N1009E"></a><p class="title"><b>Figure&nbsp;2.1.&nbsp;&#44536;&#47548;&#48264;&#54840;&#46020; &#50508;&#50500;&#49436; &#47564;&#46308;&#50612; &#51469;&#45768;&#45796;.</b></p><div class="figure-contents"><img src="../image/oden/overview_somethingmissing.png" alt="&#44536;&#47548;&#48264;&#54840;&#46020; &#50508;&#50500;&#49436; &#47564;&#46308;&#50612; &#51469;&#45768;&#45796;."></div></div><br class="figure-break"></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/concepts-list"></a>List</h2></div></div></div><p>
+					&#47785;&#47197;&#51008; &#48264;&#54840;&#44032; &#51080;&#45716; &#47785;&#47197;&#44284; &#48264;&#54840;&#44032; &#50630;&#45716; &#47785;&#47197;&#51060; &#51080;&#45796;. 
+			</p><p>
+					&#48264;&#54840;&#44032; &#51080;&#45716; &#47785;&#47197;&#51008; &#45796;&#51020;&#44284; &#44057;&#51060; &#51089;&#49457;&#54620;&#45796;.
+					<div class="orderedlist"><ol type="1"><li><p>
+								Arabic : The arabic numerals (1, 2, 3, ...) are used.
+							</p><p>
+								The Numeration attribute of the OrderedList element is
+								needed to specify the sequence to use when numbering the list
+								items. This attribute can get one of the following values
+						</p></li><li><p>
+								Upperalpha : The upper letters (A, B, C, ...) are used.
+							</p></li><li><p>
+								Loweralpha : The lower letters (a, b, c, ...) are used.
+							</p></li><li><p>
+								Upperroman : The upper roman numerals (I, II, III, IV, ...)
+								are used. 
+						</p></li><li><p>
+								Lowerroman : The lower roman numerals (I, II, III, IV, ...)
+								are used. 
+						</p></li></ol></div>
+				</p><p>
+					&#48264;&#54840;&#44032; &#50630;&#45716; &#47785;&#47197;&#51008; &#45796;&#51020;&#44284; &#44057;&#51060; &#51089;&#49457;&#54620;&#45796;.
+					<div class="itemizedlist"><ul type="disc"><li><p>
+								Inherit : The nested list inherits the numeration of the
+								lists in which it is nested. 
+						</p><p>
+								The InheritNum attribute of the OrderedList element specify
+								if a
+								nested list must inherit the numeration from its parent
+								lists.
+								This attribute can get the following values
+						</p></li><li><p>
+								Ignore : The nested list does not inherit any numeration.
+							</p></li></ul></div>
+				</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/concepts-serverandagent"></a>Servers and Agents</h2></div></div></div><p>
+					At vver eos et accusam dignissum qui blandit est praesent.
+					Trenz pruca beynocguon doas nog apoply su trenz ucu hugh rasoluguon
+					monugor or trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo
+					producgs su IdfoBraid, yop quiel geg ba solaly rasponsubla rof
+					trenzur sala ent dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis
+					phat eit sakem eit vory gast te Plok peish ba useing phen roxas.
+					Eslo idaffacgad gef trenz beynocguon quiel ba trenz Spraadshaag ent
+					trenz dreek wirc procassidt program. Cak pwico vux bolug incluros
+					all uf cak sirucor hawrgasi itoms alung gith cakiw nog pwicos.
+				</p></div><p>
+				&#50668;&#44592;&#44620;&#51648;&#44032; html &#54620; &#54168;&#51060;&#51648;&#51077;&#45768;&#45796;.
+					</p><div class="footnotes"><br><hr align="left" width="100"><div class="footnote"><p><sup>[<a href="#N10094" name="ftn.N10094" class="para">1</a>] </sup>
+						&#44033;&#51452;&#45716; &#45796;&#51020;&#44284; &#44057;&#45796;. &#48264;&#54840;&#45716; &#50508;&#50500;&#49436; &#47564;&#46308;&#50612; &#51452;&#45768; &#49888;&#44221;&#50416;&#51648; &#47560;&#49464;&#50836;.
+				</p></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="//AK/ODEN/userinterface"></a>Chapter&nbsp;3.&nbsp;User Interface</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#//AK/ODEN/userinterface-cli">Command Line Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-gui">Graphical User Interface</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/userinterface-resource">Resource</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/userinterface-cli"></a>Command Line Interface</h2></div></div></div><p>802.1x is a protocol for implementing port-based network
+					access
+					over wired or wireless LANs. It supports a wide range of
+					authentication methods, including TLS, TTLS, LEAP, MDS, and PEAP
+					(MSCHAPv2, MD5, GTC</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/userinterface-gui"></a>Graphical User Interface</h2></div></div></div><p>The Dynamic Host Configuration Protocol and the Bootstrap
+					Protocol automate the assignment of IP addresses in a particular
+					network.
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/userinterface-resource"></a>Resource</h2></div></div></div><div class="variablelist"><dl><dt><span class="term">Download</span></dt><dd><p>
+								<a class="ulink" href="http://luaforge.net/frs/download.php/3143/lua5_1_3_Sources.zip" target="_top">file name</a>
+							</p></dd><dt><span class="term">See Also</span></dt><dd><p>
+								<a class="ulink" href="http://www.anyframejava.org" target="_top">reference site name</a>
+							</p><p>
+								<a class="ulink" href="http://www.google.com" target="_top">reference site name</a>
+							</p></dd></dl></div></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="//AK/ODEN/backupandrestore"></a>Chapter&nbsp;4.&nbsp;Backup and Restore</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#//AK/ODEN/backupandrestore-snapshotplans">Snapshot Plans</a></span></dt></dl></div><p>
+				Plloaso mako nuto uf cakso dodtos anr koop a cupy uf cak vux
+				noaw yerw
+				phuno.
+				Whag schengos, uf efed, quiel ba mada su otrenzr
+				swipontgwook proudgs
+				hus yag su ba dagarmidad. Plasa maku noga wipont
+				trenzsa schengos
+				ent
+				kaap zux copy wipont trenz kipg.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/backupandrestore-snapshotplans"></a>Snapshot Plans</h2></div></div></div><p>
+					&#53580;&#51060;&#48660;&#51008; &#45796;&#51020;&#44284; &#44057;&#51060; &#49324;&#50857;&#54620;&#45796;.
+			</p><div class="table"><a name="N10112"></a><p class="title"><b>Table&nbsp;4.1.&nbsp;DocBook Framework properties</b></p><div class="table-contents"><table summary="DocBook Framework properties" border="1"><colgroup><col><col><col></colgroup><thead><tr><th>property name</th><th>default value</th><th>property function</th></tr></thead><tbody><tr><td>
+									<code class="literal">paper.type</code>
+								</td><td>
+									<code class="literal">Letter</code>
+								</td><td>Paper output size for PDF docs</td></tr><tr><td>
+									<code class="literal">src.dir</code>
+								</td><td>
+									<code class="literal">${basedir}/src</code>
+								</td><td>docbook and related sources dir</td></tr><tr><td>
+									<code class="literal">style.src.dir</code>
+								</td><td>
+									<code class="literal">${src.dir}/styles</code>
+								</td><td>custom styles directory</td></tr><tr><td>
+									<code class="literal">docbook.src.dir</code>
+								</td><td>
+									<code class="literal">${src.dir}/docbook</code>
+								</td><td>docbook files directory</td></tr><tr><td>
+									<code class="literal">images.src.dir</code>
+								</td><td>
+									<code class="literal">${src.dir}/images</code>
+								</td><td>images location</td></tr><tr><td>
+									<code class="literal">css.src.dir</code>
+								</td><td>
+									<code class="literal">${src.dir}/css</code>
+								</td><td>css files location</td></tr><tr><td>
+									<code class="literal">target.dir</code>
+								</td><td>
+									<code class="literal">${basedir}/target</code>
+								</td><td>output directory</td></tr><tr><td>
+									<code class="literal">tmp.dir</code>
+								</td><td>
+									<code class="literal">${target.dir}/tmp</code>
+								</td><td>temporary files location</td></tr></tbody></table></div></div><br class="table-break"></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="//AK/ODEN/deployingitems"></a>Chapter&nbsp;5.&nbsp;Deploying Items</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#//AK/ODEN/deployingitems-policies">Policies</a></span></dt><dt><span class="section"><a href="#//AK/ODEN/deployingitems-tasks">Tasks</a></span></dt></dl></div><p>
+				At vver eos et accusam dignissum qui blandit est praesent.
+				Trenz
+				pruca
+				beynocguon doas nog apoply su trenz ucu hugh rasoluguon
+				monugor
+				or
+				trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo
+				producgs su
+				IdfoBraid, yop quiel geg ba solaly rasponsubla rof
+				trenzur sala ent
+				dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis
+				phat eit sakem eit
+				vory gast te Plok peish ba useing phen roxas. Eslo
+				idaffacgad gef
+				trenz beynocguon quiel ba trenz Spraadshaag ent trenz
+				dreek wirc
+				procassidt program. Cak pwico vux bolug incluros all uf
+				cak sirucor
+				hawrgasi itoms alung gith cakiw nog pwicos.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/deployingitems-policies"></a>Policies</h2></div></div></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">&#45432;&#53944;</h3><p>
+						&#49352;&#44200;&#46160;&#50612;&#50556;&#54624; &#45236;&#50857;&#51008; "note"&#47484; &#49324;&#50857;&#54620;&#45796;.
+						&#45432;&#53944;&#45716; &#51060;&#47088;&#49885;&#51004;&#47196; &#49324;&#50857;&#54644;&#50836;.
+						</p></div><div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">&#51452;&#51032;</h3><p>
+						&#51452;&#51032;&#54644;&#50556;&#54624; &#45236;&#50857;&#51008; "warning"&#47484; &#49324;&#50857;&#54620;&#45796;.
+						&#44221;&#44256;&#45716; &#51060;&#47088; &#49885;&#51004;&#47196; &#45804;&#50500;&#50836;.
+						</p></div><div class="important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">&#51473;&#50836;</h3><p>
+						&#51221;&#47568; &#51473;&#50836;&#54620; &#45236;&#50857;&#51008; "important"&#47484; &#49324;&#50857;&#54620;&#45796;.
+						&#51473;&#50836;&#54620; &#44144;&#45716; &#51060;&#47088; &#49885;&#51004;&#47196; &#45804;&#50500;&#50836;.
+				</p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="//AK/ODEN/deployingitems-tasks"></a>Tasks</h2></div></div></div><p>&#53076;&#46300;&#49368;&#54540;&#51008; "codesample"&#51012; &#49324;&#50857;&#54620;&#45796;.</p><div class="figure"><a name="N101B7"></a><p class="title"><b>Figure&nbsp;5.1.&nbsp;Adding a new docbook document</b></p><div class="figure-contents"><pre class="programlisting">
+
+&lt;beans&gt;
+
+    &lt;bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
+        &lt;property name="aliases"&gt;
+            &lt;props&gt;
+                &lt;prop key="Flight"&gt;org.springframework.oxm.xstream.Flight&lt;/prop&gt;
+            &lt;/props&gt;
+        &lt;/property&gt;
+    &lt;/bean&gt;
+    ...
+
+&lt;/beans&gt;
+			</pre></div></div><br class="figure-break"></div></div></div></div></body></html>

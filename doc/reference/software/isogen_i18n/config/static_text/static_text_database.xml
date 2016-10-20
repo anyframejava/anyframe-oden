@@ -1,0 +1,1247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE text_database SYSTEM "static_text_database.dtd">
+<!-- Caution: This document contains Unicode characters above
+              the ASCII range. Save as "binary" in CVS and
+              be careful with text editors.
+
+
+     Each entry must provide the language-appropriate white space before or
+     after a term when it is used in context where more complex strings are
+     constructed from multiple generated text bits, such as cross references.
+  -->
+<text_database xmlns="http://www.innodata-isogen.com/vocabularies/i18n_support/static_text_database">
+  <metadata>
+    <title>Sample Static Text Database</title>
+    <description>
+      <p>This is a sample static text database.</p>
+    </description>
+    <copyright>
+      <p>Copyright (C) 2003, 2004 Innodata Isogen</p>
+      <p>This sample may be used to create derivative text databases without restriction.</p>
+    </copyright>
+    <security>
+      <p>For Public Use</p>
+    </security>
+    <revision_history>
+      <revision>
+        <date>2003-03-24</date>
+        <author>W. Eliot Kimber, ISOGEN Internation, LLC</author>
+        <description>
+          <p>Created initial sample of static text database.</p>
+          <p>All the text samples were translated using the AltaVista babel fish service (http://babelfish.altavista.com/babelfish/tr).</p>
+        </description>
+      </revision>
+    </revision_history>
+  </metadata>
+  <contexts_common>
+    <context>
+      <lookup_key>#contents</lookup_key>
+      <text_before>
+        <default_item>{#contents not translated}</default_item>
+        <item xml:lang="en">Contents</item>
+        <item xml:lang="ar">المحتويات</item>
+        <item xml:lang="de">Inhalt</item>
+        <item xml:lang="fr">Sommaire</item>
+        <item xml:lang="fi">Sisältö</item>
+        <item xml:lang="da">Indholdsfortegnelse</item>
+        <item xml:lang="no">Innhold</item>
+        <item xml:lang="nl">Inhoudsopgave</item>
+        <item xml:lang="it">Indice</item>
+        <item xml:lang="es">Índice</item>
+        <item xml:lang="pt">Índice</item>
+        <item xml:lang="el">Περιεχόμενα</item>
+        <item xml:lang="pl">Spis treści</item>
+        <item xml:lang="ru">Содержание</item>
+        <item xml:lang="cs">Obsah</item>
+        <item xml:lang="hu">Tartalom</item>
+        <item xml:lang="tr">İçindekiler</item>
+        <item xml:lang="fr-CA">Sommaire</item>
+        <item xml:lang="sv">Innehåll</item>
+        <item xml:lang="pt-BR">Sumário</item>
+        <item xml:lang="es-LAM">Contenido</item>
+        <item xml:lang="bg">Съдържание</item>
+        <item xml:lang="et">Sisukord</item>
+        <item xml:lang="he">תוכן</item>
+        <item xml:lang="hr">Sadržaj</item>
+        <item xml:lang="is">Efnisyfirlit</item>
+        <item xml:lang="lt">Turinys</item>
+        <item xml:lang="lv">Saturs</item>
+        <item xml:lang="ro">Cuprins</item>
+        <item xml:lang="sk">Obsah</item>
+        <item xml:lang="sl">Vsebina</item>
+        <item xml:lang="sr-LAT">Sadržaj</item>
+        <item xml:lang="sr-CYR">Садржај</item>
+        <item xml:lang="uk">Зміст</item>
+        <item xml:lang="af">Inhoud</item>
+        <item xml:lang="fa">فهرست مطالب</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Daftar Isi</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko">색인</item>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Dikahare</item>
+        <item xml:lang="sw">Yaliyomo</item>
+        <item xml:lang="th">สารบัญ</item>
+        <item xml:lang="tl">Mga Nilalaman</item>
+        <item xml:lang="ur">فہرست اجزا</item>
+        <item xml:lang="vi">Muûc luûc</item>
+        <item xml:lang="xh">IsiQulatho</item>
+        <item xml:lang="zh-CN">目录</item>
+        <item xml:lang="zh-HK">目錄</item>
+        <item xml:lang="zh-TW">目錄</item>
+        <item xml:lang="zu">Okuqukethwe</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#index</lookup_key>
+      <text_before>
+        <default_item>{Index not translated}</default_item>
+        <item xml:lang="en">Index</item>
+        <item xml:lang="ar">الفهرس</item>
+        <item xml:lang="tl">Indeks</item>
+        <item xml:lang="de">Index</item>
+        <item xml:lang="fr">Index</item>
+        <item xml:lang="fi">Hakemisto</item>
+        <item xml:lang="da">Indeks</item>
+        <item xml:lang="no">Stikkordregister</item>
+        <item xml:lang="nl">Index</item>
+        <item xml:lang="it">Indice analitico</item>
+        <item xml:lang="es">Índice alfabético</item>
+        <item xml:lang="pt">Índice remissivo</item>
+        <item xml:lang="el">Ευρετήριο</item>
+        <item xml:lang="pl">Indeks</item>
+        <item xml:lang="ru">Алфавитный указатель</item>
+        <item xml:lang="cs">Rejstřík</item>
+        <item xml:lang="hu">Mutató</item>
+        <item xml:lang="tr">Dizin</item>
+        <item xml:lang="fr-CA">Index</item>
+        <item xml:lang="sv">Index</item>
+        <item xml:lang="pt-BR">Índice</item>
+        <item xml:lang="es-LAM">Índice</item>
+        <item xml:lang="bg">Индекс</item>
+        <item xml:lang="et">Register</item>
+        <item xml:lang="he">אינדקס</item>
+        <item xml:lang="hr">Kazalo</item>
+        <item xml:lang="is">Atriðaskrá</item>
+        <item xml:lang="lt">Rodyklė</item>
+        <item xml:lang="lv">Alfabētiskais rādītājs</item>
+        <item xml:lang="ro">Index</item>
+        <item xml:lang="sk">Register</item>
+        <item xml:lang="sl">Kazalo</item>
+        <item xml:lang="sr-LAT">Indeks</item>
+        <item xml:lang="sr-CYR">Индекс</item>
+        <item xml:lang="uk">Покажчик</item>
+        <item xml:lang="af">Indeks</item>
+        <item xml:lang="fa">فهرست</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Indeks</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Indekse</item>
+        <item xml:lang="sw">Faharasa</item>
+        <item xml:lang="th">ดัชนี</item>
+        <item xml:lang="tl">Indise</item>
+        <item xml:lang="ur">انڈيکس</item>
+        <item xml:lang="vi">Tæì muûc</item>
+        <item xml:lang="xh">Isalathisi</item>
+        <item xml:lang="zh-CN">索引</item>
+        <item xml:lang="zh-HK">索引</item>
+        <item xml:lang="zh-TW">索引</item>
+        <item xml:lang="zu">Izikhombo</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#glossary</lookup_key>
+      <text_before>
+        <default_item>{glossary not translated}</default_item>
+        <item xml:lang="en">Glossary</item>
+        <item xml:lang="ar">قاموس المصطلحات</item>
+        <item xml:lang="de">Glossar</item>
+        <item xml:lang="fr">Glossaire</item>
+        <item xml:lang="fi">Sanasto</item>
+        <item xml:lang="da">Ordliste</item>
+        <item xml:lang="no">Ordliste</item>
+        <item xml:lang="nl">Woordenlijst</item>
+        <item xml:lang="it">Glossario</item>
+        <item xml:lang="es">Glosario</item>
+        <item xml:lang="pt">Glossário</item>
+        <item xml:lang="el">Γλωσσάριο</item>
+        <item xml:lang="pl">Słownik</item>
+        <item xml:lang="ru">Глоссарий</item>
+        <item xml:lang="cs">Glosář</item>
+        <item xml:lang="hu">Szójegyzék</item>
+        <item xml:lang="tr">Sözlük</item>
+        <item xml:lang="fr-CA">Glossaire</item>
+        <item xml:lang="sv">Ordlista</item>
+        <item xml:lang="pt-BR">Glossário</item>
+        <item xml:lang="es-LAM">Glosario</item>
+        <item xml:lang="bg">Речник</item>
+        <item xml:lang="et">Mõisted</item>
+        <item xml:lang="he">מילון מונחים</item>
+        <item xml:lang="hr">Rječnik</item>
+        <item xml:lang="is">Orðalisti</item>
+        <item xml:lang="lt">Terminų paaiškinimai</item>
+        <item xml:lang="lv">Skaidrojošā vārdnīca</item>
+        <item xml:lang="ro">Glosar</item>
+        <item xml:lang="sk">Výklad termínov</item>
+        <item xml:lang="sl">Slovarček</item>
+        <item xml:lang="sr-LAT">Glosar</item>
+        <item xml:lang="sr-CYR">Глосар</item>
+        <item xml:lang="uk">Глосарій</item>
+        <item xml:lang="af">Woordelys</item>
+        <item xml:lang="fa">واژه نامه</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Daftar istilah</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Pokello ya mantswe</item>
+        <item xml:lang="sw">Maneno Yaliyotumika</item>
+        <item xml:lang="th">อภิธานศัพท์</item>
+        <item xml:lang="tl">Glosaryo</item>
+        <item xml:lang="ur">فہرست مصطلحات</item>
+        <item xml:lang="vi">Baíng chuï giaíi</item>
+        <item xml:lang="xh">Uluhlu lwamagama</item>
+        <item xml:lang="zh-CN">词汇</item>
+        <item xml:lang="zh-HK">詞彙表</item>
+        <item xml:lang="zh-TW">詞彙</item>
+        <item xml:lang="zu">Uhla Lwamagama</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#all-rights-reserved</lookup_key>
+      <text_before>
+        <default_item>{#all-rights-reserved not translated}</default_item>
+        <item xml:lang="en">ThreeInitialCorp. All rights reserved.</item>
+        <item xml:lang="ar">ThreeInitialCorp جميع الحقوق محفوظة.</item>
+        <item xml:lang="de">ThreeInitialCorp. Alle Rechte vorbehalten.</item>
+        <item xml:lang="fr">ThreeInitialCorp. Tous droits réservés.</item>
+        <item xml:lang="fi">ThreeInitialCorp. Kaikki oikeudet pidätetään.</item>
+        <item xml:lang="da">ThreeInitialCorp. Alle rettigheder forbeholdes.</item>
+        <item xml:lang="no">ThreeInitialCorp. Alle rettigheter forbeholdt.</item>
+        <item xml:lang="nl">ThreeInitialCorp. Alle rechten voorbehouden.</item>
+        <item xml:lang="it">ThreeInitialCorp. Tutti i diritti sono riservati.</item>
+        <item xml:lang="es">ThreeInitialCorp. Reservados todos los derechos.</item>
+        <item xml:lang="pt">ThreeInitialCorp. Todos os direitos reservados.</item>
+        <item xml:lang="el">ThreeInitialCorp. Με την επιφύλαξη παντός δικαιώματος.</item>
+        <item xml:lang="pl">ThreeInitialCorp. Wszelkie prawa zastrzeżone.</item>
+        <item xml:lang="ru">ThreeInitialCorp. Все права защищены.</item>
+        <item xml:lang="cs">ThreeInitialCorp. Všechna práva vyhrazena.</item>
+        <item xml:lang="hu">ThreeInitialCorp. Minden jog fenntartva.</item>
+        <item xml:lang="tr">ThreeInitialCorp telif hakkıdır. Tüm hakları mahfuzdur.</item>
+        <item xml:lang="fr-CA">ThreeInitialCorp. Tous droits réservés.</item>
+        <item xml:lang="sv">ThreeInitialCorp. Alla rättigheter förbehållna.</item>
+        <item xml:lang="pt-BR">ThreeInitialCorp. Todos os direitos reservados.</item>
+        <item xml:lang="es-LAM">ThreeInitialCorp. Todos los derechos reservados.</item>
+        <item xml:lang="bg">ThreeInitialCorp. Всички права запазени.</item>
+        <item xml:lang="et">ThreeInitialCorp. Kõik õigused kaitstud.</item>
+        <item xml:lang="he">.כל הזכויות שמורות .ThreeInitialCorp</item>
+        <item xml:lang="hr">ThreeInitialCorp. Sva prava pridržana.</item>
+        <item xml:lang="is">ThreeInitialCorp. Öll réttindi áskilin.</item>
+        <item xml:lang="lt">„ThreeInitialCorp“. Visos teisės saugomos įstatymo.</item>
+        <item xml:lang="lv">ThreeInitialCorp. Visas tiesības aizsargātas.</item>
+        <item xml:lang="ro">ThreeInitialCorp. Toate drepturile rezervate.</item>
+        <item xml:lang="sk">ThreeInitialCorp. Všetky práva vyhradené.</item>
+        <item xml:lang="sl">ThreeInitialCorp. Vse pravice pridržane.</item>
+        <item xml:lang="sr-LAT">ThreeInitialCorp. Sva prava zadržana.</item>
+        <item xml:lang="sr-CYR">ThreeInitialCorp. Сва права задржана.</item>
+        <item xml:lang="uk">ThreeInitialCorp. Всі права захищені.</item>
+        <item xml:lang="af">ThreeInitialCorp. Alle regte voorbehou.</item>
+        <item xml:lang="fa">كليه حقوق براي ThreeInitialCorp محفوظ است.</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">ThreeInitialCorp. Semua hak dilindungi.</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">ThreeInitialCorp. Ditokelo tsohle di sireleditswe ka molao.</item>
+        <item xml:lang="sw">ThreeInitialCorp. Haki zote zimehifadhiwa.</item>
+        <item xml:lang="th">ThreeInitialCorpสงวนลิขสิทธิ์</item>
+        <item xml:lang="tl">ThreeInitialCorp. Nakareserba ang lahat ng karapatan.</item>
+        <item xml:lang="ur">نوکيا، جملہ حقوق محفوظ ہيں</item>
+        <item xml:lang="vi">ThreeInitialCorp. Baín quyãön âaî âàng kyï baío häü.</item>
+        <item xml:lang="xh">ThreeInitialCorp. Onke amalungelo aphantsi koxhomekeko.</item>
+        <item xml:lang="zh-CN">诺基亚。保留所有权利。</item>
+        <item xml:lang="zh-HK">ThreeInitialCorp.版權所有，翻印必究。</item>
+        <item xml:lang="zh-TW">ThreeInitialCorp。版權所有，翻印必究。</item>
+        <item xml:lang="zu">ThreeInitialCorp. Wonke amalungelo agodliwe.</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>toc</lookup_key>
+      <text_before>
+        <default_item>{Contents not translated}</default_item>
+        <item xml:lang="en">Contents</item>
+        <item xml:lang="tl">Mga Nilalaman</item>
+        <item xml:lang="ar">المحتويات</item>
+        <item xml:lang="de">Inhalt</item>
+        <item xml:lang="fr">Sommaire</item>
+        <item xml:lang="fi">Sisältö</item>
+        <item xml:lang="da">Indholdsfortegnelse</item>
+        <item xml:lang="no">Innhold</item>
+        <item xml:lang="nl">Inhoudsopgave</item>
+        <item xml:lang="it">Indice</item>
+        <item xml:lang="es">Índice</item>
+        <item xml:lang="pt">Índice</item>
+        <item xml:lang="el">Περιεχόμενα</item>
+        <item xml:lang="pl">Spis treści</item>
+        <item xml:lang="ru">Содержание</item>
+        <item xml:lang="cs">Obsah</item>
+        <item xml:lang="hu">Tartalom</item>
+        <item xml:lang="tr">İçindekiler</item>
+        <item xml:lang="fr-CA">Sommaire</item>
+        <item xml:lang="sv">Innehåll</item>
+        <item xml:lang="pt-BR">Sumário</item>
+        <item xml:lang="es-LAM">Contenido</item>
+        <item xml:lang="bg">Съдържание</item>
+        <item xml:lang="et">Sisukord</item>
+        <item xml:lang="he">תוכן</item>
+        <item xml:lang="hr">Sadržaj</item>
+        <item xml:lang="is">Efnisyfirlit</item>
+        <item xml:lang="lt">Turinys</item>
+        <item xml:lang="lv">Saturs</item>
+        <item xml:lang="ro">Cuprins</item>
+        <item xml:lang="sk">Obsah</item>
+        <item xml:lang="sl">Vsebina</item>
+        <item xml:lang="sr-LAT">Sadržaj</item>
+        <item xml:lang="sr-CYR">Садржај</item>
+        <item xml:lang="uk">Зміст</item>
+        <item xml:lang="af">Inhoud</item>
+        <item xml:lang="fa">فهرست مطالب</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Daftar Isi</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Dikahare</item>
+        <item xml:lang="sw">Yaliyomo</item>
+        <item xml:lang="th">สารบัญ</item>
+        <item xml:lang="tl">Mga Nilalaman</item>
+        <item xml:lang="ur">فہرست اجزا</item>
+        <item xml:lang="vi">Muûc luûc</item>
+        <item xml:lang="xh">IsiQulatho</item>
+        <item xml:lang="zh-CN">目录</item>
+        <item xml:lang="zh-HK">目錄</item>
+        <item xml:lang="zh-TW">目錄</item>
+        <item xml:lang="zu">Okuqukethwe</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>index</lookup_key>
+      <text_before>
+        <default_item>{Index not translated}</default_item>
+        <item xml:lang="en">Index</item>
+        <item xml:lang="tl">Indeks</item>
+        <item xml:lang="ar">الفهرس</item>
+        <item xml:lang="de">Index</item>
+        <item xml:lang="fr">Index</item>
+        <item xml:lang="fi">Hakemisto</item>
+        <item xml:lang="da">Indeks</item>
+        <item xml:lang="no">Stikkordregister</item>
+        <item xml:lang="nl">Index</item>
+        <item xml:lang="it">Indice analitico</item>
+        <item xml:lang="es">Índice alfabético</item>
+        <item xml:lang="pt">Índice remissivo</item>
+        <item xml:lang="el">Ευρετήριο</item>
+        <item xml:lang="pl">Indeks</item>
+        <item xml:lang="ru">Алфавитный указатель</item>
+        <item xml:lang="cs">Rejstřík</item>
+        <item xml:lang="hu">Mutató</item>
+        <item xml:lang="tr">Dizin</item>
+        <item xml:lang="fr-CA">Index</item>
+        <item xml:lang="sv">Index</item>
+        <item xml:lang="pt-BR">Índice</item>
+        <item xml:lang="es-LAM">Índice</item>
+        <item xml:lang="bg">Индекс</item>
+        <item xml:lang="et">Register</item>
+        <item xml:lang="he">אינדקס</item>
+        <item xml:lang="hr">Kazalo</item>
+        <item xml:lang="is">Atriðaskrá</item>
+        <item xml:lang="lt">Rodyklė</item>
+        <item xml:lang="lv">Alfabētiskais rādītājs</item>
+        <item xml:lang="ro">Index</item>
+        <item xml:lang="sk">Register</item>
+        <item xml:lang="sl">Kazalo</item>
+        <item xml:lang="sr-LAT">Indeks</item>
+        <item xml:lang="sr-CYR">Индекс</item>
+        <item xml:lang="uk">Покажчик</item>
+        <item xml:lang="af">Indeks</item>
+        <item xml:lang="fa">فهرست</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Indeks</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Indekse</item>
+        <item xml:lang="sw">Faharasa</item>
+        <item xml:lang="th">ดัชนี</item>
+        <item xml:lang="tl">Indise</item>
+        <item xml:lang="ur">انڈيکس</item>
+        <item xml:lang="vi">Tæì muûc</item>
+        <item xml:lang="xh">Isalathisi</item>
+        <item xml:lang="zh-CN">索引</item>
+        <item xml:lang="zh-HK">索引</item>
+        <item xml:lang="zh-TW">索引</item>
+        <item xml:lang="zu">Izikhombo</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>glossary</lookup_key>
+      <text_before>
+        <default_item>{Glossary not translated}</default_item>
+        <item xml:lang="en">Glossary</item>
+        <item xml:lang="tl">Glossary</item>
+        <item xml:lang="ar">قاموس المصطلحات</item>
+        <item xml:lang="de">Glossar</item>
+        <item xml:lang="fr">Glossaire</item>
+        <item xml:lang="fi">Sanasto</item>
+        <item xml:lang="da">Ordliste</item>
+        <item xml:lang="no">Ordliste</item>
+        <item xml:lang="nl">Woordenlijst</item>
+        <item xml:lang="it">Glossario</item>
+        <item xml:lang="es">Glosario</item>
+        <item xml:lang="pt">Glossário</item>
+        <item xml:lang="el">Γλωσσάριο</item>
+        <item xml:lang="pl">Słownik</item>
+        <item xml:lang="ru">Глоссарий</item>
+        <item xml:lang="cs">Glosář</item>
+        <item xml:lang="hu">Szójegyzék</item>
+        <item xml:lang="tr">Sözlük</item>
+        <item xml:lang="fr-CA">Glossaire</item>
+        <item xml:lang="sv">Ordlista</item>
+        <item xml:lang="pt-BR">Glossário</item>
+        <item xml:lang="es-LAM">Glosario</item>
+        <item xml:lang="bg">Речник</item>
+        <item xml:lang="et">Mõisted</item>
+        <item xml:lang="he">מילון מונחים</item>
+        <item xml:lang="hr">Rječnik</item>
+        <item xml:lang="is">Orðalisti</item>
+        <item xml:lang="lt">Terminų paaiškinimai</item>
+        <item xml:lang="lv">Skaidrojošā vārdnīca</item>
+        <item xml:lang="ro">Glosar</item>
+        <item xml:lang="sk">Výklad termínov</item>
+        <item xml:lang="sl">Slovarček</item>
+        <item xml:lang="sr-LAT">Glosar</item>
+        <item xml:lang="sr-CYR">Глосар</item>
+        <item xml:lang="uk">Глосарій</item>
+        <item xml:lang="af">Woordelys</item>
+        <item xml:lang="fa">واژه نامه</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Daftar istilah</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Pokello ya mantswe</item>
+        <item xml:lang="sw">Maneno Yaliyotumika</item>
+        <item xml:lang="th">อภิธานศัพท์</item>
+        <item xml:lang="tl">Glosaryo</item>
+        <item xml:lang="ur">فہرست مصطلحات</item>
+        <item xml:lang="vi">Baíng chuï giaíi</item>
+        <item xml:lang="xh">Uluhlu lwamagama</item>
+        <item xml:lang="zh-CN">词汇</item>
+        <item xml:lang="zh-HK">詞彙表</item>
+        <item xml:lang="zh-TW">詞彙</item>
+        <item xml:lang="zu">Uhla Lwamagama</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>note</lookup_key>
+      <text_before>
+        <default_item>{"note" not translated}</default_item>
+        <item xml:lang="en">Note: </item>
+        <item xml:lang="tl">Paalala: </item>
+        <item xml:lang="ar"> :ملاحظة</item>
+        <item xml:lang="de">Hinweis: </item>
+        <item xml:lang="fr">Remarque : </item>
+        <item xml:lang="fi">Huom! </item>
+        <item xml:lang="da">Bemærk: </item>
+        <item xml:lang="no">Merk: </item>
+        <item xml:lang="nl">Opmerking: </item>
+        <item xml:lang="it">Nota: </item>
+        <item xml:lang="es">Nota: </item>
+        <item xml:lang="pt">Nota: </item>
+        <item xml:lang="el">Σημείωση: </item>
+        <item xml:lang="pl">Uwaga: </item>
+        <item xml:lang="ru">Примечание: </item>
+        <item xml:lang="cs">Poznámka: </item>
+        <item xml:lang="hu">Megjegyzés: </item>
+        <item xml:lang="tr">Not: </item>
+        <item xml:lang="fr-CA">Remarque: </item>
+        <item xml:lang="sv">Obs: </item>
+        <item xml:lang="pt-BR">Nota: </item>
+        <item xml:lang="es-LAM">Nota: </item>
+        <item xml:lang="bg">Бележка: </item>
+        <item xml:lang="et">Märkus: </item>
+        <item xml:lang="he"> :הערה</item>
+        <item xml:lang="hr">Opaska: </item>
+        <item xml:lang="is">Til athugunar: </item>
+        <item xml:lang="lt">Pastaba: </item>
+        <item xml:lang="lv">Piezīme: </item>
+        <item xml:lang="ro">Observaţie: </item>
+        <item xml:lang="sk">Upozornenie: </item>
+        <item xml:lang="sl">Opomba: </item>
+        <item xml:lang="sr-LAT">Napomena: </item>
+        <item xml:lang="sr-CYR">Напомена: </item>
+        <item xml:lang="uk">Примітка: </item>
+        <item xml:lang="af">Nota: </item>
+        <item xml:lang="fa">نكته: </item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Catatan: </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Temoso: </item>
+        <item xml:lang="sw">Zingatia: </item>
+        <item xml:lang="th">หมายเหต:ุ </item>
+        <item xml:lang="tl">Note: </item>
+        <item xml:lang="ur">نوٹ: </item>
+        <item xml:lang="vi">Læu yï: </item>
+        <item xml:lang="xh">Qaphela: </item>
+        <item xml:lang="zh-CN">注意： </item>
+        <item xml:lang="zh-HK">注意： </item>
+        <item xml:lang="zh-TW">請注意： </item>
+        <item xml:lang="zu">Bhekisisa: </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>caution</lookup_key>
+      <text_before>
+        <default_item>{"caution" not translated}</default_item>
+        <item xml:lang="en">Important: </item>
+        <item xml:lang="tl"/>
+        <item xml:lang="ar"> :هام</item>
+        <item xml:lang="de">Wichtig: </item>
+        <item xml:lang="fr">Important : </item>
+        <item xml:lang="fi">Tärkeää: </item>
+        <item xml:lang="da">Vigtigt: </item>
+        <item xml:lang="no">Viktig: </item>
+        <item xml:lang="nl">Belangrijk: </item>
+        <item xml:lang="it">Importante: </item>
+        <item xml:lang="es">Importante: </item>
+        <item xml:lang="pt">Importante: </item>
+        <item xml:lang="el">Σημαντικό: </item>
+        <item xml:lang="pl">Ważne: </item>
+        <item xml:lang="ru">Важное замечание: </item>
+        <item xml:lang="cs">Důležité: </item>
+        <item xml:lang="hu">Fontos: </item>
+        <item xml:lang="tr">Önemli: </item>
+        <item xml:lang="fr-CA">Important: </item>
+        <item xml:lang="sv">Viktigt: </item>
+        <item xml:lang="pt-BR">Importante: </item>
+        <item xml:lang="es-LAM">Importante: </item>
+        <item xml:lang="bg">Важно: </item>
+        <item xml:lang="et">NB! </item>
+        <item xml:lang="he"> :חשוב</item>
+        <item xml:lang="hr">Važno: </item>
+        <item xml:lang="is">Mikilvægt: </item>
+        <item xml:lang="lt">Svarbu žinoti: </item>
+        <item xml:lang="lv">Svarīgi! </item>
+        <item xml:lang="ro">Important: </item>
+        <item xml:lang="sk">Dôležité: </item>
+        <item xml:lang="sl">Pomembno: </item>
+        <item xml:lang="sr-LAT">Važno: </item>
+        <item xml:lang="sr-CYR">Важно: </item>
+        <item xml:lang="uk">Важливо: </item>
+        <item xml:lang="af">Belangrik: </item>
+        <item xml:lang="fa"> :مهم</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Penting: </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Sa bohlokwa: </item>
+        <item xml:lang="sw">Muhimu: </item>
+        <item xml:lang="th">ข้อสำคัญ: </item>
+        <item xml:lang="tl">Mahalaga: </item>
+        <item xml:lang="ur"> :اھم</item>
+        <item xml:lang="vi">Chuï yï: </item>
+        <item xml:lang="xh">Kubalulekile: </item>
+        <item xml:lang="zh-CN">重要须知： </item>
+        <item xml:lang="zh-HK">重要訊息： </item>
+        <item xml:lang="zh-TW">重要： </item>
+        <item xml:lang="zu">Okubalulekile: </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>example</lookup_key>
+      <text_before>
+        <default_item>{"example" not translated}</default_item>
+        <item xml:lang="en">Example: </item>
+        <item xml:lang="tl">Halimbawa: </item>
+        <item xml:lang="ar"> :مثال</item>
+        <item xml:lang="de">Beispiel: </item>
+        <item xml:lang="fr">Exemple : </item>
+        <item xml:lang="fi">Esimerkki: </item>
+        <item xml:lang="da">Eksempel: </item>
+        <item xml:lang="no">Eksempel: </item>
+        <item xml:lang="nl">Voorbeeld: </item>
+        <item xml:lang="it">Esempio: </item>
+        <item xml:lang="es">Ejemplo: </item>
+        <item xml:lang="pt">Exemplo: </item>
+        <item xml:lang="el">Παράδειγμα: </item>
+        <item xml:lang="pl">Przykład: </item>
+        <item xml:lang="ru">Пример: </item>
+        <item xml:lang="cs">Příklad: </item>
+        <item xml:lang="hu">Példa: </item>
+        <item xml:lang="tr">Örnek: </item>
+        <item xml:lang="fr-CA">Exemple: </item>
+        <item xml:lang="sv">Exempel: </item>
+        <item xml:lang="pt-BR">Exemplo: </item>
+        <item xml:lang="es-LAM">Ejemplo: </item>
+        <item xml:lang="bg">Пример: </item>
+        <item xml:lang="et">Näide: </item>
+        <item xml:lang="he"> :דוגמה</item>
+        <item xml:lang="hr">Primjer: </item>
+        <item xml:lang="is">Dæmi: </item>
+        <item xml:lang="lt">Pavyzdys: </item>
+        <item xml:lang="lv">Piemērs: </item>
+        <item xml:lang="ro">Exemplu: </item>
+        <item xml:lang="sk">Príklad: </item>
+        <item xml:lang="sl">Primer: </item>
+        <item xml:lang="sr-LAT">Primer: </item>
+        <item xml:lang="sr-CYR">Пример: </item>
+        <item xml:lang="uk">Приклад: </item>
+        <item xml:lang="af">Voorbeeld: </item>
+        <item xml:lang="fa"> :مثال</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Contoh: </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Mohlala: </item>
+        <item xml:lang="sw">Mfano: </item>
+        <item xml:lang="th">ตัวอย่าง: </item>
+        <item xml:lang="tl">Halimbawa: </item>
+        <item xml:lang="ur">: مثال</item>
+        <item xml:lang="vi">Vê duû: </item>
+        <item xml:lang="xh">Umzekelo: </item>
+        <item xml:lang="zh-CN">示例： </item>
+        <item xml:lang="zh-HK">舉例： </item>
+        <item xml:lang="zh-TW">範例： </item>
+        <item xml:lang="zu">Isibonelo: </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>warning</lookup_key>
+      <text_before>
+        <default_item>{"Warning" not translated}</default_item>
+        <item xml:lang="en">Warning: </item>
+        <item xml:lang="tl">Babala: </item>
+        <item xml:lang="ko">경고： </item>
+        <item xml:lang="ar"> :تحذير</item>
+        <item xml:lang="de">Warnung: </item>
+        <item xml:lang="fr">Avertissement : </item>
+        <item xml:lang="fi">Varoitus: </item>
+        <item xml:lang="da">Advarsel: </item>
+        <item xml:lang="no">Advarsel: </item>
+        <item xml:lang="nl">Waarschuwing: </item>
+        <item xml:lang="it">Avvertenza: </item>
+        <item xml:lang="es">Aviso: </item>
+        <item xml:lang="pt">Aviso: </item>
+        <item xml:lang="el">Προειδοποίηση: </item>
+        <item xml:lang="pl">Ostrzeżenie: </item>
+        <item xml:lang="ru">Внимание: </item>
+        <item xml:lang="cs">Výstraha: </item>
+        <item xml:lang="hu">Figyelmeztetés: </item>
+        <item xml:lang="tr">Uyarı: </item>
+        <item xml:lang="fr-CA">Avertissement: </item>
+        <item xml:lang="sv">Varning: </item>
+        <item xml:lang="pt-BR">Aviso: </item>
+        <item xml:lang="es-LAM">Advertencia: </item>
+        <item xml:lang="bg">Предупреждение: </item>
+        <item xml:lang="et">Hoiatus: </item>
+        <item xml:lang="he"> :אזהרה</item>
+        <item xml:lang="hr">Upozorenje: </item>
+        <item xml:lang="is">Viðvörun: </item>
+        <item xml:lang="lt">Perspėjimas: </item>
+        <item xml:lang="lv">Uzmanību: </item>
+        <item xml:lang="ro">Avertizare: </item>
+        <item xml:lang="sk">Výstraha: </item>
+        <item xml:lang="sl">Opozorilo: </item>
+        <item xml:lang="sr-LAT">Upozorenje: </item>
+        <item xml:lang="sr-CYR">Упозорење: </item>
+        <item xml:lang="uk">Попередження: </item>
+        <item xml:lang="af">Waarskuwing: </item>
+        <item xml:lang="fa"> :هشدار</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Peringatan: </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Tlhokomediso: </item>
+        <item xml:lang="sw">Tahadhari: </item>
+        <item xml:lang="th">ตัวอย่าง: </item>
+        <item xml:lang="tl">Babala: </item>
+        <item xml:lang="ur"> :تنبيہ</item>
+        <item xml:lang="vi">Caính baïo: </item>
+        <item xml:lang="xh">Isilumkiso: </item>
+        <item xml:lang="zh-CN">警告： </item>
+        <item xml:lang="zh-HK">警告： </item>
+        <item xml:lang="zh-TW">警告： </item>
+        <item xml:lang="zu">Isixwayiso: </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#NUMERIC</lookup_key>
+      <text_before>
+        <default_item>{Symbols/Numerics not translated}</default_item>
+        <item xml:lang="en">Symbols/Numerics</item>
+        <item xml:lang="ar">الرموز/الأرقام</item>
+        <item xml:lang="de">Symbole/Nummern</item>
+        <item xml:lang="fr">Symboles/Nombres</item>
+        <item xml:lang="fi">Symbolit/numerot</item>
+        <item xml:lang="da">Symboler/tal</item>
+        <item xml:lang="no">Symboler/tall</item>
+        <item xml:lang="nl">Symbolen/Numeriek</item>
+        <item xml:lang="it">Simboli/Numeri</item>
+        <item xml:lang="es">Símbolos/Números</item>
+        <item xml:lang="pt">Símbolos/Números</item>
+        <item xml:lang="el">Σύμβολα/Αριθμητικά</item>
+        <item xml:lang="pl">Symbole/Liczby</item>
+        <item xml:lang="ru">Символы или числа</item>
+        <item xml:lang="cs">Symboly/Čísla</item>
+        <item xml:lang="hu">Jelzések/számok</item>
+        <item xml:lang="tr">Simgeler/Sayılar</item>
+        <item xml:lang="fr-CA">Symboles/chiffres</item>
+        <item xml:lang="sv">Symboler/nummer</item>
+        <item xml:lang="pt-BR">Símbolos/numerais</item>
+        <item xml:lang="es-LAM">Símbolos/Números</item>
+        <item xml:lang="bg">Символи/Числени означения</item>
+        <item xml:lang="et">Sümbolid/numbrid</item>
+        <item xml:lang="he">סמלים/ספרות</item>
+        <item xml:lang="hr">Simboli/brojevi</item>
+        <item xml:lang="is">Tákn/Tölur</item>
+        <item xml:lang="lt">Simboliai/skaitmenys</item>
+        <item xml:lang="lv">Simboli/cipari</item>
+        <item xml:lang="ro">Simboluri/Numere</item>
+        <item xml:lang="sk">Symboly/Čísla</item>
+        <item xml:lang="sl">Simboli/Številke</item>
+        <item xml:lang="sr-LAT">Simboli/Brojevi</item>
+        <item xml:lang="sr-CYR">Симболи/Бројеви</item>
+        <item xml:lang="uk">Символи/Цифри</item>
+        <item xml:lang="af">Simbole/Syfers</item>
+        <item xml:lang="fa">علائم/اعداد</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Simbol/Numerik</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Matshwao/Dipalo</item>
+        <item xml:lang="sw">Alama/Namba</item>
+        <item xml:lang="th">สัญลักษณ์/ตัวเลข</item>
+        <item xml:lang="tl">Mga Simbolo/Numero</item>
+        <item xml:lang="ur">علامت\نمبر</item>
+        <item xml:lang="vi">Kyï hiãûu/Säú</item>
+        <item xml:lang="xh">Iisimboli/Amanani</item>
+        <item xml:lang="zh-CN">符号/数字</item>
+        <item xml:lang="zh-HK">符號/數字</item>
+        <item xml:lang="zh-TW">符號 / 數字</item>
+        <item xml:lang="zu">Izimpawu/Izinombolo</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#see</lookup_key>
+      <text_before>
+        <default_item>{"see" not translated}</default_item>
+        <item xml:lang="en">See </item>
+        <item xml:lang="ar"> انظر</item>
+        <item xml:lang="de">Siehe </item>
+        <item xml:lang="fr">Voir </item>
+        <item xml:lang="fi">Katso </item>
+        <item xml:lang="da">Se </item>
+        <item xml:lang="no">Se </item>
+        <item xml:lang="nl">Zie </item>
+        <item xml:lang="it">Vedere </item>
+        <item xml:lang="es">Véase </item>
+        <item xml:lang="pt">Consulte </item>
+        <item xml:lang="el">Βλέπε </item>
+        <item xml:lang="pl">Patrz </item>
+        <item xml:lang="ru">См. </item>
+        <item xml:lang="cs">Viz </item>
+        <item xml:lang="hu">Lásd </item>
+        <item xml:lang="tr">Bkz. </item>
+        <item xml:lang="fr-CA">Voir </item>
+        <item xml:lang="sv">Se </item>
+        <item xml:lang="pt-BR">Consulte </item>
+        <item xml:lang="es-LAM">Véase </item>
+        <item xml:lang="bg">Вижте </item>
+        <item xml:lang="et">Vt </item>
+        <item xml:lang="he"> ראה</item>
+        <item xml:lang="hr">Vidi </item>
+        <item xml:lang="is">Sjá </item>
+        <item xml:lang="lt">Žr. </item>
+        <item xml:lang="lv">Sk. </item>
+        <item xml:lang="ro">A se vedea </item>
+        <item xml:lang="sk">Pozrite si </item>
+        <item xml:lang="sl">Glejte </item>
+        <item xml:lang="sr-LAT">Vidite </item>
+        <item xml:lang="sr-CYR">Видите </item>
+        <item xml:lang="uk">Див. </item>
+        <item xml:lang="af">Sien </item>
+        <item xml:lang="fa">مراجعه كنيد به</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Lihat </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Sheba </item>
+        <item xml:lang="sw">Angalia </item>
+        <item xml:lang="th">โปรดดูที่</item>
+        <item xml:lang="tl">Tingnan ang </item>
+        <item xml:lang="ur">ديکھئے</item>
+        <item xml:lang="vi">Xem pháön </item>
+        <item xml:lang="xh">Khangela </item>
+        <item xml:lang="zh-CN">请参见</item>
+        <item xml:lang="zh-HK">請參閱</item>
+        <item xml:lang="zh-TW">請參閱</item>
+        <item xml:lang="zu">Bheka </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#see_also</lookup_key>
+      <text_before>
+        <default_item>{"#see_also" not translated}</default_item>
+        <item xml:lang="en">See also </item>
+        <item xml:lang="ar"> انظر أيضًا</item>
+        <item xml:lang="de">Siehe auch </item>
+        <item xml:lang="fr">Voir aussi </item>
+        <item xml:lang="fi">Katso myös </item>
+        <item xml:lang="da">Se også </item>
+        <item xml:lang="no">Se også </item>
+        <item xml:lang="nl">Zie ook </item>
+        <item xml:lang="it">Vedere inoltre </item>
+        <item xml:lang="es">Véase también </item>
+        <item xml:lang="pt">Consulte também </item>
+        <item xml:lang="el">Βλέπε επίσης </item>
+        <item xml:lang="pl">Patrz również </item>
+        <item xml:lang="ru">См. также </item>
+        <item xml:lang="cs">Viz také </item>
+        <item xml:lang="hu">Lásd még </item>
+        <item xml:lang="tr">Ayrıca bkz. </item>
+        <item xml:lang="fr-CA">Voir aussi </item>
+        <item xml:lang="sv">Se även </item>
+        <item xml:lang="pt-BR">Consulte també©m </item>
+        <item xml:lang="es-LAM">Véase también </item>
+        <item xml:lang="bg">Вижте също </item>
+        <item xml:lang="et">Vt ka </item>
+        <item xml:lang="he">ראה גם</item>
+        <item xml:lang="hr">Vidi također </item>
+        <item xml:lang="is">Sjá einnig </item>
+        <item xml:lang="lt">Taip pat žr. </item>
+        <item xml:lang="lv">Sk. arī </item>
+        <item xml:lang="ro">A se vedea şi </item>
+        <item xml:lang="sk">Pozrite si aj </item>
+        <item xml:lang="sl">Glejte tudi </item>
+        <item xml:lang="sr-LAT">Vidite i </item>
+        <item xml:lang="sr-CYR">Видите и </item>
+        <item xml:lang="uk">Див. також </item>
+        <item xml:lang="af">Sien ook </item>
+        <item xml:lang="fa">همچنين ببينيد</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">Lihat juga </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">Sheba hape </item>
+        <item xml:lang="sw">Angalia pia </item>
+        <item xml:lang="th">โปรดดูเพิ่มเติมที่</item>
+        <item xml:lang="tl">Tingnan din ang </item>
+        <item xml:lang="ur">مذيد ديکھئے</item>
+        <item xml:lang="vi">Xem thãm pháön </item>
+        <item xml:lang="xh">Khangela naphaya </item>
+        <item xml:lang="zh-CN">另请参见</item>
+        <item xml:lang="zh-HK">請參閱</item>
+        <item xml:lang="zh-TW">請同時參閱</item>
+        <item xml:lang="zu">Bheka futhi </item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#on</lookup_key>
+      <text_before>
+        <default_item>{#on not translated}</default_item>
+        <item xml:lang="en"> on </item>
+        <item xml:lang="zh-CN">第 </item>
+        <item xml:lang="zh-HK">, 刊於第 </item>
+        <item xml:lang="zh-TW">第</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#page</lookup_key>
+      <text_before>
+        <default_item>{#page not translated}</default_item>
+        <item xml:lang="en"> page </item>
+        <item xml:lang="zh-CN"> 页的</item>
+        <item xml:lang="zh-HK"> 頁</item>
+        <item xml:lang="zh-TW">頁的</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>#on_page</lookup_key>
+      <text_before>
+        <default_item>{"#on_page" not translated}</default_item>
+        <item xml:lang="en"> on page </item>
+        <item xml:lang="ar"> .</item>
+        <item xml:lang="de"> auf Seite </item>
+        <item xml:lang="fr"> à la page </item>
+        <item xml:lang="fi"> sivulla </item>
+        <item xml:lang="da"> på side </item>
+        <item xml:lang="no"> på side </item>
+        <item xml:lang="nl"> op pagina </item>
+        <item xml:lang="it"> a pagina </item>
+        <item xml:lang="es"> en la página </item>
+        <item xml:lang="pt"> na página </item>
+        <item xml:lang="el"> στη σελίδα </item>
+        <item xml:lang="pl"> na stronie </item>
+        <item xml:lang="ru"> на стр. </item>
+        <item xml:lang="cs"> na straně </item>
+        <item xml:lang="hu"> a(z) </item>
+        <item xml:lang="tr"> sayfa </item>
+        <item xml:lang="fr-CA"> à la page </item>
+        <item xml:lang="sv"> på sidan </item>
+        <item xml:lang="pt-BR"> na página </item>
+        <item xml:lang="es-LAM"> en la página </item>
+        <item xml:lang="bg"> на страница </item>
+        <item xml:lang="et"> leheküljel </item>
+        <item xml:lang="he">.</item>
+        <item xml:lang="hr"> na stranici </item>
+        <item xml:lang="is"> á bls. </item>
+        <item xml:lang="lt"> psl. </item>
+        <item xml:lang="lv">. lpp. </item>
+        <item xml:lang="ro"> la pagina </item>
+        <item xml:lang="sk"> na strane </item>
+        <item xml:lang="sl"> na strani </item>
+        <item xml:lang="sr-LAT"> na stranici </item>
+        <item xml:lang="sr-CYR"> на страници </item>
+        <item xml:lang="uk"> на стор. </item>
+        <item xml:lang="af"> op bladsy </item>
+        <item xml:lang="fa">.</item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id"> pada halaman</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st"> leqepheng la </item>
+        <item xml:lang="sw"> ukurasa </item>
+        <item xml:lang="th">ในหน้า</item>
+        <item xml:lang="tl">sa pahina</item>
+        <item xml:lang="ur">.</item>
+        <item xml:lang="vi">åí trang</item>
+        <item xml:lang="xh"> kwiphepha </item>
+        <item xml:lang="zh-CN"/>
+        <item xml:lang="zh-HK"/>
+        <item xml:lang="zh-TW"/>
+        <item xml:lang="zu"> ekhasini </item>
+      </text_before>
+      <text_after>
+        <item xml:lang="en">.</item>
+        <item xml:lang="ar">الصفحة </item>
+        <item xml:lang="de">.</item>
+        <item xml:lang="fr">.</item>
+        <item xml:lang="fi">.</item>
+        <item xml:lang="da">.</item>
+        <item xml:lang="no">.</item>
+        <item xml:lang="nl">.</item>
+        <item xml:lang="it">.</item>
+        <item xml:lang="es">.</item>
+        <item xml:lang="pt">.</item>
+        <item xml:lang="el">.</item>
+        <item xml:lang="pl">.</item>
+        <item xml:lang="ru">.</item>
+        <item xml:lang="cs">.</item>
+        <item xml:lang="hu">. oldalon
+          <?Pub Caret?>
+        </item>
+        <item xml:lang="tr">.</item>
+        <item xml:lang="fr-CA">.</item>
+        <item xml:lang="sv">.</item>
+        <item xml:lang="pt-BR">.</item>
+        <item xml:lang="es-LAM">.</item>
+        <item xml:lang="bg">.</item>
+        <item xml:lang="et">.</item>
+        <item xml:lang="he"> בעמוד </item>
+        <item xml:lang="hr">.</item>
+        <item xml:lang="is">.</item>
+        <item xml:lang="lt">.</item>
+        <item xml:lang="lv">.</item>
+        <item xml:lang="ro">.</item>
+        <item xml:lang="sk">.</item>
+        <item xml:lang="sl">.</item>
+        <item xml:lang="sr-LAT">.</item>
+        <item xml:lang="sr-CYR">.</item>
+        <item xml:lang="uk">.</item>
+        <item xml:lang="af">.</item>
+        <item xml:lang="fa"> در صفحه </item>
+        <item xml:lang="hi">.</item>
+        <item xml:lang="id">.</item>
+        <item xml:lang="ja">.</item>
+        <item xml:lang="km">.</item>
+        <item xml:lang="ko">.</item>
+        <item xml:lang="ms">.</item>
+        <item xml:lang="sh">.</item>
+        <item xml:lang="st">.</item>
+        <item xml:lang="sw">.</item>
+        <item xml:lang="th">.</item>
+        <item xml:lang="tl">.</item>
+        <item xml:lang="ur"> صفحہ </item>
+        <item xml:lang="vi">.</item>
+        <item xml:lang="xh">.</item>
+        <item xml:lang="zu">.</item>
+        <item xml:lang="zh-CN">页</item>
+        <item xml:lang="zh-HK">頁</item>
+        <item xml:lang="zh-TW">頁</item>
+      </text_after>
+    </context>
+    <context>
+      <lookup_key>#table</lookup_key>
+      <text_before>
+        <default_item>{"#table" not translated}</default_item>
+        <item xml:lang="en"> Table </item>
+        <item xml:lang="ar"> القائمة </item>
+        <item xml:lang="de"> Tabelle </item>
+        <item xml:lang="fr"> Tableau </item>
+        <item xml:lang="fi"> Taulukko </item>
+        <item xml:lang="da"> Tabel </item>
+        <item xml:lang="no"> Tabell </item>
+        <item xml:lang="nl"> Tabel </item>
+        <item xml:lang="it"> Tabella </item>
+        <item xml:lang="es"> Tabla </item>
+        <item xml:lang="pt"> Tabela </item>
+        <item xml:lang="el"> Πίνακας </item>
+        <item xml:lang="pl"> Tabela </item>
+        <item xml:lang="ru"> Табл. </item>
+        <item xml:lang="cs"> Tabulka </item>
+        <item xml:lang="hu"/>
+        <item xml:lang="tr"> Tablo </item>
+        <item xml:lang="fr-CA"> Tableau </item>
+        <item xml:lang="sv"> Tabell </item>
+        <item xml:lang="pt-BR"> Tabela </item>
+        <item xml:lang="es-LAM"> Tabla </item>
+        <item xml:lang="bg"> Таблица </item>
+        <item xml:lang="et"> Tabel </item>
+        <item xml:lang="he"> טבלה </item>
+        <item xml:lang="hr"> Tablica </item>
+        <item xml:lang="is"> Tafla </item>
+        <item xml:lang="lt"> lentelė </item>
+        <item xml:lang="lv"/>
+        <item xml:lang="ro"> Tabel </item>
+        <item xml:lang="sk"> Tabuľka </item>
+        <item xml:lang="sl"> Tabela </item>
+        <item xml:lang="sr-LAT"> Tabela </item>
+        <item xml:lang="sr-CYR"> Табела </item>
+        <item xml:lang="uk"> Таблиця </item>
+        <item xml:lang="af"> Tabel </item>
+        <item xml:lang="fa"> جدول </item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id"> Tabel </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st"> Tafole </item>
+        <item xml:lang="sw"> Jedwali </item>
+        <item xml:lang="th">ตาราง</item>
+        <item xml:lang="tl">Talaan</item>
+        <item xml:lang="ur"> جدول </item>
+        <item xml:lang="vi">Baíng</item>
+        <item xml:lang="xh"> Uluhlu </item>
+        <item xml:lang="zh-CN">表</item>
+        <item xml:lang="zh-HK">表</item>
+        <item xml:lang="zh-TW">表</item>
+        <item xml:lang="zu"> Uhla </item>
+      </text_before>
+      <text_after>
+        <default_item/>
+        <item xml:lang="en"/>
+        <item xml:lang="hu">. táblázat </item>
+        <item xml:lang="lv">. tabula </item>
+      </text_after>
+    </context>
+    <context>
+      <lookup_key>#figure</lookup_key>
+      <text_before>
+        <default_item>{"#figure" not translated}</default_item>
+        <item xml:lang="en"> Figure </item>
+        <item xml:lang="ar"> الشكل </item>
+        <item xml:lang="de"> Abbildung </item>
+        <item xml:lang="fr"> Figure </item>
+        <item xml:lang="fi"> Kuva </item>
+        <item xml:lang="da"> Figur </item>
+        <item xml:lang="no"> Figur </item>
+        <item xml:lang="nl"> Figuur </item>
+        <item xml:lang="it"> Figura </item>
+        <item xml:lang="es"> Figura </item>
+        <item xml:lang="pt"> Figura </item>
+        <item xml:lang="el"> Σχήμα </item>
+        <item xml:lang="pl"> Rysunek </item>
+        <item xml:lang="ru"> Рис. </item>
+        <item xml:lang="cs"> Obrázek </item>
+        <item xml:lang="hu"/>
+        <item xml:lang="tr"> Şekil </item>
+        <item xml:lang="fr-CA"> Figure </item>
+        <item xml:lang="sv"> Bild </item>
+        <item xml:lang="pt-BR"> Figura </item>
+        <item xml:lang="es-LAM"> Figura </item>
+        <item xml:lang="bg"> Фигура </item>
+        <item xml:lang="et"> Joonis </item>
+        <item xml:lang="he"> תרשים </item>
+        <item xml:lang="hr"> Slika </item>
+        <item xml:lang="is"> Mynd </item>
+        <item xml:lang="lt"> pav. </item>
+        <item xml:lang="lv"/>
+        <item xml:lang="ro"> Figura </item>
+        <item xml:lang="sk"> Obrázok </item>
+        <item xml:lang="sl"> Slika </item>
+        <item xml:lang="sr-LAT"> Slika </item>
+        <item xml:lang="sr-CYR"> Слика </item>
+        <item xml:lang="uk"> Малюнок </item>
+        <item xml:lang="af"> Figuur </item>
+        <item xml:lang="fa"> تصوير </item>
+        <item xml:lang="hi"/>
+        <item xml:lang="id"> Gambar </item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st"> Setshwantsho </item>
+        <item xml:lang="sw"> Kielelezo </item>
+        <item xml:lang="th">รูปที่</item>
+        <item xml:lang="tl">Pigura</item>
+        <item xml:lang="ur"> تصوير </item>
+        <item xml:lang="vi">Hçnh minh hoüa</item>
+        <item xml:lang="xh"> Umfanekiso </item>
+        <item xml:lang="zh-CN">图</item>
+        <item xml:lang="zh-HK">圖形</item>
+        <item xml:lang="zh-TW">圖</item>
+        <item xml:lang="zu">Umfanekiso</item>
+      </text_before>
+      <text_after>
+        <default_item/>
+        <item xml:lang="en"/>
+        <item xml:lang="hu">. ábra </item>
+        <item xml:lang="lv">. attēls </item>
+      </text_after>
+    </context>
+    <context>
+      <lookup_key>#full_stop</lookup_key>
+      <text_before>
+        <default_item>.</default_item>
+        <item xml:lang="zh-CN">。</item>
+        <item xml:lang="zh-HK">。</item>
+        <item xml:lang="zh-TW">。</item>
+      </text_before>
+      <text_after/>
+    </context>
+    <context>
+      <lookup_key>For Testing Only</lookup_key>
+      <text_before>
+        <default_item>default value</default_item>
+        <item xml:lang="en">en value</item>
+        <item xml:lang="ar">القيمة العربية</item>
+        <item xml:lang="de">de value</item>
+        <item xml:lang="fr">valeur fr</item>
+        <item xml:lang="fi">fi value</item>
+        <item xml:lang="da">da value</item>
+        <item xml:lang="no">no value</item>
+        <item xml:lang="nl">nl value</item>
+        <item xml:lang="it">it value</item>
+        <item xml:lang="es">es value</item>
+        <item xml:lang="pt">valor pt</item>
+        <item xml:lang="el">el value</item>
+        <item xml:lang="pl">pl value</item>
+        <item xml:lang="ru">ru значение</item>
+        <item xml:lang="cs">cs value</item>
+        <item xml:lang="hu">hu value</item>
+        <item xml:lang="tr">tr value</item>
+        <item xml:lang="fr-CA">fr-CA value</item>
+        <item xml:lang="sv">sv value</item>
+        <item xml:lang="pt-BR">valor bp</item>
+        <item xml:lang="es-LAM">es-LAM value</item>
+        <item xml:lang="bg">bg value</item>
+        <item xml:lang="et">et value</item>
+        <item xml:lang="fa">مقدار فارسي</item>
+        <item xml:lang="he">he ערך</item>
+        <item xml:lang="hr">hr value</item>
+        <item xml:lang="is">is value</item>
+        <item xml:lang="lt">lt value</item>
+        <item xml:lang="lv">lv value</item>
+        <item xml:lang="ro">ro value</item>
+        <item xml:lang="sk">sk value</item>
+        <item xml:lang="sl">sl value</item>
+        <item xml:lang="sr-LAT">sr value</item>
+        <item xml:lang="sr-CYR">sr-CYR валуе</item>
+        <item xml:lang="uk">uk value</item>
+        <item xml:lang="af">en-waarde</item>
+        <item xml:lang="fa"/>
+        <item xml:lang="hi"/>
+        <item xml:lang="id">id value</item>
+        <item xml:lang="ja"/>
+        <item xml:lang="km"/>
+        <item xml:lang="ko"/>
+        <item xml:lang="ms"/>
+        <item xml:lang="sh"/>
+        <item xml:lang="st">boleng</item>
+        <item xml:lang="sw">thaman kiing</item>
+        <item xml:lang="th">ค่า en</item>
+        <item xml:lang="tl">tl value</item>
+        <item xml:lang="ur">ur قيمت</item>
+        <item xml:lang="vi">giaï trë vn</item>
+        <item xml:lang="xh">ukuxabisa</item>
+        <item xml:lang="zh-CN">zh-CN value</item>
+        <item xml:lang="zh-HK">zh-HK value</item>
+        <item xml:lang="zh-TW">zh-TW value</item>
+        <item xml:lang="zu">en inani</item>
+      </text_before>
+      <text_after/>
+    </context>
+  </contexts_common>
+  <attribute_maps_common/>
+</text_database>
+<?Pub *0000078765?>

@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
+[
+<!ENTITY concepts_rea SYSTEM "concepts.xml">
+<!ENTITY backup-and-restore_rea SYSTEM "backup-and-restore.xml">
+<!ENTITY deploying-items_rea SYSTEM "deploying-items.xml">
+<!ENTITY user-interface_rea SYSTEM "user-interface.xml">
+]
+>
+
+	<!--
+		Licensed to the Apache Software Foundation (ASF) under one or more
+		contributor license agreements. See the NOTICE file distributed with
+		this work for additional information regarding copyright ownership.
+		The ASF licenses this file to you under the Apache License, Version
+		2.0 (the "License"); you may not use this file except in compliance
+		with the License. You may obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+
+<book lang="ko">
+	<title>Anyframe Manual Title</title>
+
+	<bookinfo>
+
+		<copyright>
+			<year>2009</year>
+			<holder>holder</holder>
+		</copyright>
+
+		<releaseinfo>version</releaseinfo>
+
+		<productname>productname</productname>
+
+		<authorgroup>
+			<corpauthor>corpauthor</corpauthor>
+		</authorgroup>
+
+		<mediaobject>
+			<imageobject>
+				<!-- logo 변경 -->
+				<imagedata fileref="../image/common/header_anyframe_doc_banner.png" format="PNG"/>
+			</imageobject>
+		</mediaobject>
+	</bookinfo>
+
+	<toc />
+
+	<part id="//AK/ODEN/aboutanyframe4">
+		<title>About Anyframe 4.0</title>
+		<partintro id="spring-core-intro">
+			<para>
+				The Spring Framework is a lightweight solution and a potential
+				one-stop-shop for building your enterprise-ready applications.
+				However, Spring is modular, allowing you to use only those parts
+				that you need,
+				without having to bring in the rest. You can use the
+				IoC container,
+				with Struts on top, but you can also use only the
+				Hibernate integration code
+				or the
+				<link linkend="jdbc-introduction">JDBC abstraction layer</link>
+				. The Spring
+				Framework supports declarative transaction management,
+				remote access to your
+				logic through RMI or web services, and various
+				options for persisting your
+				data. It offers a full-featured
+				<link linkend="mvc-introduction">MVC framework</link>
+				, and enables you to integrate
+				<link linkend="aop-introduction">AOP</link>
+				transparently into your software.
+			</para>
+
+			<para>Spring is designed to be non-intrusive, meaning that your
+				domain logic
+				code generally has no dependencies on the framework
+				itself. In your
+				integration layer (such as the data access layer),
+				some dependencies
+				on the
+				data access technology and the Spring
+				libraries will exist. However, it
+				should be easy to isolate these
+				dependencies from the rest of your
+				code
+				base.</para>
+
+			<para>
+				This document is a reference guide to Spring Framework features. If
+				you have any requests, comments, or questions on this document,
+				please post
+				them on the user mailing list or on the support forums at
+				<ulink url="http://forum.springsource.org/"></ulink>
+				.
+			</para>
+		</partintro>
+
+	</part>
+
+	<part id="//AK/ODEN/aboutgen">
+		<title>About Anyframe Gen</title>
+		
+		&concepts_rea;
+		&backup-and-restore_rea;
+		&deploying-items_rea;
+		&user-interface_rea;
+
+		<chapter id="//AK/GEN/callback">
+			<title>Callout</title>
+			<para>
+				callout에 관한 것은 다음과 같이 사용할 수 있다.
+			</para>
+
+			<figure>
+				<title>About Callout</title>
+				<programlisting>&lt;root&gt;
+  |
+  +---- build.xml <co id="co-build-xml" linkends="ca-build-xml"/>
+  +---- project.properties <co id="co-project-properties"
+            linkends="ca-project-properties"/>
+  |
+  +-- src
+       |
+       +-- docbook <co id="co-docbook-sources" linkends="ca-docbook-sources"/>
+       |
+       +-- styles
+       |     |
+       |     +-- pdf <co id="co-styles-pdf" linkends="ca-styles-pdf"/>
+       |     |
+       |     +-- html <co id="co-styles-html" linkends="ca-styles-html"/>
+       |
+       +-- css
+       |    |
+       |    +-- html <co id="co-css-html" linkends="ca-css-html"/>
+       |
+       +-- images <co id="co-src-images" linkends="ca-src-images"/></programlisting>
+
+        <calloutlist>
+          <callout arearefs="co-build-xml" id="ca-build-xml">
+            <para>ant build file</para>
+          </callout>
+
+          <callout arearefs="co-project-properties" id="ca-project-properties">
+            <para>custom settings for your build</para>
+          </callout>
+
+          <callout arearefs="co-docbook-sources" id="ca-docbook-sources">
+            <para>Docbook sources</para>
+          </callout>
+
+          <callout arearefs="co-styles-pdf" id="ca-styles-pdf">
+            <para>Custom styles for PDF</para>
+          </callout>
+
+          <callout arearefs="co-styles-html" id="ca-styles-html">
+            <para>Custom styles for HTML</para>
+          </callout>
+
+          <callout arearefs="co-css-html" id="ca-css-html">
+            <para>CSS files for HTML</para>
+          </callout>
+
+          <callout arearefs="co-src-images" id="ca-src-images">
+            <para>Image files for PDF/HTML</para>
+          </callout>
+        </calloutlist>
+      </figure>
+		</chapter>
+	</part>
+
+	<part id="//AK/ODEN/aboutoden">
+		<title>오뎅</title>
+
+		<chapter id="//AK/ODEN/concepts">
+			<title>Concepts</title>
+			
+			<sect2 id="//AK/ODEN/concepts-overview">
+				<title>sect2</title>
+				<para>
+					Anyframe Core는 Spring Framework을 기반으로 Core 기능을 제공하고 있다. 현재 Anyframe Core 3.2.1 에 적용된 Spring Framework의 버전은 2.5.6 이다. 
+				</para>
+				<sect3 id="//AK/ODEN/aboutoden-IoC">
+					<title>IoC(Inversion of Control)개념</title>
+					<para>
+						IoC는 Inversion of Control의 약자이다. 우리나라 말로 직역해 보면 "역제어"라고 할 수 있다. 제어의 역전 현상이 무엇인지 살펴본다. 기존에 자바 기반으로 어플리케이션을 개발할 때 자바 객체를 생성하고 서로간의 의존 관계를 연결시키는 작업에 대한 제어권은 보통 개발되는 어플리케이션에 있었다. 그러나 Servlet, EJB 등을 사용하는 경우 Servlet Container, EJB Container에게 제어권이 넘어가서 객체의 생명주기(Life Cycle)를 Container들이 전담하게 된다. 이처럼 IoC에서 이야기하는 제어권의 역전이란 객체의 생성에서부터 생명주기의 관리까지 모든 객체에 대한 제어권이 바뀌었다는 것을 의미한다. Spring Framework도 객체에 대한 생성 및 생명주기를 관리할 수 있는 기능을 제공하고 있다. 즉, IoC Container 기능을 제공하고 있다. 
+					</para>
+				</sect3>
+				<sect3 id="//AK/ODEN/aboutoden-IoCRelation">
+					<title>IoC와 Dependency Injection간의 관계 </title>
+					<para>
+						Spring Framework의 가장 큰 장점으로 IoC Container 기능이 부각되어 있으나, IoC 기능은 Spring Framework이 탄생하기 훨씬 이전부터 사용되던 개념이었다. 그러므로 "IoC 기능을 Spring Framework의 장점이라고 이야기하는 것은 적합하지 않다."고 반론을 제기하면서 "새로운 개념을 사용하는 것이 적합하다."고 주장한 사람이 Martin Flowler이다. Lightweight 컨테이너들이 이야기하는 IoC를 Dependency Injection이라는 용어로 사용하는 것이 더 적합하다고 이야기하고 있다. Martin Flowler의 이 같은 구분 이후 IoC 개념을 개발자들마다 다양한 방식으로 분류하고 있으나 다음 그림과 같이 IoC와 Dependency Injection 간의 관계를 분류하는 것이 일반적이다. 
+					</para>
+				</sect3>
+			</sect2>	
+			
+			<para>
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit, set
+				eiusmod
+				tempor incidunt et labore et dolore magna aliquam. Ut enim ad
+				minim
+				veniam, <xref linkend="//AK/ODEN/deployingitems-policies" />quis nostrud exerc. Irure dolor in reprehend incididunt
+				ut
+				labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+				nostrud
+				exercitation <link linkend="//AK/ODEN/deployingitems-policies">adrfgqfasd</link> laboris nisi ut aliquip ex ea commodo
+				consequat.
+				<footnote>
+					<para>
+						각주는 다음과 같다. 번호는 알아서 만들어 주니 신경쓰지 마세요.
+				</para>
+				</footnote>
+				Duis aute irure dolor in reprehenderit in voluptate velit
+				esse
+				molestaie cillum. Tia non ob ea soluad incom dereud facilis est
+				er
+				expedit distinct. Nam liber te conscient to factor tum poen legum
+				odioque civiuda et tam. Neque pecun modut est neque nonor et imper
+				ned libidig met, consectetur adipiscing elit, sed ut labore et
+				dolore
+				magna aliquam is nostrud exercitation ullam mmodo consequet.
+			</para>
+
+			<section id="//AK/ODEN/concepts-architecture">
+				<title>Architecture</title>
+				<para>
+					그림은 다음과 같이 넣습니다.
+					</para>
+				<figure>
+					<title>그림번호도 알아서 만들어 줍니다.</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="../image/oden/overview_somethingmissing.png" format="PNG"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+
+			</section>
+
+			<section id="//AK/ODEN/concepts-list">
+				<title>List</title>
+				<para>
+					목록은 번호가 있는 목록과 번호가 없는 목록이 있다. 
+			</para>
+				<para>
+					번호가 있는 목록은 다음과 같이 작성한다.
+					<orderedlist numeration="Arabic" inheritnum="inherit">
+						<listitem>
+							<para>
+								Arabic : The arabic numerals (1, 2, 3, ...) are used.
+							</para>
+							<para>
+								The Numeration attribute of the OrderedList element is
+								needed to specify the sequence to use when numbering the list
+								items. This attribute can get one of the following values
+						</para>
+						</listitem>
+						<listitem>
+							<para>
+								Upperalpha : The upper letters (A, B, C, ...) are used.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Loweralpha : The lower letters (a, b, c, ...) are used.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Upperroman : The upper roman numerals (I, II, III, IV, ...)
+								are used. 
+						</para>
+						</listitem>
+						<listitem>
+							<para>
+								Lowerroman : The lower roman numerals (I, II, III, IV, ...)
+								are used. 
+						</para>
+						</listitem>
+					</orderedlist>
+				</para>
+				<para>
+					번호가 없는 목록은 다음과 같이 작성한다.
+					<itemizedlist>
+						<listitem>
+							<para>
+								Inherit : The nested list inherits the numeration of the
+								lists in which it is nested. 
+						</para>
+							<para>
+								The InheritNum attribute of the OrderedList element specify
+								if a
+								nested list must inherit the numeration from its parent
+								lists.
+								This attribute can get the following values
+						</para>
+						</listitem>
+						<listitem>
+							<para>
+								Ignore : The nested list does not inherit any numeration.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</section>
+
+			<section id="//AK/ODEN/concepts-serverandagent">
+				<title>Servers and Agents</title>
+				<para>
+					At vver eos et accusam dignissum qui blandit est praesent.
+					Trenz pruca beynocguon doas nog apoply su trenz ucu hugh rasoluguon
+					monugor or trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo
+					producgs su IdfoBraid, yop quiel geg ba solaly rasponsubla rof
+					trenzur sala ent dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis
+					phat eit sakem eit vory gast te Plok peish ba useing phen roxas.
+					Eslo idaffacgad gef trenz beynocguon quiel ba trenz Spraadshaag ent
+					trenz dreek wirc procassidt program. Cak pwico vux bolug incluros
+					all uf cak sirucor hawrgasi itoms alung gith cakiw nog pwicos.
+				</para>
+			</section>
+			<para>
+				여기까지가 html 한 페이지입니다.
+					</para>
+
+		</chapter>
+
+		<chapter id="//AK/ODEN/userinterface">
+			<title>User Interface</title>
+
+			<section id="//AK/ODEN/userinterface-cli">
+				<title>Command Line Interface</title>
+				<para>802.1x is a protocol for implementing port-based network
+					access
+					over wired or wireless LANs. It supports a wide range of
+					authentication methods, including TLS, TTLS, LEAP, MDS, and PEAP
+					(MSCHAPv2, MD5, GTC</para>
+			</section>
+
+			<section id="//AK/ODEN/userinterface-gui">
+				<title>Graphical User Interface</title>
+				<para>The Dynamic Host Configuration Protocol and the Bootstrap
+					Protocol automate the assignment of IP addresses in a particular
+					network.
+			</para>
+			</section>
+
+			<section id="//AK/ODEN/userinterface-resource">
+				<title>Resource</title>
+				<variablelist>
+					<varlistentry>
+						<term>Download</term>
+						<listitem>
+							<para>
+								<ulink
+									url="http://luaforge.net/frs/download.php/3143/lua5_1_3_Sources.zip">file name</ulink>
+							</para>
+						</listitem>
+					</varlistentry>
+					<varlistentry>
+						<term>See Also</term>
+						<listitem>
+							<para>
+								<ulink url="http://www.anyframejava.org">reference site name</ulink>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<ulink url="http://www.google.com">reference site name</ulink>
+							</para>
+						</listitem>
+					</varlistentry>
+				</variablelist>
+			</section>
+
+		</chapter>
+
+		<chapter id="//AK/ODEN/backupandrestore">
+			<title>Backup and Restore</title>
+
+			<para>
+				Plloaso mako nuto uf cakso dodtos anr koop a cupy uf cak vux
+				noaw yerw
+				phuno.
+				Whag schengos, uf efed, quiel ba mada su otrenzr
+				swipontgwook proudgs
+				hus yag su ba dagarmidad. Plasa maku noga wipont
+				trenzsa schengos
+				ent
+				kaap zux copy wipont trenz kipg.
+		</para>
+
+			<section id="//AK/ODEN/backupandrestore-snapshotplans">
+				<title>Snapshot Plans</title>
+
+				<para>
+					테이블은 다음과 같이 사용한다.
+			</para>
+
+				<table>
+					<title>DocBook Framework properties</title>
+
+					<tgroup cols="3">
+						<thead>
+							<row>
+								<entry>property name</entry>
+								<entry>default value</entry>
+								<entry>property function</entry>
+							</row>
+						</thead>
+						<tbody>
+							<row>
+								<entry>
+									<literal>paper.type</literal>
+								</entry>
+								<entry>
+									<literal>Letter</literal>
+								</entry>
+								<entry>Paper output size for PDF docs</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>src.dir</literal>
+								</entry>
+								<entry>
+									<literal>${basedir}/src</literal>
+								</entry>
+								<entry>docbook and related sources dir</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>style.src.dir</literal>
+								</entry>
+								<entry>
+									<literal>${src.dir}/styles</literal>
+								</entry>
+								<entry>custom styles directory</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>docbook.src.dir</literal>
+								</entry>
+								<entry>
+									<literal>${src.dir}/docbook</literal>
+								</entry>
+								<entry>docbook files directory</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>images.src.dir</literal>
+								</entry>
+								<entry>
+									<literal>${src.dir}/images</literal>
+								</entry>
+								<entry>images location</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>css.src.dir</literal>
+								</entry>
+								<entry>
+									<literal>${src.dir}/css</literal>
+								</entry>
+								<entry>css files location</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>target.dir</literal>
+								</entry>
+								<entry>
+									<literal>${basedir}/target</literal>
+								</entry>
+								<entry>output directory</entry>
+							</row>
+							<row>
+								<entry>
+									<literal>tmp.dir</literal>
+								</entry>
+								<entry>
+									<literal>${target.dir}/tmp</literal>
+								</entry>
+								<entry>temporary files location</entry>
+							</row>
+						</tbody>
+					</tgroup>
+				</table>
+
+			</section>
+
+		</chapter>
+
+		<chapter id="//AK/ODEN/deployingitems">
+			<title>Deploying Items</title>
+
+			<para>
+				At vver eos et accusam dignissum qui blandit est praesent.
+				Trenz
+				pruca
+				beynocguon doas nog apoply su trenz ucu hugh rasoluguon
+				monugor
+				or
+				trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo
+				producgs su
+				IdfoBraid, yop quiel geg ba solaly rasponsubla rof
+				trenzur sala ent
+				dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis
+				phat eit sakem eit
+				vory gast te Plok peish ba useing phen roxas. Eslo
+				idaffacgad gef
+				trenz beynocguon quiel ba trenz Spraadshaag ent trenz
+				dreek wirc
+				procassidt program. Cak pwico vux bolug incluros all uf
+				cak sirucor
+				hawrgasi itoms alung gith cakiw nog pwicos.
+		</para>
+
+			<section id="//AK/ODEN/deployingitems-policies">
+				<title>Policies</title>
+				<note>
+					<title>노트</title>
+					<para>
+						새겨두어야할 내용은 "note"를 사용한다.
+						노트는 이런식으로 사용해요.
+						</para>
+				</note>
+				<warning>
+					<title>주의</title>
+					<para>
+						주의해야할 내용은 "warning"를 사용한다.
+						경고는 이런 식으로 달아요.
+						</para>
+				</warning>
+				<important>
+					<title>중요</title>
+					<para>
+						정말 중요한 내용은 "important"를 사용한다.
+						중요한 거는 이런 식으로 달아요.
+				</para>
+				</important>
+			</section>
+			<section id="//AK/ODEN/deployingitems-tasks">
+				<title>Tasks</title>
+				<para>코드샘플은 "codesample"을 사용한다.</para>
+				<figure>
+					<title>Adding a new docbook document</title>
+					<programlisting language="xml">
+<![CDATA[
+<beans>
+
+    <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+        <property name="aliases">
+            <props>
+                <prop key="Flight">org.springframework.oxm.xstream.Flight</prop>
+            </props>
+        </property>
+    </bean>
+    ...
+
+</beans>]]>
+			</programlisting>
+				</figure>
+			</section>
+
+
+		</chapter>
+	</part>
+
+
+</book>

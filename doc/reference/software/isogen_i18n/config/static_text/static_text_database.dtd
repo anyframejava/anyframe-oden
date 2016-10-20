@@ -1,0 +1,294 @@
+<!--==========================================================
+    Static Text Database Document Type
+
+    This DTD governs documents that define databases of static
+    text in multiple languages for use with rendering systems.
+    The database essentially provides a lookup mechanism by which
+    systems can request the national-language-specific version of
+    a given string. It supports both XML-markup-context related
+    lookups (elements in context, attribute values), as well as
+    arbitrary lookups by string key.
+    
+    The namespace URI for this XML vocabulary is:
+    
+    http://www.innodata-isogen.com/vocabularies/i18n_support/static_text_database
+
+    Author: W. Eliot Kimber, eliot@isogen.com
+            Innodata Isogen
+
+    Copyright (c) 2003, 2004 Innodata Isogen
+
+
+    $Revision: 1.1.1.1 $
+
+    ===========================================================-->
+
+<!-- language attribute is an ISO language or language-and-country code -->
+<!ENTITY % lang     "xml:lang CDATA #REQUIRED" >
+
+<!-- text_database is the document root element. It contains
+     descriptive metadata for the database and one or more sets of
+     contexts defining the translated text strings.
+
+     Contexts may be common across all doctypes or specific to
+     a particular doctype. Doctype-specific contexts override
+     common contexts.
+
+  -->
+<!ELEMENT text_database
+  (metadata,
+   contexts_common,
+   contexts_common*,
+   attribute_maps_common?,
+   attribute_maps_dtd_specific*)
+>
+<!ATTLIST text_database
+  xmlns:fo
+    CDATA
+    #FIXED "http://www.w3.org/1999/XSL/Format"
+  xmlns
+    CDATA
+    #FIXED "http://www.innodata-isogen.com/vocabularies/i18n_support/static_text_database"
+>
+
+<!ELEMENT metadata
+  (title?,
+   description?,
+   copyright?,
+   security?,
+   revision_history?)
+>
+
+<!-- Descriptive title of the database, e.g. "Foo project generated text"
+  -->
+<!ELEMENT title
+  (#PCDATA)
+>
+
+<!-- Contains a copyright statement for the database instance
+  -->
+<!ELEMENT copyright
+  (p+)
+>
+
+<!-- Contains a security statement for the database instance,
+     e.g., "For Internal Use Only" or some such.
+  -->
+<!ELEMENT security
+  (p+)
+>
+
+<!-- Revision history is intended to capture the development history
+     of the database itself.
+  -->
+<!ELEMENT revision_history
+  (revision*)
+>
+
+<!-- The revision element describes a single revision to the database.
+  -->
+<!ELEMENT revision
+  (date,
+   author,
+   description)
+>
+
+<!-- Contains the date the revision was made.
+  -->
+<!ELEMENT date
+  (#PCDATA)
+>
+
+<!-- The author of the revision -->
+<!ELEMENT author
+  (#PCDATA)
+>
+
+<!-- A description of the revision -->
+<!ELEMENT description
+  (p+)
+>
+
+<!ELEMENT p
+  (#PCDATA)
+>
+
+<!-- contexts_common contains all the contexts that are common to two or
+     more document types. Each "context" is a binding between a specific
+     element type and its static text. For each context there may be
+     either text-before, text-after or both.
+
+     Contexts can also be used for arbitrary string keys that are not
+     related to any particular element type.
+  -->
+<!ELEMENT contexts_common
+  (context*)
+>
+
+<!-- contexts_dtd_specific contains contexts that are specific to a particular
+     document type. The "doctype" attribute specifies the external identifier
+     of the document type to which the contexts apply.
+  -->
+<!ELEMENT contexts_dtd_specific
+  (context*)
+>
+<!ATTLIST contexts_dtd_specific
+  doctype
+    CDATA
+    #REQUIRED
+>
+
+<!-- The context element specifies the pre- and/or post-text for a given
+     context, either element type or abitrary string key.
+
+     Note that the element type named is the element type that establishes
+     the unique context, not necessarily the element type to which the
+     generated text is actually applied. For example, in the case of a caution
+     element that contains para subelements, it would be the caution element that establishes the context (and is thus name as the value of the tagname element) even though it would be
+     the para element within the caution that actually presented the generated
+     text.
+  -->
+<!ELEMENT context
+  (lookup_key,
+   text_before,
+   text_after,
+   attribute_maps?)
+>
+
+<!-- The lookup key is either an element type name or some other
+     arbitrary string.
+
+     By convention the hat character ("^") is used to separate
+     parts of compound keys.
+
+  -->
+<!ELEMENT lookup_key
+  (#PCDATA)
+>
+
+<!-- Text before contains a set of items, one for each unique language,
+     for the pre-text for the specified element type.
+
+     The optional default element specifies generated text to be used
+     for any language that does not have its own item.
+
+     Text before may be empty if the element type has no pre-text.
+  -->
+<!ELEMENT text_before
+  (default_item?,
+   item*)
+>
+
+<!-- Text after contains a set of items, one for each unique language,
+     for the post-text for the specified element type.
+
+     Text after may be empty if the element type has no pre-text.
+  -->
+<!ELEMENT text_after
+  (default_item?,
+   item*)
+>
+
+<!-- Default item contains text that is used as the default for any language
+     that does not have it's own item.
+
+     Primarily intended for non-alphabetic generated text or to visually
+     identify untranslated languages by using a default like "CAUTION not translated"
+     or something.
+  -->
+<!ELEMENT default_item
+  (#PCDATA |
+   fo:inline)*
+>
+
+<!-- Each item element defines the generated pre- or post-text for a specific element
+     for a specific language or language/country pair. By default, the country is
+     "" (world-wide).
+  -->
+<!ELEMENT item
+  (#PCDATA |
+   fo:inline)*
+>
+<!ATTLIST item
+  %lang;
+>
+
+<!-- attribute_maps provide mappings from attribute values to
+     their display text in the context of a particular element type.
+
+  -->
+<!ELEMENT attribute_maps
+  (attr_map+)
+>
+
+<!-- The common and doctype attribute mappings provide attribute
+     value mappings that are not specific to a single element type
+
+     When a value is looked up for a particular attribute, the
+     element type's mappings are checked first, then the doctype-specific
+     mappings, then the common mappings.
+  -->
+<!ELEMENT attribute_maps_common
+  (attr_map+)
+>
+
+<!ELEMENT attribute_maps_dtd_specific
+  (attr_map+)
+>
+<!ATTLIST attribute_maps_dtd_specific
+  dtd
+    CDATA
+    #REQUIRED
+>
+
+<!ELEMENT attr_map
+  (attr_name,
+   attr_values*)
+>
+
+<!ELEMENT attr_name
+  (#PCDATA)
+>
+
+<!ELEMENT attr_values
+  (attr_value_map+)
+>
+
+<!ELEMENT attr_value_map
+  (attr_value,
+   default_item?,
+   item*)
+>
+
+<!ELEMENT attr_value
+  (#PCDATA |
+   fo:inline)*
+>
+
+<!ELEMENT fo:inline
+  (#PCDATA |
+   fo:inline)*
+>
+<!ATTLIST fo:inline
+  font-size
+    CDATA
+    #IMPLIED
+  font-family
+    CDATA
+    #IMPLIED
+  font-weight
+    CDATA
+    #IMPLIED
+  font-style
+    CDATA
+    #IMPLIED
+  text-decoration
+    CDATA
+    #IMPLIED
+  baseline-shift
+    CDATA
+    #IMPLIED
+  id
+    NMTOKEN
+    #IMPLIED
+>

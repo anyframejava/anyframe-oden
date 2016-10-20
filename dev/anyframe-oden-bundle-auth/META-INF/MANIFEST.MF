@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Enterprise Auth
+Bundle-SymbolicName: anyframe-oden-bundle-auth
+Bundle-Version: 1.0.2
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: org.anyframe.oden.bundle.http,
+ org.anyframe.oden.bundle.common,
+ javax.servlet,
+ javax.servlet.http,
+ org.osgi.framework,
+ org.osgi.service.component,
+ org.osgi.service.http
+Service-Component: OSGI-INF/security_handler.xml
+Main-Class: org.anyframe.oden.bundle.auth.Account

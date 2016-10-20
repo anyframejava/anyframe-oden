@@ -1,0 +1,125 @@
+<chapter id="//AK/ODEN/concepts_re">
+	<title>Concepts</title>
+	<para>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit, set
+		eiusmod
+		tempor incidunt et labore et dolore magna aliquam. Ut enim ad
+		minim
+		veniam, quis nostrud exerc. Irure dolor in reprehend incididunt
+		ut
+		labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+		nostrud
+		exercitation ullamco laboris nisi ut aliquip ex ea commodo
+		consequat.
+		<footnote>
+			<para>
+				각주는 다음과 같다. 번호는 알아서 만들어 주니 신경쓰지 마세요.
+				</para>
+		</footnote>
+		Duis aute irure dolor in reprehenderit in voluptate velit
+		esse
+		molestaie cillum. Tia non ob ea soluad incom dereud facilis est
+		er
+		expedit distinct. Nam liber te conscient to factor tum poen legum
+		odioque civiuda et tam. Neque pecun modut est neque nonor et imper
+		ned libidig met, consectetur adipiscing elit, sed ut labore et dolore
+		magna aliquam is nostrud exercitation ullam mmodo consequet.
+	</para>
+
+	<section id="//AK/ODEN/concepts-architecture_re">
+		<title>Architecture</title>
+		<para>
+			그림은 다음과 같이 넣습니다.
+			</para>
+
+		<figure>
+			<title>그림번호도 알아서 만들어 줍니다.</title>
+			<imagedata fileref="../image/oden/overview_somethingmissing.png" />
+		</figure>
+	</section>
+	<section id="//AK/ODEN/concepts-list_re">
+		<title>List</title>
+		<para>
+			목록은 번호가 있는 목록과 번호가 없는 목록이 있다. 
+			</para>
+		<para>
+			번호가 있는 목록은 다음과 같이 작성한다.
+			<orderedlist numeration="Arabic" inheritnum="inherit">
+				<listitem>
+					<para>
+						Arabic : The arabic numerals (1, 2, 3, ...) are used. 
+						</para>
+					<para>
+						The Numeration attribute of the OrderedList element is
+						needed to specify the sequence to use when numbering the list
+						items. This attribute can get one of the following values
+						</para>
+				</listitem>
+				<listitem>
+					<para>
+						Upperalpha : The upper letters (A, B, C, ...) are used.
+						</para>
+				</listitem>
+				<listitem>
+					<para>
+						Loweralpha : The lower letters (a, b, c, ...) are used.
+						</para>
+				</listitem>
+				<listitem>
+					<para>
+						Upperroman : The upper roman numerals (I, II, III, IV, ...)
+						are used. 
+						</para>
+				</listitem>
+				<listitem>
+					<para>
+						Lowerroman : The lower roman numerals (I, II, III, IV, ...)
+						are used. 
+						</para>
+				</listitem>
+			</orderedlist>
+		</para>
+		<para>
+			번호가 없는 목록은 다음과 같이 작성한다.
+			<itemizedlist>
+				<listitem>
+					<para>
+						Inherit : The nested list inherits the numeration of the
+						lists in which it is nested. 
+						</para>
+					<para>
+						The InheritNum attribute of the OrderedList element specify
+						if a
+						nested list must inherit the numeration from its parent
+						lists.
+						This attribute can get the following values
+						</para>
+				</listitem>
+				<listitem>
+					<para>
+						Ignore : The nested list does not inherit any numeration.
+						</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+	</section>
+
+	<section id="//AK/ODEN/concepts-serverandagent_re">
+		<title>Servers and Agents</title>
+		<para>
+			At vver eos et accusam dignissum qui blandit est praesent.
+			Trenz pruca beynocguon doas nog apoply su trenz ucu hugh rasoluguon
+			monugor or trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo
+			producgs su IdfoBraid, yop quiel geg ba solaly rasponsubla rof
+			trenzur sala ent dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis
+			phat eit sakem eit vory gast te Plok peish ba useing phen roxas.
+			Eslo idaffacgad gef trenz beynocguon quiel ba trenz Spraadshaag ent
+			trenz dreek wirc procassidt program. Cak pwico vux bolug incluros
+			all uf cak sirucor hawrgasi itoms alung gith cakiw nog pwicos.
+			</para>
+	</section>
+	<para>
+		여기까지가 html 한 페이지입니다.
+					</para>
+
+</chapter>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="FileSystemRepository" immediate="true">
+   <implementation class="org.anyframe.oden.bundle.core.repository.FileSystemRepositoryImpl"/>
+   <service>
+      <provide interface="org.anyframe.oden.bundle.core.repository.RepositoryService"/>
+   </service>
+</component>

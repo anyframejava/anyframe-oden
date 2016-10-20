@@ -1,0 +1,10 @@
+----- 닥북 작업 환경 -----
+HTML 생성:
+docbook2html 입력파일.xml
+PDF 생성:
+docbook2pdf 입력파일.xml 출력.pdf
+--------------------------
+Microsoft Windows XP [Version 5.1.2600]
+(C) Copyright 1985-2001 Microsoft Corp.
+
+D:\workspace\doc\reference>

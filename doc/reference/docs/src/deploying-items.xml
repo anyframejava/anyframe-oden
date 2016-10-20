@@ -1,0 +1,66 @@
+<chapter id="//AK/ODEN/deployingitems_re">
+	<title>Deploying Items</title>
+
+	<para>
+		At vver eos et accusam dignissum qui blandit est praesent. Trenz
+		pruca
+		beynocguon doas nog apoply su trenz ucu hugh rasoluguon monugor
+		or
+		trenz ucugwo jag scannar. Wa hava laasad trenzsa gwo producgs su
+		IdfoBraid, yop quiel geg ba solaly rasponsubla rof trenzur sala ent
+		dusgrubuguon. Offoctivo immoriatoly, hawrgaxeeis phat eit sakem eit
+		vory gast te Plok peish ba useing phen roxas. Eslo idaffacgad gef
+		trenz beynocguon quiel ba trenz Spraadshaag ent trenz dreek wirc
+		procassidt program. Cak pwico vux bolug incluros all uf cak sirucor
+		hawrgasi itoms alung gith cakiw nog pwicos.
+		</para>
+
+	<section id="//AK/ODEN/deployingitems-policies_re">
+		<title>Policies</title>
+		<note>
+			<title>노트</title>
+			<para>
+				새겨두어야할 내용은 "note"를 사용한다.
+				노트는 이런식으로 사용해요.
+						</para>
+		</note>
+		<warning>
+			<title>주의</title>
+			<para>
+				주의해야할 내용은 "warning"를 사용한다.
+				경고는 이런 식으로 달아요.
+						</para>
+		</warning>
+		<important>
+			<title>중요</title>
+			<para>
+				정말 중요한 내용은 "important"를 사용한다.
+				중요한 거는 이런 식으로 달아요.
+				</para>
+		</important>
+	</section>
+	<section id="//AK/ODEN/deployingitems-tasks_re">
+		<title>Tasks</title>
+		<para>코드샘플은 "codesample"을 사용한다.</para>
+		<figure>
+			<title>Adding a new docbook document</title>
+			<programlisting language="xml">
+<![CDATA[
+<beans>
+
+    <bean id="xstreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+        <property name="aliases">
+            <props>
+                <prop key="Flight">org.springframework.oxm.xstream.Flight</prop>
+            </props>
+        </property>
+    </bean>
+    ...
+
+</beans>]]>
+			</programlisting>
+		</figure>
+	</section>
+
+
+</chapter>

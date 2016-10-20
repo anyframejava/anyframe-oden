@@ -1,0 +1,12 @@
+﻿zh-CN character boundaries
+
+First character Zhongda dictionary, second is that used in ICU4J collation rules.
+--------------------------
+A: 阿/阿
+B: 八/八
+C: 擦/嚓
+D: 耷/耷
+E: 讹(阿)/妸 The Unicode database lists 妸 as E1 but it does not appear in either the Zhongda dictionary or the cedict dictionary.
+                 The character 阿 has two pronunciations: A1 and E1, although A1 is it's primary pronunciation. When used in words
+                 that start with E1, 阿 should be the first character in the E group, but there's no way to do that with single-character
+                 collation rules.

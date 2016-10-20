@@ -1,0 +1,12 @@
+@ECHO OFF
+
+set LOCAL_FOP_HOME=%DOCBOOK_HOME%\software\fop\
+
+set LIBDIR=%LOCAL_FOP_HOME%lib
+set LOCALCLASSPATH=%LOCAL_FOP_HOME%build\fop.jar
+set LOCALCLASSPATH=%LOCALCLASSPATH%;%LIBDIR%\xml-apis-1.3.02.jar
+set LOCALCLASSPATH=%LOCALCLASSPATH%;%LIBDIR%\xercesImpl-2.7.1.jar
+set LOCALCLASSPATH=%LOCALCLASSPATH%;%LIBDIR%\xalan-2.7.0.jar
+set LOCALCLASSPATH=%LOCALCLASSPATH%;%LIBDIR%\commons-logging-1.0.4.jar
+set LOCALCLASSPATH=%LOCALCLASSPATH%;%LIBDIR%\avalon-framework-4.2.0.jar
+java -cp "%LOCALCLASSPATH%" org.apache.fop.fonts.apps.TTFReader %1 %2 %3 %4 %5 %6 %7 %8

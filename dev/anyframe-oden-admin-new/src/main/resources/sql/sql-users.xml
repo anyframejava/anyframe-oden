@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE queryservice PUBLIC "-//ANYFRAME//DTD QUERYSERVICE//EN" "http://www.anyframejava.org/dtd/anyframe-core-query-mapping-3.2.dtd">
+<queryservice>
+	<queries>
+
+		<query id="createUser">
+			<statement>
+		<![CDATA[
+			INSERT INTO USERS ( 			
+				USER_ID, 
+				CREATE_DATE, 
+				ENABLED, 
+				MODIFY_DATE, 
+				PASSWORD, 
+				USER_NAME) 
+			VALUES (:vo.userId, 
+				:vo.createDate, 
+				:vo.enabled, 
+				:vo.modifyDate, 
+				:vo.password, 
+				:vo.userName)
+		]]>
+			</statement>
+		</query>
+
+		<query id="updateUser">
+			<statement>
+		<![CDATA[
+			UPDATE USERS
+			SET 
+				CREATE_DATE = :vo.createDate, 
+				ENABLED = :vo.enabled, 
+				MODIFY_DATE = :vo.modifyDate, 
+				PASSWORD = :vo.password, 
+				USER_NAME = :vo.userName
+			WHERE
+				USER_ID = :vo.userId 
+		]]>
+			</statement>
+		</query>
+
+		<query id="removeUser">
+			<statement>
+		<![CDATA[
+			DELETE FROM USERS 
+			WHERE 
+				USER_ID = :userId
+		]]>
+			</statement>
+		</query>
+
+		<query id="findUserByPk">
+			<statement>
+		<![CDATA[
+			SELECT 
+				users.USER_ID, users.CREATE_DATE, users.ENABLED, users.MODIFY_DATE, users.PASSWORD, users.USER_NAME
+			FROM USERS users
+			WHERE 
+				users.USER_ID = :vo.userId
+		]]>
+			</statement>
+			<result class="org.anyframe.oden.admin.vo.User" />
+		</query>
+
+		<query id="findUserList" isDynamic="true">
+			<statement>
+		<![CDATA[
+			SELECT 
+				users.USER_ID, users.CREATE_DATE, users.ENABLED, users.MODIFY_DATE, users.PASSWORD, users.USER_NAME 
+			FROM USERS users
+			order by							
+				users.USER_ID
+		]]>
+			</statement>
+			<result class="org.anyframe.oden.admin.vo.User" />
+		</query>
+
+	</queries>
+</queryservice>

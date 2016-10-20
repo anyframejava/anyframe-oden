@@ -1,0 +1,21 @@
+<section id="workingwithodenadmin_status">
+	<title>Status</title>
+
+	<para>
+		진행중인 배포 작업과, 대기중인 작업 리스트를 모니터링할 수 있는 화면이다.	
+	</para>
+	
+	<section id="workingwithodenadmin_status_jobstatus">
+		<title>Job Status</title>
+		
+		<para>
+			현재 진행중이거나 대기중인 배포 작업들을 확인할 수 있다. 배포는 한번에 한 작업씩만 진행되므로 나머지 작업들은 대기중인
+			상태를 확인할 수 있다. 진행중인 작업을 중단하거나 대기중인 작업을 취소할 수 있다. 
+		</para>
+		
+		<para>
+			현재 진행중인 배포 작업에 대해서는 작업 진행률과 배포중인 파일에 대한 정보가 나타난다.
+		</para>
+	</section>
+
+</section>

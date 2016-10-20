@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oden>
+	<agents>
+		<agent name="sampleapp">
+			<address host="localhost" port="9872"/>
+			<default-location value="target"/>
+			<backup-location value="snapshots"/>
+		</agent>
+		<!--  
+		<agent name="%agentName2%">
+			<address host="%agentHost2%" port="9872"/>
+			<default-location value="%agentLoc2%"/>
+			<backup-location value="snapshots"/>
+		</agent>
+		-->
+	</agents>
+</oden>

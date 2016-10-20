@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Anyframe Documentation</title>
+    <meta id="Copyright" name="Copyright" content="Copyright 2009 SAMSUNG SDS Co., Ltd. All Rights Reserved."/>
+	<meta name="author" content="Jihwan Rhie">
+	<!-- Date: 2009-09-16 -->
+	
+    <link rel="stylesheet" type="text/css" href="../../css/anyframedocs.css" charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../../css/docheader.css" charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../../css/docs.css" charset="utf-8"/>
+
+    <!--[if IE]><link rel="stylesheet" type="text/css" href="../../css/ie.css" charset="utf-8"/><![endif]-->
+
+    <script>
+        var Book={
+            isConceptualFlow: true,
+            language: document.getElementsByTagName('html')[0].getAttribute('xml:lang'),
+            resourcesURI: '../../',
+            tocURI: './toc.html',
+            bookTitle: 'Anyframe Oden User Guide'
+        };
+    </script>
+
+    <script type="text/javascript" src="../../javascript/lib/prototype.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/lib/scriptaculous.js?load=effects" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/anyframedocs.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/header_toc.js" charset="utf-8"></script>
+
+</head>
+<body>
+
+	<div id="anyframeHeader" class="hideOnPrint">
+		<div style='height:36px; background-image: url("../../images/common/header_background.png");'>
+			<a href='../../index.html'><img src='../../images/common/header_anyframe_doc_banner.png' alt="Anyframe Java Documentation" height='36' width='256' style='border:none'></a>
+		</div>
+    </div>
+    <div id="header">
+        <div id="title"></div>
+        <ul id="headerButtons" class="hideOnPrint">
+            <li id="toc_button" style="display:none"><button id="table_of_contents">Table of Contents</button></li>
+        </ul>
+    </div>
+    <div id="tocContainer" style="display:none"><ul id="toc"></ul></div>
+
+    <div id="contents">
+        <a id="top" name="top"></a>
+        
+        <!-- DOCUMENT CONTENT STARTS HERE -->
+
+<a name="//AK/ODEN/02_000" title="#AK_ODEN_02_000"></a><br/><h1 id="pageTitle">Concepts</h1>
+<p>
+본 장에서는 Oden에 대한 보다 상세한 이해를 돕기 위해, Oden에서 지향하는 아키텍처의 형태 및 주요 구성요소에 대한 소개를 제공한다.
+</p>
+
+<a name="//AK/ODEN/02_100" title="#AK_ODEN_02_100"></a><h2>Architecture</h2>
+<p>
+Oden을 활용한 배포관리 환경은 크게 다음과 같은 구성요소로 이루어진다.
+<ul>
+<li><strong>Server</strong> &amp; <strong>Agent</strong>: 배포관련 각종 작업을 수행하는 핵심모듈로, Server는 빌드리파지토리 (Build Repository) 혹은 배포대상서버 (Target Server) 등에 위치시킬 수 있으며, Agent는 배포대상서버에 설치되며, CLI 기반 UI를 제공함</li>
+<li><strong>Build Repository</strong>: CI 환경에 의해 빌드된 각종 컴포넌트들이 저장된 장소로, 배포대상서버의 디렉토리 구조와 동일하게 구성되어야 함</li>
+<li><strong>GUI Tool</strong>: Eclipse Plug-in 등을 활용하여 Oden 관련 각종 배포작업을 수행하는 GUI 환경</li>
+</ul>
+<br/>
+</p>
+
+<p>
+Oden을 활용하기 위해 Eclipse Plug-in을 사용할 경우, Eclipse의 Plug-in 기반 아키텍처의 장점에 의해, 모델링-코드생성-빌드-테스트-배포 및 형상/이슈관리를 유기적으로 통합시킬 수 있다. 이러한 일련의 흐름을 예를 들어 설명하면 다음과 같다.
+<ol>
+<li>설계모델링을 통해 Eclipse 프로젝트 및 소스코드를 생성한다.</li>
+<li>생성된 코드를 바탕으로 필요한 비즈니스로직을 추가하여 프로그램을 작성한다.</li>
+<li>이러한 개발을 진행할 때에는 테스트케이스를 함께 생성하여 진행함으로써 개발생산성 및 유지보수성을 증대시킨다.</li>
+<li>CI 엔진과 연계하여 빌드 시 테스트 수행을 포함하여 통합빌드를 진행한다.</li>
+<li>배포관리툴과 연계하여 원하는 배포대상서버에 배포를 실시한다.</li>
+<li>이러한 일련의 과정을 이슈관리 시스템 및 형상관리 시스템과 연계시켜 체계적으로 관리한다.</li>
+</ol>
+<br/>
+다음 그림은 이러한 유기적인 통합의 모습을 개념적으로 나타낸 것이다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-1&nbsp;&nbsp;</strong>Oden Integrated Architecture powered by Eclipse</caption><br/><img src="../../images/oden/concepts_integratedarchitecture.png" /><br/><br/>
+</p>
+
+<p>
+Oden을 활용한 배포환경 구성 시에는 Oden에서 제공하는 Server, Agent, Eclipse Plug-in 등을 각각의 위치에 설치하여야 하며, 이때 Server의 위치는 빌드리파지토리나 배포대상서버, 어느 곳이든 상관이 없지만, Agent의 경우에는 반드시 배포대상서버에 위치시키도록 한다. 설치 관련 자세한 사항은 "<a href="gettingstarted.html#//AK/ODEN/03_200">Installing Anyframe Oden</a>"을 참고하도록 한다.<br/>
+<div class="notebox"><p><strong>Note:</strong>&nbsp;Server는 빌드리파지토리 혹은 배포대상서버에 위치시키고, Agent는 배포대상서버에 위치시킨다.</p></div><br/>
+Oden을 활용하여 배포대상물을 원하는 배포대상서버에 배포하고, 로그를 통해 결과를 조회하며, 원하지 않는 경우 스냅샷을 뜬 시점으로 롤백할 수 있다. 이러한 일련의 내용을 각 구간별로 설명하면 다음과 같다.
+
+<h5>Eclipse Plug-in UI를 통한 배포관리</h5>
+<ul>
+<li>배포정책 (Policy; Full/Selective/Incremental) 설정</li>
+<li>배포실행 (Task)</li>
+<li>로그를 통한 결과 확인/재실행</li>
+<li>스냅샷 관리 및 실행</li>
+<li>롤백 실행</li>
+</ul>
+
+<h5>Console (CLI)을 통한 배포관리</h5>
+<ul>
+<li>Eclipse Plug-in UI (GUI)와 동일한 기능 수행</li>
+</ul>
+
+<h5>빌드리파지토리에서 배포대상물을 가져옴</h5>
+<ul>
+<li>각종 배포대상물 (클래스/JAR/WAR, 웹리소스 등)에 대한 변경사항 감지</li>
+<li>CI를 활용한 빌드 시 Incremental Build 방법을 적용할 것을 가이드함</li>
+</ul>
+
+<h5>Oden Server가 설치된 서버가 "HOST" 역할을 수행함</h5>
+<ul>
+<li>배포정책 (Policy) 저장</li>
+<li>배포실행 (Task) 및 로그생성</li>
+<li>바뀐 부분을 감지하여 배포할 파일만 Agent에게 전달</li>
+<li>스냅샷 및 롤백 수행</li>
+<li>Server를 CI서버/빌드리파지토리에 위치시키거나 별도의 장비, 혹은 배포대상서버들 중 하나에 설치하는 것이 가능함</li>
+</ul>
+
+<h5>Oden Agent만 설치된 배포대상 서버들은 "GUEST" 역할을 수행함</h5>
+<ul>
+<li>Server로부터 전달받은 배포대상물들을 지정된 위치에 배포함</li>
+</ul>
+<br/><br/>
+
+다음 그림은 이러한 배포 흐름을 개념적으로 설명한 것이다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-2&nbsp;&nbsp;</strong>Oden Deployment Flow</caption><br/><img src="../../images/oden/concepts_deploymentflow.png" /><br/><br/>
+</p>
+
+
+<a name="//AK/ODEN/02_200" title="#AK_ODEN_02_200"></a><h2>Servers and Agents</h2>
+<p>
+Oden의 Server 및 Agent는 배포작업을 실질적으로 관할하고 수행하는 역할을 수행한다.<br/>
+Server 및 Agent는 배포할 것들을 확인, 감지, 목록화, 전송, 배포하는 일련의 작업들을 수행하며, 이러한 것들은 각각의 기능구성 및 설치 환경 등을 고려하여 개별 번들<sup>&nbsp;1&nbsp;</sup>로 구성되어 있다.
+</p>
+
+<a name="//AK/ODEN/02_210" title="#AK_ODEN_02_210"></a><h3>Servers</h3>
+<p>Oden Server는 각종 Oden Shell을 통한 쉘 커맨드를 제공하며, 이를 통해 다양한 배포관련 명령을 수행할 수 있도록 한다. 또한, Eclipse Plug-in 등 외부 GUI 환경과의 연계를 위한 서비스도 제공한다.<br/>
+이러한 Oden Server는 단일 어플리케이션 당 하나로 구성하는 것을 권장하며, 여러대의 배포대상서버<sup>&nbsp;2&nbsp;</sup>에 대한 배포를 하나의 Server 및 여러개의 Agent를 통해 수행하게 된다. 예를 들어, 'A'라는 업무도메인에 대한 어플리케이션을 3대의 배포대상서버에 배포하고, 'B'라는 업무도메인에 대한 어플리케이션을 2대의 배포대상서버에 배포한다면, 총 2개의 Server를 구성하는 것을 권장한다. 이는, 각 어플리케이션 당 관련된 빌드리파지토리만을 특정 Oden Server와 연결하는 것이 관리하기 편하기 때문이다.<br/>
+<div class="codesample"><pre>
+Number of Oden Servers = ∑ (Number of Applications)
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/02_220" title="#AK_ODEN_02_220"></a><h3>Agents</h3>
+<p>Oden Agent는 Oden Server로부터 전달받은 배포대상물을 지정된 위치에 배포(복사)하는 역할을 수행한다.<br/>
+그러므로, 앞서 예를 든 'A' 및 'B'라는 업무도메인에 대한 배포대상서버가 각각 3대 및 2대이므로, Oden Agent는 업무도메인 'A'용 Oden Server에 대해서 3개를, 업무도메인 'B'용 Oden Server에 대해서 2개를 각각의 배포대상서버에 구성한다.<br/>
+<div class="codesample"><pre>
+Number of Oden Agents = ∑ (Number of Target Servers)
+</pre></div>
+만약 배포대상서버가 물리적으로 중복된 장비에 위치해 있다하더라도, 구성하는 Agent의 개수는 변하지 않는다. Oden의 Server 및 Agent의 구성은 논리적인 구성에 입각하여 구성하는 것을 권장한다.<br/>
+<div class="notebox"><p><strong>Note:</strong>&nbsp;Server는 단일 어플리케이션 당 하나로 구성하는 것을 권장하며, Agent는 해당 어플리케이션의 배포대상서버 당 하나를 구성한다.</p></div>
+</p>
+
+
+<a name="//AK/ODEN/02_300" title="#AK_ODEN_02_300"></a><h2>Deploying Items</h2>
+<p>
+Oden은 배포작업의 효율성을 위해 배포정책(Policy) 및 배포작업(Task)에 의해 배포를 실시한다.
+</p>
+
+<a name="//AK/ODEN/02_310" title="#AK_ODEN_02_310"></a><h3>Policies</h3>
+<p>
+특정 아이템을 배포하겠다는 내용을 “배포정책”으로 서버에 저장하여, 개별 사용자가 정의한 배포정책을 다수의 사용자가 공유하여 활용할 수 있다.<br/>
+배포정책에 대한 보다 자세한 내용은 "<a href="commandline.html#//AK/ODEN/04_210">Policy Command</a>" 및 "<a href="eclipse.html#//AK/ODEN/05_300">Oden Policy and Task Editor</a>" 등을 참고한다.
+</p>
+
+<a name="//AK/ODEN/02_320" title="#AK_ODEN_02_320"></a><h3>Tasks</h3>
+<p>
+하나 이상의 배포정책을 묶어서 “배포작업”으로 설정한 후, 해당 배포작업을 실행시키면, 배포작업 내에 정의된 배포정책에 의해 배포대상물들이 배포된다.<br/>
+배포작업에 대한 보다 자세한 내용은 "<a href="commandline.html#//AK/ODEN/04_220">Task Command</a>" 및 "<a href="eclipse.html#//AK/ODEN/05_300">Oden Policy and Task Editor</a>" 등을 참고한다.
+</p>
+
+<p>
+배포를 수행하는데 번거롭게 여겨질 수도 있는 배포정책(Policy)와 배포작업(Task)의 다단계 구성을 한 이유는 다음과 같다.
+<ul>
+<li>한번 작성한 배포정책을 여러사람이 여러번 재사용할 수 있도록 하게 함</li>
+<li>배포정책 자체를 꼭 필요한 범위만으로 설정할 수 있는 모듈 구성으로 만들어서 빈번한 배포 시에 보다 신속한 배포작업을 가능하게 함</li>
+<li>여러개의 배포정책을 하나로 묶어서 한번에 실행하는 배포작업을 구성할 수 있도록 하게 함</li>
+</ul>
+<br/>
+이상의 Policy와 Task 간의 관계를 그림으로 나타내면 다음과 같다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-3&nbsp;&nbsp;</strong>Policy and Task</caption><br/><img src="../../images/oden/concepts_policyandtask.png" /><br/><br/><br/>
+</p>
+
+
+<a name="//AK/ODEN/02_400" title="#AK_ODEN_02_400"></a><h2>Backup and Restore</h2>
+<p>
+Oden은 특정 시점의 배포형상을 별도로 보관하고 이를 통해 배포형상을 되돌리기 위한 롤백 기능을 지원한다.
+</p>
+
+<a name="//AK/ODEN/02_410" title="#AK_ODEN_02_410"></a><h3>Snapshot Plans</h3>
+<p>
+배포대상서버의 특정 위치를 지정하여 스냅샷을 뜨도록 스냅샷정책을 설정한다.<br/>
+스냅샷정책은 특정 위치에 배포된 파일 및 디렉토리 등을 백업하기 위한 설정이며, 이에 대한 보다 자세한 내용은 "<a href="commandline.html#//AK/ODEN/04_240">Snapshot Command</a>" 및 "<a href="eclipse.html#//AK/ODEN/05_400">Oden Snapshot View</a>" 등을 참고한다.
+</p>
+
+<a name="//AK/ODEN/02_420" title="#AK_ODEN_02_420"></a><h3>Snapshots and Rollback</h3>
+<p>
+정의한 스냅샷정책에 의해 실제 스냅샷을 생성함으로써 백업을 수행하고, 이를 바탕으로한 롤백을 통해 복구를 수행한다.<br/>
+스냅샷은 스냅샷정책에서 정의된 위치의 파일 및 디렉토리 등을 압축<sup>&nbsp;3&nbsp;</sup>한 파일이며, 롤백은 이 파일을 스냅샷정책을 참고하여 다시 원래의 위치에 풀어놓는 방식이다. 스냅샷 및 롤백에 대한 보다 자세한 내용은 "<a href="commandline.html#//AK/ODEN/04_240">Snapshot Command</a>" 및 "<a href="commandline.html#//AK/ODEN/04_250">Rollback Command</a>", "<a href="eclipse.html#//AK/ODEN/05_400">Oden Snapshot View</a>" 등을 참고한다.
+</p>
+
+<p>
+스냅샷정책(Snapshot Plan)과 스냅샷(Snapshot) 역시 한번 정의한 스냅샷정책에 의해 여러번의 스냅샷을 뜰 수 있도록 하기 위해 단일작업이 아닌 다단계 작업에 의해 수행된다. 이러한 관계를 그림으로 나타내면 다음과 같다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-4&nbsp;&nbsp;</strong>Snapshot Plan, Snapshot and Rollback</caption><br/><img src="../../images/oden/concepts_snapshotandrollback.png" /><br/><br/>
+</p>
+
+
+<a name="//AK/ODEN/02_500" title="#AK_ODEN_02_500"></a><h2>User Interface</h2>
+<p>Oden은 CLI 및 GUI 환경 모두에서 작업이 가능하며, 사용자는 두 환경 모두에서 동일한 배포 결과를 얻을 수 있다.</p>
+
+<a name="//AK/ODEN/02_510" title="#AK_ODEN_02_510"></a><h3>Command Line Interface</h3>
+<p>Oden 명령어를 실행시키기 위해 Oden에서는 자체 Shell 환경을 제공한다. Oden Shell을 통해 사용자는 Oden에서 제공하는 기능들을 이용할 수 있다.<br/>
+보다 자세한 사항은 "<a href="commandline.html">Working with Command Line</a>"을 참고한다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-5&nbsp;&nbsp;</strong>Oden Command Line Interface: Oden Shell</caption><br/><img src="../../images/oden/concepts_odencli.png" /><br/><br/><br/>
+</p>
+
+<a name="//AK/ODEN/02_520" title="#AK_ODEN_02_520"></a><h3>Graphical User Interface</h3>
+<p>Oden Eclipse Plug-in은 배포관리를 위한 Oden Server와 연계 하여 배포관리를 지원하는 플러그인으로, 배포 용이성 및 높은 신뢰성을 기대하게 해 준다.<br/>
+보다 자세한 사항은 "<a href="eclipse.html">Working with Eclipse Plug-in</a>"을 참고한다.<br/><br/>
+<caption class="tablecaption"><strong>Figure 2-6&nbsp;&nbsp;</strong>Oden Graphical User Interface: Eclipse Plug-in</caption><br/><img src="../../images/oden/concepts_odeneclipse.png" /><br/><br/><br/>
+</p>
+
+
+<!-- FOOTNOTE STARTS HERE -->
+
+<div class="footnote">
+<p><sup>1&nbsp;</sup>Oden Server 및 Agent는 OSGi 표준사양을 따르는 개별 번들로 구성되어 있다.</p>
+<p><sup>2&nbsp;</sup>Oden은 물리적인 하드웨어가 아닌 웹어플리케이션서버(WAS) 또는 서블릿컨테이너 등의 인스턴스 하나를 배포대상서버 하나로 간주한다.</p>
+<p><sup>3&nbsp;</sup>스냅샷은 확장자가 없는 ZIP 압축 파일이다.</p>
+</div>
+
+<!-- FOOTNOTE ENDS HERE -->
+
+        <!-- DOCUMENT CONTENT ENDS HERE -->
+
+		<div class="hideOnPrint">
+			<br/><hr />
+            <div id="globalfooter">
+			    <p class="gf-anyframe">더 많은 정보를 얻으려면 <a href="http://www.anyframejava.org/">Anyframe Java Open Source Community</a>를 확인하십시오.</p>
+			    
+			    <ul class="gf-links piped">
+					<li><a class="first" href="http://www.anyframejava.org/node">Anyframe Updates</a></li>
+					<li><a href="http://www.anyframejava.org/node/264">Anyframe Training Courses</a></li>
+				</ul>
+
+				<div class="gf-copyright">
+					<p>Copyright © 2009 SAMSUNG SDS Co., Ltd. All rights reserved.</p>
+				</div>
+		    </div> <!--/globalfooter-->
+        </div> <!-- end of footer -->
+
+</body>
+</html>

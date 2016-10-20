@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="run" name="Create Runnable Jar for Project anyframe-enterprise-codevalidator with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+	<property name="build.dir" location="dist" />
+	
+	<path id="classpath">
+	    <fileset dir="lib">	
+	    	<include name="**/*.jar"/>
+	    </fileset>
+	</path>
+	
+	<target name="run">
+		<taskdef name="checkout" classname="org.anyframe.oden.dimmension.Adapter" classpathref="classpath"/>		
+		<checkout></checkout>	
+	</target>
+
+</project>

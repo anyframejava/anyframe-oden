@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Hessian Server
+Bundle-SymbolicName: anyframe-oden-bundle-hessiansvr
+Bundle-Version: 1.6.0.qualifier
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.caucho.hessian.io,
+ com.caucho.hessian.server,
+ javax.servlet,
+ javax.servlet.http,
+ org.ungoverned.osgi.service.shell,
+ org.anyframe.oden.bundle.common,
+ org.osgi.framework,
+ org.osgi.service.component,
+ org.osgi.service.http
+Service-Component: OSGI-INF/oden_hessian_servlet.xml,
+ OSGI-INF/shell_servlet.xml
+Main-Class: org.anyframe.oden.bundle.hessiansvr.Cmd
+Export-Package: org.anyframe.oden.bundle.hessiansvr

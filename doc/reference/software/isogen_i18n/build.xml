@@ -1,0 +1,263 @@
+<?xml version="1.0"?>
+<!-- Jakarta ANT config file for the tm_explore project. -->
+
+<project name="i18n support" default="compile" basedir=".">
+  <property name="build.sysclasspath"    value="ignore"/>
+  <property name="ext-lib"     value="${basedir}/lib"/>
+  <property name="distBaseDir" value="${basedir}/dist"/>
+  <property name="distdir"     value="${distBaseDir}/i18n_support"/>
+  <property name="classes"     value="${basedir}/build"/>
+  <property name="javadoc"     value="${distdir}/docs/apis"/>
+  <property name="src"         value="${basedir}/src"/>
+  <property name="test"        value="${basedir}/test"/>
+  <property name="samples"     value="${basedir}/samples"/>
+  <property name="docs"        value="${basedir}/docs"/>
+  <property environment="env"/>
+  <path id="base_classpath">
+    <pathelement path="${ext-lib}/saxon6.jar"/>
+    <pathelement path="${ext-lib}/icu4j_3_2.jar"/>
+    <pathelement path="${ext-lib}/xercesImpl.jar"/>
+    <pathelement path="${ext-lib}/junit.jar"/>
+    <pathelement path="${env.CLASSPATH}"/>
+  	<pathelement path="${classes}"/>
+  </path>
+
+  <target name="init">
+    <tstamp/>
+  	<mkdir dir="${distdir}"/>
+  </target>
+
+  <target name="clean">
+    <!-- For cleanup after compile and jar operations -->
+    <delete includeEmptyDirs="true">
+      <fileset dir="${src}" includes="**/*~,**/.#*" defaultexcludes="no"/>
+    </delete>
+    <delete includeEmptyDirs="true" dir="${classes}/com"/>
+    <delete includeEmptyDirs="true" dir="${distBaseDir}"/>
+  </target>
+
+  <target name="compile" depends="init" description="Compile the Java code">
+    <delete includeEmptyDirs="true" dir="${classes}/com"/>
+    <delete>
+      <fileset  dir="${classes}" includes="*.jar"/>
+      <fileset  dir="${classes}" includes="*~"/>
+    </delete>
+    <javac
+      srcdir="${src}"
+      destdir="${classes}"
+      debug="on">
+      <classpath refid="base_classpath"/>
+    </javac>
+    <copy todir="${classes}">
+      <fileset dir="${test}">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+        <include name="com/isogen/**"/>
+        <include name="com/isogen/**"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile" description="Creates the Jar file">
+    <jar jarfile="${distdir}/i18n_support.jar">
+      <exclude name="CVS"/>
+      <exclude name=".cvsignore"/>
+      <fileset dir="${classes}">
+        <exclude name=".nbattrs"/>
+        <include name="com/isogen/i18nsupport/**"/>
+        <include name="com/isogen/indexhelper/**"/>
+        <include name="com/isogen/saxoni18n/**"/>
+        <include name="com/icl/saxon/sort/**"/>
+        <include name="com/isogen/util/**"/>
+      </fileset>
+   	  <manifest>
+		<attribute name="Main-Class" value="com.icl.saxon.StyleSheet" />
+		<attribute name="Class-Path" 
+				  value=". 
+			             lib/junit.jar 
+			             lib/xercesImpl.jar 
+			             lib/xml-apis.jar 
+			             lib/saxon6.jar
+						 lib/icu4j_3_2.jar
+			            " />
+   	  </manifest>
+    </jar>
+    <delete includeEmptyDirs="true" dir="${classes}/com"/>
+  </target>
+
+  <target name="test" depends="compile" description="Runs the unit tests">
+    <echo>I81N Service tests:</echo>
+    <java classname="com.isogen.i18nsupport.AllTests"
+           fork="yes">
+      <classpath>
+        <pathelement path="${classes}"/>
+        <path refid="base_classpath"/>
+      </classpath>
+    </java>
+    <echo>I81N Util tests:</echo>
+    <java classname="com.isogen.i18nsupport.I18nUtilTest"
+           fork="yes">
+      <classpath>
+        <path refid="base_classpath"/>
+        <pathelement path="${classes}"/>
+      </classpath>
+    </java>
+    <echo>Saxon integration tests:</echo>
+    <java classname="com.isogen.saxoni18n.XSLi18nServiceTest"
+           fork="yes">
+      <classpath>
+        <path refid="base_classpath"/>
+        <pathelement path="${classes}"/>
+      </classpath>
+    </java>
+  </target>
+
+  <target name="jar-test" depends="jar" description="Runs the tests from the Jar file">
+    <echo>I81N Service tests:</echo>
+    <java classname="com.isogen.i18nsupport.AllTests"
+           fork="yes">
+      <classpath>
+        <path refid="base_classpath"/>
+        <pathelement path="i18n_support.jar"/>
+      </classpath>
+    </java>
+    <echo>Saxon integration layer tests:</echo>
+    <java classname="com.isogen.saxoni18n.XSLi18nServiceTest"
+           fork="yes">
+      <classpath>
+        <path refid="base_classpath"/>
+        <pathelement path="${classpath}/i18n_support.jar"/>
+      </classpath>
+    </java>
+  </target>
+
+  <target name="javadoc" depends="init" description="Generates the Javadoc for the library">
+    <mkdir dir="${javadoc}"/>
+    <javadoc sourcepath="${src};${test}" packagenames="com.isogen.*" destdir="${javadoc}"/>
+  </target>
+
+  <target name="user-docs" depends="jar" description="Generates the HTML version of the user documentation">
+    <java classname="com.icl.saxon.StyleSheet"
+           fork="yes"
+  	>
+      <jvmarg line="-Dcom.innodata.i18n.home=${basedir}"/>
+   	  <arg line="-o ${docs}/isogen_i18n_user_guide.html"/>
+      <arg line="${docs}/isogen_i18n_user_guide.xml"/>
+      <arg line="${samples}/xslts/generate_html_saxon6.xsl"/>
+    	
+      <classpath>
+        <pathelement path="${distdir}/i18n_support.jar"/>
+      </classpath>
+    </java>
+  </target>
+	
+  <target name="dist-samples" description="Copies the samples to the distribution directory">
+  	<mkdir dir="${distdir}/samples"/>
+  	<copy todir="${distdir}/samples">
+      <fileset dir="samples">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+        <exclude name=".nbattrs"/>
+        <exclude name="*.class"/>
+      	<exclude name="**/xml/*.html"/>
+        <include name="**"/>
+      </fileset>
+    </copy>  	
+  </target>
+	
+  <target name="dist-config" description="Copies the config files to the distribution directory">
+    <copy todir="${distdir}/config">
+      <fileset dir="config">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+      	<exclude name="**/*.ptd"/>
+      	<exclude name="**/*.pro"/>
+      	<exclude name="**/*.dec"/>
+      	<exclude name="**/*.atd"/>
+      	<exclude name="**/*.log"/>
+      	<exclude name="**/*.xsl"/>
+      </fileset>
+    </copy>
+  	
+  </target>
+
+  <target name="distimageCommon" depends="jar-test, javadoc, user-docs, dist-samples, dist-config">
+  	
+  	<!-- NOTE: The dist/ directory is created by the jar and javadoc tasks
+  	           as they do their thing directly into that directory so as
+  	           not to mix CVS and non-CVS files.
+  	           
+  	           Thus to create a good clean dist you must do "ant clean distimage*"
+  	  -->
+
+    <copy todir="${distdir}">
+      <fileset dir="${basedir}">
+        <include name="LICENSE.isogen_i18n"/>
+        <include name="lgpl.txt"/>
+        <include name="build.xml"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${distdir}/docs">
+      <fileset dir="docs">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+      </fileset>
+    </copy>
+
+  	<mkdir dir="${distdir}/lib"/>
+  	<copy todir="${distdir}/lib">
+      <fileset dir="lib">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+        <exclude name=".nbattrs"/>
+        <exclude name="*.class"/>
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="distimageExternal" depends="distimageCommon" 
+  	      description="Creates a distribution package for distribution outside of Innodata Isogen">
+  	<!-- Includes the source code. -->
+
+    <mkdir dir="${distdir}/src"/>
+    <copy todir="${distdir}/src">
+      <fileset dir="src">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+        <exclude name=".nbattrs"/>
+        <exclude name="*.class"/>
+        <include name="**"/>
+      </fileset>
+    </copy>
+
+  	<mkdir dir="${distdir}/test"/>
+  	<copy todir="${distdir}/test">
+      <fileset dir="test">
+        <exclude name="CVS"/>
+        <exclude name=".cvsignore"/>
+        <exclude name=".nbattrs"/>
+        <exclude name="*.class"/>
+        <include name="**"/>
+      </fileset>
+    </copy>
+
+    <zip zipfile="${basedir}/dist_${DSTAMP}.zip"
+         basedir="${distBaseDir}"
+    />
+  </target>
+
+  <target name="distimageInternal" depends="distimageCommon"
+      description="Creates a distribution package for distribution inside of Innodata Isogen">
+  	<!-- Does not include the source code  -->
+
+    <zip zipfile="${basedir}/dist_${DSTAMP}.zip"
+         basedir="${distBaseDir}"
+    />
+  </target>
+
+  <target name="all" depends="clean, jar-test, javadoc, distimageExternal"/>
+
+</project>

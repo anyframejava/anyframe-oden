@@ -1,0 +1,264 @@
+<!--=============================================================
+    Back-of-the-Book Index Configuration and Sorting Rules
+    Specification document.
+
+    The namespace URI for this XML vocabulary is:
+    
+    http://www.innodata-isogen.com/vocabularies/i18n_support/botb_index_config
+
+    Copyright (c) 2003, 2004 Innodata Isogen
+
+
+    This DTD defines documents that configure back-of-the-book
+    index generation for different national languages.
+
+    For a given national language index you need the following information:
+
+    - The collation sequence for the characters in the language
+    - The headings for the index sections (e.g., "A", "B", "C" in
+      English)
+    - The mapping of characters in the language to specific headings.
+      For example, several different characters might all sort
+      under "C" in a particular language.
+    - For each sort grouping, the sort order within that grouping.
+    =============================================================-->
+
+<!ELEMENT botb_index_rules
+  (metadata,
+   index_config+)
+>
+<!ATTLIST botb_index_rules
+  xmlns
+    CDATA
+    #FIXED "http://www.innodata-isogen.com/vocabularies/i18n_support/botb_index_config"
+>    
+
+<!ELEMENT metadata
+  (title?,
+   description?,
+   copyright?,
+   security?,
+   revision_history?)
+>
+
+<!-- Descriptive title of the database, e.g. "Foo doctype index configuration"
+  -->
+<!ELEMENT title
+  (#PCDATA)
+>
+
+<!-- A generic description -->
+<!ELEMENT description
+  (p+)
+>
+
+<!ELEMENT p
+  (#PCDATA)
+>
+
+
+<!-- Contains a copyright statement for the configuration document
+  -->
+<!ELEMENT copyright
+  (p+)
+>
+
+<!-- Contains a security statement for the configuration document,
+     e.g., "For Internal Use Only" or some such.
+  -->
+<!ELEMENT security
+  (p+)
+>
+
+<!-- Revision history is intended to capture the development history
+     of the configuration document itself.
+  -->
+<!ELEMENT revision_history
+  (revision*)
+>
+
+<!-- The revision element describes a single revision to the configuration document.
+  -->
+<!ELEMENT revision
+  (date,
+   author,
+   description)
+>
+
+<!-- Contains the date the revision was made.
+  -->
+<!ELEMENT date
+  (#PCDATA)
+>
+
+<!-- The author of the revision -->
+<!ELEMENT author
+  (#PCDATA)
+>
+
+<!--
+     Defines the index configuration for a single
+     national language.
+
+  -->
+<!ELEMENT index_config
+  (national_language,
+   description,
+   collation_spec,
+   sort_method,
+   group_definitions)
+>
+
+<!ELEMENT sort_method
+  ((sort_by_members |
+    sort_between_keys)?,
+   (sort_english_before |
+    sort_english_after)?)
+>
+
+<!-- Indicates that the grouping method is to sort by the explicit
+     group membership. This is the default grouping strategy.
+  -->
+<!ELEMENT sort_by_members
+  EMPTY
+>
+
+<!-- Indicates that the grouping method is to sort between the
+     index group keys rather than by the explicit group membership.
+  -->
+<!ELEMENT sort_between_keys
+  EMPTY
+>
+
+<!-- Indicates that English terms should be sorted before the main
+     language's entries. This is the default.
+  -->
+<!ELEMENT sort_english_before
+  EMPTY
+>
+
+<!-- Indicates that English terms should be sorted after the main
+     language's entries.
+  -->
+<!ELEMENT sort_english_after
+  EMPTY
+>
+
+<!-- Contains the language code for the national language
+     this index configuration applies to.
+
+     Language code is as for xml:lang.
+  -->
+<!ELEMENT national_language
+  (#PCDATA)
+>
+
+<!-- Contains the specification of the collation sequence to use
+     for the language. If no explicit collation specification is
+     provided, the implementing system's built-in collation rules
+     for the national language are used.
+  -->
+<!ELEMENT collation_spec
+  (java_collation_spec?)
+>
+
+<!-- Contains a Java RuleBasedCollator
+     (http://java.sun.com/products/jdk/1.2/docs/api/java/text/RuleBasedCollator.html)
+
+     rule set.
+  -->
+<!ELEMENT java_collation_spec
+  (#PCDATA |
+   include_collation_spec)*
+>
+
+<!-- Specifes the name of the collation specification file to use. This file
+     must contain a Java collation spec as used with the RuleBasedCollator
+     class.
+
+     The value is interpreted as a Java resource filename resolved relative to the
+     class path. Normally this would be relative to the "dtds\" directory, which
+     must already be in the classpath for other reasons.
+
+     If more than one include_collation_spec is specified, then all the rule sets
+     are used for the collator.
+
+     If include_collation_spec is used, any other text content within java_collation_spec
+     is ignored. That is, the intended content model is (#PCDATA | include_collation_spec+).
+  -->
+<!ELEMENT include_collation_spec
+  (#PCDATA)
+>
+
+<!-- Defines the groupings used to organize the index entries -->
+<!ELEMENT group_definitions
+  (term_group+)
+>
+
+<!-- Defines a single index term group -->
+<!ELEMENT term_group
+  (group_key,
+   group_label?,
+   group_sort_key?,
+   group_members)
+>
+
+<!-- The key used in organizing index entries into their proper groups.
+     This is the value used, for example, for the top-level xsl:key
+     use= string.
+
+     If group_label is not also specified, then the group_key is also
+     used as the group label.
+
+     Use group_sort_key if the group key will not sort the group
+     into the right position.
+
+  -->
+<!ELEMENT group_key
+  (#PCDATA)
+>
+
+<!-- The text to be displayed for the index group in the composed index.
+
+     The group label is optional. If not specified, the group key is also
+     used as the group label.
+  -->
+<!ELEMENT group_label
+  (#PCDATA)
+>
+
+<!-- The key used to determine the collation order of the group if it is
+     different from the collation order of the group label.
+  -->
+<!ELEMENT group_sort_key
+  (#PCDATA)
+>
+
+<!-- Specifies the characters that make up this index group. Must include
+     all case varriants e.g.:
+
+     <group_members><char_or_seq>a</char_or_seq><char_or_seq>A</char_or_seq>
+     </group.members>
+
+     The last_member specifies the character that is the last member of the
+     last group in the index configuration. This is for languages that use
+     the "sort_between_keys" method of group definition so that the system
+     can distinguish characters that are outside the range of the last
+     index group.
+  -->
+<!ELEMENT group_members
+  (char_or_seq* |
+   last_member)
+>
+
+<!-- Specifies either a single character or a sequence of characters that
+     are treated as a single character for the purpose of determining
+     grouping and sorting within the group.
+  -->
+<!ELEMENT char_or_seq
+  (#PCDATA)
+>
+
+<!ELEMENT last_member
+  (char_or_seq)
+>

@@ -1,0 +1,82 @@
+<section id="install_systemrequirements">
+	<title>System Requirements</title>
+
+	<para>
+		ODEN을 설치하기 위해서는 다음의 요구사항을 충족해야 한다.
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				ODEN Server 및 Agent 설치요구사항
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						20MB 이상 하드디스크 공간 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						512MB RAM 이상
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				ODEN Admin 설치요구사항
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Java Runtime Environment 1.5 or above
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						30MB 이상 하드디스크 공간 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						256MB RAM 이상
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				 Linux, UNIX, Solaris, Mac OS X, MS Windows 등의 플랫폼
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 서버간 방화벽 확인 (default Port 변경가능)
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						ODEN Server(Port:9860) -> ODEN Agent(Port:9872) 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						사용자PC -> ODEN Admin(Port:9880) 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						ODEN Sever(Port:9860) -> Jenkins(Port:9090) 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+	</itemizedlist>
+
+</section>

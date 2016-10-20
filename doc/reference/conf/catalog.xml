@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--  <!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
+                        "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd"> -->
+
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+  <public publicId="-//OASIS//DTD DocBook XML V5.0//EN"
+                   uri="../schemas/5.0/dtd/docbook.dtd"/>
+  <public publicId="-//OASIS//DTD DocBook XML V4.5//EN"
+                   uri="../schemas/4.5/dtd/docbookx.dtd"/>
+  <public publicId="-//OASIS//DTD DocBook XML V4.4//EN"
+                   uri="../schemas/4.5/dtd/docbookx.dtd"/>
+  <public publicId="-//OASIS//DTD DocBook XML V4.3//EN"
+                   uri="../schemas/4.5/dtd/docbookx.dtd"/>
+
+  <rewriteSystem systemIdStartString="http://www.oasis-open.org/docbook/xml/5.0/"
+                   rewritePrefix="../schemas/5.0/dtd/"/>
+  <rewriteSystem systemIdStartString="http://www.oasis-open.org/docbook/xml/4.5/"
+                   rewritePrefix="../schemas/4.5/dtd/"/>
+  <rewriteSystem systemIdStartString="http://www.oasis-open.org/docbook/xml/4.4/"
+                   rewritePrefix="../schemas/4.5/dtd/"/>
+  <rewriteSystem systemIdStartString="http://www.oasis-open.org/docbook/xml/4.3/"
+                   rewritePrefix="../schemas/4.5/dtd/"/>
+
+  <rewriteSystem systemIdStartString="http://docbook.sourceforge.net/release/xsl/current/"
+                   rewritePrefix="../stylesheet/docbook-xsl/"/>
+  <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl/current/"
+                   rewritePrefix="../stylesheet/docbook-xsl/" />                   
+</catalog>

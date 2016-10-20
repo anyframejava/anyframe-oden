@@ -1,0 +1,17 @@
+License for Use
+
+ISOGEN International licenses the Internationalization Support Java library
+as open source through the GNU Lesser (Library) Public License (LGPL)
+(see LGPL.txt).
+
+The LGPL license allows unrestricted use of this source code,
+including modification or inclusion into other software, as long
+as the resulting software is also licensed under the GPL or LGPL.
+The LGPL allows other software to link to the binary form of 
+this library without itself being GPLed. That is, proprietary
+software can use this library as a service (but cannot include
+or be derived from the source code of the library).
+
+ISOGEN International also provides commercial licenses on a per-request
+and for-cost basis. If you are interested in discussing non-GPL
+license terms, contact info@isogen.com.

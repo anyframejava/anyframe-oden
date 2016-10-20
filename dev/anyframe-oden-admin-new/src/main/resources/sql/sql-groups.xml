@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE queryservice PUBLIC "-//ANYFRAME//DTD QUERYSERVICE//EN" "http://www.anyframejava.org/dtd/anyframe-core-query-mapping-3.2.dtd">
+<queryservice>
+	<queries>
+	
+		<query id="findGroupByName" isDynamic="true">
+			<statement>
+		<![CDATA[
+			SELECT
+				GROUP_ID
+			FROM GROUPS
+			WHERE
+				GROUP_NAME = :vo.role
+				
+		]]>
+			</statement>
+		</query>
+
+	</queries>
+</queryservice>

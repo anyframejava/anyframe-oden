@@ -1,0 +1,291 @@
+<section id="workingwitheclipseplugin_odensnapshotview">
+	<title>Oden Snapshot (모듈 별도 제공) </title>
+
+	<para>
+		Snapshot View에서는 Snapshot Plan과 Snapshot을 관리할 수 있다.
+		Plan은
+		Snapshot을 생성하고자 하는 디렉토리의 정보를 담고 있다. Snapshot Plan에 의해 생성되는 Snapshot은 config.xml의
+		backup-location으로 지정된 위치에 저장된다.
+	</para>
+
+	<para>
+		Snapshot View에 관한 설명은 다음과 같다.
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">Oden Server</emphasis>
+				</para>
+				<para>
+					Oden Server를 선택할 수 있다. View를 처음 시작하면 목록의 첫번째 Oden Server를 선택한
+					상태가 된다.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Snapshot Plan and Snapshot Tree</emphasis>
+				</para>
+				<para>
+					Oden Server를 선택했을 경우, 그에 해당하는 Snapshot Plan과 Snapshot으로 이루어진
+					tree가 나타난다.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Details</emphasis>
+				</para>
+				<para>
+					Tree 중에서 Snapshot Plan이나 Snapshot을 선택했을 경우, 각각의 상세정보가 나타난다.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			만약 Oden Server가 연결될 수 없다면, Error Log를 통해 Oden Server에 연결할 수 없다는
+			메시지가 나타난다. 
+		</para>
+
+		<para>
+			Toolbar에 있는 Refresh 버튼을 통해 Oden Server의 목록과 선택된 Oden Server의
+			Snapshot Plan,
+			Snapshot 구조가 Refresh되어 update된 내용을 얻어올 수 있다.
+		</para>
+	</para>
+
+	<section id="workingwitheclipseplugin_odensnapshotview_managingplan">
+		<title>Managing Snapshot Plans</title>
+
+		<para>
+			Snapshot Plan은 Snapshot 대상 디렉토리, Agent의 정보를 담고 있다.
+			Snapshot은
+			Snapshot Plan을 통해서만 생성이 가능하다. 
+		</para>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingplan_adding">
+			<title>Adding a New Snapshot Plan</title>
+
+			<para>
+				Snapshot Plan은 두가지 방법으로 생성이 가능하다.
+
+				<orderedlist numeration="Arabic" inheritnum="inherit">
+					<listitem>
+						<para>
+							Toolbar에 있는 버튼을 통해 Snapshot Add Dialog를 열 수 있다.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Tree 위치에서 Context Menu를 통해서 Snapshot Add Dialog를 열 수 있다.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+
+			<mediaobject>
+				<imageobject>
+					<title>Add a new Snapshot Plan</title>
+					<imagedata fileref="../image/WorkingWithEclipsePlugin/eclipse_addplan.png"
+						align="left" width="6in"/>
+				</imageobject>
+			</mediaobject>
+
+			<para>
+				만약, Oden Server가 연결되어 있지 않은 상태에서 Snapshot Plan을 Add 하려고 하면,
+				Error Log에 Oden Server에 연결할 수 없다는 메시지가 나타나게 된다. 
+			</para>
+
+			<para>
+				위 다이얼로그를 통해 새로운 Plan을 생성할 수도 있고, 기존에 있던 Plan을 update할 수도 있다.
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">Snapshot Plan Name</emphasis>
+						</para>
+						<para>
+							Plan을 식별할 수 있는 이름
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Description</emphasis>
+						</para>
+						<para>
+							Plan에 대한 설명
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Agent to Use</emphasis>
+						</para>
+						<para>
+							Snapshot을 만들 대상 디렉토리, 저장할 디렉토리가 저장된 변수들을 가지고 있는 Agent
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Snapshot Source</emphasis>
+						</para>
+						<para>
+							Snapshot을 만들 대상 디렉토리가 저장된 변수명
+						</para>
+						<para>
+							변수명이나 절대경로에 추가되는 하위 디렉토리를 직접 입력할 수 있다.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<para>
+				정상적으로 Snapshot Plan이 저장되면, View에는 다음과 같이 나타나게 된다. Plan을 선택했을 경우, 상세
+				정보가 나타나게 되는데, 여기에 Snapshot Plan에 관한 정보가 추가되어 보여진다.
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">User Information</emphasis>
+						</para>
+						<para>
+							Snapshot Plan을 생성한 위치의 IP가 나타난다.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Date</emphasis>
+						</para>
+						<para>
+							Snapshot Plan을 생성한 날짜, 시간이 YYYY/MM/DD hh:mm:ss 형태로 나타난다.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingplan_editing">
+			<title>Editing an Existing Snapshot Plan</title>
+
+			<warning>
+				<title>Warning</title>
+				<para>Snapshot이 존재하는 Plan에 대해서는 정보 수정이 되지 않는다.</para>
+			</warning>
+
+			<para>
+				상세 정보에서 Snapshot Source, Agent to Use, Description은은 추후에 수정이 가능하다.
+				수정 후, Save 버튼을 클릭하게 되면, 정보가 새로 저장된다. 이때,
+				만약 Plan 하위의 Snapshot이 존재하면 수정이 불가능하며, 수정을 하기 위해서는 하위의 Snapshot이 없는 빈
+				Plan이어야 한다.
+			</para>
+		</section>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingplan_duplicating">
+			<title>Duplicating an Existing Snapshot Plan</title>
+
+			<para>
+				기존에 생성된 Snapshot Plan과 동일한 환경을 가지는 Plan을 생성하기 위해서는 Add 버튼을 통해
+				새로 생성하는 방법과, duplicate 메뉴를 사용하는 방법이 있다. 마우스 우클릭을 통해 Duplicate
+				Snapshot Plan 메뉴를 클릭하게 되면, Snapshot Duplicate Dialog가 나타난다. 
+			</para>
+
+			<para>
+				<emphasis role="bold">Snapshot Name</emphasis>
+				은 기존의 Plan명에
+				<emphasis role="bold">-duplicate</emphasis>
+				만 추가되었으며, 나머지 정보들은 동일하다. 그대로 사용해도 되고, 수정해서 사용해도 된다.
+			</para>
+		</section>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingplan_deleting">
+			<title>Deleting a Snapshot Plan</title>
+
+			<warning>
+				<title>Warning</title>
+				<para>Snapshot Plan을 삭제하기 위해서는 하위의 Snapshot이 모두 삭제된 상태여야한다.</para>
+			</warning>
+
+			<para>
+				생성한 Snapshot Plan을 삭제하기 위해서 Delete 버튼을 클릭하게 되면, 선택한 Snapshot
+				Plan에 대해서 삭제 확인 메시지가 나타나게 된다. 
+			</para>
+		</section>
+	</section>
+
+	<section id="workingwitheclipseplugin_odensnapshotview_managingsnapshots">
+		<title>Managing Snapshots</title>
+
+		<para>
+			Snapshot은 Snapshot Plan의 정보를 토대로 Backup을 수행한 결과로 나타나는 File이다.
+		</para>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingsnapshots_taking">
+			<title>Taking a Snapshot</title>
+
+			<para>
+				Snapshot Plan을 토대로 Snapshot을 생성하기 위해서는 Take Snapshot 버튼을 클릭한다.
+			</para>
+
+			<para>
+				Snapshot을 생성하기 위해 선택한 Snapshot Plan이 맞는지 확인 후, Snapshot을 생성하게
+				된다. Snapshot은 Source 디렉토리 하위의 모든 폴더, 파일등을 .zip으로 묶은 후, 확장자 없이
+				Oden Server의 conf/config.xml에서 정의한 backup-location 위치에 저장된다.
+				Snapshot을 생성하고 난 뒤에는 Tree 위치에서 Snapshot을 확인할 수
+				있다. 
+			</para>
+
+			<para>
+				Snapshot의 상세 정보는 다음과 같다.
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">Snapshot File Name</emphasis>
+						</para>
+						<para>
+							Snapshot의 이름으로 '생성일_번호'의 형태로 저장된다.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Size</emphasis>
+						</para>
+						<para>
+							Snapshot의 size로 KB단위로 나타난다.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Date</emphasis>
+						</para>
+						<para>
+							Snapshot을 생성한 날짜, 시간이 YYYY/MM/DD hh:mm:ss 형태로 나타난다.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+		</section>
+
+		<section
+			id="workingwitheclipseplugin_odensnapshotview_managingsnapshots_deleting">
+			<title>Deleting a Snapshot</title>
+
+			<para>
+				생성한 Snapshot을 삭제하기 위해서 Delete 버튼을 클릭하게 되면, 선택한 Snapshot에 대해서 삭제
+				확인 메시지가 나타나게 된다. 
+			</para>
+		</section>
+	</section>
+
+	<section id="workingwitheclipseplugin_odensnapshotview_rollback">
+		<title>Rollback with Snapshots</title>
+
+		<para>
+			생성된 Snapshot을 통해 특정 시점으로 데이터를 돌리고자 할 때, Rollback 기능을 사용할 수 있다.
+			원하는 Snapshot을 클릭한 후 Rollback 버튼을 클릭하면 확인을 요청하는 창이 나타나고, Rollback을 수행할
+			수 있다. 
+		</para>
+	</section>
+</section>

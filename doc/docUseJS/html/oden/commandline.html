@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Anyframe Documentation</title>
+    <meta id="Copyright" name="Copyright" content="Copyright 2009 SAMSUNG SDS Co., Ltd. All Rights Reserved."/>
+	<meta name="author" content="Jihwan Rhie">
+	<!-- Date: 2009-09-16 -->
+	
+    <link rel="stylesheet" type="text/css" href="../../css/anyframedocs.css" charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../../css/docheader.css" charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../../css/docs.css" charset="utf-8"/>
+
+    <!--[if IE]><link rel="stylesheet" type="text/css" href="../../css/ie.css" charset="utf-8"/><![endif]-->
+
+    <script>
+        var Book={
+            isConceptualFlow: true,
+            language: document.getElementsByTagName('html')[0].getAttribute('xml:lang'),
+            resourcesURI: '../../',
+            tocURI: './toc.html',
+            bookTitle: 'Anyframe Oden User Guide'
+        };
+    </script>
+
+    <script type="text/javascript" src="../../javascript/lib/prototype.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/lib/scriptaculous.js?load=effects" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/anyframedocs.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../../javascript/header_toc.js" charset="utf-8"></script>
+
+</head>
+<body>
+
+	<div id="anyframeHeader" class="hideOnPrint">
+		<div style='height:36px; background-image: url("../../images/common/header_background.png");'>
+			<a href='../../index.html'><img src='../../images/common/header_anyframe_doc_banner.png' alt="Anyframe Java Documentation" height='36' width='256' style='border:none'></a>
+		</div>
+    </div>
+    <div id="header">
+        <div id="title"></div>
+        <ul id="headerButtons" class="hideOnPrint">
+            <li id="toc_button" style="display:none"><button id="table_of_contents">Table of Contents</button></li>
+        </ul>
+    </div>
+    <div id="tocContainer" style="display:none"><ul id="toc"></ul></div>
+
+    <div id="contents">
+        <a id="top" name="top"></a>
+        
+        <!-- DOCUMENT CONTENT STARTS HERE -->
+
+<a name="//AK/ODEN/04_000" title="#AK_ODEN_04_000"></a><br/><h1 id="pageTitle">Working with Command Line</h1>
+<p>
+Oden 명령어를 실행시키기 위해 Oden에서는 자체 Shell 환경을 제공한다. Oden Shell을 통해 사용자는 Oden에서 제공하는 기능들을 이용할 수 있다.
+</p>
+
+<a name="//AK/ODEN/04_100" title="#AK_ODEN_04_100"></a><h2>Introduction to Oden Shell</h2>
+<p>
+아래의 명령으로 Oden Server를 실행시키면 자동적으로 Oden Shell이 실행된다.<sup>&nbsp;1</sup> 
+<div class="codesample"><pre>
+cd &lt;Oden Server가 설치된 경로&gt;
+java -jar bin/oden-x.x.x.jar [-port &lt;포트번호&gt;]
+</pre></div>
+Oden Server는 기본적으로 하나의 Oden Agent를 내장하고 있으며, Oden Server실행과 동시에 내장되어 있는 Oden Agent도 실행되게 된다. -port 옵션의 포트번호는 Oden Agent의 포트번호를 의미하며 지정할 경우 conf/oden.ini 파일의 agent.port의 값을 대신하게 된다. 지정하지 않았을 경우 기본 값은 9862이다.
+</p>
+<p>
+로컬뿐만 아니라 Telnet을 통해 원격으로 Oden Shell 에 접근할 수도 있다. 
+<div class="codesample"><pre>
+telnet &lt;Oden Server IP&gt; &lt;Oden Shell Port&gt;
+</pre></div>
+Oden Shell Port의 기본 값은 9861이며 값을 수정하기 위해서는 Oden Server의 conf/oden.ini 파일의 shell.port값을 수정하면 된다. 수정 후 Oden Server를 재구동해야 한다. 로컬에 있는 Oden Server에 Telnet으로 접근하기 위해서는 IP에 localhost나 127.0.0.1과 같은 alias가 아닌 실제 Oden Server가 설치된 IP를 입력해 주어야 한다.  
+</p>
+
+<a name="//AK/ODEN/04_200" title="#AK_ODEN_04_200"></a><h2>Oden Shell Commands</h2>
+<p>
+Oden Shell을 통해 Oden Shell Commands를 실행시킬 수 있다. 인자에 스페이스가 들어가 있으면 "&nbsp;"로 묶어줘야 한다. 
+</p>
+
+<a name="//AK/ODEN/04_210" title="#AK_ODEN_04_210"></a><h3>Policy Command</h3>
+<p>
+Policy Command를 통해 Policy를 설정하고 테스트해 볼 수 있다. Oden에서 배포 작업을 수행하는 단위는 Task이지만, Task는 여러개의 Policy들로 구성되어 있기 때문에 Task를 설정하기 전에 Policy를 설정해야만 한다.<sup>2&nbsp;</sup>
+</p>
+ 
+<a name="//AK/ODEN/04_211" title="#AK_ODEN_04_211"></a><h4>policy add</h4>
+<p> 
+Policy를 추가하기 위한 명령어. 동일한 이름을 가진 Policy가 있을 경우 덮어 쓴다. 
+<div class="codesample"><pre>
+policy add &lt;policy-name&gt; 
+	-r[epo] [file://&lt;path&gt;] | [ftp://&lt;host&gt; &lt;path&gt; [&lt;id&gt; &lt;password&gt;]] 
+	-i[nclude] &lt;wildcard-location&gt; ... [-e[xclude] &lt;wildcard-location&gt; ...] 
+	[-u[pdate]] 
+	-d[est] &lt;agent-name&gt;[/&lt;location-variable-name&gt;] ... 
+	[-desc &lt;description&gt;]
+</pre></div>
+‘-r’은 Oden Server에서 접근할 Build Repository를 의미한다. Oden Server와 물리적으로 동일한 장비에 파일이 존재한다면 file 프로토콜을, 아니면 ftp프로토콜을 사용하면 된다.<br/>
+‘-i’는 Build Repository에서 어떤 파일들을 배포할 것인지 지정하는 옵션이다. ‘*’같은 wildcard문자를 사용할 수 있으며, 하위경로까지 포함하려면 ‘**’를 사용해야 한다. 여러개의 인자가 있을 경우 ‘스페이스’로 구분한다. ‘-e’ 옵션을 지정할 경우 지정된 파일들은 배포대상에서 제외된다. 들어가는 인자의 형태는 ‘-i’ 옵션과 동일하다.<br/>
+‘-u’ 옵션을 지정할 경우 Agent에 기 배포되어 있는 파일과 비교(날짜 비교) 하여 변경된 파일만 배포한다. jar파일일 경우 jar파일내에 포함되어 있는 파일 중 변경된 파일만 update하게 된다.<br/>
+‘-d’는 Agent명과 Agent의 location을 지정한다. Agent와 location은 conf/config.xml에 이미 등록이 되어 있어야 한다. Agent와 location명은 / 로 구분하며, location을 지정하지 않았을 경우 conf/config.xml에 지정된 default-location에 배포하게 된다. 배포할 Agent가 여러개일 경우 스페이스로 구분한다.<br/>
+</p>   
+
+<h5>로컬 파일을 agent0로 배포</h5>
+<p>
+	<div class="codesample"><pre>
+policy add p0 -r "file://C:/Build Repository/anyframe-app" -i ** -d agent0 -desc "local files to agent0"
+	</pre></div>
+C:/Build Repository/anyframe-app의 모든 file(하위경로 포함)들을 agent0(conf/config.xml에 설정되어 있어야 함)의 default-location에 배포함. 옵션의 인자에 스페이스가 있을 경우 쌍따옴표로 묶어야 한다. **는 하위의 모든 경로를 포함함을 의미한다. 경로가 포함되면 그 안의 파일들도 배포가 되기 때문에 결국 **만 지정을 해주면 하위경로의 모든 파일을 배포함을 의미한다. 
+</p>
+
+<h5>특정확장자를 제외한 파일만 배포</h5>
+<p>
+<div class="codesample"><pre>
+policy add p1 -r "file://C:/Build Repository/anyframe-app" -i ** -e **/*.svn -d agent0/temp
+</pre></div>
+C:/Build Repository/anyframe-app의 모든 file(하위경로 포함)들중 svn확장자를 가진 파일이나 폴더를 제외하고 agent0의 temp에 배포함. temp는 conf/config.xml의 location에 정의되어 있어야 한다. 
+</p>
+
+<h5>ftp로 특정확장자의 파일들을 여러 agent로 배포</h5>
+<p>
+<div class="codesample"><pre>
+policy add p2 -r ftp://172.16.70.77 /anyframe-app/images guest 1111 -i **/*.jpg **/*.gif -d agent0/images agent1/images
+</pre></div>
+172.16.70.77의 ftp에 guest/1111 계정으로 접근한 뒤 anyframe-app/images 하위의 모든 jpg, gif, png파일들을 agent0와 agent1의 images 경로로 배포함. agent0와 agent1, agent0의 images, agent1의 images는 conf/config.xml에 정의되어 있어야 한다.
+</p>
+
+<h5>ftp로 특정확장자의 파일들을 여러 agent로 배포2</h5>
+<p>
+<div class="codesample"><pre>
+policy add p2 -r ftp://172.16.70.77 /anyframe-app guest 1111 -i images/**/*.jpg images/**/*.gif -d agent0 agent1
+</pre></div>
+이번 예제는 config.xml에 images location을 등록하지 않고도 위의 예제와 동일한 결과를 얻을 수 있음을 보여준다. -i 옵션에서 지정된 경로는 그 경로 그대로 Agent로 배포된다. 예를들어 -i sample/**로 배포할 파일을 지정하면 Agent에 sample폴더 이하의 파일이 바로 배포되는 것이 아니라, sample폴더가 먼저 생성이 된 후 그 안에 파일들이 배포된다. conf/config.xml에 매번 location을 등록하는 것이 번거롭다면 이런식으로 사용하기 바란다. 
+</p>
+
+<h5>변경된 파일만 배포</h5>
+<p>
+<div class="codesample"><pre>
+policy add p3 -r ftp://172.16.70.77 /anyframe-app/classes guest 1111 -i ** -u -d agent0/classes
+</pre></div>
+172.16.70.77의 ftp에 guest/1111 계정으로 접근한 뒤 classes폴더의 모든 파일들(하위경로 포함)과 agent0의 classes의 파일들과 비교하여 날짜가 변경된 파일만 배포함. jar파일이 있을 경우 jar내의 변경된 파일들만 update함. conf/config.xml에 agent0(agent태그)와 classes(location태그)가 정의되어 있어야 한다.   
+<div class="notebox">
+<strong>Note: </strong>Ant를 이용하여 변경된 소스코드만 빌드하도록 할 수 있다.  Ant의 javac 태스크는 기본적으로 소스 폴더와 빌드 폴더를 비교하여 class파일이 존재하지 않는 소스 코드에 대해서만 빌드를 수행하도록 되어 있다. 그래서 일반적으로 ant 스크립트 작성 javac를 수행하기 전에 빌드 폴더를 전부 삭제하여 Full Build를 수행한다. ant의 depend 태스크를 사용하면 빌드 폴더를 전부 삭제하지 않고 변경이 일어난 class 와 그것과 의존관계가 있는 class파일만 삭제할 수 있다. 이 후 javac 태스크에서는 존재하는 파일은 제외하고 존재하지 않는 파일(depend에 의해 삭제된 변경된 class 및 그것과 의존성이 있는 class)에 대해서만 빌드를 수행하므로 변경된 파일에 대해서만 빌드가 가능하다. 이렇게 변경된 파일과 그것과 의존성이 있는 파일에 대해서만 빌드하는 것을 Incremental Build라고 한다. 아래 예제는 depend 태스크를 이용하여 Incremental Build를 수행하는 스크립트를 보여준다.    
+<pre>
+&lt;target name="inc-build"&gt;
+    &lt;depend srcdir="src/main/java" destdir="build/classes" closure="yes" /&gt;
+    &lt;javac srcdir="src/main/java" destdir="build/classes"&gt;
+        &lt;classpath&gt;
+            &lt;path refid="compile.classpath" /&gt;
+        &lt;/classpath&gt;
+    &lt;/javac&gt;
+&lt;/target&gt;
+</pre>
+depend 태스크에 의해 src/main/java와 build/classes를 비교하여 변경된 파일과 의존성있는 파일에 대해서만 class파일이 삭제된다. javac 태스크에 의해 삭제된 파일에 대해서만 빌드가 일어난다. 이 후 Oden Policy의 -u옵션을 통해 변경된 바이너리 파일만 배포가 가능하다. 
+</div>
+</p>
+
+<a name="//AK/ODEN/04_212" title="#AK_ODEN_04_212"></a><h4>policy info</h4>
+<p>
+Policy의 정보를 조회하기 위한 명령어. policy-name을 지정하지 않았을 경우 등록된 모든 Policy의 정보를 보여준다. 
+<div class="codesample"><pre>
+policy info [&lt;policy-name&gt;]	
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_213" title="#AK_ODEN_04_213"></a><h4>policy del</h4>
+<p> 
+Policy 삭제 명령어. policy-name에 해당하는 Policy를 삭제한다. 
+<div class="codesample"><pre>
+policy del &lt;policy-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_214" title="#AK_ODEN_04_214"></a><h4>policy test</h4>
+<p> 
+Policy가 어떤 파일들을 배포할 것인지 테스트해 보는 명령어. 배포가 될 파일들의 리스트가 나타난다. 실제로 배포하지는 않는다. 
+<div class="codesample"><pre>
+policy test &lt;policy-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_220" title="#AK_ODEN_04_220"></a><h3>Task Command</h3>
+<p>
+Task는 Oden의 실제 배포작업을 수행하는 단위이다. Task는 여러개의 Policy들로 구성되어 있다. Task 명령어를 통해 실행할 Policy를 가진 Task들을 설정하고 실행할 수 있다.
+</p>
+
+<a name="//AK/ODEN/04_221" title="#AK_ODEN_04_221"></a><h4>task add</h4>
+<p> 
+새 Task를 생성하기 위한 명령어. 동일한 이름을 가진 Task가 있을 경우 덮어 쓴다. 
+<div class="codesample"><pre>
+task add &lt;task-name&gt;
+	-p[olicy] &lt;policy-name&gt; ... 
+	-desc &lt;description&gt;
+</pre></div>
+-p는 Task에 포함될 Policy들을 지정하는 옵션이다. Policy가 여러개일 경우 스페이스로 구분한다.
+</p> 	
+
+<h5>두개의 Policy를 가지는 Task 생성</h5>
+<p>
+<div class="codesample"><pre>
+task add t0 -p p0 p1
+</pre></div>
+Policy p0와 p1을 가지는 Task t0 생성. Policy Command를 통해 p0와 p1이 이미 등록되어 있어야 한다.
+</p>
+ 
+<a name="//AK/ODEN/04_222" title="#AK_ODEN_04_222"></a><h4>task info</h4>
+<p>
+Task의 정보를 조회하기 위한 명령어. task-name을 지정하지 않았을 경우 등록된 모든 Task의 정보를 보여준다. 
+<div class="codesample"><pre>
+task info [&lt;task-name&gt;]
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_223" title="#AK_ODEN_04_223"></a><h4>task del</h4> 
+<p>등록된 Task 삭제 명령어. task-name에 해당하는 Task를 삭제한다.
+<div class="codesample"><pre>
+task del &lt;task-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_224" title="#AK_ODEN_04_224"></a><h4>task test</h4>
+<p>Task가 어떤 파일들을 배포할 것인지 미리 확인해 보는 명령어. 실제로 파일을 배포하지는 않는다.
+<div class="codesample"><pre>
+task test &lt;task-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_225" title="#AK_ODEN_04_225"></a><h4>task run</h4>
+<p>Task를 실행하는 명령어. task-name에 해당하는 Task를 실행한다. 
+<div class="codesample"><pre>
+task run &lt;task-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_230" title="#AK_ODEN_04_230"></a><h3>History Command</h3>
+<p>
+History 명령어를 통해 배포된 내역을 조회할 수 있다. Task 명령어를 통해 배포된 내역을 조회할 수 있으며, 같은 Task 안에서 수행되었더라도 실제로 배포되지 않은 파일은 기록되지 않는다.   
+</p>
+
+<a name="//AK/ODEN/04_231" title="#AK_ODEN_04_231"></a><h4>history show</h4>
+<p>
+Oden을 통해 배포된 내역을 조회한다. 옵션이 없을 경우 최근에 배포된 Policy의 내역을 보여준다. Oden Shell이나 Telnet을 통해 수행된 Task의 유저 IP 정보는 항상 Oden Server의 IP가 된다. 누가 배포하였는지 정확한 정보를 기록하기 위해서는 Eclipse Plugin과 같이 Oden의 HTTP 서비스를 이용하는 UI를 통해 배포하여야 한다.
+<div class="codesample"><pre>
+history show 
+	[-u[ser] &lt;user-access-ip&gt;] 
+	[-a[gent] &lt;host-name&gt;] 
+	[-p[ath] &lt;path&gt;] 
+	[-d[ate] &lt;start-date: yyyyMMdd&gt; &lt;end-date: yyyyMMdd&gt;]
+</pre></div>
+‘-u’ 옵션은 배포 명령어를 수행시킨 사용자의 IP를 검색하기 위한 옵션이다. 70.7로 시작하는 모든 사용자가 배포한 내역을 검색하려면 ‘-u 70.7’ 로 인자를 주면 된다. Telnet으로 수행하였더라도 Oden Shell을 통해 수행된 Task는 모두 Oden Server의 IP로 기록되어 있으니 정확한 사용자를 파악하기 위해서는 Eclipse Plug-in과 같이 Oden의 HTTP 서비스를 사용하는 UI를 이용하여야 한다.<br/>
+‘-a’ 옵션은 Agent의 IP를 지칭한다. Oden Server에 내장된 Agent인 경우 IP에 localhost로 기록이 된다.<br/>
+‘-p’는 배포한 파일의 경로를 지정하는 옵션이며 지정한 경로가 들어가 있는 모든 내역을 출력한다. 예를 들어 ‘-p anyframe’을 입력하면 경로에 anyframe이 들어가 있는 모든 내역을 출력한다.<br/>
+‘-d’는 배포가 실행된 날짜를 지정해 주는 옵션이다. 인자가 하나만 있을 경우 ‘start-date’를 의미하며 ‘start-date’부터 오늘까지 배포된 모든 내역을 출력한다.<br/>
+</p> 	
+
+<h5>특정날짜로 부터 특정 Agent에 배포된 모든 내역을 조회</h5>
+<p>
+<div class="codesample"><pre>
+history show -a 192.168.0.2:9862 -d 20090101
+</pre></div>
+2009년 1월 1일 부터 192.168.0.2:9862에 배포된 모든 내역을 조회한다.
+</p>
+
+<h5>Oden Server에 내장된 Agent에 배포된 내역을 조회</h5>
+<p>
+<div class="codesample"><pre>
+history show -a localhost -d 20090101 20090102
+</pre></div>
+2009년 1월 1일부터 2009년 1월 2일 사이에 OdenServer에 내장된 Agent에 배포된 파일 내역을 조회한다.
+<div class="notebox">
+<strong>Note: </strong>Oden Server에 내장된 Agent에 배포를 하면 history에는 localhost로 기록이 된다.
+</div>
+</p> 
+
+<h5>특정 IP대역의 유저가 배포한 내역을 조회</h5>
+<p>
+<div class="codesample"><pre>
+history show -u 172.16.70 -d 20090101
+</pre></div>
+172.16.70으로 시작하는 IP를 가진 유저들이 2009년 1월 1일 부터 배포한 내역을 조회
+</p> 
+
+<h5>특정파일을 배포한 내역을 조회 </h5>
+<p>
+<div class="codesample"><pre>
+history show -p index.html 
+</pre></div>
+지금까지 index.html을 배포한 모든 내역을 조회 
+</p>
+
+<a name="//AK/ODEN/04_240" title="#AK_ODEN_04_240"></a><h3>Snapshot Command</h3>
+<p>
+Target Server의 파일을 Backup하거나 Backup된 파일(Snapshot이라 부른다.)을 조회하기 위한 명령어이다. Backup을 수행하기 위해서는 해당 정보를 가지고 있는 Snapshot Plan을 먼저 정의해야 한다. Backup이 수행되면 Plan정보를 바탕으로 폴더를 압축하여 지정한 위치에 저장한다. Snapshot 명령어로 Backup된 파일의 정보를 확인할 수 있다.
+<div class="warningbox"><p><strong>Warning:</strong>&nbsp;Snapshot Plan이 삭제되거나 수정되면 해당 Plan을 바탕으로 생성된 Snapshot File들은 모두 사라지게 된다. </p></div> 
+</p>
+
+<a name="//AK/ODEN/04_241" title="#AK_ODEN_04_241"></a><h4>snapshot add</h4>
+<p>Snapshot Plan을 추가한다. 기존에 Plan이 있을 경우 해당 정보를 덮어쓰게 된다. 해당 정보를 덮어쓰게 될 경우 Plan을 통해 생성된 Snapshot File들이 모두 사라지므로 주의해야 한다. 
+<div class="codesample"><pre>
+snapshot add &lt;plan-name&gt; 
+	-s[ource] /[&lt;location-variable-name&gt;] 
+	-d[est] &lt;agent-name&gt;[/&lt;location-variable-name&gt;] 
+	[-desc &lt;description&gt;]
+</pre></div>
+‘-s’옵션은 어느 위치의 파일들을 Backup할 것인지 지정하는 옵션이다. conf/config.xml에 지정된 location명을 입력해야 하며 location명 앞에 ‘/’를 붙여 줘야 한다. ‘/’만 있을 경우 Agent의 default-location을 의미한다.<br/>
+‘-d’ 옵션에 지정한 Agent를 ‘-s’에서도 사용한다. ‘-d’ 옵션은 Backup되어 압축된 파일을 어디에 저장할 것인지 지정하는 옵션이다. conf/config.xml에 정의된 Agent명과 location명을 지정하여야 한다. Agent와 location이름 사이에는 ‘/’로 구분한다.<br/>
+</p>
+ 
+<h5>간단한 백업 </h5>
+<p>
+<div class="codesample"><pre>
+snapshot add s0 -s / -d agent0/backup
+</pre></div>
+agent0의 default-location 내의 모든 파일들을 압축하여 agent0의 backup 경로에 저장한다. agent0와 backup은 conf/config.xml에 정의되어 있어야 한다.
+</p>   
+
+<h5>간단한 백업2 </h5>
+<p>
+<div class="codesample"><pre>
+snapshot add s0 -s /anyframe-app -d agent0/backup
+</pre></div>
+agent0의 anyframe-app경로 내의 모든 파일들을 압축하여 agent0의 backup 경로에 저장한다. agent0와 anyframe-app, backup은 모두 conf/config.xml에 정의되어 있어야 한다.
+</p>
+
+<a name="//AK/ODEN/04_242" title="#AK_ODEN_04_242"></a><h4>snapshot info</h4>
+<p>Snapshot Plan 혹은 Snapshot File 정보를 조회한다. ‘-p’나 ‘-f’옵션을 붙이지 않았을 경우 모든 Snapshot Plan정보를 출력한다. ‘-p’를 붙였을 경우 해당 Plan의 정보를 출력하며 plan-name이 없을 경우 모든 Plan정보를 출력한다. ‘-f’옵션을 붙였을 경우 Backup 을 통해 생성된 Snapshot File의 정보를 출력하며 file-name을 지정하지 않았을 경우 모든 Snapshot File의 정보를 출력한다.
+<div class="codesample"><pre>
+snapshot info 
+	-p[lan] [&lt;plan-name&gt;] | -f[ile] [&lt;file-name&gt;]
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_243" title="#AK_ODEN_04_243"></a><h4>snapshot del</h4>
+<p>Snapshot Plan 혹은 Snapshot File을 삭제한다. ‘-p’ 옵션이 있을 경우 지정한 Snapshot Plan을 삭제한다. 이 Plan을 통해 만들어진 Snapshot File도 모두 삭제되므로 주의하여야 한다. ‘-f’ 옵션이 있을 경우 지정한 Snapshot File을 삭제한다.
+<div class="codesample"><pre>
+snapshot del 
+	-p[lan] [&lt;plan-name&gt;] | -f[ile] [&lt;file-name&gt;]
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_244" title="#AK_ODEN_04_244"></a><h4>snapshot test</h4>
+<p>Snapshot Plan이 수행되었을 경우 어느 경로의 파일들이 어디에 저장될 것인지를 미리 보여준다. 실제로 Backup을 수행하지는 않는다.
+<div class="codesample"><pre>
+snapshot test &lt;plan-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_245" title="#AK_ODEN_04_245"></a><h4>snapshot run</h4>
+<p>Snapshot Plan의 정보를 바탕으로 Backup을 수행한다. 
+<div class="codesample"><pre>
+snapshot run &lt;plan-name&gt;
+</pre></div>
+</p>
+
+
+<a name="//AK/ODEN/04_250" title="#AK_ODEN_04_250"></a><h3>Rollback Command</h3>
+<p>
+Snapshot명령어로 Backup된 파일들을 복원할 때 사용되는 명령어이다.
+</p>
+
+<a name="//AK/ODEN/04_251" title="#AK_ODEN_04_251"></a><h4>rollback run</h4>
+<p>Backup으로 생성된 Snapshot File들을 Snapshot Plan을 참조하여 원래의 위치로 복원시킨다. 기존에 있는 파일들을 모두 무시하고 덮어쓰게 되므로 주의하여야 한다. 
+<div class="codesample"><pre>
+rollback run &lt;snapshot-file-name&gt;
+</pre></div>
+</p>
+
+<a name="//AK/ODEN/04_260" title="#AK_ODEN_04_260"></a><h3>Agent Command</h3>
+<p>
+conf/config.xml에 설정된 Agent에 관한 설정을 조회하기 위한 명령어이다. conf/config.xml에 설정된 Agent정보는 다른 명령어들을 실행할 때 사용되며, 이 명령어를 통해 그 정보들을 조회해 볼 수 있다. Agent정보는 수정할 수는 없으며, 수정하기 위해서는 conf/config.xml을 직접 수정하여야 한다. conf/config.xml 수정 후 재구동할 필요없이 바로 적용된다.
+</p>
+
+<a name="//AK/ODEN/04_261" title="#AK_ODEN_04_261"></a><h4>agent info</h4>
+<p>
+<div class="codesample"><pre>
+agent info
+</pre></div>
+</p>
+
+
+<a name="//AK/ODEN/04_300" title="#AK_ODEN_04_300"></a><h2>Viewing Help</h2>
+<p>
+Oden Shell에서 제공하는 모든 명령어의 목록을 보기 위해서는 help를 입력하면 된다. 각 명령어의 상세 사용법을 보기 위해서는 명령어 뒤에 help를 붙이거나 뒤의 인자를 제외한 명령어 이름만 입력하면 된다.
+</p>
+
+<h5>Policy Command의 사용법 조회</h5>
+<p>
+<div class="codesample"><pre>
+policy 혹은 policy help
+</pre></div>
+Policy Command의 사용법을 출력한다. 
+</p>
+
+
+<!-- FOOTNOTE STARTS HERE -->
+
+<div class="footnote">
+<p><sup>1&nbsp;</sup>Oden Agent는 입력 가능한 Shell환경을 제공하지 않는다.</p>
+<p><sup>2&nbsp;</sup>Policy를 바로 실행할 수 없다. 해당 Policy를 가진 Task를 구성하여 실행햐야 된다.</p>
+</div>
+
+<!-- FOOTNOTE ENDS HERE -->
+
+       <!-- DOCUMENT CONTENT ENDS HERE -->
+
+		<div class="hideOnPrint">
+			<br/><hr />
+            <div id="globalfooter">
+			    <p class="gf-anyframe">더 많은 정보를 얻으려면 <a href="http://www.anyframejava.org/">Anyframe Java Open Source Community</a>를 확인하십시오.</p>
+			    
+			    <ul class="gf-links piped">
+					<li><a class="first" href="http://www.anyframejava.org/node">Anyframe Updates</a></li>
+					<li><a href="http://www.anyframejava.org/node/264">Anyframe Training Courses</a></li>
+				</ul>
+
+				<div class="gf-copyright">
+					<p>Copyright © 2009 SAMSUNG SDS Co., Ltd. All rights reserved.</p>
+				</div>
+		    </div> <!--/globalfooter-->
+        </div> <!-- end of footer -->
+
+</body>
+</html>

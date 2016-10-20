@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oden>
+	<agents>
+		<agent name="qewf">
+			<address host="qwer" port="zxcv"/>
+			<default-location value=""/>
+			<location name="ssdfg2" value="wert2"/>
+			<location name="ssdfg1" value="wert1"/>
+			<location name="ssdfg3" value="wert3"/>
+		</agent>
+		<agent name="grfw">
+			<address host="qwe223r" port="zx432cv"/>
+			<default-location value=""/>
+			<location name="ssd234fg1" value="wert1"/>
+			<location name="ssd1231fg2" value="wert2"/>
+			<location name="ssdfg1233" value="wert3"/>
+		</agent>
+		<agent name="nn">
+			<address host="hh" port="pp"/>
+			<default-location value="ll"/>
+			<location name="kk" value="12345"/>
+		</agent>
+	</agents>
+</oden>

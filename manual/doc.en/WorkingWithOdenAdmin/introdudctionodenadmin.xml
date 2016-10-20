@@ -1,0 +1,52 @@
+<section id="workingwithodenadmin_introductionodenadmin">
+	<title>Introduction to Oden Admin</title>
+
+	<para>
+		Oden Admin is a UI that supports deployment management by integrating with Oden Server. 
+		It has the following features.
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				 Adds, deletes, and manages Job.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Shows preview of file to be deployed.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Executes script for a specific server.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Compares results of deployment among servers.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Checks deployment progress.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Checks deployment results. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Checks system error log. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Manages user authority. 
+			</para>
+		</listitem>
+	</itemizedlist>
+	
+</section>

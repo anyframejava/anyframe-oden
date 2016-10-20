@@ -1,0 +1,108 @@
+<chapter id="//AK/ODEN/backupandrestore_re">
+	<title>Backup and Restore</title>
+
+	<para>
+		Plloaso mako nuto uf cakso dodtos anr koop a cupy uf cak vux noaw yerw phuno.
+		Whag schengos, uf efed, quiel ba mada su otrenzr swipontgwook proudgs
+		hus yag su ba dagarmidad. Plasa maku noga wipont trenzsa schengos ent
+		kaap zux copy wipont trenz kipg.
+		</para>
+
+	<section id="//AK/ODEN/backupandrestore-snapshotplans_re">
+		<title>Snapshot Plans</title>
+
+		<para>
+			테이블은 다음과 같이 사용한다.
+			</para>
+
+		<table>
+			<title>DocBook Framework properties</title>
+
+			<tgroup cols="3">
+				<thead>
+					<row>
+						<entry>property name</entry>
+						<entry>default value</entry>
+						<entry>property function</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>
+							<literal>paper.type</literal>
+						</entry>
+						<entry>
+							<literal>Letter</literal>
+						</entry>
+						<entry>Paper output size for PDF docs</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>src.dir</literal>
+						</entry>
+						<entry>
+							<literal>${basedir}/src</literal>
+						</entry>
+						<entry>docbook and related sources dir</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>style.src.dir</literal>
+						</entry>
+						<entry>
+							<literal>${src.dir}/styles</literal>
+						</entry>
+						<entry>custom styles directory</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>docbook.src.dir</literal>
+						</entry>
+						<entry>
+							<literal>${src.dir}/docbook</literal>
+						</entry>
+						<entry>docbook files directory</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>images.src.dir</literal>
+						</entry>
+						<entry>
+							<literal>${src.dir}/images</literal>
+						</entry>
+						<entry>images location</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>css.src.dir</literal>
+						</entry>
+						<entry>
+							<literal>${src.dir}/css</literal>
+						</entry>
+						<entry>css files location</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>target.dir</literal>
+						</entry>
+						<entry>
+							<literal>${basedir}/target</literal>
+						</entry>
+						<entry>output directory</entry>
+					</row>
+					<row>
+						<entry>
+							<literal>tmp.dir</literal>
+						</entry>
+						<entry>
+							<literal>${target.dir}/tmp</literal>
+						</entry>
+						<entry>temporary files location</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+
+	</section>
+
+</chapter>

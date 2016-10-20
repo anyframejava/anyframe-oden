@@ -1,0 +1,86 @@
+<section id="workingwithodenadmin_user">
+	<title>User</title>
+
+	<para>
+		배포 작업을 수행할 수 있는 사용자를 등록하여 권한을 부여하고, 주어진 권한을 제어하며, 
+		등록된 사용자를 삭제할 수 있는 기능을 가진 화면이다. 
+		사용자에 관한 내용을 제어하므로 권한을 가진 일부 사용자만 접근할 수 있다. 
+	</para>
+
+	<note>
+			<para>
+				Admin role의 계정만 본 기능을 사용할 수 있다.
+			</para>
+		</note>
+	<section id="workingwithodenadmin_user_main">
+		<title>User List</title>
+		
+		<para>
+			User 목록화면은 현재 등록된 사용자들의 목록을 보여준다. 
+			Role이 Deployer인 사용자에게 주어지는 권한은 Job별로 주어지며, 권한이 있는 Job에 대해서만 상세정보, 
+			배포이력(History) 정보를 확인할 수 있다. 
+			Role이 Admin인 사용자는 모든 Job에 대한 권한이 주어지므로 모든 Job 정보를 확인할 수 있다. 
+		</para>
+		
+		<para>
+			만약 Role이 Admin인 사용자라면, 
+			모든 Job에 대해 권한이 있으므로 Assigned Job List에는 <emphasis role="bold">All Jobs</emphasis>라고만 나타난다.
+			하지만 모든 Job에 대해 권한이 있는 사용자라고 해도 Role이 Deployer일 경우에는 Assigned Job List에는 모든 Job List가 나타난다.
+		</para>
+	</section>
+	
+	<section id="workingwithodenadmin_user_add">
+		<title>Add User</title>
+		
+		<para>
+			사용자는 페이지 상단의 Add 버튼을 통해 추가할 수 있다. 
+			표 하단에 사용자 정보를 입력할 수 있는 부분이 나타나며, 이미 등록된 사용자를 클릭하면 사용자의 정보를 확인할 수 있다.
+			사용자 정보를 확인하는 도중에 새로운 사용자를 추가하려면 Add 버튼을 눌러 보여지는 사용자 상세정보를 초기화 한 후에 입력하면 된다.
+			
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">User ID</emphasis> : 사용자가 사용할 ID 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Role Name</emphasis> : 등록할 사용자의 권한(Admin / Deployer) 
+					</para>
+					<itemizedlist>
+						<listitem>
+							<para>Admin : 모든 Job에 접근이 가능하며, User 메뉴 접근이 가능</para>
+						</listitem>
+						<listitem>
+							<para>Deployer : assign된 Job에 대해서만 접근이 가능하며, User 메뉴에는 접근 불가</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Password / Confirm Password</emphasis> : 사용자가 사용할 비밀번호 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">Assign Job</emphasis> : 사용자에게 접근 권한이 주어진 Job List(Job이 둘 이상일 경우 컴마(,)를 통해 구분한다.)
+					</para>
+				</listitem>
+			</itemizedlist>			
+		</para>
+	</section>
+	
+	<section id="workingwithodenadmin_user_remove">
+		<title>Remove User</title>
+		
+		<para>
+			User 목록에서 삭제하고 싶은 사용자 계정을 User의 휴지통 아이콘을 클릭하여 해당 사용자를 삭제할 수 있다.
+		</para>
+		<note>
+			<para>
+				계정 관리를 위해 기본 제공된 사용자 계정(oden)을 제외한 모든 계정은 삭제가 가능하다.	
+			</para>		
+		</note>
+	</section>
+
+</section>

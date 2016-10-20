@@ -1,0 +1,48 @@
+<chapter id="//AK/ODEN/userinterface_re">
+	<title>User Interface</title>
+
+	<section id="//AK/ODEN/userinterface-cli_re">
+		<title>Command Line Interface</title>
+		<para>802.1x is a protocol for implementing port-based network access
+			over wired or wireless LANs. It supports a wide range of
+			authentication methods, including TLS, TTLS, LEAP, MDS, and PEAP
+			(MSCHAPv2, MD5, GTC</para>
+	</section>
+
+	<section id="//AK/ODEN/userinterface-gui_re">
+		<title>Graphical User Interface</title>
+		<para>The Dynamic Host Configuration Protocol and the Bootstrap
+			Protocol automate the assignment of IP addresses in a particular
+			network.
+			</para>
+	</section>
+
+	<section id="//AK/ODEN/userinterface-resource_re">
+		<title>Resource</title>
+		<variablelist>
+			<varlistentry>
+				<term>Download</term>
+				<listitem>
+					<para>
+						<ulink
+							url="http://luaforge.net/frs/download.php/3143/lua5_1_3_Sources.zip">file name</ulink>
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>See Also</term>
+				<listitem>
+					<para>
+						<ulink url="http://www.anyframejava.org">reference site name</ulink>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<ulink url="http://www.google.com">reference site name</ulink>
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+
+</chapter>
