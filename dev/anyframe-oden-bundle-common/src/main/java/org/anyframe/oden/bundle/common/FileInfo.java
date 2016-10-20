@@ -47,6 +47,8 @@ public class FileInfo implements Serializable {
 
 	private boolean update;
 
+	private String date;
+
 	public FileInfo(String path, boolean isDir, long lastModified) {
 		this(FileUtil.normalize(path), isDir, lastModified, 0);
 	}
@@ -55,6 +57,13 @@ public class FileInfo implements Serializable {
 		this.path = FileUtil.normalize(path);
 		this.isDir = isDir;
 		this.lastModified = lastModified;
+		this.size = size;
+	}
+
+	public FileInfo(String path, boolean isDir, String date, long size) {
+		this.path = FileUtil.normalize(path);
+		this.isDir = isDir;
+		this.date = date;
 		this.size = size;
 	}
 
@@ -111,6 +120,14 @@ public class FileInfo implements Serializable {
 
 	public boolean isUpdate() {
 		return update;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 	@Override

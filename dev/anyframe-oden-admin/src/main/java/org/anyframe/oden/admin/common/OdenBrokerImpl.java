@@ -44,8 +44,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	/**
 	 * Send request and get response, Interface server with http protocol
 	 */
-	public String sendRequest(String shellUrl, String msg)
-			throws BrokerException {
+	public String sendRequest(String shellUrl, String msg) throws BrokerException {
 		PrintWriter writer = null;
 		String result = null;
 
@@ -62,7 +61,10 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				// receive
 				result = handleResult(conn);
 			} catch (BrokerException e) {
-				throw new BrokerException(e.getMessage());
+				if (msg.startsWith("build") && e.getMessage().equals("Connection refused: connect")) {
+				}else{
+					throw new BrokerException(e.getMessage());
+				}
 			} catch (ConnectException e) {
 				// throw new BrokerException("broker.info.notavail");
 				throw new BrokerException("Oden Server is not available");
@@ -79,8 +81,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		}
 	}
 
-	public boolean checkUser(String shellUrl, String userid, String password)
-			throws BrokerException {
+	public boolean checkUser(String shellUrl, String userid, String password) throws BrokerException {
 		PrintWriter writer = null;
 
 		if (shellUrl != null && !(shellUrl.equals(""))) {
@@ -97,8 +98,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 
 				BufferedReader reader = null;
 
-				reader = new BufferedReader(new InputStreamReader(
-						conn.getInputStream(), "utf-8"));
+				reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
 
 				readAll(reader);
 
@@ -117,13 +117,11 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		return true;
 	}
 
-	private String handleResult(URLConnection conn) throws BrokerException,
-			IOException {
+	private String handleResult(URLConnection conn) throws BrokerException, IOException {
 		String result = null;
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					conn.getInputStream(), "utf-8"));
+			reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
 
 			result = readAll(reader);
 			// check if shell exception or unknown exception
@@ -133,7 +131,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		} catch (JSONException e) {
 			if (result.contains("Command not found")) {
 				throw new BrokerException("broker.exception.notcommand");
-			} 
+			}
 		} catch (BrokerException e) {
 			throw new BrokerException(e.getMessage());
 		} finally {
@@ -152,8 +150,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	 * @throws JSONException
 	 * @throws BrokerException
 	 */
-	private void determineException(JSONArray ja) throws BrokerException,
-			IOException {
+	private void determineException(JSONArray ja) throws BrokerException, IOException {
 
 		if (ja == null || ja.length() != 1) {
 			return;
@@ -166,7 +163,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				if (json.has(UNKNOWN_EXCEPTION)) {
 					// TODO unknown
 					throw new BrokerException(json.getString(UNKNOWN_EXCEPTION));
-				} 
+				}
 			}
 		} catch (JSONException jexc) {
 			throw new IOException(jexc.getMessage());
@@ -176,15 +173,14 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	private String readAll(BufferedReader reader) throws IOException {
 		StringBuffer buf = new StringBuffer();
 
-		for ( String line; (line = reader.readLine()) != null; ) {
+		for (String line; (line = reader.readLine()) != null;) {
 			buf.append(line);
 			buf.append("\n");
 		}
 		return buf.toString();
 	}
 
-	private URLConnection init(String url) throws MalformedURLException,
-			IOException {
+	private URLConnection init(String url) throws MalformedURLException, IOException {
 		URLConnection con = new URL(url).openConnection();
 
 		con.setUseCaches(false);
@@ -194,8 +190,7 @@ public class OdenBrokerImpl implements OdenBrokerService {
 
 		// 우선 Oden Server 계정 상수로 세팅
 		if (url != null) {
-			con.addRequestProperty("Authorization",
-					"Basic " + encode("oden", "oden0"));
+			con.addRequestProperty("Authorization", "Basic " + encode("oden", "oden0"));
 		}
 
 		return con;

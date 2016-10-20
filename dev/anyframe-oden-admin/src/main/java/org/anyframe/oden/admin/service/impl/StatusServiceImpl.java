@@ -15,10 +15,17 @@
  */
 package org.anyframe.oden.admin.service.impl;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.domain.Status;
 import org.anyframe.oden.admin.service.StatusService;
+import org.anyframe.oden.admin.util.CommandUtil;
 import org.anyframe.pagination.Page;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,7 +36,9 @@ import org.springframework.stereotype.Service;
 @Service("statusService")
 public class StatusServiceImpl implements StatusService {
 
-	private final OdenCommonDao<Status> odenCommonDao = new OdenCommonDao<Status>();
+	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<Status> odenCommonDao;
 
 	/**
 	 * Method for getting job list in progess.
@@ -39,6 +48,34 @@ public class StatusServiceImpl implements StatusService {
 	 */
 	public Page findList(String domain) throws Exception {
 		return odenCommonDao.getList("status", "info");
+	}
+
+	/**
+	 * Method for getting job list in progess.
+	 * 
+	 * @param domain
+	 * @throws Exception
+	 */
+	public boolean checkRunning(String domain) throws Exception {
+		Page page = odenCommonDao.getList("status", "info");
+
+		int totalCount = page.getTotal();
+
+		String command = CommandUtil.getBasicCommand("build", "status");
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+		for (JSONObject object : objectArray) {
+			String status = object.getString("status");
+			if (status.equals("B")) {
+				page.setTotal(totalCount++);
+			}
+		}
+
+		if (totalCount > 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

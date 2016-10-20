@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 
 <project name="ODEN Packaging" default="default" basedir=".">
-	<property name="version" value="2.5.0"/>
+	<property name="version" value="2.6.0"/>
 	<!--property name="manual.dir" location="../../../manual/manual/target/oden"/-->
 	<!--property name="manual.dir" location="../../../manual/manual/target"/-->
 	<property name="manual.dir" location="../../../manual/Release/target"/>
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
 	<!--property name="distDir" location="../dist"/-->
 	<property name="distDir" location="../dist"/>
-	<property name="pkname" value="Anyframe-Oden-${version}-bin.zip"/>
+	<property name="pkname" value="Anyframe-Oden-${version}.zip"/>
 	
 	<target name="init">
 		<echo>initialize temporary distribution structure</echo>

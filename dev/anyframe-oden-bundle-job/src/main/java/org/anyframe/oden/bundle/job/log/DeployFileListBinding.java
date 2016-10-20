@@ -64,7 +64,9 @@ public class DeployFileListBinding extends TupleBinding {
 			String log = in.readString();
 			Mode mode = DeployFileUtil.stringToMode(in.readString());
 			boolean isSuccess = in.readBoolean();
-
+			long date = in.readLong();
+			long size = in.readLong();
+			
 			if (this.mode != Mode.NA && this.mode != mode)
 				continue;
 
@@ -74,7 +76,9 @@ public class DeployFileListBinding extends TupleBinding {
 			if (!StringUtil.empty(this.path) && !_path.endsWith(this.path))
 				continue;
 
-			DeployFile df = new DeployFile(repo, _path, agent, 0L, 0L, mode,
+//			DeployFile df = new DeployFile(repo, _path, agent, 0L, 0L, mode,
+//					isSuccess);
+			DeployFile df = new DeployFile(repo, _path, agent, size, date, mode,
 					isSuccess);
 			if (!isSuccess && log != null) {
 				df.setErrorLog(log);
@@ -99,6 +103,10 @@ public class DeployFileListBinding extends TupleBinding {
 			out.writeString(df.errorLog());
 			out.writeString(DeployFileUtil.modeToString(df.mode()));
 			out.writeBoolean(df.isSuccess());
+			
+			// add date and size 
+			out.writeLong(df.getDate());
+			out.writeLong(df.getSize());
 		}
 		// }else if(o instanceof SlimDeployFile){
 		// Collection<SlimDeployFile> dfs = (Collection<SlimDeployFile>)o;

@@ -53,16 +53,21 @@ public class Cmd {
 			Cmd cmd = new Cmd();
 			cmd.loadINI();
 			String rtn = cmd.sendRequest(cmd.toCommand(args));
+			
 			if (rtn.startsWith("[S]")) {
-				// success
+				// success deploy
 				System.out.println(rtn);
 				System.exit(0); // normal
-			} else {
-				// fail
+			} else if (rtn.startsWith("[F]")) {
+				// fail deploy
 				System.out.println(rtn);
 				System.exit(-1); // abnormal
+			} else {
+				// script 실행은 정상여부를 알수가 없기 때문에 정상으로 처리
+				System.out.println(rtn);
+				System.exit(0); // normal
 			}
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

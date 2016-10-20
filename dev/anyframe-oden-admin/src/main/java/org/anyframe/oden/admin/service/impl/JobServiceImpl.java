@@ -15,14 +15,11 @@
  */
 package org.anyframe.oden.admin.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -32,13 +29,25 @@ import javax.inject.Named;
 
 import org.anyframe.iam.core.acl.IViewResourceAccessService;
 import org.anyframe.iam.core.reload.IResourceReloadService;
-import org.anyframe.oden.admin.common.CommonUtil;
 import org.anyframe.oden.admin.common.OdenCommonDao;
+import org.anyframe.oden.admin.convert.JsonConverter;
 import org.anyframe.oden.admin.dao.JobDao;
+import org.anyframe.oden.admin.domain.BuildHistory;
+import org.anyframe.oden.admin.domain.Command;
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Mapping;
+import org.anyframe.oden.admin.service.BuildService;
+import org.anyframe.oden.admin.service.GroupService;
 import org.anyframe.oden.admin.service.JobService;
+import org.anyframe.oden.admin.service.ScriptService;
+import org.anyframe.oden.admin.service.ServerService;
+import org.anyframe.oden.admin.util.CommandUtil;
+import org.anyframe.oden.admin.util.CommonUtil;
+import org.anyframe.oden.admin.util.DateUtil;
+import org.anyframe.oden.admin.util.MapUtil;
+import org.anyframe.oden.admin.util.OdenConstants;
 import org.anyframe.pagination.Page;
+import org.hsqldb.lib.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,16 +63,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = { Exception.class })
 public class JobServiceImpl implements JobService {
 
-	private final OdenCommonDao<Job> odenCommonDao = new OdenCommonDao<Job>();
-
-	String ahrefPre = "<a href=\"";
-	String ahrefMid = "\">";
-	String ahrefPost = "</a>";
-
-	String doubleQuotation = "\"";
-
-	private Map runningMap;
-	private Map waitMap;
+	private Map<String, String> runningMap = new HashMap<String, String>();
+	private Map<String, String> waitMap = new HashMap<String, String>();
+	private Map<String, String> runningBuildMap = new HashMap<String, String>();
+	private Map<String, String> runningBuildURLMap = new HashMap<String, String>();
 
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
@@ -72,12 +75,31 @@ public class JobServiceImpl implements JobService {
 	int previewPageUnit;
 
 	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<Job> odenCommonDao;
+
+	@Inject
 	@Named("jobDao")
 	private JobDao jobDao;
 
 	@Inject
+	@Named("groupService")
+	GroupService groupservice;
+
+	@Inject
+	@Named("buildService")
+	BuildService buildservice;
+
+	@Inject
+	@Named("serverService")
+	ServerService serverService;
+
+	@Inject
+	@Named("scriptService")
+	ScriptService scriptService;
+
+	@Inject
 	@Named("resourceReloadService")
-	
 	IResourceReloadService service;
 
 	@Inject
@@ -92,7 +114,6 @@ public class JobServiceImpl implements JobService {
 	 * @param opt
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public Page test(Object objPage, String param, String opt) throws Exception {
 
 		String option = "";
@@ -109,62 +130,45 @@ public class JobServiceImpl implements JobService {
 		}
 
 		option = option.concat("-page" + " " + (page - 1) + " ");
-		
 		option = option.concat("-pgscale" + " " + previewPageUnit);
 
-		String result = odenCommonDao.getResultString("deploy", "test",
-				doubleQuotation + param + doubleQuotation + " " + option);
+		String toggle = OdenConstants.A_HREF_HEAD + "javascript:toggleRemoveList();" + OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_CROSS
+				+ OdenConstants.A_HREF_TAIL;
 
-		String imgSuccess = "<img src='images/cross.png' style='vertical-align:middle;'/>";
+		List<Job> jobList = new ArrayList<Job>();
 
-		// String toggle =
-		// "<input type='button' onClick='javascript:toggleRemoveList();'>"+
-		// imgSuccess +"</input>";
-		String toggle = ahrefPre + "javascript:toggleRemoveList();"
-				+ ahrefMid + imgSuccess + ahrefPost;
-
-		List list = new ArrayList();
+		String command = CommandUtil.getBasicCommand("deploy", "test", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN + " "
+				+ option);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
 		int totalNum = 0;
-		if (!(result == null) && !("".equals(result))) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					totalNum = Integer.parseInt(object.getString("total"));
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
+		for (JSONObject object : objectArray) {
+			totalNum = Integer.parseInt(object.getString("total"));
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
 
-							String mode = dataObj.getString("mode");
-							String path = dataObj.getString("path");
-							JSONArray targets = dataObj.getJSONArray("targets");
-							String target = "";
-							for (int n = 0; n < targets.length(); n++) {
-								target = target.concat("[" + targets.get(n) + "] ");
-							}
-							target = target.substring(0, target.length() - 1);
-
-							Job g = new Job();
-							g.setMode(mode); // ADD-DELETE
-							g.setFile(path);
-							g.setDestination(target);
-							g.setToggle(toggle);
-							g.setHidden("");
-							list.add(g);
-						}
+					String mode = dataObj.getString("mode");
+					String path = dataObj.getString("path");
+					JSONArray targets = dataObj.getJSONArray("targets");
+					String target = "";
+					for (int n = 0; n < targets.length(); n++) {
+						target = target.concat("[" + targets.get(n) + "] ");
 					}
+					target = target.substring(0, target.length() - 1);
+
+					Job job = new Job();
+					job.setMode(mode); // ADD-DELETE
+					job.setFile(path);
+					job.setDestination(target);
+					job.setToggle(toggle);
+					job.setHidden("");
+					jobList.add(job);
 				}
 			}
 		}
-
-		// if (list.size() == 0) {
-		// return new Page(list, 1, list.size(), 1, 1);
-		// } else {
-		return new Page(list, page, totalNum, previewPageUnit, previewPageUnit);
-		// }
-
+		return new Page(jobList, page, totalNum, previewPageUnit, previewPageUnit);
 	}
 
 	/**
@@ -176,8 +180,7 @@ public class JobServiceImpl implements JobService {
 	 * @param objPage
 	 * @throws Exception
 	 */
-	public String run(String[] param, String opt, String job, Object objPage,
-			String cmd, String userid) throws Exception {
+	public String run(String[] param, String opt, String job, Object objPage, String cmd, String userid) throws Exception {
 
 		String option_result = "";
 		String option_iu = "";
@@ -198,7 +201,7 @@ public class JobServiceImpl implements JobService {
 			option_c = option_c.concat("-c ");
 		}
 
-		List paramList = new ArrayList();
+		List<String> paramList = new ArrayList<String>();
 
 		boolean boolDeployAll = false;
 
@@ -208,7 +211,7 @@ public class JobServiceImpl implements JobService {
 			String mode = values[0];
 			String file = values[1];
 
-			String temp = mode + "@oden@" + file;
+			String newParam = mode + "@oden@" + file;
 
 			if (i == 0 && mode.equalsIgnoreCase(".")) {
 				// deploy all one page
@@ -221,32 +224,29 @@ public class JobServiceImpl implements JobService {
 				break;
 			}
 
-			paramList.add(temp);
+			paramList.add(newParam);
 		}
 
-		if (! boolDeployAll) {
-			Set wholeList = getListByPage(job, option_iu + option_d, objPage);
+		if (!boolDeployAll) {
+			Set<String> wholeList = getListByPage(job, option_iu + option_d, objPage);
 
 			option_iu = option_iu.replaceAll("u", "i");
-			// mode + "@oden@" + file
-			Iterator itr = wholeList.iterator();
+
+			Iterator<String> itr = wholeList.iterator();
 			while (itr.hasNext()) {
 				String strList = itr.next() + "";
-				if (! paramList.contains(strList)) {
+				if (!paramList.contains(strList)) {
 					String[] values = strList.split("@oden@");
 
 					String mode = values[0];
 					String file = values[1];
 
 					if (mode.equalsIgnoreCase("add")) {
-						option_iu = option_iu.concat(doubleQuotation + file
-								+ doubleQuotation + " ");
+						option_iu = option_iu.concat(OdenConstants.DOUBLE_QUOTATOIN + file + OdenConstants.DOUBLE_QUOTATOIN + " ");
 					} else if (mode.equalsIgnoreCase("update")) {
-						option_iu = option_iu.concat(doubleQuotation + file
-								+ doubleQuotation + " ");
+						option_iu = option_iu.concat(OdenConstants.DOUBLE_QUOTATOIN + file + OdenConstants.DOUBLE_QUOTATOIN + " ");
 					} else if (mode.equalsIgnoreCase("delete")) {
-						option_d = option_d.concat(doubleQuotation + file
-								+ doubleQuotation + " ");
+						option_d = option_d.concat(OdenConstants.DOUBLE_QUOTATOIN + file + OdenConstants.DOUBLE_QUOTATOIN + " ");
 					}
 				}
 			}
@@ -259,11 +259,10 @@ public class JobServiceImpl implements JobService {
 		if (!(userid == null || "".equals(userid))) {
 			option_user = "-_user" + " " + userid + " ";
 		}
-		option_result = option_iu + option_d + option_c + option_script
-				+ option_user;
+		option_result = option_iu + option_d + option_c + option_script + option_user;
 
-		return odenCommonDao.getResultString("deploy", "run", doubleQuotation
-				+ job + doubleQuotation + " " + option_result);
+		return odenCommonDao.getResultString("deploy", "run", OdenConstants.DOUBLE_QUOTATOIN + job + OdenConstants.DOUBLE_QUOTATOIN + " "
+				+ option_result);
 	}
 
 	/**
@@ -277,35 +276,28 @@ public class JobServiceImpl implements JobService {
 		return odenCommonDao.getResultString("deploy", "undo", txid);
 	}
 
-	private Set getListByPage(String job, String opt, Object objPage)
-			throws Exception {
-		Set result = new HashSet();
+	private Set<String> getListByPage(String job, String opt, Object objPage) throws Exception {
+		Set<String> result = new HashSet<String>();
 
-		int page = Integer.parseInt(objPage + "") - 1;
+		int page = Integer.parseInt(String.valueOf(objPage)) - 1;
 
 		String pageOpt = "-page" + " " + page;
 		pageOpt = pageOpt.concat(" " + "-pgscale" + " " + previewPageUnit);
-		
-		String strWhole = odenCommonDao.getResultString("deploy", "test",
-				doubleQuotation + job + doubleQuotation + " " + opt + " "
-						+ pageOpt);
 
-		if (!(strWhole == null) && !"".equals(strWhole)) {
-			JSONArray array = new JSONArray(strWhole);
-			if (!(array.length() == 0)) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
-							String path = dataObj.getString("path");
-							String mode = dataObj.getString("mode");
+		String command = CommandUtil.getBasicCommand("deploy", "test", OdenConstants.DOUBLE_QUOTATOIN + job + OdenConstants.DOUBLE_QUOTATOIN + " "
+				+ opt + " " + pageOpt);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-							String temp = mode + "@oden@" + path;
-							result.add(temp);
-						}
-					}
+		for (JSONObject object : objectArray) {
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
+					String path = dataObj.getString("path");
+					String mode = dataObj.getString("mode");
+
+					String param = mode + "@oden@" + path;
+					result.add(param);
 				}
 			}
 		}
@@ -319,144 +311,131 @@ public class JobServiceImpl implements JobService {
 	 * @param cmd
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
-	public Page findList(String cmd) throws Exception {
+	@SuppressWarnings("null")
+	public Page findList(String cmd, String buildName, String group) throws Exception {
 		List<String> roles = CommonUtil.getRoleList(cmd);
 
-		runningMap = new HashMap();
-		waitMap = new HashMap();
-		List _list = odenCommonDao.getListByList("job", "info");
-		List list = new ArrayList();
+		List<String> jobNameList = null;
+		if (group.equals("ALL")) {
+			jobNameList = odenCommonDao.getStringList("job", "info");
+		} else {
+			jobNameList = groupservice.findByName(group);
+		}
+		List<Job> list = new ArrayList<Job>();
 
-		runningStatus();
-		Collection runningJob = runningMap.values();
-		Collection waitJob = waitMap.values();
+		init();
+		boolean isRunning = runningStatus();
+		boolean buildCheck = getBuildCheck();
+		boolean isBuilding = false;
+		if(buildCheck != false) {
+			isBuilding = runningBuildStatus(buildName);
+		}
 
-		for (int i = 0; i < _list.size(); i++) {
-			Job g = new Job();
+		for (int i = 0; i < jobNameList.size(); i++) {
+			String jobStatus = "";
+			String jobTxid = "";
+			String jobName = jobNameList.get(i) + "";
+			String jobBuild = "";
 
-			String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
-			String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
-			String imgRunning = "<img src='images/progress.gif' style='vertical-align:middle;'/>";
-			String imgWait = "<img src='images/progress_1.gif' style='vertical-align:middle;'/>";
-
-			String gStatus = "";
-			String gTxid = "";
-			String gName = _list.get(i) + "";
-			if (gName.indexOf("\\") != -1) {
-				gName = gName.replaceAll("\\\\", "/");
+			Job job = new Job();
+			// 2014.11.19 job info를 한번만 날리도록 수정
+			String buildCmd = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArr = odenCommonDao.jsonObjectArrays(buildCmd);
+			job.setBuild(getBuildByobjectArray(objectArr));
+			
+			if (jobName.indexOf("\\") != -1) {
+				jobName = jobName.replaceAll("\\\\", "/");
 			}
 
-			if (roles.contains(gName) || "ROLE_ADMIN".equals(roles.get(0))) {
-				g.setJobname(ahrefPre
-						+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
-						+ gName + "');" + ahrefMid + gName + ahrefPost);
+			if (roles.contains(jobName) || "ROLE_ADMIN".equals(roles.get(0))) {
+				job.setName(OdenConstants.A_HREF_HEAD + "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '" + jobName
+						+ "', '&amp;initdataService=groupService.findGroupAndBuildJob()&amp;initdataResult=groupBuildJobs', currentSelectedTab);"
+						+ OdenConstants.A_HREF_MID + jobName + OdenConstants.A_HREF_TAIL);
 
-				if (runningJob.contains(gName)) {
-					Iterator itr = runningMap.keySet().iterator();
-					String id = "";
-					while (itr.hasNext()) {
-						id = itr.next() + "";
-						String name = runningMap.get(id) + "";
-						if (name.equalsIgnoreCase(gName)) {
-							break;
-						} else {
-							id = "";
-						}
+				if (runningMap.containsValue(jobName)) {
+					jobTxid = MapUtil.getKeyFromMapByValue(runningBuildMap, jobName);
+
+					jobStatus = OdenConstants.IMG_TAG_RUNNING;
+					job.setTxId(jobTxid);
+					job.setDate(jobStatus);
+					job.setMode(runningJobAction(jobTxid));
+
+				} else if (waitMap.containsValue(jobName)) {
+					jobTxid = MapUtil.getKeyFromMapByValue(waitMap, jobName);
+
+					jobStatus = OdenConstants.IMG_TAG_WAIT;
+					job.setTxId(jobTxid);
+					job.setDate(jobStatus);
+					job.setMode(runningJobAction(jobTxid));
+
+				} else if (runningBuildMap.containsValue(job.getBuild())) {
+					String build = job.getBuild();
+					if (!StringUtil.isEmpty(build) || !"None".equals(build)) {
+						job.setBuildDate(OdenConstants.IMG_TAG_RUNNING);
+						String consoleUrl = runningBuildURLMap.get(build);
+						job.setMode(OdenConstants.A_HREF_HEAD + "javascript:popupOpen('" + consoleUrl + "');" + OdenConstants.A_HREF_MID
+								+ OdenConstants.IMG_TAG_MONITOR + OdenConstants.A_HREF_TAIL);
 					}
-
-					gStatus = imgRunning;
-					g.setTxId(id);
-					g.setDate(gStatus);
-					g.setMode(runningJobAction(id));
-				} else if (waitJob.contains(gName)) {
-					Iterator itr = waitMap.keySet().iterator();
-					String id = "";
-					while (itr.hasNext()) {
-						id = itr.next() + "";
-						String name = waitMap.get(id) + "";
-						if (name.equalsIgnoreCase(gName)) {
-							break;
-						} else {
-							id = "";
-						}
-					}
-
-					gStatus = imgWait;
-					g.setTxId(id);
-					g.setDate(gStatus);
-					g.setMode(runningJobAction(id));
-
 				} else {
-					String para = "-job " + doubleQuotation + gName
-							+ doubleQuotation;
-					String result = odenCommonDao.getResultString("log",
-							"search", para);
+					String para = "-job " + OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN;
+					String command = CommandUtil.getBasicCommand("log", "search", para);
+					List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-					if (!(result == null) && !"".equals(result)) {
-						JSONArray array = notUndoLog(new JSONArray(result));
+					jobTxid = jobName; // default
 
-						if (!(array.length() == 0)) {
-							// int n = array.length() - 1; // latest history
-							JSONObject object = (JSONObject) array.get(0); // latest
-																			// history
-							gTxid = object.getString("txid");
-							String status = object.getString("status");
-							String date = object.getString("date");
+					if (objectArray.size() > 0) {
+						JSONObject object = objectArray.get(0);
+						String total = object.getString("total");
+						JSONArray data = (JSONArray) object.get("data");
+						if (Integer.parseInt(total) > 0) {
+							JSONObject dataObj = (JSONObject) data.get(0);
+							if (!isUndoLog(dataObj)) {
+								jobTxid = dataObj.getString("txid");
+								String status = dataObj.getString("status");
+								String date = dataObj.getString("date");
 
-							if (status.equalsIgnoreCase("S")) {
-								gStatus = ahrefPre
-										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahrefMid
-										+ imgSuccess + "(" + date + ")"
-										+ ahrefPost;
-							} else if (status.equalsIgnoreCase("F")) {
-								gStatus = ahrefPre
-										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahrefMid + imgFail
-										+ "(" + date + ")" + ahrefPost;
-							} else {
-								gStatus = "";
+								if (status.equalsIgnoreCase("S")) {
+									jobStatus = OdenConstants.A_HREF_HEAD + "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+											+ jobTxid + "');" + OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_SUCCESS + "(" + date + ")"
+											+ OdenConstants.A_HREF_TAIL;
+								} else if (status.equalsIgnoreCase("F")) {
+									jobStatus = OdenConstants.A_HREF_HEAD + "javascript:fn_addTab('04History', 'History', 'historydetail', '"
+											+ jobTxid + "');" + OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_FAIL + "(" + date + ")"
+											+ OdenConstants.A_HREF_TAIL;
+								} else {
+									jobStatus = "";
+								}
 							}
-
-							// String total = object.getString("total");
-							// JSONArray data = (JSONArray) object.get("data");
-							// if (!(data.length() == 0)) {
-							// JSONObject dataObj = (JSONObject) data.get(0);
-							//
-							// gTxid = dataObj.getString("txid");
-							// String status = dataObj.getString("status");
-							// String date = dataObj.getString("date");
-							//
-							// if (status.equalsIgnoreCase("S")) {
-							// gStatus = ahref_pre
-							// +
-							// "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-							// + gTxid + "');" + ahref_mid
-							// + imgSuccess + "(" + date + ")"
-							// + ahref_post;
-							// ;
-							// } else if (status.equalsIgnoreCase("F")) {
-							// gStatus = ahref_pre
-							// +
-							// "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-							// + gTxid + "');" + ahref_mid
-							// + imgFail + "(" + date + ")"
-							// + ahref_post;
-							// ;
-							// } else {
-							// gStatus = "";
-							// }
-						} else {
-							gTxid = gName;
 						}
 					}
 
-					g.setTxId(gTxid);
-					g.setDate(gStatus);
-					g.setMode(stoppingJobAction(gName, gTxid, gStatus));
+					if (job.getBuild() != "All") {
+						BuildHistory buildHistory = null;
+						if(buildCheck != false) {
+							buildHistory = buildservice.findByName(job.getBuild());
+						}
+
+						if (buildHistory != null && buildHistory.getDate() > 0) {
+							if (buildHistory.isSuccess()) {
+								job.setBuildDate(OdenConstants.A_HREF_HEAD + "javascript:popupOpen('" + buildHistory.getConsoleUrl() + "');"
+										+ OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_SUCCESS + "("
+										+ DateUtil.toStringDate(buildHistory.getDate()) + ")" + OdenConstants.A_HREF_TAIL);
+							} else {
+								job.setBuildDate(OdenConstants.A_HREF_HEAD + "javascript:popupOpen('" + buildHistory.getConsoleUrl() + "');"
+										+ OdenConstants.A_HREF_MID + OdenConstants.IMG_TAG_FAIL + "(" + DateUtil.toStringDate(buildHistory.getDate())
+										+ ")" + OdenConstants.A_HREF_TAIL);
+							}
+						} else {
+							job.setBuildDate("");
+						}
+						jobBuild = job.getBuild();
+					}
+
+					job.setTxId(jobTxid);
+					job.setDate(jobStatus);
+					job.setMode(stoppingJobAction(jobName, jobTxid, jobStatus, jobBuild, isRunning, isBuilding, job, objectArr, buildCheck));
 				}
-				list.add(g);
+				list.add(job);
 			}
 		}
 
@@ -467,33 +446,24 @@ public class JobServiceImpl implements JobService {
 		}
 	}
 
-	private JSONArray notUndoLog(JSONArray array) throws Exception {
-		JSONArray rtnArr = new JSONArray();
+	private void init() {
+		runningMap = new HashMap<String, String>();
+		waitMap = new HashMap<String, String>();
+		runningBuildMap = new HashMap<String, String>();
+		runningBuildURLMap = new HashMap<String, String>();
+	}
 
-		if (!(array.length() == 0)) {
-			for (int i = 0; i < array.length(); i++) {
-				JSONObject object = (JSONObject) array.get(i);
-				JSONArray data = (JSONArray) object.get("data");
-				if (!(data.length() == 0)) {
-					for (int j = 0; j < data.length(); j++) {
-						JSONObject dataObj = (JSONObject) data.get(j);
-						String txid = dataObj.getString("txid");
-						if (!isUndoId(txid)) {
-							rtnArr.put(dataObj);
-							break;
-						}
-
-					}
-
-				}
-			}
+	private boolean isUndoLog(JSONObject object) throws Exception {
+		String txid = object.getString("txid");
+		if (isUndoId(txid)) {
+			return true;
+		} else {
+			return false;
 		}
-		return rtnArr;
 	}
 
 	private boolean isUndoId(String txid) throws Exception {
-		String para = "-job " + doubleQuotation + "deploy undo:" + txid
-				+ doubleQuotation;
+		String para = "-job " + OdenConstants.DOUBLE_QUOTATOIN + "deploy undo:" + txid + OdenConstants.DOUBLE_QUOTATOIN;
 
 		String result = odenCommonDao.getResultString("log", "search", para);
 		JSONArray array = new JSONArray(result);
@@ -508,31 +478,77 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @throws Exception
 	 */
-	private void runningStatus() throws Exception {
-		// HashMap resultMap = new HashMap();
-		String result = odenCommonDao.getResultString("status", "info");
+	private boolean runningStatus() throws Exception {
+		String command = CommandUtil.getBasicCommand("status", "info");
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
 		String pre = "deploy undo:";
 
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					String jobName = object.getString("desc");
-					jobName = jobName.startsWith(pre) ? getJobById(jobName
-							.substring(jobName.indexOf(pre) + pre.length(),
-									jobName.indexOf(pre) + pre.length() + 13))
-							: object.getString("desc");
-					String txid = object.getString("id");
-					int status = object.getInt("status");
-					if (status == 4) {
-						runningMap.put(txid, jobName);
-					} else if (status == 2) {
-						waitMap.put(txid, jobName);
-					} 
+		for (JSONObject object : objectArray) {
+			String jobName = object.getString("desc");
+			jobName = jobName.startsWith(pre) ? getJobById(jobName.substring(jobName.indexOf(pre) + pre.length(), jobName.indexOf(pre) + pre.length()
+					+ 13)) : object.getString("desc");
+			String txid = object.getString("id");
+			int status = object.getInt("status");
+			if (status == 4) {
+				runningMap.put(txid, jobName);
+			} else if (status == 2) {
+				waitMap.put(txid, jobName);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Methods for getting build list in progress.
+	 * 
+	 * @throws Exception
+	 */
+	private boolean runningBuildStatus(String currentBuildName) throws Exception {
+		String command = CommandUtil.getBasicCommand("build", "status");
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+		for (JSONObject object : objectArray) {
+			String buildName = object.getString("jobName");
+			String txid = object.getString("buildNo");
+			String status = object.getString("status");
+			String consoleUrl = object.getString("consoleUrl");
+			boolean isCurrentBuildAdd = true;
+			if (!currentBuildName.equals("") && buildName.equals(currentBuildName)) {
+				int duration = 0;
+				while (isCurrentBuildAdd) {
+
+					String detailCommand = CommandUtil.getBasicCommand("build", "status", OdenConstants.DOUBLE_QUOTATOIN + currentBuildName
+							+ OdenConstants.DOUBLE_QUOTATOIN);
+					List<JSONObject> detailArray = odenCommonDao.jsonObjectArrays(detailCommand);
+
+					if (detailArray.size() == 1) { // 둘 이상 될수 없음
+						status = String.valueOf(detailArray.get(0).get("status"));
+					}
+
+					if (!status.equals("B")) {
+						Thread.sleep(2000);
+						duration += 2000;
+						if (duration == 30000) {
+							return false;
+						}
+
+					} else {
+						runningBuildMap.put(txid, buildName);
+						runningBuildURLMap.put(buildName, consoleUrl);
+						isCurrentBuildAdd = false;
+						return true;
+					}
+				}
+			} else if (currentBuildName.equals("") || !buildName.equals(currentBuildName)) {
+				if (status.equals("B")) {
+					runningBuildMap.put(txid, buildName);
+					runningBuildURLMap.put(buildName, consoleUrl);
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -541,20 +557,18 @@ public class JobServiceImpl implements JobService {
 	 * @throws Exception
 	 */
 	private String getJobById(String txid) throws Exception {
-		String result = odenCommonDao.getResultString("log", "show", txid);
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					String jobName = object.getString("job");
-					if (!"".equals(jobName)) {
-						return jobName;
-					}
-				}
+		String command = CommandUtil.getBasicCommand("log", "show", txid);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+		String jobName = "";
+
+		for (JSONObject object : objectArray) {
+			jobName = object.getString("job");
+			if (!StringUtil.isEmpty(jobName)) {
+				return jobName;
 			}
 		}
-		return "";
+		return jobName;
 	}
 
 	/**
@@ -564,12 +578,9 @@ public class JobServiceImpl implements JobService {
 	 * @return String
 	 */
 	private String runningJobAction(String txId) {
-
-		String imgStop = "<img src='images/stop.png' style='vertical-align:middle;'/>";
-
 		String result = "";
-		result = result.concat(ahrefPre + "javascript:stopDeployJob('" + txId
-				+ "');" + ahrefMid + imgStop + ahrefPost);
+		result = result.concat(OdenConstants.A_HREF_HEAD + "javascript:stopDeployJob('" + txId + "');" + OdenConstants.A_HREF_MID
+				+ OdenConstants.IMG_TAG_STOP + OdenConstants.A_HREF_TAIL);
 		return result;
 	}
 
@@ -581,102 +592,122 @@ public class JobServiceImpl implements JobService {
 	 * @return String
 	 * @throws Exception
 	 */
-	private String stoppingJobAction(String jobName, String txId, String gStatus)
+	private String stoppingJobAction(String jobName, String txId, String gStatus, String gBuild, boolean isRunning, boolean isBuilding, Job jobInfo, List<JSONObject> objectArr, boolean buildCheck)
 			throws Exception {
 
-		String imgDeploy = "<img src='images/ico_deploy.gif' alt='Job Deploy' title='Job Deploy' style='vertical-align:middle;'/>";
-		String imgCleanDeploy = "<img src='images/ico_celandeploy.gif' alt='Clean Deploy' title='Clean Deploy' style='vertical-align:middle;'/>";
-		String imgCompare = "<img src='images/ico_compare.gif' alt='Compare Targets' title='Compare Targets' style='vertical-align:middle;'/>";
-		String imgCompareUnable = "<img src='images/ico_compare_d.gif' alt='Compare Targets(Unable)' title='Compare Targets(Unable)' style='vertical-align:middle;'/>";
-		String imgScript = "<img src='images/ico_runscript.gif' alt='Run Script' title='Run Script' style='vertical-align:middle;'/>";
-		String imgScriptUnable = "<img src='images/ico_runscript_d.gif' alt='Run Script(Unable)' title='Run Script(Unable)' style='vertical-align:middle;'/>";
-		String imgDel = "<img src='images/ico_del.gif' alt='Delete Job' title='Delete Job' style='vertical-align:middle;'/>";
-		String imgDelUnable = "<img src='images/ico_del_d.gif' alt='Delete Job' title='Delete Job' style='vertical-align:middle;'/>";
-		String imgRollback = "<img src='images/ico_rollback.gif' alt='Job Rollback' title='Job Rollback' style='vertical-align:middle;'/>";
-		String imgRollbackUnable = "<img src='images/ico_rollback_d.gif' alt='Job Rollback(Unable)' title='Job Rollback(Unable)' style='vertical-align:middle;'/>";
-
-		Page g = new ServerServiceImpl().findListByPk(jobName);
-		Page c = new ScriptServiceimpl().findListByPk(jobName, "del");
+		//String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
+		//List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+		//List<JSONObject> objectArray1 = odenCommonDao.jsonObjectArrays(command);
+		//List<JSONObject> objectArray2 = odenCommonDao.jsonObjectArrays(command);
+		
+		Page g = serverService.findListByPk(jobName, objectArr);
+		Page c = scriptService.findListByPk(jobName, "del", objectArr);
 
 		String result = "";
 		List<Integer> permList = new ArrayList<Integer>();
 		permList.add(4);
 
-		boolean access = viewResourceAccessService.isGranted("addUser",
-				permList);
+		boolean access = viewResourceAccessService.isGranted("addUser", permList);
 
+		//Job jobInfo = findByName(jobName);
+
+		/**
+		 * <pre>
+		 * 7 :: operation count 
+		 * 0 - Build Run 
+		 * 1 - Deploy 
+		 * 2 - Clean Deploy 
+		 * 3 - Compare 
+		 * 4 - Restart 
+		 * 5 - Delete Job 
+		 * 6 - Rollback Job
+		 * </pre>
+		 */
 		int optCount = 0;
-		while (optCount < 6) {
+		while (optCount < 7) {
 			String link = "";
 			String action = "";
-			boolean b = true;
-			String deploy_init = "&initdataService=scriptService.getCommandList(param)&initdataResult=cmds&param="
-					+ jobName;
+			boolean activeLink = true;
+
 			switch (optCount) {
 			case 0:
-				link = "javascript:fn_addTab('03job', 'Deploy', 'deploy', '"
-						+ jobName + "','" + deploy_init + "');";
-				action = imgDeploy;
+				link = "javascript:runBuild('" + jobInfo.getBuild() + "');";
+				if (gBuild == null || gBuild.equals("") || gBuild.equals("None") || isBuilding == true || isRunning == true || buildCheck == false) {
+					action = OdenConstants.IMG_TAG_BUILD_UNABLE;
+					activeLink = false;
+				} else {
+					action = OdenConstants.IMG_TAG_BUILD;
+				}
+
 				break;
 			case 1:
-				link = "javascript:cleanDeploy('" + jobName + "');";
-				action = imgCleanDeploy;
+				String deploy_init = "&initdataService=scriptService.getCommandList(param)&initdataResult=cmds&param=" + jobName;
+				link = "javascript:fn_addTab('03job', 'Deploy', 'deploy', '" + jobName + "', '" + deploy_init + "', currentSelectedTab);";
+				if (isBuilding == true) {
+					action = OdenConstants.IMG_TAG_DEPLOY_UNABLE;
+					activeLink = false;
+				} else {
+					action = OdenConstants.IMG_TAG_DEPLOY;
+				}
+
 				break;
 			case 2:
-				link = "javascript:fn_addTab('03job', 'Compare', 'compare', '"
-						+ jobName + "');";
-				if (g.getList().size() > 1) {
-					action = imgCompare;
+				link = "javascript:cleanDeploy('" + jobName + "');";
+				if (isBuilding == true) {
+					action = OdenConstants.IMG_TAG_CLEANDEPLOY_UNABLE;
+					activeLink = false;
 				} else {
-					action = imgCompareUnable;
-					b = false;
+					action = OdenConstants.IMG_TAG_CLEANDEPLOY;
 				}
 				break;
 			case 3:
-				link = "javascript:fn_addTab('03job', 'Restart', 'script', '"
-						+ jobName + "');";
-				if (c.getList().size() > 0) {
-					action = imgScript;
+				link = "javascript:fn_addTab('03job', 'Compare', 'compare', '" + jobName + "', + currentSelectedTab);";
+				if (g.getList().size() > 1 && isBuilding == false) {
+					action = OdenConstants.IMG_TAG_COMPARE;
 				} else {
-					action = imgScriptUnable;
-					b = false;
+					action = OdenConstants.IMG_TAG_COMPARE_UNABLE;
+					activeLink = false;
 				}
 				break;
 			case 4:
-				link = "javascript:delJob('" + jobName + "');";
-				if (access) {
-					action = imgDel;
+				link = "javascript:fn_addTab('03job', 'Restart', 'script', '" + jobName + "', + currentSelectedTab);";
+				if (c.getList().size() > 0 && isBuilding == false) {
+					action = OdenConstants.IMG_TAG_SCRIPT;
 				} else {
-					action = imgDelUnable;
-					b = false;
+					action = OdenConstants.IMG_TAG_SCRIPT_UNABLE;
+					activeLink = false;
 				}
 				break;
 			case 5:
-				link = "javascript:rollbackJob('" + txId + "');";
-				if (!"".equals(gStatus)) {
-					action = imgRollback;
+				link = "javascript:delJob('" + jobName + "');";
+				if (access && isBuilding == false) {
+					action = OdenConstants.IMG_TAG_DEL;
 				} else {
-					action = imgRollbackUnable;
-					b = false;
+					action = OdenConstants.IMG_TAG_DEL_UNABLE;
+					activeLink = false;
+				}
+				break;
+			case 6:
+				link = "javascript:rollbackJob('" + txId + "');";
+				if (!"".equals(gStatus) && isBuilding == false) {
+					action = OdenConstants.IMG_TAG_ROLLBACK;
+				} else {
+					action = OdenConstants.IMG_TAG_ROLLBACK_UNABLE;
+					activeLink = false;
 				}
 				break;
 			default:
 				break;
 			}
 
-			if (b) {
-				result = result.concat(ahrefPre + link + ahrefMid + action
-						+ ahrefPost + "&nbsp;&nbsp;&nbsp;");
+			if (activeLink) {
+				result = result.concat(OdenConstants.A_HREF_HEAD + link + OdenConstants.A_HREF_MID + action + OdenConstants.A_HREF_TAIL
+						+ "&nbsp;&nbsp;&nbsp;");
 			} else {
 				result = result.concat(action + "&nbsp;&nbsp;&nbsp;");
 			}
-			// result += ahref_pre + link + ahref_mid + action
-			// + ahref_post + "   ";
-
 			optCount++;
 		}
-
-		// result = result.substring(0, result.length() - 3);
 		return result;
 	}
 
@@ -687,50 +718,18 @@ public class JobServiceImpl implements JobService {
 	 * @throws Exception
 	 */
 	public Job findByName(String param) throws Exception {
-
 		if ("".equals(param)) {
 			return new Job();
 		} else {
-			String result = odenCommonDao.getResultString("job", "info",
-					doubleQuotation + param + doubleQuotation);
-			Job g = new Job();
+			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-			if (!(result == null) && !"".equals(result)) {
-				JSONArray array = new JSONArray(result);
-				if (!(array.length() == 0)) {
-					int recordSize = array.length();
-					for (int i = 0; i < recordSize; i++) {
-						JSONObject object = (JSONObject) array.get(i);
-						String name = object.get("name") + "";
-						JSONObject sources = (JSONObject) object.get("sources");
-
-						String repo = sources.getString("dir");
-						// JSONArray mappings = (JSONArray) sources
-						// .get("mappings");
-						//
-
-						JSONArray excludes = (JSONArray) sources
-								.get("excludes");
-						String strExcludes = "";
-						for (int num = 0; num < excludes.length(); num++) {
-							strExcludes = strExcludes.concat(excludes.get(num)
-									+ ", ");
-						}
-						if (!"".equals(strExcludes)) {
-							strExcludes = strExcludes.substring(0,
-									strExcludes.length() - 2);
-						}
-
-						g.setJobname(name);
-						g.setRepo(repo);
-						g.setExcludes(strExcludes);
-					}
-				}
+			Job job = new Job();
+			if (objectArray.size() == 1) { // 둘 이상 될수 없음
+				job = JsonConverter.jsonToJob(objectArray.get(0));
 			}
-
-			return g;
+			return job;
 		}
-
 	}
 
 	/**
@@ -744,18 +743,21 @@ public class JobServiceImpl implements JobService {
 	 * @param excludes
 	 * @throws Exception
 	 */
-	public void insert(String[] param, String[] cmds, String[] mappings,
-			String jobname, String repository, String excludes)
-			throws Exception {
-		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes);
-		// DB Role Insert
-		try {
-			this.createRole(jobname);
-		} catch (Exception e) {
-			// 추가 된 job add rollback
-			this.remove(jobname);
-			throw e;
+	public void insert(String[] param, String[] cmds, String[] mappings, String jobname, String repository, String excludes, String groupName,
+			String build) throws Exception {
+		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes, groupName, build);
+		createRole(jobname);
+	}
+	
+	public boolean existJob(String jobName) throws Exception{
+		List<String> jobNameList = odenCommonDao.getStringList("job", "info");
+		
+		if(jobNameList.contains(jobName)){
+			return true;
+		}else{
+			return false;
 		}
+		
 	}
 
 	/**
@@ -769,26 +771,27 @@ public class JobServiceImpl implements JobService {
 	 * @param excludes
 	 * @throws Exception
 	 */
-	public void update(String[] param, String[] cmds, String[] mappings,
-			String jobname, String repository, String excludes)
-			throws Exception {
-		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes);
+	public void update(String[] param, String[] cmds, String[] mappings, String jobname, String repository, String excludes, String groupName,
+			String build) throws Exception {
+		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes, groupName, build);
 	}
 
-	@SuppressWarnings("PMD")
-	private void insertToOdenServer(String[] param, String[] cmds,
-			String[] mappings, String jobname, String repository,
-			String excludes) throws Exception {
+	private void insertToOdenServer(String[] param, String[] cmds, String[] mappings, String jobname, String repository, String excludes,
+			String groupName, String build) throws Exception {
 		JSONObject jo = new JSONObject();
 		jo.put("name", jobname);
+
+		// group 추가(14.08.12 by junghwan.hong)
+		jo.put("group", groupName);
+		jo.put("build", build);
 
 		JSONObject joSource = new JSONObject();
 		joSource.put("dir", repository);
 
 		String exclu = "";
-		StringTokenizer token2 = new StringTokenizer(excludes, ",");
-		while (token2.hasMoreTokens()) {
-			exclu = exclu.concat(token2.nextToken().trim() + ",");
+		StringTokenizer token = new StringTokenizer(excludes, ",");
+		while (token.hasMoreTokens()) {
+			exclu = exclu.concat(token.nextToken().trim() + ",");
 		}
 		if (exclu.length() != 0) {
 			exclu = exclu.substring(0, exclu.length() - 1);
@@ -797,20 +800,12 @@ public class JobServiceImpl implements JobService {
 
 		JSONArray mappingArray = new JSONArray();
 		for (int i = 0; i < mappings.length; i++) {
-			String key = mappings[i];
-			String[] values = key.split("@oden@");
-			String dir = values[0];
-			String checkout = values[1];
-
-			if (i == 0 && dir.equalsIgnoreCase(".")
-					&& checkout.equalsIgnoreCase(".")) {
-				break;
+			JSONObject mapping = JsonConverter.mappingToJson(mappings[i]);
+			if (i == 0) {
+				if (mapping.get("dir").equals(".") && mapping.get("checkout-dir").equals(".")) {
+					break;
+				}
 			}
-
-			JSONObject mapping = new JSONObject();
-			mapping.put("dir", dir);
-			mapping.put("checkout-dir", checkout);
-
 			mappingArray.put(mapping);
 		}
 
@@ -819,39 +814,18 @@ public class JobServiceImpl implements JobService {
 
 		JSONArray jaTarget = new JSONArray();
 		for (int i = 0; i < param.length; i++) {
-			String para = param[i];
-			String[] values = para.split("@oden@");
-			String name = values[0];
-			String url = values[1];
-			String path = values[2];
-
-			JSONObject innerJO = new JSONObject();
-			innerJO.put("name", name);
-			innerJO.put("address", url);
-			innerJO.put("dir", path);
-
-			jaTarget.put(innerJO);
+			JSONObject target = JsonConverter.targetToJson(param[i]);
+			jaTarget.put(target);
 		}
 		jo.put("targets", jaTarget);
 
 		JSONArray jaCommands = new JSONArray();
 		for (int i = 0; i < cmds.length; i++) {
-			String para = cmds[i];
-			String[] values = para.split("@oden@");
-			String name = values[0];
-			String path = values[1];
-			String script = values[2];
-
-			if (i == 0 && name.equalsIgnoreCase(".")) {
+			JSONObject cmd = JsonConverter.commandToJson(cmds[i]);
+			if (i == 0 && cmd.get("name").equals(".")) {
 				break;
 			}
-
-			JSONObject innerJO = new JSONObject();
-			innerJO.put("name", name);
-			innerJO.put("dir", path);
-			innerJO.put("command", script);
-
-			jaCommands.put(innerJO);
+			jaCommands.put(cmd);
 		}
 		jo.put("commands", jaCommands);
 
@@ -896,112 +870,59 @@ public class JobServiceImpl implements JobService {
 	 * @param param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public Page loadMappings(String param) throws Exception {
-		if ("".equals(param)) {
-			List list = new ArrayList();
-			return new Page(list, 1, list.size(), 1, 1);
-		} else {
-			List list = new ArrayList();
+		List<Mapping> list = new ArrayList<Mapping>();
+		if (!StringUtil.isEmpty(param)) {
+			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-			String result = odenCommonDao.getResultString("job", "info",
-					doubleQuotation + param + doubleQuotation);
+			for (JSONObject object : objectArray) {
+				JSONObject sources = (JSONObject) object.get("source");
+				JSONArray mappings = (JSONArray) sources.get("mappings");
 
-			String imgDel = "<img src='images/ico_del.gif'/>";
+				if (!(mappings == null) && !"".equals(mappings)) {
+					for (int n = 0; n < mappings.length(); n++) {
+						JSONObject mapping = (JSONObject) mappings.get(n);
 
-			if (!(result == null) && !"".equals(result)) {
-				JSONArray array = new JSONArray(result);
-				if (!(array.length() == 0)) {
-					int recordSize = array.length();
-					for (int i = 0; i < recordSize; i++) {
-						JSONObject object = (JSONObject) array.get(i);
-						JSONObject sources = (JSONObject) object.get("sources");
-
-						JSONArray mappings = (JSONArray) sources
-								.get("mappings");
-						if (!(mappings == null) && !"".equals(mappings)) {
-							for (int n = 0; n < mappings.length(); n++) {
-								JSONObject mapping = (JSONObject) mappings
-										.get(n);
-								String dir = mapping.getString("dir");
-								String checkout = mapping
-										.getString("checkout-dir");
-
-								String key = dir + "@oden@" + checkout;
-
-								String event = ahrefPre
-										+ "javascript:delSource('" + key
-										+ "');" + ahrefMid + imgDel
-										+ ahrefPost;
-
-								Mapping m = new Mapping();
-								m.setDir(dir);
-								m.setCheckout(checkout);
-								m.setHidden(event);
-								m.setHiddenname(key);
-
-								list.add(m);
-							}
-						}
-
-					}
-				}
-			}
-
-			if (list.isEmpty()) {
-				return new Page(list, 1, list.size(), 1, 1);
-			} else {
-				return new Page(list, 1, list.size(), list.size(), list.size());
-			}
-		}
-	}
-	
-	@SuppressWarnings("PMD")
-	public Page findMappings(String param) throws Exception {
-		if ("".equals(param)) {
-			List list = new ArrayList();
-			return new Page(list, 1, list.size(), 1, 1);
-		} else {
-			List list = new ArrayList();
-
-			String opt = doubleQuotation + param + doubleQuotation;
-
-			String result = odenCommonDao.getResultString("job",
-					"mapping-scan", opt);
-
-			String imgDel = "<img src='images/ico_del.gif'/>";
-
-			if (!(result == null) && !"".equals(result)) {
-				JSONArray array = new JSONArray(result);
-				if (!(array.length() == 0)) {
-					int recordSize = array.length();
-					for (int i = 0; i < recordSize; i++) {
-						JSONObject object = (JSONObject) array.get(i);
-
-						String dir = object.getString("dir");
-						String checkout = object.getString("checkout-dir");
-
-						String key = dir + "@oden@" + checkout;
-
-						String event = ahrefPre + "javascript:delSource('"
-								+ key + "');" + ahrefMid + imgDel + ahrefPost;
-
-						Mapping m = new Mapping();
-						m.setDir(dir);
-						m.setCheckout(checkout);
+						Mapping m = JsonConverter.jsonToMapping(mapping);
+						String event = OdenConstants.A_HREF_HEAD + "javascript:delSource('" + m.getHiddenname() + "');" + OdenConstants.A_HREF_MID
+								+ OdenConstants.IMG_TAG_DEL + OdenConstants.A_HREF_TAIL;
 						m.setHidden(event);
-						m.setHiddenname(key);
-
 						list.add(m);
 					}
 				}
 			}
 
-			if (list.isEmpty()) {
-				return new Page(list, 1, list.size(), 1, 1);
-			} else {
-				return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+	}
+
+	public Page findMappings(String param) throws Exception {
+		List<Mapping> list = new ArrayList<Mapping>();
+		if (!StringUtil.isEmpty(param)) {
+			String command = CommandUtil.getBasicCommand("job", "mapping-scan", OdenConstants.DOUBLE_QUOTATOIN + param
+					+ OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+			for (JSONObject object : objectArray) {
+				Mapping m = JsonConverter.jsonToMapping(object);
+
+				String event = OdenConstants.A_HREF_HEAD + "javascript:delSource('" + m.getHiddenname() + "');" + OdenConstants.A_HREF_MID
+						+ OdenConstants.IMG_TAG_DEL + OdenConstants.A_HREF_TAIL;
+				m.setHidden(event);
+				list.add(m);
 			}
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
 
@@ -1012,17 +933,12 @@ public class JobServiceImpl implements JobService {
 	 * @param param
 	 * @param opt
 	 */
-	@SuppressWarnings("PMD")
-	public Page compare(Object objPage, String param, String opt)
-			throws Exception {
+	public Page compare(Object objPage, String param, String opt) throws Exception {
 
-		int page = Integer.parseInt(objPage + "");
+		int page = Integer.parseInt(String.valueOf(objPage));
 		int totalNum = 0;
 
 		String option = opt + " ";
-
-		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
-		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
 
 		if (page == 0) {
 			option = option.concat("-page" + " " + page);
@@ -1030,54 +946,44 @@ public class JobServiceImpl implements JobService {
 			option = option.concat("-page" + " " + (page - 1));
 		}
 
-		String result = odenCommonDao.getResultString("job", "compare",
-				doubleQuotation + param + doubleQuotation + " " + option);
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 
-		List list = new ArrayList();
+		String command = CommandUtil.getBasicCommand("job", "compare", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN + " "
+				+ option);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				int recordSize = array.length();
-				for (int i = 0; i < recordSize; i++) {
-					JSONObject object = (JSONObject) array.get(i);
+		for (JSONObject object : objectArray) {
+			totalNum = Integer.parseInt(object.getString("total"));
+			JSONArray data = (JSONArray) object.get("data");
 
-					totalNum = Integer.parseInt(object.getString("total"));
-					JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					Map<String, String> map = new HashMap<String, String>();
+					JSONObject dataObj = (JSONObject) data.get(j);
 
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							HashMap map = new HashMap();
-							JSONObject dataObj = (JSONObject) data.get(j);
+					String path = dataObj.getString("path");
+					String equal = dataObj.getString("equal");
 
-							String path = dataObj.getString("path");
-							String equal = dataObj.getString("equal");
+					String eqaulResult = "";
+					if ("T".equals(equal)) {
+						eqaulResult = OdenConstants.IMG_TAG_SUCCESS;
+					} else {
+						eqaulResult = OdenConstants.IMG_TAG_FAIL;
+					}
+					map.put("status", eqaulResult);
+					map.put("file", path);
 
-							String eqaulResult = "";
-							if ("T".equals(equal)) {
-								eqaulResult = imgSuccess;
-							} else {
-								eqaulResult = imgFail;
-							}
-							map.put("status", eqaulResult);
-							map.put("file", path);
-
-							JSONArray targets = (JSONArray) dataObj
-									.get("targets");
-							if (!(targets.length() == 0)) {
-								for (int n = 0; n < targets.length(); n++) {
-									JSONObject t = (JSONObject) targets.get(n);
-									String name = t.getString("name");
-									String date = chgDateFormat(Long
-											.parseLong(t.getString("date")));
-									String size = t.getString("size");
-									map.put(name, date + "<br/>" + size
-											+ "byte");
-								}
-							}
-							list.add(map);
+					JSONArray targets = (JSONArray) dataObj.get("targets");
+					if (!(targets.length() == 0)) {
+						for (int n = 0; n < targets.length(); n++) {
+							JSONObject t = (JSONObject) targets.get(n);
+							String name = t.getString("name");
+							String date = DateUtil.toStringDate(Long.parseLong(t.getString("date")));
+							String size = t.getString("size");
+							map.put(name, date + "<br/>" + size + "byte");
 						}
 					}
+					list.add(map);
 				}
 			}
 		}
@@ -1090,17 +996,15 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param param
 	 */
-	@SuppressWarnings("PMD")
-	public Map compareHeader(String param) throws Exception {
+	public Map<String, Object> compareHeader(String param) throws Exception {
 
 		int numHeader = 0;
 
-		ArrayList header = new ArrayList();
+		List<String> header = new ArrayList<String>();
 		header.add("STATUS");
 		header.add("FILE");
 
-		String result = odenCommonDao.getResultString("job", "info",
-				doubleQuotation + param + doubleQuotation);
+		String result = odenCommonDao.getResultString("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
 
 		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
@@ -1120,10 +1024,10 @@ public class JobServiceImpl implements JobService {
 				}
 			}
 		}
-		ArrayList model = new ArrayList();
+		List<Map<String, Object>> model = new ArrayList<Map<String, Object>>();
 
 		// status
-		HashMap map_model_status = new HashMap();
+		Map<String, Object> map_model_status = new HashMap<String, Object>();
 		map_model_status.put("name", ((String) header.get(0)).toLowerCase());
 		map_model_status.put("index", ((String) header.get(0)).toLowerCase());
 		map_model_status.put("align", "center");
@@ -1133,7 +1037,7 @@ public class JobServiceImpl implements JobService {
 		model.add(map_model_status);
 
 		// file
-		HashMap map_model_file = new HashMap();
+		Map<String, Object> map_model_file = new HashMap<String, Object>();
 		map_model_file.put("name", ((String) header.get(1)).toLowerCase());
 		map_model_file.put("index", ((String) header.get(1)).toLowerCase());
 		map_model_file.put("align", "left");
@@ -1144,7 +1048,7 @@ public class JobServiceImpl implements JobService {
 
 		// target servers
 		for (int i = 2; i < numHeader + 2; i++) {
-			HashMap map_model = new HashMap();
+			Map<String, Object> map_model = new HashMap<String, Object>();
 			map_model.put("name", header.get(i));
 			map_model.put("index", header.get(i));
 			map_model.put("align", "center");
@@ -1153,7 +1057,7 @@ public class JobServiceImpl implements JobService {
 			map_model.put("sortable", false);
 			model.add(map_model);
 		}
-		Map map_result = new HashMap();
+		Map<String, Object> map_result = new HashMap<String, Object>();
 		map_result.put("header", header);
 		map_result.put("model", model);
 
@@ -1166,7 +1070,7 @@ public class JobServiceImpl implements JobService {
 	 * @param name
 	 */
 	public void remove(String name) throws Exception {
-		odenCommonDao.remove("_job", name);
+		odenCommonDao.remove("_job", OdenConstants.DOUBLE_QUOTATOIN + name + OdenConstants.DOUBLE_QUOTATOIN);
 		this.removeRole(name);
 	}
 
@@ -1179,58 +1083,44 @@ public class JobServiceImpl implements JobService {
 		odenCommonDao.getResultString("status", "stop", param);
 	}
 
-	private String chgDateFormat(Long input) {
-		return new SimpleDateFormat("yyyy.MM.dd aa hh:mm:ss", Locale
-				.getDefault()).format(input);
-	}
-
 	/**
 	 * Methode for downloading excel file with job comparing information.
 	 * 
 	 * @param param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
-	public List<HashMap> excel(String param) throws Exception {
+	public List<Map<String, String>> excel(String param) throws Exception {
 
-		String result = odenCommonDao.getResultString("job", "compare", param);
+		String command = CommandUtil.getBasicCommand("job", "compare", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
 
-		List list = new ArrayList();
+		for (JSONObject object : objectArray) {
+			JSONArray data = (JSONArray) object.get("data");
 
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				int recordSize = array.length();
-				for (int i = 0; i < recordSize; i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
 
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							HashMap map = new HashMap();
-							JSONObject dataObj = (JSONObject) data.get(j);
+				for (int j = 0; j < data.length(); j++) {
+					Map<String, String> map = new HashMap<String, String>();
+					JSONObject dataObj = (JSONObject) data.get(j);
 
-							String path = dataObj.getString("path");
-							String equal = dataObj.getString("equal");
+					String path = dataObj.getString("path");
+					String equal = dataObj.getString("equal");
 
-							map.put("status", equal);
-							map.put("file", path);
+					map.put("status", equal);
+					map.put("file", path);
 
-							JSONArray targets = (JSONArray) dataObj
-									.get("targets");
-							if (!(targets.length() == 0)) {
-								for (int n = 0; n < targets.length(); n++) {
-									JSONObject t = (JSONObject) targets.get(n);
-									String name = t.getString("name");
-									String date = chgDateFormat(Long
-											.parseLong(t.getString("date")));
-									String size = t.getString("size");
-									map.put(name, date + " " + size + "byte");
-								}
-							}
-							list.add(map);
+					JSONArray targets = (JSONArray) dataObj.get("targets");
+					if (!(targets.length() == 0)) {
+						for (int n = 0; n < targets.length(); n++) {
+							JSONObject t = (JSONObject) targets.get(n);
+							String name = t.getString("name");
+							String date = DateUtil.toStringDate(Long.parseLong(t.getString("date")));
+							String size = t.getString("size");
+							map.put(name, date + " " + size + "byte");
 						}
 					}
+					list.add(map);
 				}
 			}
 		}
@@ -1245,8 +1135,42 @@ public class JobServiceImpl implements JobService {
 	 * @throws Exception
 	 */
 	public List<Job> findJob() throws Exception {
-		ArrayList roles = new ArrayList();
+		List<String> roles = new ArrayList<String>();
 		roles.add("ROLE_ADMIN");
 		return odenCommonDao.findJob("job", "info", roles);
+	}
+	
+	/**
+	 * Get build Name
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	
+	public String getBuildByobjectArray(List<JSONObject> objectArray) throws Exception {
+		String buildName = null;
+		for (JSONObject object : objectArray) {
+			buildName = (String) object.get("build");
+
+		}
+		return buildName;
+	}
+	
+	/**
+	 * Get build Check
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	
+	public boolean getBuildCheck() throws Exception {
+		boolean buildCheck = false;
+		String buildCmd = CommandUtil.getBasicCommand("build", "check");
+		List<JSONObject> objectArr = odenCommonDao.jsonObjectArrays(buildCmd);
+		for (JSONObject object : objectArr) {
+			buildCheck = (Boolean) object.get("serverStatus");
+
+		}
+		return buildCheck;
 	}
 }

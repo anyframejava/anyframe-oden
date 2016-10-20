@@ -1,6 +1,9 @@
 <%@ page language="java" errorPage="/common/error.jsp" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ include file="/common/taglibs.jsp"%>
-<% String jobName = (String)request.getParameter("para"); %>
+<%	request.setCharacterEncoding("UTF-8");
+	String jobName = (String)request.getParameter("para");
+	String currentSelectedTab = (String)request.getParameter("para1");
+%>
 
 <script type="text/javascript">
 
@@ -72,7 +75,7 @@
 	}
 	
 	function ok() {
-		fn_addTab('03job', 'Job', 'job');
+		fn_addTab('03job', 'Job', 'job', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);
 	}
 
 	function setChooser(result){

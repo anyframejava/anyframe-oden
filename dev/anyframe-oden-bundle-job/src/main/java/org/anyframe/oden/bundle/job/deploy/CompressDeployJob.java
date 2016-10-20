@@ -496,8 +496,12 @@ public class CompressDeployJob extends CompressJob {
 				f.setErrorLog(info.getException());
 				setError(info.getException());
 			}
+			// add the size of deploy file
+			f.setSize(info.size());
 		} catch (Exception e) {
 			f.setSuccess(false);
+			// add the size of deploy file
+			f.setSize(0L);
 			if (StringUtil.empty(f.errorLog())) {
 				f.setErrorLog(e.getMessage());
 			}

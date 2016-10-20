@@ -27,12 +27,12 @@ margin:0;
 				<table width="65" border="0" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
 					<tr>
 						<td valign="top" bgcolor="#eeeeee" class="depth01">
-						   <a href="javascript:fn_addTab('03job', 'Job');"></a>
+						   <a href="javascript:fn_addTab('03job', 'Job', '', '&amp;initdataService=groupService.findGroupAndUngroup()&amp;initdataResult=groupUngroups', 'ALL');"></a>
 						</td>
 					</tr>
 					<tr>
 						<td valign="top" bgcolor="#eeeeee" class="depth02">
-						   <a href="javascript:fn_addTab('04history', 'History','','&amp;initdataService=historyService.findJob(role)&amp;initdataResult=jobs&amp;role=<%= session.getAttribute("userrole") %>');"></a>
+						   <a href="javascript:fn_addTab('04history', 'History','','','&amp;initdataService=historyService.findJob(role)&amp;initdataResult=jobs&amp;role=<%= session.getAttribute("userrole") %>');"></a>
 						</td>
 					</tr>
 					<tr>

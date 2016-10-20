@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.anyframe.oden.admin.common;
+package org.anyframe.oden.admin.util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

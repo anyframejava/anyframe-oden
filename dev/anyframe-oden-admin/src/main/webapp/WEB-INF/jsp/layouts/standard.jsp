@@ -5,6 +5,8 @@
 <% String resId = (String)request.getParameter("tabId"); 
    String resNm = (String)request.getParameter("tabName");
    String resPara = (String)request.getParameter("keyParam"); %>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -43,7 +45,7 @@
 jQuery(document).ready(function() {
 	$('#body').show();
 	$('#body_img').hide();
-	fn_addTab('03job', 'Job');
+	fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', 'ALL');
 });
 </script>
 </head>
@@ -85,7 +87,7 @@ jQuery(document).ready(function() {
 
 	document.charset="UTF-8"; //
   	
-    function fn_addTab(id, name, data, para , para1){
+    function fn_addTab(id, name, data, para, para1, para2){
     		$('#body').show();
     		$('#body_img').hide();
     		$('#nameParam').val(name);
@@ -112,8 +114,12 @@ jQuery(document).ready(function() {
     		if(para1 !== null || para1.length !== 0){
     			appendPara1 = "&para1="+para1;
         	}
-    		var url = "<c:url value='/simplejson.do?layout="+dtlURL+"Layout" + appendPara + appendPara1 + "'/>";
-
+    		
+    		if(para2 !== null || para2.length !== 0){
+    			appendPara2 = "&para2="+para2;
+        	}
+    		var url = "<c:url value='/simplejson.do?layout="+dtlURL+"Layout" + appendPara + appendPara1 + appendPara2 + "'/>";
+    		//alert(url);
 			var maintab =jQuery('#body').tabs({
 		        	add: function(event, ui) {
 			            $(ui.tab).parents('li:first')

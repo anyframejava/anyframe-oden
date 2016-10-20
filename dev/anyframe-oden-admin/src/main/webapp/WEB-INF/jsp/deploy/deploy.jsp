@@ -3,6 +3,7 @@
 <%  request.setCharacterEncoding("UTF-8");
 	String jobName = (String)request.getParameter("para");
 	String userid = (String) session.getAttribute("userid");
+	String currentSelectedTab = (String)request.getParameter("para2");
 %>
 <script type="text/javascript">
 	var toggleID = "";
@@ -40,7 +41,7 @@
 					$( "#dialog-form" ).dialog( "destroy" );
 
 					
-					setTimeout('fn_addTab("03job", "Job", "job")', 500);
+					setTimeout('fn_addTab("03job", "Job", "job", "&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups", currentSelectedTab)', 500);
 					//fn_addTab("03job", "Job", "job")
 				},
 				Cancel: function() {
@@ -276,7 +277,7 @@ function drawGrid() {
 	});	
 	
 	$('[name=deploycancellink]').click(function() {
-		fn_addTab('03job', 'Job', 'job');
+		fn_addTab('03job', 'Job', 'job', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);
 	});
 
 	

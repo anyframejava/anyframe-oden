@@ -1,5 +1,5 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.5.0"/>
+	<property name="version" value="2.6.0"/>
 	<property name="manual.dir" location="../../../manual/manual/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
@@ -35,6 +35,8 @@
 		<!-- ant antfile="../anyframe.oden.bundle.sh/build.xml" target="${todo}" inheritall="false" / -->
 		
 		<ant antfile="../anyframe-oden-bundle-job/build.xml" target="${todo}" inheritall="false" />
+		
+		<ant antfile="../anyframe-oden-bundle-build/build.xml" target="${todo}" inheritall="false" />
 		
 		<ant antfile="../anyframe-oden-bundle-external/build.xml" target="${todo}" inheritall="false" />
 	</target>
@@ -100,6 +102,7 @@
 					anyframe-oden-bundle-auth-*.jar,
 					anyframe-oden-bundle-job-*.jar,
 					anyframe-oden-bundle-external-*.jar,
+				    anyframe-oden-bundle-build-*.jar,
 					felix.jar,
 					org.apache.felix.configadmin-*.jar,
 					org.apache.felix.eventadmin-*.jar,
@@ -112,7 +115,10 @@
 					hessian-*.jar,
 					berkelydb-*.jar,
 					icu4j-*.jar,
+				    jdom.jar,
 					org.apache.servicemix.bundles.jasypt-*.jar,
+				    org.apache.servicemix.bundles.commons-codec-*.jar,
+				    org.apache.servicemix.bundles.commons-httpclient-*.jar,
 					commons-logging-*.jar"/>
 		</copy>
 		<copy todir="${artifactsDir}/conf">

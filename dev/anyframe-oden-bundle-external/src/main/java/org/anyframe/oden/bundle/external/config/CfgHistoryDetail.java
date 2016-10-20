@@ -40,14 +40,21 @@ public class CfgHistoryDetail implements Serializable {
 
 	private String success;
 
+	private String date;
+
+	private long size;
+
 	public CfgHistoryDetail(String source, String path, String mode,
-			String errorlog, String targets, String success) {
+			String errorlog, String targets, String success, String date,
+			long size) {
 		this.source = source;
 		this.path = path;
 		this.mode = mode;
 		this.errorlog = errorlog;
 		this.targets = targets;
 		this.success = success;
+		this.date = date;
+		this.size = size;
 	}
 
 	public String getSource() {
@@ -72,6 +79,14 @@ public class CfgHistoryDetail implements Serializable {
 
 	public String getSuccess() {
 		return success;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public long getSize() {
+		return size;
 	}
 
 }

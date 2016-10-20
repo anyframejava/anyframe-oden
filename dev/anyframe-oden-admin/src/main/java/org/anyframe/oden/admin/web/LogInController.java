@@ -70,6 +70,7 @@ public class LogInController {
 				mav = new ModelAndView("jsonLayout");
 				session.setAttribute("userid", userid);
 				session.setAttribute("userrole", getRole());
+				session.setAttribute("groupid", getGroupId());
 			}
 		} catch (BrokerException e) {
 			mav = new ModelAndView("login");
@@ -104,5 +105,30 @@ public class LogInController {
 			}
 		}
 		return roles;
+	}
+	
+	private String getGroupId() throws Exception{
+		String groupId = "";
+		ResultSet rs = null;
+		if (!"".equals(userid) || userid != null) {
+			try {
+				Class.forName("org.hsqldb.jdbcDriver");
+				connection = DriverManager.getConnection(url, "sa", "");
+				if (connection != null) {
+					rs = connection.prepareStatement(
+							"SELECT GROUP_ID FROM GROUPS_USERS WHERE USER_ID ='"
+									+ userid + "'").executeQuery();
+					while (rs.next()) {
+						groupId = rs.getString("GROUP_ID");
+					}
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				rs.close();
+				connection.close();
+			}
+		}
+		return groupId;
 	}
 }

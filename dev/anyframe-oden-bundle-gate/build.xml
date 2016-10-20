@@ -39,7 +39,7 @@
 	    </pmd>
 	</target>
 	    	
-	<target name="dist.bundle" depends="compile.bundle, pmd">
+	<target name="dist.bundle" depends="compile.bundle">
 		<copy todir="${build}">
 			<fileset dir="${basedir}" includes="OSGI-INF/*.xml"/>
 		</copy>

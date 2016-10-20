@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.anyframe.oden.admin.util.CommonUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,9 +44,9 @@ public class Cmd {
 	private String action = "";
 	private String actionArg = "";
 	private final List<Opt> options = new ArrayList<Opt>();
-	
+
 	private final Log logger = LogFactory.getLog(this.getClass());
-	
+
 	public Cmd(String line) {
 		parse(line);
 	}
@@ -59,7 +60,7 @@ public class Cmd {
 		if (args.length == 0 || isOption(args[0])) {
 			logger.error("Syntax Error command");
 		}
-		
+
 		int idx = 0;
 		name = args[idx++];
 		if (idx < args.length && !isOption(args[idx])) {
@@ -155,7 +156,7 @@ public class Cmd {
 		if (op != null) {
 			return op.getArgList();
 		}
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	public String[] getOptionArgArray(String[] names) {
@@ -181,8 +182,7 @@ public class Cmd {
 	public String toString() {
 		StringBuffer buf = new StringBuffer(name);
 		buf.append(action.length() > 0 ? " " + action : "");
-		buf.append(actionArg.length() > 0 ? " \"" + actionArg + "\"" : " \""
-				+ "\"");
+		buf.append(actionArg.length() > 0 ? " \"" + actionArg + "\"" : " \"" + "\"");
 		for (Opt option : options) {
 			buf.append(" ");
 			buf.append(option.toString());

@@ -1,6 +1,6 @@
 <project name="Oden Enterprise Http" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe-oden-bundle-http" />
-	<property name="version" value="2.0.3"/>
+	<property name="version" value="2.0.4"/>
 	
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
@@ -39,7 +39,7 @@
 	    </pmd>
 	</target>
 	        	
-	<target name="dist.bundle" depends="compile.bundle, pmd">
+	<target name="dist.bundle" depends="compile.bundle">
 		<copy todir="${build}">
 			<fileset dir="${basedir}" includes="OSGI-INF/*.xml,web/**/*.*" excludes="**/*.svn"/>
 		</copy>

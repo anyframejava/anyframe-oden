@@ -15,7 +15,6 @@
  */
 package org.anyframe.oden.admin.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,43 +40,41 @@ public interface JobService {
 	 * @param param
 	 * @throws Exception
 	 */
-	public String run(String[] param, String opt, String job, Object objPage,
-			String cmd, String userid) throws Exception;
+	public String run(String[] param, String opt, String job, Object objPage, String cmd, String userid) throws Exception;
 
 	/**
 	 * 
 	 * @param param
 	 * @throws Exception
 	 */
-	public Page compare(Object objPage, String param, String flag)
-			throws Exception;
+	public Page compare(Object objPage, String param, String flag) throws Exception;
 
 	public void stop(String param) throws Exception;
 
-	public Map compareHeader(String param) throws Exception;
+	public Map<String, Object> compareHeader(String param) throws Exception;
 
-	public Page findList(String param) throws Exception;
+	public Page findList(String param, String buildName, String group) throws Exception;
 
 	public Job findByName(String param) throws Exception;
 
-	public void update(String[] param, String[] cmd, String[] mappings,
-			String jobname, String repository, String excludes)
-			throws Exception;
-	
-	public void insert(String[] param, String[] cmd, String[] mappings,
-			String jobname, String repository, String excludes)
-			throws Exception;
+	public void update(String[] param, String[] cmd, String[] mappings, String jobname, String repository, String excludes, String groupName,
+			String build) throws Exception;
+
+	public void insert(String[] param, String[] cmd, String[] mappings, String jobname, String repository, String excludes, String groupName,
+			String build) throws Exception;
 
 	public void remove(String name) throws Exception;
 
-	public List<HashMap> excel(String param) throws Exception;
+	public List<Map<String, String>> excel(String param) throws Exception;
 
 	public Page loadMappings(String param) throws Exception;
 
 	public Page findMappings(String param) throws Exception;
-	
+
 	public List<Job> findJob() throws Exception;
-	
+
 	public String rollback(String txid) throws Exception;
+	
+	public boolean existJob(String jobName) throws Exception;
 
 }

@@ -4,7 +4,7 @@
 	<property environment="env"/>
 
 	<property name="pack.name" value="anyframe-oden-admin" />
-	<property name="version" value="2.5.0"/>
+	<property name="version" value="2.6.0"/>
 	<!--property name="env.ANT_HOME" value="C:\ats-2.0.2\anyframe-5.0.1\ide\ant"/-->
 	<property name="dist" location="dist"/>
 	<property name="pack" location="pack"/>
@@ -96,6 +96,6 @@
 		<antcall target="war"/>
 	</target>
 
-	<target name="all" depends="init, cp-rscs, compile, pmd, war, package"/>
+	<target name="all" depends="init, cp-rscs, compile, war, package"/>
 
 </project>

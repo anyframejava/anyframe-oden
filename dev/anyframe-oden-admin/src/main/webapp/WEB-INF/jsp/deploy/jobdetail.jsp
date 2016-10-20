@@ -2,6 +2,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%  request.setCharacterEncoding("UTF-8");
 	String jobName = (String)request.getParameter("para");
+	String currentSelectedTab = (String)request.getParameter("para2");
 	
 	boolean isNew = false; 
 	if(jobName.charAt(0)=='"'){
@@ -9,7 +10,6 @@
 		jobName = jobName.substring(1, jobName.length()-1);
 	}
 %>
-
 
 <script type="text/javascript">
 	var boolSourceReload = false;
@@ -20,23 +20,50 @@
 	var lastselSources = '0';
 	var lastselTarget = '0';
 	var lastselCmd = '0';
-	
-	$(function(){
-		$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findByName(id)&viewName=jsonView'/>",
-		       {id : "<%=jobName%>"}, function(data) {
-		    	   jQuery("#job_name").val(data.autoData.jobname);
-		    	   jQuery("#repository").val(data.autoData.repo);
-		    	   jQuery("#excludes").val(data.autoData.excludes);
-	     });
+	var groups = '${groupBuildJobs.groups}';
+	var buildJobs = '${groupBuildJobs.buildJobs}';
+	var currentSelectedTab = '<%=currentSelectedTab%>';
+	var currentJobTab = 'ALL';
+	jQuery(document).ready(function(){
+		getData();
 
 		drawGrid();
-
 
 		$(".btn-slide").click(function(){
 			$("#panel").slideToggle("slow");
 			$(this).toggleClass("active"); return false;
 		});
+		
+		if(currentSelectedTab == 'ALL') {
+			jQuery("#job_group").val(currentJobTab).attr("selected", "selected");
+		}
+		
+		if ($('#build_job').val() != '' && $('#build_job').val() != null && $('#build_job').val() != 'None') {
+			var arr = document.getElementById('buildJob_table');
+				arr.style.display ='block'; 
+		}
 	});
+	
+	function getData() {
+		$.ajax({
+			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findByName(id)&viewName=jsonView'/>",
+			async : false,
+			data : {
+				id : "<%=jobName%>"
+			},
+			success : function(data) {
+				
+				jQuery("#job_name").val(data.autoData.name);
+				jQuery("#repository").val(data.autoData.repo);
+				jQuery("#excludes").val(data.autoData.excludes);
+				currentJobTab = data.autoData.group;
+				jQuery("#job_group").val(data.autoData.group).attr("selected", "selected");
+				if(data.autoData.build != null){
+					jQuery("#build_job").val(data.autoData.build).attr("selected", "selected");
+				}
+			} 
+		});
+	}
 
 	function drawGrid() {
 		drawSources();
@@ -572,41 +599,68 @@
 			var job_n = replacePath($("#job_name").val());
 			var job_r = replacePath($("#repository").val());
 			var job_e = replacePath($("#excludes").val());
+			
+			var group_n = replacePath($("#job_group").val());
+			if(group_n == 'All') {
+				group_n = '';
+			}
+			var build_n = replacePath($("#build_job").val());
+			
 
 			if(isValidStringJobName(job_n) || isValidString(job_r) || isValidString(job_e)){
 				alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 			}else{
-				<%if(isNew){ %>
-				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.insert(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
+				var isDupJob = false;
+				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.existJob(jobName)&viewName=jsonView'/>",
 					       {
-					       list : rowTargetArray,
-					       cmd : rowCmdArray,
-					       mapping : rowMappingArray,
-					       jobname : job_n,
-					       repo : job_r,
-					       excludes :  job_e
-					       }, function(data) {
-					    	fn_addTab('03job', 'Job', 'job');   
-				     });
-				<%}else{%>
-				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.update(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
-					       {
-					       list : rowTargetArray,
-					       cmd : rowCmdArray,
-					       mapping : rowMappingArray,
-					       jobname : job_n,
-					       repo : job_r,
-					       excludes :  job_e
-					       }, function(data) {
-					    	fn_addTab('03job', 'Job', 'job');   
-				     });
-				<%}%>
+							jobName : job_n
+					       }, function(data){
+					    	   isDupJob = data.autoData;
+					    	   
+					    	   <%if(isNew){ %>
+								if(isDupJob == true || isDupJob == 'true'){
+									alert('<spring:message code="jobdetail.alert.dulplicatejobname"/>');
+								}else{
+									$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.insert(list,cmd,mapping,jobname,repo,excludes,groupName,build)&viewName=jsonView'/>",
+									       {
+									       list : rowTargetArray,
+									       cmd : rowCmdArray,
+									       mapping : rowMappingArray,
+									       jobname : job_n,
+									       repo : job_r,
+									       excludes :  job_e,
+									       groupName : group_n,
+									       build : build_n
+									       }, function(data) {
+									    	   fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);   
+								     });
+								}
+								<%}else{%>
+								//alert("Save Start!");
+								//alert("group_n : "+group_n);
+								$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.update(list,cmd,mapping,jobname,repo,excludes,groupName,build)&viewName=jsonView'/>",
+									       {
+									       list : rowTargetArray,
+									       cmd : rowCmdArray,
+									       mapping : rowMappingArray,
+									       jobname : job_n,
+									       repo : job_r,
+									       excludes :  job_e,
+									       groupName : group_n,
+									       build : build_n
+									       }, function(data) {
+									    	   fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);   
+								     });
+								<%}%>
+				});
+				
+				
 			}
 		}
 	}
 	
 	function cancelJob(){
-		fn_addTab('03job', 'Job', 'job');   
+		fn_addTab('03job', 'Job', '', '&initdataService=groupService.findGroupAndUngroup()&initdataResult=groupUngroups', currentSelectedTab);   
 	}
 
 	function hiddenMappings(){
@@ -618,6 +672,12 @@
 
 	function hiddenCommands(){
 		var arr = document.getElementById('commands_table');
+		if ( arr!= null ) { 
+			arr.style.display = (arr.style.display == 'none')? 'block':'none'; 
+		} 
+	}
+	function hiddenBuildJob(){
+		var arr = document.getElementById('buildJob_table');
 		if ( arr!= null ) { 
 			arr.style.display = (arr.style.display == 'none')? 'block':'none'; 
 		} 
@@ -637,7 +697,7 @@
 
 	function isValidStringJobName(str){
 
-		var strArray = new Array("\"","&","<",">","!","`","@","%","^","&","*",":",";","\'","~","$","+","=","|","{","}",",",".","/","?"," ");
+		var strArray = new Array("\"","&","<",">","!","`","@","%","^","&","*",":",";","\'","~","$","+","=","|","{","}",",",".","/","?");
 		
 		for(var i=0; i<strArray.length; i++){
 			if(str.indexOf(strArray[i]) != -1){
@@ -666,29 +726,43 @@
 </div><!-- end pageSubtitle --> 
 <div id="body_jobdetail">
 <form method="post" id="searchForm" name="searchForm">
-	<!--START: input table-->
-	<fieldset>
-	<legend>register</legend>
-	<div class="input_table" style="padding-top:2px;">
-		<table summary="job">
-			<caption>job register</caption>
-			<tbody>
-				<tr>
-					<th scope="row"><label for="JobName"><spring:message code="jobdetail.label.jobname"/></label></th>
-					
-					<%if(isNew){ %>
-					<td><input type="text" id="job_name" name="job_name" size="40" value="" style="height:18px;width:300px;" /></td>
-					<simpleweb:validate id="job_name" required="true" promptMessage="Enter Job Name" /> 
-					<%}else{%>
-					<td><input type="text" id="job_name" name="job_name" disabled="disabled" size="40" value="" style="height:18px;width:300px;" /></td>
-					<%}%>
-					<td width="450"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	</fieldset>	
-	<!--END: input table-->
+<!--START: input table-->
+<fieldset>
+<legend>register</legend>
+<div class="input_table source_table" style="padding-top:2px;">
+	<table summary="job">
+		<caption>job register</caption>
+		<colgroup>
+			<col width="10%">
+			<col width="40%">
+			<col width="10%">
+			<col width="40%">
+		</colgroup>
+		<tbody>
+			<tr>
+				<th scope="row"><label for="JobName"><spring:message code="jobdetail.label.jobname"/></label></th>
+				
+				<%if(isNew){ %>
+				<td><input type="text" id="job_name" name="job_name" size="40" value="" style="height:18px;width:300px;" /></td>
+				<simpleweb:validate id="job_name" required="true" promptMessage="Enter Job Name" /> 
+				<%}else{%>
+				<td><input type="text" id="job_name" name="job_name" disabled="disabled" size="40" value="" style="height:18px;width:300px;" /></td>
+				<%}%>
+				<th scope="row"><label for="GroupName"><spring:message code="jobdetail.label.group" text="Group Name :"/></label></th>
+				<td>
+					<select id="job_group" name="job_group"	class="selectbox" style="height:18px;width:150px;">
+						<option value="All" selected="selected">All</option>
+					<c:forEach var="jobGroup" items="${groupBuildJobs.groups}" varStatus="status">
+						<option value="${jobGroup}"><c:out value="${jobGroup}"></c:out></option>
+					</c:forEach>
+					</select>	
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+</fieldset>	
+<!--END: input table-->
 
 <!--START: input table_source info-->
 <div class="pageSubtitle" style="padding-top:10px;">
@@ -700,6 +774,12 @@
 <div class="input_table source_table" style="padding-top:2px;">
 	<table summary="job">
 		<caption>source</caption>
+		<colgroup>
+			<col width="10%">
+			<col width="40%">
+			<col width="10%">
+			<col width="40%">
+		</colgroup>
 		<tbody>
 			<tr>
 				<th scope="row"><label for="Repository"><spring:message code="jobdetail.label.directory"/></label></th>
@@ -821,6 +901,43 @@
 </fieldset>
 </div>	
 <!--END: input table_command info-->
+<!--START: build table-->
+<div class="pageSubtitle" style="padding-top:10px;">
+	<h4 class="subtitle_h4"><a href="javascript:hiddenBuildJob();"><spring:message code="jobdetail.build.subtitle" text="Build"/> <img src='<c:url value='/images/ico_down.gif'/>' style='vertical-align:middle;'/></a></h4>
+</div><!-- end pageSubtitle --> 
+<div id="buildJob_table" style="display:none;">
+	<fieldset>
+	<legend>register</legend>
+	<div class="input_table" style="padding-top:2px;">
+		<table summary="job">
+			<caption>source</caption>
+			<colgroup>
+				<col width="10%">
+				<col width="40%">
+				<col width="10%">
+				<col width="40%">
+			</colgroup>
+			<tbody>
+				<tr>
+					<th scope="row"><label for="Build"><spring:message code="jobdetail.label.buildname" text="Job Name"/></label></th>
+					<td>
+						<select id="build_job" name="build_job"	class="selectbox" style="height:18px;width:150px;">
+							<option value="" selected="selected">None</option>
+						<c:forEach var="buildJob" items="${groupBuildJobs.buildJobs}" varStatus="status">
+							<option value="${buildJob}"><c:out value="${buildJob}"></c:out></option>
+						</c:forEach>
+					</td>
+					<th>
+					</th>
+					<td>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	</fieldset>	
+</div>
+<!--END: build table-->
 <div id="button" style="padding-top:5px;">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>

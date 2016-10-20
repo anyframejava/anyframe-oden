@@ -12,8 +12,9 @@ Bundle-ClassPath: hessian-3.1.6.jar,
  org.apache.felix.framework.security-1.0.0.jar,
  berkelydb-4.0.103.jar,
  org.apache.servicemix.bundles.jasypt-1.7_1.jar,
- commons-logging-1.1.1.jar,
- icu4j-4.6.1.jar
+ icu4j-4.6.1.jar,
+ org.apache.servicemix.bundles.commons-httpclient-3.1_7.jar,
+ commons-logging-1.1.2.jar
 Export-Package: 
  com.caucho.burlap.client,
  com.caucho.burlap.io,
@@ -75,6 +76,10 @@ Export-Package:
  com.sleepycat.util.keyrange,
  org.apache.commons.codec,
  org.apache.commons.codec.binary,
+ org.apache.commons.httpclient,
+ org.apache.commons.httpclient.auth,
+ org.apache.commons.httpclient.methods,
+ org.apache.commons.httpclient.params,
  org.apache.felix.prefs,
  org.jasypt.encryption,
  org.jasypt.encryption.pbe,

@@ -164,6 +164,33 @@
 							agent.ini 에 정의하며, Window Server의 경우 Subinacl 윈도우 유틸리티가 설치 되어야 한다. 또한 모든 경로의 접근을 위해 Admin 권한으로 Agent를 구동하여야 한다.
 						</para>
 					</listitem>
+					<listitem>
+						<para>
+							build.url: Jenkins와 연동을 위한 Jenkins접속 url. ex) http://127.0.0.1:9090  
+						</para>
+						<note>
+							<para>
+								Jenkins와의 연동을 위해서는 추가적으로 아래의 작업이 필요하다. Jenkins의 ./jenkins/war/WEB-INF/web.xml에 아래내용을 추가한다.
+								<programlisting><![CDATA[<servlet>
+		<servlet-name>Ctip Gen Servlet</servlet-name>
+		<servlet-class>org.anyframe.ide.ctip.integration.CtipGenServlet</servlet-class>
+		<init-param>
+			<param-name>hudsonHome</param-name>
+			<param-value>../jenkins</param-value>
+		</init-param>
+		<init-param>
+			<param-name>hudsonJobDir</param-name>
+			<param-value>../jenkins/jobs</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Ctip Gen Servlet</servlet-name>
+		<url-pattern>/anyframe/api/*</url-pattern>
+	</servlet-mapping>]]></programlisting>
+	anyframe-ide-ctip-integration-2.7.0.jar 다운받아 ./jenkins/war/WEB-INF/lib 경로에 추가한다.
+							</para>
+						</note>
+					</listitem>
 				</itemizedlist>
 			</para>
 		</section>

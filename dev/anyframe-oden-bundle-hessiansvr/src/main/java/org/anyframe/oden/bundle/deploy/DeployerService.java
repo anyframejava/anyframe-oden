@@ -233,7 +233,10 @@ public interface DeployerService {
 	public List<FileInfo> listAllFiles(String dir) throws Exception;
 
 	public Set<FileInfo> listAllFilesAsSet(String dir) throws Exception;
-
+	
+	public List<FileInfo> listAllFilesAsCondition(String fromDate,
+			String toDate, String dir, List<String> excludes) throws Exception;
+	
 	public boolean touchAvailable() throws Exception;
 
 	public CfgReturnScript execShellCommand(String command, String dir,

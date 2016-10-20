@@ -29,6 +29,7 @@ public class ShortenRecord {
 	int total;
 	int nSuccess;
 	String log;
+	long size;
 
 	@SuppressWarnings("PMD")
 	public ShortenRecord() {
@@ -110,4 +111,11 @@ public class ShortenRecord {
 		this.log = log;
 	}
 
+	public long getSize() {
+		return size;
+	}
+
+	public void setSize(long size) {
+		this.size = size;
+	}
 }

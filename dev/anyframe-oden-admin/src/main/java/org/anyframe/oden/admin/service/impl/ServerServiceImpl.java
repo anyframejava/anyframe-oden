@@ -18,11 +18,18 @@ package org.anyframe.oden.admin.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.anyframe.oden.admin.common.OdenCommonDao;
+import org.anyframe.oden.admin.convert.JsonConverter;
 import org.anyframe.oden.admin.domain.Server;
 import org.anyframe.oden.admin.domain.Target;
 import org.anyframe.oden.admin.service.ServerService;
+import org.anyframe.oden.admin.util.CommandUtil;
+import org.anyframe.oden.admin.util.OdenConstants;
 import org.anyframe.pagination.Page;
+import org.hsqldb.lib.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -34,13 +41,10 @@ import org.springframework.stereotype.Service;
  */
 @Service("serverService")
 public class ServerServiceImpl implements ServerService {
-	private final OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
 
-	String ahrefPre = "<a href=\"";
-	String ahrefMid = "\">";
-	String ahrefPost = "</a>";
-
-	String doubleQuotation = "\"";
+	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<Server> odenCommonDao;
 
 	/**
 	 * 
@@ -74,68 +78,84 @@ public class ServerServiceImpl implements ServerService {
 	 * 
 	 * @param param
 	 */
-	@SuppressWarnings("PMD")
 	public Page findListByPk(String param) throws Exception {
 
-		if ("".equals(param)) {
-			List list = new ArrayList();
-			return new Page(list, 1, list.size(), 1, 1);
-		} else {
-			List list = new ArrayList();
+		List<Target> list = new ArrayList<Target>();
+		if (!StringUtil.isEmpty(param)) {
+			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-			String result = odenCommonDao.getResultString("job", "info",
-					doubleQuotation + param + doubleQuotation);
+			for (JSONObject object : objectArray) {
+				JSONArray targets = (JSONArray) object.get("targets");
 
-			String imgDel = "<img src='images/ico_del.gif'/>";
+				for (int num = 0; num < targets.length(); num++) {
+					JSONObject targetObject = (JSONObject) targets.get(num);
+					Target t = JsonConverter.jsonToTarget(targetObject);
 
-			String imgStatusGreen = "<img src='images/status_green.png'/>";
-			String imgStatusGray = "<img src='images/status_gray.png'/>";
+					String status = targetObject.getString("status");
 
-			if (!(result == null) && !"".equals(result)) {
-				JSONArray array = new JSONArray(result);
-				if (!(array.length() == 0)) {
-					int recordSize = array.length();
-
-					for (int i = 0; i < recordSize; i++) {
-
-						JSONObject object = (JSONObject) array.get(i);
-						JSONArray targets = (JSONArray) object.get("targets");
-
-						for (int num = 0; num < targets.length(); num++) {
-							Target t = new Target();
-
-							JSONObject target = (JSONObject) targets.get(num);
-							String address = target.getString("address");
-							String name = target.getString("name");
-							String path = target.getString("dir");
-							String status = target.getString("status");
-
-							String statusResult = "";
-							if (status.equalsIgnoreCase("T")) {
-								statusResult = imgStatusGreen;
-							} else {
-								statusResult = imgStatusGray;
-							}
-
-							t.setName(name);
-							t.setUrl(address);
-							t.setPath(path);
-							t.setStatus(statusResult);
-							t.setHidden(ahrefPre + "javascript:delServer('"
-									+ name + "');" + ahrefMid + imgDel
-									+ ahrefPost);
-							t.setHiddenname(name);
-
-							list.add(t);
-						}
+					String statusResult = "";
+					if (status.equalsIgnoreCase("T")) {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GREEN;
+					} else {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GRAY;
 					}
+					t.setStatus(statusResult);
+					t.setHidden(OdenConstants.A_HREF_HEAD + "javascript:delServer('" + t.getName() + "');" + OdenConstants.A_HREF_MID
+							+ OdenConstants.IMG_TAG_DEL + OdenConstants.A_HREF_TAIL);
+
+					list.add(t);
 				}
 			}
-			if (list.isEmpty()) {
-				return new Page(list, 1, list.size(), 1, 1);
-			} else {
-				return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+	}
+	
+	/**
+	 * Method for getting Job mapping info in Job Detail page.
+	 * 
+	 * @param param, objectArray
+	 */
+	public Page findListByPk(String param, List<JSONObject> objectArray) throws Exception {
+
+		List<Target> list = new ArrayList<Target>();
+		if (!StringUtil.isEmpty(param)) {
+//			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+//			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+			for (JSONObject object : objectArray) {
+				JSONArray targets = (JSONArray) object.get("targets");
+
+				for (int num = 0; num < targets.length(); num++) {
+					JSONObject targetObject = (JSONObject) targets.get(num);
+					Target t = JsonConverter.jsonToTarget(targetObject);
+
+					String status = targetObject.getString("status");
+
+					String statusResult = "";
+					if (status.equalsIgnoreCase("T")) {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GREEN;
+					} else {
+						statusResult = OdenConstants.IMG_TAG_STATUS_GRAY;
+					}
+					t.setStatus(statusResult);
+					t.setHidden(OdenConstants.A_HREF_HEAD + "javascript:delServer('" + t.getName() + "');" + OdenConstants.A_HREF_MID
+							+ OdenConstants.IMG_TAG_DEL + OdenConstants.A_HREF_TAIL);
+
+					list.add(t);
+				}
 			}
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
 

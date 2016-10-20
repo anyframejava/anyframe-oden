@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import org.anyframe.oden.bundle.common.Logger;
 import org.anyframe.oden.bundle.common.OdenException;
+import org.anyframe.oden.bundle.core.command.Cmd;
 import org.anyframe.oden.bundle.core.command.JSONUtil;
 import org.anyframe.oden.bundle.job.config.CfgCommand;
 import org.anyframe.oden.bundle.job.config.CfgJob;
@@ -71,11 +72,27 @@ public class InternalJobCommandImpl implements Command {
 
 				addJob(new JSONObject(line.substring(start, end + 1)));
 				out.println("[]");
-			} else if (action.equals("del")) {
+			} else if (action.equals("update")) {
 				if (!tok.hasMoreTokens()) {
 					throw new OdenException("Invalid Arguments");
 				}
-				jobConfig.removeJob(tok.nextToken());
+				int start = line.indexOf(tok.nextToken());
+				int end = line.lastIndexOf('}');
+				if (end <= start) {
+					throw new OdenException("Invalid Arguments");
+				}
+
+				updateJob(new JSONObject(line.substring(start, end + 1)));
+				out.println("[]");
+	
+			} else if (action.equals("del")) {
+				Cmd cmd = new Cmd(line);
+				String name = cmd.getActionArg();
+				
+				if ("".equals(name)) {
+					throw new OdenException("Invalid Arguments");
+				}
+				jobConfig.removeJob(name);
 				out.println("[]");
 			} else {
 				throw new OdenException("Invalid action: " + action);
@@ -88,12 +105,20 @@ public class InternalJobCommandImpl implements Command {
 
 	private void addJob(JSONObject jjob) throws Exception {
 		CfgJob job = new CfgJob(jjob.getString("name"),
+				jjob.getString("group"),
 				makeSource(jjob.getJSONObject("source")),
 				makeTargets(jjob.getJSONArray("targets")),
-				makeCommands(jjob.getJSONArray("commands")));
+				makeCommands(jjob.getJSONArray("commands")),
+				jjob.getString("build"));
 		jobConfig.addJob(job);
 	}
-
+	
+	private void updateJob(JSONObject jjob) throws Exception {
+		CfgJob job = new CfgJob(jjob.getString("name"),
+				jjob.getString("group"), null, null, null, null);
+		jobConfig.updateJobByGroup(job);
+	}
+	
 	@SuppressWarnings("PMD")
 	private List<CfgCommand> makeCommands(JSONArray jcommands)
 			throws JSONException {
@@ -134,10 +159,17 @@ public class InternalJobCommandImpl implements Command {
 	private String getFullUsage() {
 		return "_job add {"
 				+ "\n\t\"name\": \"\","
+				+ "\n\t\"group\": \"\","
 				+ "\n\t\"source\": {\"dir\": \"\", \"excludes\": \"\" , \"mappings\": [ {\"dir\": \"\", \"checkout-dir\": \"\"}, ... ] },"
 				+ "\n\t\"targets\": [ {\"name\": \"\", \"address\": \"\", \"dir\": \"\"}, ... ],"
-				+ "\n\t\"commands\": [ {\"name\": \"\", \"command\": \"\", \"dir\": \"\"}, ... ]"
-				+ "\n\t}" + "\n_job del <job>";
+				+ "\n\t\"commands\": [ {\"name\": \"\", \"command\": \"\", \"dir\": \"\"}, ... ],"
+				+ "\n\t\"build\": \"\""
+				+ "\n\t}"
+				+ "\n_job update {"
+				+ "\n\t\"name\": \"\","
+				+ "\n\t\"group\": \"\""
+				+ "\n\t}"
+				+ "\n_job del <job>";
 	}
 
 	public String getName() {

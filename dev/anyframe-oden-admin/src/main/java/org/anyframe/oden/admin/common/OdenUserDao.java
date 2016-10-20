@@ -17,12 +17,15 @@ package org.anyframe.oden.admin.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.anyframe.oden.admin.domain.User;
+import org.anyframe.oden.admin.util.CommonUtil;
+import org.anyframe.oden.admin.util.OdenConstants;
 import org.anyframe.pagination.Page;
 import org.anyframe.query.QueryService;
 import org.springframework.stereotype.Repository;
@@ -38,13 +41,8 @@ public class OdenUserDao {
 	@Inject
 	QueryService queryService;
 
-	// public void setQueryService(IQueryService queryService) {
-	// super.setQueryService(queryService);
-	// }
-
 	public Page getUserList() throws Exception {
-		Collection collection = queryService.find("findUsersList",
-				new Object[] {});
+		Collection collection = queryService.find("findUsersList", new Object[] {});
 
 		Collection result_col = new ArrayList();
 		Iterator itr = collection.iterator();
@@ -53,17 +51,15 @@ public class OdenUserDao {
 			Object[] iVal = getVoArray(vo);
 
 			// add role name
-			ArrayList role_list = (ArrayList) queryService.find("findUserRole",
-					getObjectArray(iVal));
-			String role = ((HashMap) role_list.get(0)).get("groupName") + "";
+			List role_list = (List) queryService.find("findUserRole", getObjectArray(iVal));
+			String role = ((Map) role_list.get(0)).get("groupName") + "";
 			vo.setRole(role);
 
 			// add assign job
-			ArrayList<HashMap> job_list = (ArrayList) queryService.find(
-					"findUserJobList", getObjectArray(iVal));
+			List<Map> job_list = (List) queryService.find("findUserJobList", getObjectArray(iVal));
 			String assign_job = "";
 
-			for (HashMap map : job_list) {
+			for (Map map : job_list) {
 				if (map.get("roleId").equals("ROLE_ADMIN")) {
 					assign_job = "All Jobs";
 					continue;
@@ -77,45 +73,38 @@ public class OdenUserDao {
 			}
 
 			if (!(vo.getUserId().equalsIgnoreCase("oden"))) {
-				String imgDel = "<img src='images/ico_del.gif' alt='Delete' title='Delete' style='vertical-align:middle;'/>";
-
-				String deleteAction = "<a href=\"javascript:deleteUser('"
-						+ vo.getUserId() + "');\">" + imgDel + "</a>";
+				String deleteAction = "<a href=\"javascript:deleteUser('" + vo.getUserId() + "');\">" + OdenConstants.IMG_TAG_DEL + "</a>";
 				vo.setHidden(deleteAction);
 			}
 			result_col.add(vo);
 		}
 
-		return new Page(result_col, 1, result_col.size(), result_col.size(),
-				result_col.size());
+		return new Page(result_col, 1, result_col.size(), result_col.size(), result_col.size());
 	}
-	
+
 	private Object[] getObjectArray(Object[] iVal) {
 		return new Object[] { iVal };
 	}
-	
+
 	private Object[] getVoArray(User vo) {
 		return new Object[] { "vo", vo };
 	}
-	
+
 	public User getUser(String id) throws Exception {
 		User vo = new User();
 		vo.setUserId(id);
 		Object[] iVal = new Object[] { "vo", vo };
 
-		User user = (User) ((ArrayList) queryService.find("findUsersByPk",
-				new Object[] { iVal })).get(0);
+		User user = (User) ((List) queryService.find("findUsersByPk", new Object[] { iVal })).get(0);
 
-		ArrayList role_list = (ArrayList) queryService.find("findUserRole",
-				new Object[] { iVal });
-		String role = ((HashMap) role_list.get(0)).get("groupName") + "";
+		List role_list = (List) queryService.find("findUserRole", new Object[] { iVal });
+		String role = ((Map) role_list.get(0)).get("groupName") + "";
 		user.setRole(role);
 
-		ArrayList<HashMap> job_list = (ArrayList) queryService.find(
-				"findUserJobList", new Object[] { iVal });
+		List<Map> job_list = (List) queryService.find("findUserJobList", new Object[] { iVal });
 		String assign_job = "";
 
-		for (HashMap map : job_list) {
+		for (Map map : job_list) {
 			assign_job = assign_job.concat(map.get("roleId") + ", ");
 		}
 		if (assign_job.length() > 0) {
@@ -142,24 +131,18 @@ public class OdenUserDao {
 	}
 
 	public Collection findGroupByName(String role) throws Exception {
-		return queryService.find("findGroupByName",
-				new Object[] { new Object[] { "groupName", role } });
+		return queryService.find("findGroupByName", new Object[] { new Object[] { "groupName", role } });
 	}
 
 	public int createGroupUser(String groupId, String id) throws Exception {
-		return queryService.create("createGroupUser", new Object[] {
-				new Object[] { "groupId", groupId },
-				new Object[] { "userId", id },
-				new Object[] { "createDate", CommonUtil.getCurrentDate() },
-				new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
+		return queryService.create("createGroupUser", new Object[] { new Object[] { "groupId", groupId }, new Object[] { "userId", id },
+				new Object[] { "createDate", CommonUtil.getCurrentDate() }, new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
 	}
 
 	public int createAuthorities(String jobName, String id) throws Exception {
-		return queryService.create("createAuthorities", new Object[] {
-				new Object[] { "roleId", jobName },
-				new Object[] { "subjectId", id }, new Object[] { "type", "U" },
-				new Object[] { "createDate", CommonUtil.getCurrentDate() },
-				new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
+		return queryService.create("createAuthorities",
+				new Object[] { new Object[] { "roleId", jobName }, new Object[] { "subjectId", id }, new Object[] { "type", "U" },
+						new Object[] { "createDate", CommonUtil.getCurrentDate() }, new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
 	}
 
 	public int updateUser(String id, String pw) throws Exception {
@@ -177,25 +160,19 @@ public class OdenUserDao {
 	}
 
 	public int updateGroupUser(String groupId, String id) throws Exception {
-		return queryService.create("updateGroupUser", new Object[] {
-				new Object[] { "groupId", groupId },
-				new Object[] { "userId", id },
-				new Object[] { "createDate", CommonUtil.getCurrentDate() },
-				new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
+		return queryService.create("updateGroupUser", new Object[] { new Object[] { "groupId", groupId }, new Object[] { "userId", id },
+				new Object[] { "createDate", CommonUtil.getCurrentDate() }, new Object[] { "modifyDate", CommonUtil.getCurrentDate() } });
 	}
 
 	public int removeUser(String id) throws Exception {
-		return queryService.create("removeUsers", new Object[] { new Object[] {
-				"userId", id } });
+		return queryService.create("removeUsers", new Object[] { new Object[] { "userId", id } });
 	}
 
 	public int removeGroupUser(String id) throws Exception {
-		return queryService.create("removeGroupUser",
-				new Object[] { new Object[] { "userId", id } });
+		return queryService.create("removeGroupUser", new Object[] { new Object[] { "userId", id } });
 	}
 
 	public int removeAuthorities(String id) throws Exception {
-		return queryService.create("removeAuthorities",
-				new Object[] { new Object[] { "userId", id } });
+		return queryService.create("removeAuthorities", new Object[] { new Object[] { "userId", id } });
 	}
 }

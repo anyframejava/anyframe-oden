@@ -19,8 +19,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.anyframe.oden.bundle.build.config.CfgPmdReturnVO;
+import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.deploy.CfgReturnScript;
+import org.anyframe.oden.bundle.external.config.CfgBuild;
+import org.anyframe.oden.bundle.external.config.CfgBuildReturnVO;
 import org.anyframe.oden.bundle.external.config.CfgHistory;
+import org.anyframe.oden.bundle.external.config.CfgHistoryDetail;
 import org.anyframe.oden.bundle.external.config.CfgJob;
 import org.anyframe.oden.bundle.external.config.CfgReturnPreview;
 import org.anyframe.oden.bundle.external.config.CfgReturnStatus;
@@ -47,7 +52,7 @@ public interface ExtDeployerService {
 	public CfgReturnVO execute(CfgJob job) throws Exception;
 
 	/**
-	 * External API method , which deploy batch in multi thread
+	 * External API method , which deploy batch in m-thread
 	 * 
 	 * @param job
 	 * @return
@@ -106,6 +111,15 @@ public interface ExtDeployerService {
 			throws Exception;
 
 	/**
+	 * External API method , which show the deployment detailed logs
+	 * 
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CfgHistoryDetail> logDetail(String id) throws Exception;
+
+	/**
 	 * External API method , which run command or script
 	 * 
 	 * @param script
@@ -141,5 +155,80 @@ public interface ExtDeployerService {
 	 * @throws Exception
 	 */
 	public Map<String, List<CfgReturnPreview>> test(CfgJob job)
+			throws Exception;
+
+	/**
+	 * External API method , which show information of each Agent files
+	 * 
+	 * @param fromDate
+	 * @param toDate
+	 * @param targets
+	 * @param except
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FileInfo> listAllFiles(String fromDate, String toDate,
+			CfgTarget targets, List<String> except) throws Exception;
+
+	/**
+	 * External API method , which build (run jenkins job)
+	 * 
+	 * @param build
+	 * @return
+	 * @throws Exception
+	 */
+	public CfgBuildReturnVO executeBuild(CfgBuild build) throws Exception;
+	
+	/**
+	 * External API method , which check available build server or not
+	 * 
+	 * @param address
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean CheckBuildServer(String address) throws Exception;
+
+	
+	/**
+	 * External API method , which rollback build item (run jenkins job)
+	 * 
+	 * @param build
+	 * @return
+	 * @throws Exception
+	 */
+	public CfgBuildReturnVO rollbackBuild(String address, String buildName,
+			List<String> build) throws Exception;
+	
+	/**
+	 * External API method , which check build job
+	 * 
+	 * @param address
+	 * @param buildName
+	 * @param buildNo
+	 * @return(0:Build, -1:Fail, 1:Success)
+	 * @throws Exception
+	 */
+	public int checkBuild(String address, String buildName, String buildNo)
+			throws Exception;
+	
+	/**
+	 * External API method , which build (run jenkins job for pmd)
+	 * 
+	 * @param build
+	 * @return
+	 * @throws Exception
+	 */
+	public CfgBuildReturnVO executePmd(CfgBuild build) throws Exception;
+
+	/**
+	 * External API method , which check build job for pmd
+	 * 
+	 * @param address
+	 * @param buildName
+	 * @param buildNo
+	 * @return
+	 * @throws Exception
+	 */
+	public CfgPmdReturnVO returnPmd(String address, String buildName, String buildNo)
 			throws Exception;
 }

@@ -1,6 +1,6 @@
 <project name="Oden" default="all-local" basedir=".">
 	<property name="bundle.name" value="anyframe-oden-bundle" />
-	<property name="version" value="2.5.0"/>
+	<property name="version" value="2.6.0"/>
 	
 	<property name="service.src" location="${basedir}/src/main/java"/>
 	<property name="service.build" location="${basedir}/build"/>		
@@ -38,7 +38,7 @@
 	    </pmd>
 	</target>
 	    	
-	<target name="dist.bundle" depends="compile.service, pmd">
+	<target name="dist.bundle" depends="compile.service">
 		<jar destfile="${dist}/oden-${version}.jar" basedir="${service.build}" 
 			manifest="${basedir}/META-INF/MANIFEST.MF" />
 		<copy todir="${dist}">

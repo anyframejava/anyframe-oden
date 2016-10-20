@@ -17,7 +17,7 @@ package org.anyframe.oden.admin.dao;
 
 import javax.inject.Inject;
 
-import org.anyframe.oden.admin.common.CommonUtil;
+import org.anyframe.oden.admin.util.CommonUtil;
 import org.anyframe.query.QueryService;
 import org.springframework.stereotype.Repository;
 

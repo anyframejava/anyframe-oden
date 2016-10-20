@@ -53,7 +53,7 @@ public class Cmd {
 			Cmd cmd = new Cmd();
 			cmd.loadINI();
 			String command = cmd.toCommand(args);
-			if("shutdown".equals(command))
+			if(! "".equals(command) || null != command)
 				cmd.sendRequest(cmd.toCommand(args));
 			else
 				System.exit(0);

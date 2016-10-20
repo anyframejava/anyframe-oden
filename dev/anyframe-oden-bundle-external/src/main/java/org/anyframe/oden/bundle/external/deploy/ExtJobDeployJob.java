@@ -71,7 +71,7 @@ public class ExtJobDeployJob extends DeployJob {
 	String id = null;
 	boolean deployExcOpt;
 	int backupcnt = 0;
-	// 배포 소스가 directory 구조가 아닐 때 , root directory 하단 파일 배포
+	
 	boolean isRoot = false;
 	String securitykey = "";
 
@@ -178,11 +178,7 @@ public class ExtJobDeployJob extends DeployJob {
 
 			FatInputStream in = null;
 			try {
-				if (isRoot)
-					// root directory 하단 파일을 배포
-					in = reposvc.resolveRoot(rf);
-				else
-					in = reposvc.resolve(rf);
+				in = reposvc.resolve(rf);
 			} catch (OdenException e) {
 				for (DeployFile f : fs.get(rf)) {
 					f.setSuccess(false);
@@ -452,12 +448,14 @@ public class ExtJobDeployJob extends DeployJob {
 							throw new IOException("Diffrent size: "
 									+ info.size() + "/" + originalFileSz);
 						f.setSuccess(true);
+						f.setSize(info.size());
 						synchronized (nSuccess) {
 							nSuccess++;
 						}
 						f.setMode(info.isUpdate() ? Mode.UPDATE : Mode.ADD);
 					} catch (Exception e) {
 						f.setSuccess(false);
+						f.setSize(0L);
 						if (StringUtil.empty(f.errorLog()))
 							f.setErrorLog(e.getMessage());
 						Logger.error(e);

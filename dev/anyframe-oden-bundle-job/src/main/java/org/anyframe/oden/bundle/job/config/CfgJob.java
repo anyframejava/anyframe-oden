@@ -35,23 +35,35 @@ public class CfgJob {
 	CfgSource source;
 	List<CfgTarget> targets;
 	List<CfgCommand> commands;
+	String group;
+	String build;
 
-	public CfgJob(String name, CfgSource source, List<CfgTarget> targets,
-			List<CfgCommand> commands) {
+	public CfgJob(String name, String group, CfgSource source, List<CfgTarget> targets,
+			List<CfgCommand> commands, String build) {
 		this.name = name;
+		this.group = group;
 		this.source = source;
 		this.targets = targets;
 		this.commands = commands;
+		this.build = build;
 	}
 
 	public String getName() {
 		return name;
 	}
-
+	
+	public String getGroup() {
+		return group;
+	}
+	
 	public List<CfgCommand> getCommands() {
 		return commands;
 	}
-
+	
+	public String getBuild() {
+		return build;
+	}
+	
 	/**
 	 * get commands which are matched with commandNames.
 	 * 

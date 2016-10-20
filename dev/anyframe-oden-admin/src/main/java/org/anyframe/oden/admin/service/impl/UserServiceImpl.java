@@ -15,8 +15,8 @@
  */
 package org.anyframe.oden.admin.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This is UserServiceImpl Class
- *  
+ * 
  * @author Junghwan Hong
  */
 @Service("userService")
@@ -74,8 +74,7 @@ public class UserServiceImpl implements UserService {
 	 * @throws Exception
 	 */
 	private boolean request(String userid, String password) throws Exception {
-		return odenBroker.checkUser("http://" + server + ":" + port + "/shell",
-				userid, password);
+		return odenBroker.checkUser("http://" + server + ":" + port + "/shell", userid, password);
 	}
 
 	public Page findList(String domain) throws Exception {
@@ -86,11 +85,9 @@ public class UserServiceImpl implements UserService {
 		return odenUserDao.getUser(id);
 	}
 
-	public void createUser(String role, String id, String pw, String[] jobs)
-			throws Exception {
+	public void createUser(String role, String id, String pw, String[] jobs) throws Exception {
 		odenUserDao.createUser(id, pw);
-		String groupId = ((HashMap) ((ArrayList) odenUserDao
-				.findGroupByName(role)).get(0)).get("groupId") + "";
+		String groupId = ((Map) ((List) odenUserDao.findGroupByName(role)).get(0)).get("groupId") + "";
 		odenUserDao.createGroupUser(groupId, id);
 		for (int i = 0; i < jobs.length; i++) {
 			if (jobs.length == 1 && jobs[0].equalsIgnoreCase("empty")) {
@@ -102,11 +99,9 @@ public class UserServiceImpl implements UserService {
 		roleReloading();
 	}
 
-	public void updateUser(String role, String id, String pw, String[] jobs)
-			throws Exception {
+	public void updateUser(String role, String id, String pw, String[] jobs) throws Exception {
 		odenUserDao.updateUser(id, pw);
-		String groupId = ((HashMap) ((ArrayList) odenUserDao
-				.findGroupByName(role)).get(0)).get("groupId") + "";
+		String groupId = ((Map) ((List) odenUserDao.findGroupByName(role)).get(0)).get("groupId") + "";
 		odenUserDao.updateGroupUser(groupId, id);
 		odenUserDao.removeAuthorities(id);
 		for (int i = 0; i < jobs.length; i++) {

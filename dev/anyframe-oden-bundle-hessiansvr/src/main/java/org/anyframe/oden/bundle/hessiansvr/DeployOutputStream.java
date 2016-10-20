@@ -133,6 +133,8 @@ public class DeployOutputStream {
 	public DoneFileInfo close(List<String> updatefiles, String bakdir,
 			int backupcnt) throws Exception {
 		try {
+			boolean isNew = false;
+			
 			if (this.out != null) {
 				this.out.close();
 			}
@@ -158,6 +160,7 @@ public class DeployOutputStream {
 						bakdir, backupcnt);
 			} else {
 				FileUtil.mkdirs(destfile);
+				isNew = true;
 			}
 
 			// copy
@@ -182,15 +185,32 @@ public class DeployOutputStream {
 											+ ownerShip.get("owner") });
 
 				} else {
-					p = Runtime.getRuntime().exec(
-							"chown " + ownerShip.get("owner") + ":"
-									+ ownerShip.get("group") + " " + parentPath
-									+ File.separator + filePath);
+					// TODO sysout test chown command~~~~
+					String command;
+					
+					if(isNew) {
+						command = "chown -R " + ownerShip.get("owner") + ":"
+						+ ownerShip.get("group") + " " + parentPath; 
+					} else {
+						command = "chown " + ownerShip.get("owner") + ":"
+						+ ownerShip.get("group") + " " + parentPath
+						+ File.separator + filePath;
+					}
+					
+					System.out.println("command: " + command);
+//					p = Runtime.getRuntime().exec(
+//							"chown " + ownerShip.get("owner") + ":"
+//									+ ownerShip.get("group") + " " + parentPath
+//									+ File.separator + filePath);
+					p = Runtime.getRuntime().exec(command);
 				}
+				
 				int exitValue = p.waitFor();
 				if (exitValue != 0) {
 					throw new OdenException(
-							"Fail to get diretory's imformation:" + parentPath);
+							"Fail to get diretory's imformation:" + parentPath
+									+ ownerShip.get("owner") + ":"
+									+ ownerShip.get("group"));
 				}
 			}
 

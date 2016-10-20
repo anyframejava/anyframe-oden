@@ -14,6 +14,11 @@
 		</listitem>
 		<listitem>
 			<para>
+				 Job Grouping 기능 제공. 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
 				배포할 파일 미리보기 기능 제공. 
 			</para>
 		</listitem>
@@ -45,6 +50,11 @@
 		<listitem>
 			<para>
 				사용자 권한 관리 
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Jenkins 연동을 통한 빌드수행 기능 제공. 
 			</para>
 		</listitem>
 	</itemizedlist>

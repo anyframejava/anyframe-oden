@@ -21,7 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,6 +62,7 @@ public class JobConfigImpl implements JobConfigService {
 
 		Element gnode = doc.createElement("job");
 		gnode.setAttribute("name", notNull(job.getName()));
+		gnode.setAttribute("group", notNull(job.getGroup()));
 
 		// source
 		CfgSource source = job.getSource();
@@ -85,9 +88,35 @@ public class JobConfigImpl implements JobConfigService {
 			doc.getDocumentElement().replaceChild(gnode, target);
 		}
 
+		// build
+		if (!StringUtil.empty(job.getBuild())) {
+			gnode.appendChild(createBuildNode(job.getBuild()));
+		}
 		store();
 	}
-
+	
+	public void updateJobByGroup(CfgJob job) throws Exception {
+		parse();
+		
+		NodeList childs = doc.getDocumentElement().getChildNodes();
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node node = childs.item(i);
+			if (node.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			Element jobs = (Element) node;
+			if (job.getName().equals(jobs.getAttribute("name"))) {
+				if("".equals(job.getGroup()) || job.getGroup() == null) {
+					jobs.removeAttribute("group");
+				} else {
+					jobs.setAttribute("group", notNull(job.getGroup()));
+				}
+				
+			}
+		}
+		
+		store();
+	}
+	
 	private Element getJobNode(String name) {
 		Element root = doc.getDocumentElement();
 		NodeList childs = root.getChildNodes();
@@ -135,6 +164,13 @@ public class JobConfigImpl implements JobConfigService {
 			srcnode.appendChild(subnode);
 		}
 		return srcnode;
+	}
+
+	private Node createBuildNode(String name) {
+		Element bnode = doc.createElement("build");
+		bnode.setAttribute("name", notNull(name));
+
+		return bnode;
 	}
 
 	private String notNull(String s) {
@@ -195,13 +231,98 @@ public class JobConfigImpl implements JobConfigService {
 				continue;
 			Element job = (Element) node;
 			if (name.equals(job.getAttribute("name"))) {
-				return new CfgJob(name,
+				return new CfgJob(name, job.getAttribute("group"),
 						getSource(job.getElementsByTagName("source")),
 						getTargets(job.getElementsByTagName("target")),
-						getCommands(job.getElementsByTagName("command")));
+						getCommands(job.getElementsByTagName("command")),
+						getBuild(job.getElementsByTagName("build")));
 			}
 		}
 		return null;
+	}
+
+	public synchronized List<String> listGroups() throws Exception {
+		parse();
+
+		List<String> groups = new ArrayList<String>();
+		NodeList childs = doc.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node node = childs.item(i);
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			Element job = (Element) node;
+			String group = job.getAttribute("group");
+			if (!StringUtil.empty(group) && !groups.contains(group)) {
+				groups.add(group);
+			}
+		}
+		return groups;
+
+	}
+
+	public List<String> listUnGroups() throws Exception {
+		parse();
+
+		List<String> groups = new ArrayList<String>();
+		NodeList childs = doc.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node node = childs.item(i);
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			Element job = (Element) node;
+			if (StringUtil.empty(job.getAttribute("group"))) {
+				groups.add(job.getAttribute("name"));
+			}
+		}
+		return groups;
+	}
+
+	public synchronized List<String> getGroup(String name) throws Exception {
+		parse();
+
+		List<String> jobs = new ArrayList<String>();
+		NodeList childs = doc.getDocumentElement().getChildNodes();
+
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node node = childs.item(i);
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
+				continue;
+			}
+			Element job = (Element) node;
+			String group = job.getAttribute("group");
+			if (!StringUtil.empty(group) && name.equals(group)) {
+				jobs.add(job.getAttribute("name"));
+			}
+		}
+		return jobs;
+
+	}
+
+	public synchronized void removeGroup(List<String> delNames)
+			throws Exception {
+		parse();
+
+		Element root = doc.getDocumentElement();
+		NodeList childs = root.getChildNodes();
+
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node node = childs.item(i);
+			if (node.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			Element job = (Element) node;
+			for (String name : delNames) {
+				if (name.equals(job.getAttribute("group"))) {
+					job.removeAttribute("group");
+				}
+			}
+		}
+
+		store();
+
 	}
 
 	@SuppressWarnings("PMD")
@@ -240,7 +361,21 @@ public class JobConfigImpl implements JobConfigService {
 		}
 		return cmds;
 	}
+	
+	private String getBuild(NodeList nodes) throws Exception {
+		if (nodes.getLength() != 1) {
+			return "";
+		}
 
+		Node node = nodes.item(0);
+		if (node.getNodeType() != Node.ELEMENT_NODE) {
+			throw new Exception("source is required.");
+		}
+		Element ele = (Element) node;
+
+		return reqAttrib(ele, "name");
+	}
+	
 	private String reqAttrib(Element ele, String name) throws Exception {
 		String attrib = ele.getAttribute(name);
 		if (attrib == null || "".equals(attrib)) {

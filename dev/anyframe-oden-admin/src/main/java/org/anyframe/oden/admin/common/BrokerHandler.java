@@ -17,6 +17,11 @@ package org.anyframe.oden.admin.common;
 
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hsqldb.lib.StringUtil;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,6 +32,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Junghwan Hong
  */
 public class BrokerHandler implements InitializingBean {
+
+	Log logger = LogFactory.getLog(this.getClass());
 
 	private static OdenBrokerService odenBroker = new OdenBrokerImpl();
 
@@ -39,27 +46,40 @@ public class BrokerHandler implements InitializingBean {
 	 * initializing
 	 */
 	private void setup() {
-		context = new ClassPathXmlApplicationContext(
-				"classpath:spring/context-property.xml");
+		context = new ClassPathXmlApplicationContext("classpath:spring/context-property.xml");
 		Map key = (Map) context.getBean("contextProperties");
 
 		server = (String) key.get("oden.server");
 		port = (String) key.get("oden.port");
+
+		logger.debug("Broker Setup : " + server + ":" + port);
 	}
 
-	public static String cmdConnect(String cmd) throws Exception {
-		// setup();
+	public String cmdConnect(String cmd) throws Exception {
+		String url = "http://" + server + ":" + port + "/shell";
+		logger.debug("Broker Connect : [" + url + "] " + cmd);
 
-		String result = "";
+		String result = odenBroker.sendRequest(url, cmd);
 
-		result = odenBroker.sendRequest("http://" + server + ":" + port
-				+ "/shell", cmd);
+		if (!StringUtil.isEmpty(result)) {
+			JSONArray array = new JSONArray(result);
+
+			for (int i = 0; i < array.length(); i++) {
+				if (array.get(i) instanceof String) {
+					return result;
+				}
+				JSONObject object = (JSONObject) array.get(i);
+				if (object.has("KnownException")) {
+					logger.debug("KnownException Occured. Return empty string.");
+					return "";
+				}
+			}
+		}
 
 		return result;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		// TODO Auto-generated method stub
 		setup();
 	}
 

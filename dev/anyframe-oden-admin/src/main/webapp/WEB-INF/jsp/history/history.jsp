@@ -149,7 +149,7 @@
 									<option value="all"><spring:message code="history.select.all"/></option>
 								</iam:access>
 								<c:forEach var="job" items="${jobs}" varStatus="status">
-									<option value="${job.jobname}"><c:out value="${job.jobname}"></c:out>
+									<option value="${job.name}"><c:out value="${job.name}"></c:out>
 								</c:forEach>
 							</select>
 						</td>

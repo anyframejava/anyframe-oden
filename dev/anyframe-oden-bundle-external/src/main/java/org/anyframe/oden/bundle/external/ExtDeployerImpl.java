@@ -15,6 +15,7 @@
  */
 package org.anyframe.oden.bundle.external;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,19 +30,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.anyframe.oden.bundle.build.config.CfgPmdReturnVO;
+import org.anyframe.oden.bundle.build.config.CfgRunJob;
+import org.anyframe.oden.bundle.build.util.HudsonRemoteAPI;
 import org.anyframe.oden.bundle.common.Assert;
 import org.anyframe.oden.bundle.common.BundleUtil;
+import org.anyframe.oden.bundle.common.DateUtil;
+import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.common.Logger;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.core.AgentLoc;
 import org.anyframe.oden.bundle.core.DeployFile;
+import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.DeployFileUtil;
 import org.anyframe.oden.bundle.core.Repository;
 import org.anyframe.oden.bundle.core.RepositoryProviderService;
 import org.anyframe.oden.bundle.core.SortedDeployFileSet;
-import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.job.CompressFileResolver;
 import org.anyframe.oden.bundle.core.job.DeployFileResolver;
 import org.anyframe.oden.bundle.core.job.Job;
@@ -51,6 +57,9 @@ import org.anyframe.oden.bundle.core.txmitter.DeployerHelper;
 import org.anyframe.oden.bundle.core.txmitter.TransmitterService;
 import org.anyframe.oden.bundle.deploy.CfgReturnScript;
 import org.anyframe.oden.bundle.deploy.DeployerService;
+import org.anyframe.oden.bundle.external.config.CfgBuild;
+import org.anyframe.oden.bundle.external.config.CfgBuildDetail;
+import org.anyframe.oden.bundle.external.config.CfgBuildReturnVO;
 import org.anyframe.oden.bundle.external.config.CfgFileInfo;
 import org.anyframe.oden.bundle.external.config.CfgHistory;
 import org.anyframe.oden.bundle.external.config.CfgHistoryDetail;
@@ -70,6 +79,9 @@ import org.anyframe.oden.bundle.external.deploy.ExtUndoJob;
 import org.anyframe.oden.bundle.external.deploy.SourceManager;
 import org.anyframe.oden.bundle.job.log.JobLogService;
 import org.anyframe.oden.bundle.job.log.ShortenRecord;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
@@ -233,7 +245,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			throws Exception {
 		// services initialize
 		initServicesLog();
-		DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss",
+		DateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss",
 				Locale.getDefault()); // HH=24h,
 		// hh=12h
 
@@ -252,6 +264,17 @@ public class ExtDeployerImpl implements ExtDeployerService {
 				String.valueOf(r.getTotal()), historydet,
 				df.format(r.getDate()), String.valueOf(r.isSuccess()));
 		return history;
+	}
+
+	public List<CfgHistoryDetail> logDetail(String id) throws Exception {
+		// services initialize
+		initServicesLog();
+
+		List<CfgHistoryDetail> det = toListHistory(new SortedDeployFileSet(
+				jobLogger.show(id, "", Mode.NA, false)));
+
+		return det;
+
 	}
 
 	/*
@@ -410,6 +433,35 @@ public class ExtDeployerImpl implements ExtDeployerService {
 				.getTotal()), String.valueOf(r.getnSuccess()), errs);
 	}
 
+	/*
+	 * Hidden SR 조회를 위한 Agent 파일, 사이즈 , 일자 조회
+	 * 
+	 * @see
+	 * org.anyframe.oden.bundle.external.deploy.ExtDeployerService#compareAgent
+	 * (java.lang.String, java.lang.String, java.util.List, java.util.List)
+	 */
+	public List<FileInfo> listAllFiles(String fromDate, String toDate,
+			CfgTarget agent, List<String> excludes) throws Exception {
+
+		// initialize services
+		initTxmintter();
+
+		if (fromDate.equals("") || toDate.equals("") || agent == null) {
+			throw new OdenException(
+					"Information is empty. Check 'From/To Date, Agent List'");
+		}
+
+		DeployerService ds = txmitter.getDeployer(agent.getAddress().contains(
+				":") ? agent.getAddress() : agent.getAddress() + port);
+		// check agent alive
+		if (ds == null)
+			throw new OdenException("Invalid agent: " + agent.getName() + "["
+					+ agent.getAddress() + "]");
+		return ds.listAllFilesAsCondition(fromDate, toDate, agent.getPath(),
+				excludes);
+
+	}
+
 	@SuppressWarnings("PMD")
 	private List<CfgHistoryDetail> toListHistory(SortedDeployFileSet fs)
 			throws Exception {
@@ -422,7 +474,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					DeployFileUtil.modeToString(current.mode()),
 					StringUtil.makeEmpty(current.errorLog()), current
 							.getAgent().agentName(), String.valueOf(current
-							.isSuccess()));
+							.isSuccess()), DateUtil.toStringDate(current
+							.getDate()), current.getSize());
 			data.add(detail);
 		}
 		return data;
@@ -559,8 +612,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	}
 
 	@SuppressWarnings("PMD")
-	private Collection<DeployFile> preview(final CfgJob job)
-			throws OdenException {
+	private Collection<DeployFile> preview(final CfgJob job,
+			final Boolean isRoot) throws OdenException {
 		final Collection<DeployFile> ret = new Vector<DeployFile>();
 		// collect repo files. collect targets files
 		List<Thread> ths = new ArrayList<Thread>();
@@ -572,12 +625,22 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					SourceManager srcmgr = null;
 					try {
 						srcmgr = getSourceManager(fileInfo.getExeDir());
+						File sourceF = new File(fileInfo.getExeDir());
 
 						for (CfgTarget t : fileInfo.getTargets()) {
-							ret.add(new DeployFile(srcmgr.getRepository(),
-									fileInfo.getCiId(), CfgUtil.toAgentLoc(t),
-									0L, 0L, fileInfo.isDelete() ? Mode.DELETE
-											: Mode.UPDATE));
+							File targetF = new File(t.getPath());
+							// executeRoot() 일때
+							if (isRoot == true) {
+								copy(sourceF, targetF, srcmgr, fileInfo, t,
+										ret, null);
+								// execute() 일때
+							} else {
+								ret.add(new DeployFile(srcmgr.getRepository(),
+										fileInfo.getCiId(), CfgUtil
+												.toAgentLoc(t), 0L, 0L,
+										fileInfo.isDelete() ? Mode.DELETE
+												: Mode.UPDATE));
+							}
 						}
 					} catch (OdenException e) {
 						e.printStackTrace();
@@ -595,6 +658,38 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			}
 
 		return ret;
+	}
+
+	/*
+	 * Root directory 하단의 파일들을 폴더구조 형태로 배포하기 위한 job구성 재귀식을 이용하여 폴더구조를 구성한다.
+	 * 
+	 * @param File sourceF, File targetF, File sourceF, File targetF,
+	 * SourceManager srcmgr, CfgFileInfo fileInfo, CfgTarget t,
+	 * Collection<DeployFile> ret, String filePath
+	 */
+	@SuppressWarnings("PMD")
+	private void copy(File sourceF, File targetF, SourceManager srcmgr,
+			CfgFileInfo fileInfo, CfgTarget t, Collection<DeployFile> ret,
+			String filePath) {
+		File[] ff = sourceF.listFiles();
+		for (File file : ff) {
+			File temp = new File(targetF.getAbsolutePath() + File.separator
+					+ file.getName());
+			// Root 하위 디렉토리 구조, directory가 아닌 file이 나올때까지 계속 dierctory를 붙여나간다.
+			String filePaths = null;
+			if (filePath != null) {
+				filePaths = filePath + File.separator + file.getName();
+			} else
+				filePaths = File.separator + file.getName();
+			// file이 아니면 recursive
+			if (file.isDirectory()) {
+				copy(file, temp, srcmgr, fileInfo, t, ret, filePaths);
+			} else {
+				ret.add(new DeployFile(srcmgr.getRepository(), filePaths,
+						CfgUtil.toAgentLoc(t), 0L, 0L,
+						fileInfo.isDelete() ? Mode.DELETE : Mode.UPDATE));
+			}
+		}
 	}
 
 	@SuppressWarnings("PMD")
@@ -689,7 +784,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	}
 
 	@SuppressWarnings("PMD")
-	private CfgReturnVO executeRun(final CfgJob job, boolean isRoot)
+	private CfgReturnVO executeRun(final CfgJob job, final boolean isRoot)
 			throws Exception {
 		List<CfgTarget> targets = getTargets(job);
 
@@ -712,7 +807,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					new DeployFileResolver() {
 						public Collection<DeployFile> resolveDeployFiles()
 								throws OdenException {
-							return new SortedDeployFileSet(preview(job));
+							return new SortedDeployFileSet(preview(job, isRoot));
 						}
 					}, isRoot);
 		else
@@ -726,7 +821,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					}, new DeployFileResolver() {
 						public Collection<DeployFile> resolveDeployFiles()
 								throws OdenException {
-							return new SortedDeployFileSet(preview(job));
+							return new SortedDeployFileSet(preview(job, isRoot));
 						}
 					});
 
@@ -800,7 +895,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 						new DeployFileResolver() {
 							public Collection<DeployFile> resolveDeployFiles()
 									throws OdenException {
-								return new SortedDeployFileSet(preview(job));
+								return new SortedDeployFileSet(preview(job,
+										false));
 							}
 						}, false);
 			} else {
@@ -814,7 +910,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 						}, new DeployFileResolver() {
 							public Collection<DeployFile> resolveDeployFiles()
 									throws OdenException {
-								return new SortedDeployFileSet(preview(job));
+								return new SortedDeployFileSet(preview(job,
+										false));
 							}
 						});
 			}
@@ -869,4 +966,110 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 	}
 
+	public CfgBuildReturnVO executeBuild(CfgBuild build) throws Exception {
+		// CfgBuild Logging
+		inputParamLogging(build);
+
+		// set buildUrl
+		HudsonRemoteAPI api = new HudsonRemoteAPI();
+		api.setHudsonURL(build.getAddress());
+		
+		// call build Parameter
+		CfgRunJob run = api.executeBuildWithArg(build.getAddress(),
+				build.getUserId(), build.getPwd(), build.getDbName(), build
+						.getDbConnection(), build.getServer(), build
+						.getProductName(), build.getProjectName(), build
+						.getBuildName(), toJSONArray(build.getRequest())
+						.toString().replace("\"", ""), build.getRepoPath(),
+				false, build.getPackageType(), build.getPackageName());
+
+		return new CfgBuildReturnVO(run.getName(), run.getBuildNo(),
+				run.getConsoleUrl());
+	}
+	
+	public boolean CheckBuildServer(String address) throws Exception {
+		HudsonRemoteAPI api = new HudsonRemoteAPI();
+		api.setHudsonURL(address);
+
+		return api.checkBuildServer();
+	}
+	
+	public CfgBuildReturnVO rollbackBuild(String address, String buildName,
+			List<String> build) throws Exception {
+		CfgRunJob run = HudsonRemoteAPI.rollbackBuildWithArg(address,
+				buildName, toJSONForRollback(build).toString()
+						.replace("\"", ""));
+		return new CfgBuildReturnVO(run.getName(), run.getBuildNo(),
+				run.getConsoleUrl());
+	}
+
+	public int checkBuild(String address, String buildName, String buildNo)
+			throws Exception {
+		Logger.debug("address:" + " " + address);
+		Logger.debug("buildName:" + " " + buildName);
+		Logger.debug("buildNo:" + " " + buildNo);
+
+		return HudsonRemoteAPI.getStatusWithArg(address, buildName, buildNo);
+	}
+
+	private void inputParamLogging(CfgBuild build) throws Exception {
+		Logger.debug("address:" + " " + build.getAddress());
+		Logger.debug("userId:" + " " + build.getUserId());
+		Logger.debug("pwd:" + " " + build.getPwd());
+		Logger.debug("dbName:" + " " + build.getDbName());
+		Logger.debug("dbConnection:" + " " + build.getDbConnection());
+		Logger.debug("server:" + " " + build.getServer());
+		Logger.debug("productName:" + " " + build.getProductName());
+		Logger.debug("projectName:" + " " + build.getProductName());
+		Logger.debug("buildName:" + " " + build.getBuildName());
+		Logger.debug("request:" + " "
+				+ new JSONArray(build.getRequest()).toString());
+		Logger.debug("repoPath:" + " " + build.getRepoPath());
+	}
+
+	private JSONArray toJSONArray(List<CfgBuildDetail> builds)
+			throws JSONException {
+		JSONArray list = new JSONArray();
+
+		for (CfgBuildDetail build : builds) {
+			list.put(new JSONObject().put("requestId", build.getRequestId())
+					.put("buildId", build.getBuildId()));
+		}
+
+		return list;
+	}
+
+	private JSONArray toJSONForRollback(List<String> builds)
+			throws JSONException {
+		JSONArray list = new JSONArray();
+
+		for (String build : builds) {
+			list.put(new JSONObject().put("buildId", build));
+		}
+
+		return list;
+	}
+
+	public CfgBuildReturnVO executePmd(CfgBuild build) throws Exception {
+		// set buildUrl
+		HudsonRemoteAPI api = new HudsonRemoteAPI();
+		api.setHudsonURL(build.getAddress());
+		
+		// call build Parameter & run pmd
+		CfgRunJob run = api.executeBuildWithArg(build.getAddress(),
+				build.getUserId(), build.getPwd(), build.getDbName(), build
+						.getDbConnection(), build.getServer(), build
+						.getProductName(), build.getProjectName(), build
+						.getBuildName(), toJSONArray(build.getRequest())
+						.toString().replace("\"", ""), build.getRepoPath(),
+				true, build.getPackageType(), build.getPackageName());
+		return new CfgBuildReturnVO(run.getName(), run.getBuildNo(),
+				run.getConsoleUrl());
+	}
+
+	public CfgPmdReturnVO returnPmd(String address, String buildName,
+			String buildNo) throws Exception {
+		return HudsonRemoteAPI.returnPmd(address, buildName, buildNo);
+	}
+	
 }

@@ -64,11 +64,6 @@ public class RepoManager {
 		return repo.resolve(makeToRepoArgs(rf.getSubdir()), rf.getFile());
 	}
 
-	public FatInputStream resolveRoot(RepoFile rf) throws OdenException {
-		return repo.resolve(makeToRepoArgs(rf.getSubdir()),
-				FileUtil.fileName(rf.getFile()));
-	}
-
 	public FatInputStream resolve(String path) throws OdenException {
 		return repo.resolve(path);
 	}

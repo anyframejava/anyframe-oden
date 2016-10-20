@@ -82,5 +82,15 @@
 			</listitem>
 		</itemizedlist>
 	</para>
+	<para>
+		여섯째, CI서버와 연동을 통해 빌드수행이 가능하다.
+		<itemizedlist>
+			<listitem>
+				<para>
+					Jenkins와 연동 가능
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
 
 </section>

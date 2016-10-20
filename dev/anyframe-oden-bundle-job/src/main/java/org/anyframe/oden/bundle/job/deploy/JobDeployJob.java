@@ -429,8 +429,12 @@ public class JobDeployJob extends DeployJob {
 							nSuccess++;
 						}
 						f.setMode(info.isUpdate() ? Mode.UPDATE : Mode.ADD);
+						// add the size of deploy file
+						f.setSize(info.size());
 					} catch (Exception e) {
 						f.setSuccess(false);
+						// add the size of deploy file
+						f.setSize(0L);
 						if (StringUtil.empty(f.errorLog()))
 							f.setErrorLog(e.getMessage());
 						Logger.error(e);

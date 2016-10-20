@@ -33,7 +33,7 @@
 	<itemizedlist>
 		<listitem>
 			<para>
-				CI서버를 통해 배포대상물을 빌드 
+				CI서버를 통해 배포대상물을 빌드(Jekins와 연동 가능) 
 			</para>
 		</listitem>
 		<listitem>

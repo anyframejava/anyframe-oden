@@ -18,12 +18,18 @@ package org.anyframe.oden.admin.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.anyframe.oden.admin.common.CommonUtil;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.anyframe.oden.admin.common.OdenCommonDao;
+import org.anyframe.oden.admin.convert.JsonConverter;
 import org.anyframe.oden.admin.domain.History;
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Log;
 import org.anyframe.oden.admin.service.HistoryService;
+import org.anyframe.oden.admin.util.CommandUtil;
+import org.anyframe.oden.admin.util.CommonUtil;
+import org.anyframe.oden.admin.util.OdenConstants;
 import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,14 +43,13 @@ import org.springframework.stereotype.Service;
  */
 @Service("historyService")
 public class HistoryServiceImpl implements HistoryService {
-	private final OdenCommonDao<History> odenCommonDao = new OdenCommonDao<History>();
 
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
 
-	String ahrefPre = "<a href=\"";
-	String ahrefMid = "\">";
-	String ahrefPost = "</a>";
+	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<History> odenCommonDao;
 
 	/**
 	 * Method for showing history detail information.
@@ -52,11 +57,10 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public Page show(Object objPage, String param, String opt) throws Exception {
-		// return odenCommonDao.getList("log", "show", param);
-		ArrayList list = new ArrayList();
-		int page = Integer.parseInt(objPage + "");
+		List<Log> list = new ArrayList<Log>();
+
+		int page = Integer.parseInt(String.valueOf(objPage + ""));
 		int totalNum = 0;
 
 		String txid = "";
@@ -70,8 +74,7 @@ public class HistoryServiceImpl implements HistoryService {
 			txid = param;
 		}
 		if (param.indexOf("-path") != -1) {
-			option = option.concat(param.substring(param.indexOf("-path"),
-					param.length()));
+			option = option.concat(param.substring(param.indexOf("-path"), param.length()));
 		}
 
 		if (opt == null || opt.equals("")) {
@@ -86,76 +89,60 @@ public class HistoryServiceImpl implements HistoryService {
 			option = option.concat("-page" + " " + (page - 1));
 		}
 
-		String result = odenCommonDao.getResultString("log", "show", txid + " "
-				+ option);
+		String command = CommandUtil.getBasicCommand("log", "show", txid + " " + option);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
-		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
-
-		if (!(result == null) && !("".equals(result))) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					totalNum = Integer.parseInt(object.getString("total"));
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
-							int no = 1;
-							if (page == 0) {
-								no = pageUnit * (page) + j + 1;
-							} else {
-								no = pageUnit * (page - 1) + j + 1;
-							}
-							String success = dataObj.getString("success");
-
-							String successResult = "";
-							if (success.equalsIgnoreCase("true")) {
-								successResult = imgSuccess;
-							} else {
-								successResult = imgFail;
-							}
-
-							JSONArray targets = (JSONArray) dataObj
-									.get("targets");
-							String target = "";
-							if (!(targets.length() == 0)) {
-								for (int n = 0; n < targets.length(); n++) {
-									target = target.concat("[" + targets.get(n)
-											+ "] ");
-								}
-								target = target.substring(0,
-										target.length() - 1);
-							}
-
-							// String target = ((JSONObject)
-							// dataObj.get("agent"))
-							// .getString("name");
-							String path = dataObj.getString("path");
-							String mode = dataObj.getString("mode");
-							if ("A".equals(mode)) {
-								mode = "Add";
-							} else if ("U".equals(mode)) {
-								mode = "Update";
-							} else {
-								mode = "Delete";
-							}
-
-							String errorlog = dataObj.getString("errorlog");
-
-							Log l = new Log();
-							l.setNo(no + "");
-							l.setSuccess(successResult);
-							l.setJob(target);
-							l.setPath(path);
-							l.setMode(mode);
-							l.setErrorlog(errorlog);
-
-							list.add(l);
-						}
+		for (JSONObject object : objectArray) {
+			totalNum = Integer.parseInt(object.getString("total"));
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
+					int no = 1;
+					if (page == 0) {
+						no = pageUnit * (page) + j + 1;
+					} else {
+						no = pageUnit * (page - 1) + j + 1;
 					}
+					String success = dataObj.getString("success");
+
+					String successResult = "";
+					if (success.equalsIgnoreCase("true")) {
+						successResult = OdenConstants.IMG_TAG_SUCCESS;
+					} else {
+						successResult = OdenConstants.IMG_TAG_FAIL;
+					}
+
+					JSONArray targets = (JSONArray) dataObj.get("targets");
+					String target = "";
+					if (!(targets.length() == 0)) {
+						for (int n = 0; n < targets.length(); n++) {
+							target = target.concat("[" + targets.get(n) + "] ");
+						}
+						target = target.substring(0, target.length() - 1);
+					}
+
+					String path = dataObj.getString("path");
+					String mode = dataObj.getString("mode");
+					if ("A".equals(mode)) {
+						mode = "Add";
+					} else if ("U".equals(mode)) {
+						mode = "Update";
+					} else {
+						mode = "Delete";
+					}
+
+					String errorlog = dataObj.getString("errorlog");
+
+					Log l = new Log();
+					l.setNo(no + "");
+					l.setSuccess(successResult);
+					l.setJob(target);
+					l.setPath(path);
+					l.setMode(mode);
+					l.setErrorlog(errorlog);
+
+					list.add(l);
 				}
 			}
 		}
@@ -167,9 +154,8 @@ public class HistoryServiceImpl implements HistoryService {
 	 * 
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public Page findByPk(Object objPage, String param) throws Exception {
-		ArrayList list = new ArrayList();
+		List<Log> list = new ArrayList<Log>();
 
 		int page = Integer.parseInt(objPage + "");
 		int totalNum = 0;
@@ -181,60 +167,30 @@ public class HistoryServiceImpl implements HistoryService {
 			option = option.concat("-page" + " " + (page - 1));
 		}
 
-		String result = odenCommonDao.getResultString("log", "search", param
-				+ " " + option);
+		String command = CommandUtil.getBasicCommand("log", "search", param + " " + option);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
-		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
+		for (JSONObject object : objectArray) {
+			totalNum = Integer.parseInt(object.getString("total"));
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
+					Log log = JsonConverter.jsonToLog(dataObj);
 
-		if (!(result == null) && !("".equals(result))) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					totalNum = Integer.parseInt(object.getString("total"));
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
-
-							int total = dataObj.getInt("total");
-							int nsuccess = dataObj.getInt("nsuccess");
-							String status = dataObj.getString("status");
-							String txid = dataObj.getString("txid");
-							String job = dataObj.getString("job");
-							String date = dataObj.getString("date");
-							String user = dataObj.getString("user");
-
-							String txidAndStatus = "";
-							if (status.equalsIgnoreCase("S")) {
-								txidAndStatus = imgSuccess
-										+ "("
-										+ ahrefPre
-										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
-										+ txid + ", $('#itemname').val());"
-										+ ahrefMid + txid + ahrefPost + ")";
-							} else if (status.equalsIgnoreCase("F")) {
-								txidAndStatus = imgFail
-										+ "("
-										+ ahrefPre
-										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
-										+ txid + ", $('#itemname').val());"
-										+ ahrefMid + txid + ahrefPost + ")";
-							}
-
-							Log l = new Log();
-							l.setTxid(txidAndStatus);
-							l.setStatus(status);
-							l.setDate(date);
-							l.setJob(job);
-							l.setCounts(nsuccess + "/" + total);
-							l.setUser(user);
-
-							list.add(l);
-						}
+					String txidAndStatus = "";
+					String txid = log.getTxid();
+					if (log.getStatus().equalsIgnoreCase("S")) {
+						txidAndStatus = OdenConstants.IMG_TAG_SUCCESS + "(" + OdenConstants.A_HREF_HEAD
+								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', " + txid + ", $('#itemname').val());"
+								+ OdenConstants.A_HREF_MID + txid + OdenConstants.A_HREF_TAIL + ")";
+					} else if (log.getStatus().equalsIgnoreCase("F")) {
+						txidAndStatus = OdenConstants.IMG_TAG_FAIL + "(" + OdenConstants.A_HREF_HEAD
+								+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', " + txid + ", $('#itemname').val());"
+								+ OdenConstants.A_HREF_MID + txid + OdenConstants.A_HREF_TAIL + ")";
 					}
+					log.setTxid(txidAndStatus);
+					list.add(log);
 				}
 			}
 		}
@@ -249,8 +205,7 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @throws Exception
 	 */
 	public List<Job> findJob(String role) throws Exception {
-		return odenCommonDao.findJob("job", "info", CommonUtil
-				.getRoleList(role));
+		return odenCommonDao.findJob("job", "info", CommonUtil.getRoleList(role));
 	}
 
 	/**
@@ -277,46 +232,22 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public List<Log> findByPkExcel(String param) throws Exception {
-		String result = odenCommonDao.getResultString("log", "search", param);
+		String command = CommandUtil.getBasicCommand("log", "search", param);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
 		List<Log> list = new ArrayList<Log>();
 
-		if (!(result == null) && !("".equals(result))) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
-
-							int total = dataObj.getInt("total");
-							int nsuccess = dataObj.getInt("nsuccess");
-							String status = dataObj.getString("status");
-							String txid = dataObj.getString("txid");
-							String job = dataObj.getString("job");
-							String date = dataObj.getString("date");
-							String user = dataObj.getString("user");
-
-							Log l = new Log();
-							l.setTxid(txid);
-							l.setStatus(status);
-							l.setDate(date);
-							l.setJob(job);
-							l.setCounts(nsuccess + "/" + total);
-							l.setUser(user);
-
-							list.add(l);
-						}
-					}
+		for (JSONObject object : objectArray) {
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
+					Log log = JsonConverter.jsonToLog(dataObj);
+					list.add(log);
 				}
 			}
 		}
-
 		return list;
 	}
 
@@ -327,7 +258,6 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
-	@SuppressWarnings("PMD")
 	public List<Log> showExcel(String param, String opt) throws Exception {
 		String txid = "";
 
@@ -339,59 +269,48 @@ public class HistoryServiceImpl implements HistoryService {
 			txid = param;
 		}
 
-		String result = odenCommonDao.getResultString("log", "show", txid + " "
-				+ opt);
+		String command = CommandUtil.getBasicCommand("log", "show", txid + " " + opt);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
 		List<Log> list = new ArrayList<Log>();
 
-		if (!(result == null) && !("".equals(result))) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
+		for (JSONObject object : objectArray) {
+			JSONArray data = (JSONArray) object.get("data");
+			if (!(data.length() == 0)) {
+				for (int j = 0; j < data.length(); j++) {
+					JSONObject dataObj = (JSONObject) data.get(j);
+					String success = dataObj.get("success").equals("true") ? "Success" : "Fail";
 
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					JSONArray data = (JSONArray) object.get("data");
-					if (!(data.length() == 0)) {
-						for (int j = 0; j < data.length(); j++) {
-							JSONObject dataObj = (JSONObject) data.get(j);
-							String success = dataObj.get("success").equals(
-									"true") ? "Success" : "Fail";
-
-							JSONArray targets = (JSONArray) dataObj
-									.get("targets");
-							String target = "";
-							if (!(targets.length() == 0)) {
-								for (int n = 0; n < targets.length(); n++) {
-									target = target.concat("[" + targets.get(n)
-											+ "] ");
-								}
-								target = target.substring(0,
-										target.length() - 1);
-							}
-
-							String path = dataObj.getString("path");
-							String mode = dataObj.getString("mode");
-							if ("A".equals(mode)) {
-								mode = "Add";
-							} else if ("U".equals(mode)) {
-								mode = "Update";
-							} else {
-								mode = "Delete";
-							}
-
-							String errorlog = dataObj.getString("errorlog");
-
-							Log l = new Log();
-							l.setNo(j + 1 + "");
-							l.setSuccess(success);
-							l.setJob(target);
-							l.setPath(path);
-							l.setMode(mode);
-							l.setErrorlog(errorlog);
-
-							list.add(l);
+					JSONArray targets = (JSONArray) dataObj.get("targets");
+					String target = "";
+					if (!(targets.length() == 0)) {
+						for (int n = 0; n < targets.length(); n++) {
+							target = target.concat("[" + targets.get(n) + "] ");
 						}
+						target = target.substring(0, target.length() - 1);
 					}
+
+					String path = dataObj.getString("path");
+					String mode = dataObj.getString("mode");
+					if ("A".equals(mode)) {
+						mode = "Add";
+					} else if ("U".equals(mode)) {
+						mode = "Update";
+					} else {
+						mode = "Delete";
+					}
+
+					String errorlog = dataObj.getString("errorlog");
+
+					Log l = new Log();
+					l.setNo(j + 1 + "");
+					l.setSuccess(success);
+					l.setJob(target);
+					l.setPath(path);
+					l.setMode(mode);
+					l.setErrorlog(errorlog);
+
+					list.add(l);
 				}
 			}
 		}

@@ -31,8 +31,10 @@ public class Job implements Serializable {
 	 * 
 	 */
 	private String id = "";
-	private String jobname = "";
+	private String name = "";
+	private String group="";
 	private String date = "";
+	private String buildDate = "";
 	private String status = "";
 	private String repo = "";
 	private String includes = "";
@@ -45,7 +47,8 @@ public class Job implements Serializable {
 	private String hidden = ""; // checked option hidden property
 	private String toggle = "";
 	private List<Command> command = null;
-
+	private String build;
+	
 	public String getId() {
 		return id;
 	}
@@ -62,79 +65,99 @@ public class Job implements Serializable {
 		return txId;
 	}
 
-	public String getJobname() {
-		return jobname;
-	}
-
 	/**
 	 * @param jobname
 	 */
-	public void setJobname(String jobname) {
-		this.jobname = jobname;
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * @param jobGroup
+	 */
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
-	public String getDate() {
-		return date;
+	public String getGroup() {
+		return group;
 	}
 
 	/**
 	 * 
 	 * @param date
 	 */
+	public String getDate() {
+		return date;
+	}
+	
 	public void setDate(String date) {
 		this.date = date;
 	}
-
-	public String getStatus() {
-		return status;
+	
+	/**
+	 * 
+	 * @param buildDate
+	 */
+	public String getBuildDate() {
+		return buildDate;
+	}
+	
+	public void setBuildDate(String buildDate) {
+		this.buildDate = buildDate;
 	}
 
+	
 	/**
 	 * 
 	 * @param status
 	 */
-	public void setStatus(String status) {
-		this.status = status;
+	public String getStatus() {
+		return status;
 	}
 
-	public String getRepo() {
-		return repo;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	/**
 	 * 
 	 * @param repo
 	 */
+	public String getRepo() {
+		return repo;
+	}
 	public void setRepo(String repo) {
 		this.repo = repo;
 	}
 
-	public String getIncludes() {
-		return includes;
-	}
 
 	/**
 	 * 
 	 * @param include
 	 */
+	public String getIncludes() {
+		return includes;
+	}
+	
 	public void setIncludes(String includes) {
 		this.includes = includes;
-	}
-
-	public String getExcludes() {
-		return excludes;
 	}
 
 	/**
 	 * 
 	 * @param exclude
 	 */
+	public String getExcludes() {
+		return excludes;
+	}
+	
 	public void setExcludes(String excludes) {
 		this.excludes = excludes;
-	}
-
-	public List<Target> getTarget() {
-		return target;
 	}
 
 	/**
@@ -142,42 +165,46 @@ public class Job implements Serializable {
 	 * @param List
 	 *            <Target>
 	 */
+	public List<Target> getTarget() {
+		return target;
+	}
+	
 	public void setTarget(List<Target> target) {
 		this.target = target;
-	}
-
-	public String getMode() {
-		return mode;
 	}
 
 	/**
 	 * 
 	 * @param mode
 	 */
+	public String getMode() {
+		return mode;
+	}
+	
 	public void setMode(String mode) {
 		this.mode = mode;
-	}
-
-	public String getFile() {
-		return file;
 	}
 
 	/**
 	 * 
 	 * @param file
 	 */
+	public String getFile() {
+		return file;
+	}
+	
 	public void setFile(String file) {
 		this.file = file;
-	}
-
-	public String getDestination() {
-		return destination;
 	}
 
 	/**
 	 * 
 	 * @param destination
 	 */
+	public String getDestination() {
+		return destination;
+	}
+	
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
@@ -198,15 +225,22 @@ public class Job implements Serializable {
 		return toggle;
 	}
 
-	public List<Command> getCommand() {
-		return command;
-	}
-
 	/**
 	 * @param command
 	 */
+	public List<Command> getCommand() {
+		return command;
+	}
+	
 	public void setCommand(List<Command> command) {
 		this.command = command;
 	}
+	
+	public String getBuild() {
+		return build;
+	}
 
+	public void setBuild(String build) {
+		this.build = build;
+	}
 }

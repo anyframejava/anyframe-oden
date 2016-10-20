@@ -26,11 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -41,6 +44,7 @@ import java.util.zip.ZipFile;
 
 import org.anyframe.oden.bundle.common.BundleUtil;
 import org.anyframe.oden.bundle.common.CipherUtil;
+import org.anyframe.oden.bundle.common.DateUtil;
 import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.common.Logger;
@@ -69,12 +73,14 @@ public class DeployerImpl implements DeployerService {
 	private Object lock = new Object();
 
 	private int backupcnt;
-	
+
 	private String securitykey = "";
-	
+
 	private boolean isCompress;
-	
+
 	private boolean bootOnly = false;
+
+	private String listFilesRoot;
 	//
 	// private String backDir;
 	//
@@ -103,8 +109,8 @@ public class DeployerImpl implements DeployerService {
 	public FileInfo fileInfo(String parent, String child) throws Exception {
 		File f = new File(toAbsPath(parent), child);
 		if (f.exists())
-			return new FileInfo(child, f.isDirectory(), f.lastModified(),
-					f.length());
+			return new FileInfo(child, f.isDirectory(), f.lastModified(), f
+					.length());
 		return null;
 	}
 
@@ -185,7 +191,7 @@ public class DeployerImpl implements DeployerService {
 	}
 
 	// public void init(String parent, String path, long date) throws Exception{
-	// 		init(parent, path, date, true);
+	// init(parent, path, date, true);
 	// }
 
 	public void init(String parent, String path, long date, boolean useTmp,
@@ -193,39 +199,39 @@ public class DeployerImpl implements DeployerService {
 		parent = toAbsPath(parent);
 		this.backupcnt = backupcnt;
 		Map<String, String> ownerShip = new HashMap<String, String>();
-		
+
 		// get security key start
 		BundleContext context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
 		this.isCompress = isCompress;
-		
-		if(context.getProperty("security.key") != null) 
+
+		if (context.getProperty("security.key") != null)
 			securitykey = context.getProperty("security.key");
 		else
 			securitykey = "";
 		// get security key end
-		
+
 		// boot only one agent
 		if (context.getProperty("boot.only") != null) {
 			bootOnly = Boolean.valueOf(context.getProperty("boot.only"));
-			if(bootOnly) {
+			if (bootOnly) {
 				File file = new File(parent + File.separator + path);
-					
-				if(!file.exists() || file.length() == 0L)
+
+				if (!file.exists() || file.length() == 0L)
 					ownerShip = getOnwerShip(parent);
 			}
 		}
-		
+
 		synchronized (lock) {
 			// if (mode != MODE.INIT) {
-			// 		close all open streams.
-			// 		for (String f : fileStreams.keySet()) {
-			// 			try {
-			// 				fileStreams.remove(f).close(null, null, 0);
-			// 			} catch (IOException e) {
-			// 			}
-			// 		}
-			// 		mode = MODE.INIT;
+			// close all open streams.
+			// for (String f : fileStreams.keySet()) {
+			// try {
+			// fileStreams.remove(f).close(null, null, 0);
+			// } catch (IOException e) {
+			// }
+			// }
+			// mode = MODE.INIT;
 			// }
 
 			final String key = parent + path;
@@ -240,36 +246,53 @@ public class DeployerImpl implements DeployerService {
 			}
 		}
 	}
-	
+
 	private Map<String, String> getOnwerShip(String parent) throws Exception {
 		boolean isWin = System.getProperty("os.name").startsWith("Windows");
 		StringBuffer buf = new StringBuffer();
 		Process p;
 		String s = null;
 		Map<String, String> rtnMap = new HashMap<String, String>();
-		
+
 		if (isWin) {
 			p = Runtime.getRuntime().exec(
 					new String[] { "cmd", "/c",
 							"dir /a:d /q " + '"' + parent + '"' });
 		} else {
 			p = Runtime.getRuntime().exec("ls -d -l " + parent);
-				
+
 		}
-		
+
 		int exitValue = p.waitFor();
-		if(exitValue != 0) {
-			throw new OdenException("Fail to get diretory's imformation:" + parent);
+		if (exitValue != 0) {
+			throw new OdenException("Fail to get diretory's imformation:"
+					+ parent);
 		}
-		BufferedReader r = new BufferedReader(new InputStreamReader(
-				p.getInputStream()));
-		
+		BufferedReader r = new BufferedReader(new InputStreamReader(p
+				.getInputStream()));
+
 		while (true) {
 			if ((s = r.readLine()) == null)
 				break;
 			buf.append(s);
 		}
-		String[] resultArr = buf.toString().split(" ");
+		// System.out.println("buf to string: " + buf.toString());
+
+		String[] resultArr = null;
+		LinkedList<String> resultList = new LinkedList<String>();
+
+		if (buf.toString().contains("\t")) {
+			resultArr = buf.toString().split("\t");
+		} else if (buf.toString().contains(" ")) {
+			resultArr = buf.toString().split(" ");
+		}
+
+		for (String result : resultArr) {
+			if (!result.trim().equals("")) {
+				resultList.add(result);
+			}
+		}
+
 		if (isWin) {
 			int i = 0;
 			for (String result : resultArr) {
@@ -282,24 +305,24 @@ public class DeployerImpl implements DeployerService {
 						}
 					}
 				}
-				if(!rtnMap.isEmpty())
+				if (!rtnMap.isEmpty())
 					break;
 				i++;
-				
+
 			}
-		} else if (!isWin && resultArr.length != 0) {
-			rtnMap.put("owner", resultArr[2]);
-			rtnMap.put("group", resultArr[3]);
+		} else if (!isWin && !resultList.isEmpty()) {
+			rtnMap.put("owner", resultList.get(2));
+			rtnMap.put("group", resultList.get(3));
 		}
-		
+
 		return rtnMap;
 	}
-	
+
 	// public void zinit(int backupcnt, String backDir, String undo)
-	// 		throws Exception {
-	// 			this.backupcnt = backupcnt;
-	// 			this.backDir = backDir;
-	// 			this.undo = undo;
+	// throws Exception {
+	// this.backupcnt = backupcnt;
+	// this.backDir = backDir;
+	// this.undo = undo;
 	// }
 
 	public boolean write(String parent, String path, ByteArray buf)
@@ -308,16 +331,17 @@ public class DeployerImpl implements DeployerService {
 
 		synchronized (lock) {
 			// if (mode == MODE.CLOSE)
-			// 	throw new IOException("Writing any bytes is not allowed while closing mode.");
-			//		 mode = MODE.WRITE;
+			// throw new
+			// IOException("Writing any bytes is not allowed while closing mode.");
+			// mode = MODE.WRITE;
 
 			DeployOutputStream out = fileStreams.get(parent + path);
 			if (out == null)
 				throw new IOException("No open stream: "
 						+ FileUtil.combinePath(parent, path));
-			if(securitykey.equals("")|| isCompress) {
+			if (securitykey.equals("") || isCompress) {
 				return out.write(buf.getBytes());
-			} else { 
+			} else {
 				return out.write(CipherUtil.decrypt(buf.getBytes()));
 			}
 		}
@@ -400,18 +424,14 @@ public class DeployerImpl implements DeployerService {
 
 						copy(in, out);
 						success = true;
-						extractedfiles.put(
-								entry.getName(),
-								new FileInfo(entry.getName(), false, f
-										.lastModified(), f.length(), "",
-										success, isUpdate));
+						extractedfiles.put(entry.getName(), new FileInfo(entry
+								.getName(), false, f.lastModified(),
+								f.length(), "", success, isUpdate));
 					} catch (Exception e2) {
 						Logger.error(e2);
-						extractedfiles
-								.put(entry.getName(),
-										new FileInfo(entry.getName(), false, 0,
-												0, Utils.rootCause(e2),
-												success, isUpdate));
+						extractedfiles.put(entry.getName(), new FileInfo(entry
+								.getName(), false, 0, 0, Utils.rootCause(e2),
+								success, isUpdate));
 					} finally {
 						// do u wanna read this?
 						try {
@@ -492,8 +512,7 @@ public class DeployerImpl implements DeployerService {
 	public void removeDir(File path) throws Exception {
 		if (path != null && path.isFile()) {
 			if (!path.delete() && path.exists())
-				;
-			throw new IOException("Fail to remove file: " + path);
+				throw new IOException("Fail to remove file: " + path);
 		}
 
 		if (path != null && path.exists()) {
@@ -524,10 +543,10 @@ public class DeployerImpl implements DeployerService {
 
 	// public List<DoneFileInfo> backupNRemoveDir(String id, String dir, String
 	// bak) throws Exception {
-	// 		synchronized (lock) {
-	// 			job = new RemoveDirJob(id, toAbsPath(dir), toAbsPath(bak));
-	// 			return (List<DoneFileInfo>) job.start();
-	// 		}
+	// synchronized (lock) {
+	// job = new RemoveDirJob(id, toAbsPath(dir), toAbsPath(bak));
+	// return (List<DoneFileInfo>) job.start();
+	// }
 	// }
 
 	public List<FileInfo> listAllFilesAsJob(String id, String path)
@@ -560,6 +579,67 @@ public class DeployerImpl implements DeployerService {
 		return ret;
 	}
 
+	public List<FileInfo> listAllFilesAsCondition(String fromDate,
+			String toDate, String dir, List<String> excludes) throws Exception {
+		listFilesRoot = dir;
+		
+		return getAllFilesAsCondition(fromDate, toDate, dir, excludes);
+	}
+	
+	private List<FileInfo> getAllFilesAsCondition(String fromDate,
+			String toDate, String dir, List<String> excludes) throws Exception {
+		List<FileInfo> ret = new ArrayList<FileInfo>();
+		Long fDate = fromDate.equals("") || fromDate == null ? Long.MIN_VALUE
+				: getMilliSeconds(fromDate, true);
+		Long tDate = toDate.equals("") || toDate == null ? Long.MAX_VALUE
+				: getMilliSeconds(toDate, false);
+		// parent
+		dir = toAbsPath(dir);
+		
+		File[] files = new File(dir).listFiles();
+
+		if (files == null) {
+			return Collections.EMPTY_LIST;
+		}
+
+		for (File file : files) {
+			String path = FileUtil.combinePath(dir, file.getName());
+			if (file.isFile()) { // file
+				String pathAfterSub = FileUtil.getRelativePath(dir, path);
+				Long date = file.lastModified();
+
+				// excludes , date
+				if (FileUtil.matched(path, excludes)
+						|| !(fDate <= date && tDate >= date))
+					continue;
+				ret.add(new FileInfo(FileUtil
+						.replace(path, listFilesRoot.concat("/"), ""), false, DateUtil
+						.toStringDate(file.lastModified()), file.length()));
+			} else { // directory
+				ret.addAll(getAllFilesAsCondition(fromDate, toDate, path,
+						excludes));
+			}
+		}
+
+		return ret;
+	}
+
+	
+	private long getMilliSeconds(String inputDate, boolean isFromDate)
+			throws Exception {
+		String startTime = "000000";
+		String endTime = "235959";
+		if (isFromDate)
+			inputDate = inputDate + startTime;
+		else
+			inputDate = inputDate + endTime;
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		Date date = sdf.parse(inputDate);
+
+		return date.getTime();
+	}
+
 	/**
 	 * used before restoring snapshots.
 	 * 
@@ -577,14 +657,14 @@ public class DeployerImpl implements DeployerService {
 				if (files[i].isDirectory()) {
 					backupRemoveDir(infos, files[i], root, bak);
 				} else {
-					DoneFileInfo info = new DoneFileInfo(
-							FileUtil.getRelativePath(root, files[i].getPath()),
-							false, files[i].lastModified(), files[i].length(),
-							false, false);
+					DoneFileInfo info = new DoneFileInfo(FileUtil
+							.getRelativePath(root, files[i].getPath()), false,
+							files[i].lastModified(), files[i].length(), false,
+							false);
 					infos.add(info);
 
-					info.setUpdate(DeployerUtils.undoBackup(root,
-							info.getPath(), bak, backupcnt));
+					info.setUpdate(DeployerUtils.undoBackup(root, info
+							.getPath(), bak, backupcnt));
 					info.setSuccess(files[i].delete());
 				}
 			}
@@ -695,8 +775,8 @@ public class DeployerImpl implements DeployerService {
 
 	// public String execShellCommand(String command, String dir, long timeout)
 	// throws Exception {
-	// 		return new Launcher(new Proc(command, toAbsPath(dir), timeout), timeout)
-	// 		.start();
+	// return new Launcher(new Proc(command, toAbsPath(dir), timeout), timeout)
+	// .start();
 	// }
 
 	public CfgReturnScript execShellCommand(String command, String dir,

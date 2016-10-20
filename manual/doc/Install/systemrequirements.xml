@@ -50,6 +50,33 @@
 				</listitem>
 			</itemizedlist>
 		</listitem>
+		<listitem>
+			<para>
+				 Linux, UNIX, Solaris, Mac OS X, MS Windows 등의 플랫폼
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				 서버간 방화벽 확인 (default Port 변경가능)
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						ODEN Server(Port:9860) -> ODEN Agent(Port:9872) 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						사용자PC -> ODEN Admin(Port:9880) 
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						ODEN Sever(Port:9860) -> Jenkins(Port:9090) 
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
 	</itemizedlist>
 
 </section>

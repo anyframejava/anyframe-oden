@@ -43,15 +43,13 @@ public class ExceptionTransfer {
 	private MessageSource messageSource;
 
 	@AfterThrowing(pointcut = "execution(* org.anyframe.oden..*Impl.*(..))", throwing = "exception")
-	public void transfer(JoinPoint thisJoinPoint, Exception exception)
-			throws BrokerException {
+	public void transfer(JoinPoint thisJoinPoint, Exception exception) throws BrokerException {
 		Object target = thisJoinPoint.getTarget();
 		while (target instanceof Advised) {
 			try {
 				target = ((Advised) target).getTargetSource().getTarget();
 			} catch (Exception e) {
-				LogFactory.getLog(this.getClass()).error(
-						"Fail to get target object from JointPoint.", e);
+				LogFactory.getLog(this.getClass()).error("Fail to get target object from JointPoint.", e);
 				break;
 			}
 		}
@@ -63,8 +61,7 @@ public class ExceptionTransfer {
 		// Oden Server Interface Exception
 		if (exception instanceof BrokerException) {
 			BrokerException odenEx = (BrokerException) exception;
-			String msg = messageSource.getMessage(odenEx.getMessage(),
-					new String[] {}, Locale.getDefault());
+			String msg = messageSource.getMessage(odenEx.getMessage(), new String[] {}, Locale.getDefault());
 			if (!odenEx.getMessage().contains("broker.info")) {
 				logger.error(msg, odenEx);
 			}
@@ -75,15 +72,11 @@ public class ExceptionTransfer {
 		if (exception instanceof BaseException) {
 			BaseException baseEx = (BaseException) exception;
 			logger.error(baseEx.getMessage(), baseEx);
-			throw new BrokerException(messageSource, "error." + className + "."
-					+ opName, new String[] {}, exception);
+			throw new BrokerException(messageSource, "error." + className + "." + opName, new String[] {}, exception);
 		}
 
-		logger.error(messageSource.getMessage("error." + className + "."
-				+ opName, new String[] {}, "no messages", Locale.getDefault()),
-				exception);
+		logger.error(messageSource.getMessage("error." + className + "." + opName, new String[] {}, "no messages", Locale.getDefault()), exception);
 
-		throw new BrokerException(messageSource, "error." + className + "."
-				+ opName, new String[] {}, exception);
+		throw new BrokerException(messageSource, "error." + className + "." + opName, new String[] {}, exception);
 	}
 }

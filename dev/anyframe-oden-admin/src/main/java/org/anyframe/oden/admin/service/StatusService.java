@@ -30,6 +30,13 @@ public interface StatusService {
 	 * @throws Exception
 	 */
 	public Page findList(String domain) throws Exception;
+	
+	/**
+	 * 
+	 * @param domain
+	 * @throws Exception
+	 */
+	public boolean checkRunning(String domain) throws Exception;
 
 	/**
 	 * 

@@ -141,7 +141,8 @@ public class JobCommandImpl implements CustomCommand {
 			if (isJSON) {
 				JSONObject jo = new JSONObject();
 				jo.put("name", job.getName());
-				jo.put("sources", job.getSource().toJSON());
+				jo.put("group", job.getGroup());
+				jo.put("source", job.getSource().toJSON());
 				jo.put("targets",
 						new JSONArray(allTargetStatus(job.getTargets())));
 
@@ -150,11 +151,13 @@ public class JobCommandImpl implements CustomCommand {
 					cs.put(c.toJSON());
 				}
 				jo.put("commands", cs);
+				jo.put("build", job.getBuild());
 				return new JSONArray().put(jo).toString();
 			}
 
 			StringBuffer buf = new StringBuffer();
 			buf.append("name: " + job.getName() + "\n");
+			buf.append("group: " + job.getGroup() + "\n");
 			buf.append("source: " + job.getSource().toJSON() + "\n");
 			buf.append("targets: \n");
 			for (JSONObject targetStatus : allTargetStatus(job.getTargets())) {
@@ -164,6 +167,7 @@ public class JobCommandImpl implements CustomCommand {
 			for (CfgCommand c : job.getCommands()) {
 				buf.append("\t" + c.toJSON() + "\n");
 			}
+			buf.append("build: " + job.getBuild() + "\n");
 			return buf.toString();
 		} else if (action.equals("compare")) {
 			final CfgJob job = jobConfig.getJob(cmd.getActionArg());
@@ -279,6 +283,78 @@ public class JobCommandImpl implements CustomCommand {
 						"checkout-dir", p.getArg1()));
 			}
 			return ret.toString();
+		} else if (action.equals("group")) {
+			// Job grouping
+			// job group [ <group> ] [ -del <group> ] [ -ungroup ]
+			
+			final List<String> delNames = cmd
+			.getOptionArgList(new String[] { "del" });
+			
+			final boolean arg = StringUtil.empty(cmd.getActionArg());
+			final boolean del = cmd.getOption("del") != null;
+			final boolean ungroup = cmd.getOption("ungroup") != null;
+			
+			if(! arg) {
+				if(del || ungroup) {
+					throw new OdenException("Check the argument or option of Job group");
+				}
+			} else {
+				if(del && ungroup) {
+					throw new OdenException("Check the argument or option of Job group");
+				}
+			}
+			
+			
+			if (arg) {
+				List<String> groups = new ArrayList<String>();
+				
+				if(del) {
+					if(delNames.size() == 0 ) {
+						throw new OdenException("Check the deleted group name");
+					}
+					jobConfig.removeGroup(delNames);
+					return "";
+				}
+				if(ungroup) { 	
+					groups = jobConfig.listUnGroups();
+				} else {
+					groups = jobConfig.listGroups();
+				}
+				
+				if (isJSON) {
+					return new JSONArray(groups).toString();
+				}
+
+				StringBuffer buf = new StringBuffer();
+				for (String s : groups) {
+					buf.append(s + "\n");
+				}
+				return buf.toString();
+			}
+			List<String> jobs = jobConfig.getGroup(cmd.getActionArg());
+			
+			if (jobs.size() == 0) {
+				throw new OdenException("Invalid Group Name: "
+						+ cmd.getActionArg());
+			}
+			if (isJSON) {
+				JSONObject jo = new JSONObject();
+
+				JSONArray jn = new JSONArray();
+				for (String s : jobs) {
+					jn.put(s);
+				}
+				jo.put("group", jn);
+				return new JSONArray().put(jo).toString();
+			}
+
+			StringBuffer buf = new StringBuffer();
+			
+			buf.append(cmd.getActionArg() + " " + "group's job: \n");
+			for (String s : jobs) {
+				buf.append("\t" + s + "\n");
+			}
+			return buf.toString();
 		} else {
 			throw new OdenException("Invalid Action: " + action);
 		}
@@ -452,7 +528,8 @@ public class JobCommandImpl implements CustomCommand {
 	private String getFullUsage() {
 		return "job info [ <job> ]"
 				+ "\njob compare <job> [ -t <target> ... ] [ -failonly ]"
-				+ "\njob mapping-scan <job>";
+				+ "\njob mapping-scan <job>"
+				+ "\njob group [ <group> ] [ -del <group> ... ] [ -ungroup ]";
 	}
 
 	public String getName() {
@@ -460,7 +537,7 @@ public class JobCommandImpl implements CustomCommand {
 	}
 
 	public String getShortDescription() {
-		return "info / compare Job";
+		return "info / compare / mappping-scan / group Job";
 	}
 
 	public String getUsage() {

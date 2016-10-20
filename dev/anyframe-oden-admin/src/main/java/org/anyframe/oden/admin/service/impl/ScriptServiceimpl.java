@@ -18,11 +18,18 @@ package org.anyframe.oden.admin.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.anyframe.oden.admin.common.OdenCommonDao;
+import org.anyframe.oden.admin.convert.JsonConverter;
 import org.anyframe.oden.admin.domain.Command;
 import org.anyframe.oden.admin.domain.Server;
 import org.anyframe.oden.admin.service.ScriptService;
+import org.anyframe.oden.admin.util.CommandUtil;
+import org.anyframe.oden.admin.util.OdenConstants;
 import org.anyframe.pagination.Page;
+import org.hsqldb.lib.StringUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -35,13 +42,9 @@ import org.springframework.stereotype.Service;
 @Service("scriptService")
 public class ScriptServiceimpl implements ScriptService {
 
-	private final OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
-
-	String ahrefPre = "<a href=\"";
-	String ahrefMid = "\">";
-	String ahrefPost = "</a>";
-
-	String doubleQuotation = "\"";
+	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<Server> odenCommonDao;
 
 	/**
 	 * Method for getting script list in certain job.
@@ -49,69 +52,85 @@ public class ScriptServiceimpl implements ScriptService {
 	 * @param param
 	 * @param opt
 	 */
-	@SuppressWarnings("PMD")
 	public Page findListByPk(String param, String opt) throws Exception {
+		List<Command> list = new ArrayList<Command>();
 
-		if ("".equals(param)) {
-			List list = new ArrayList();
-			return new Page(list, 1, list.size(), 1, 1);
-		} else {
-			List list = new ArrayList();
+		if (!StringUtil.isEmpty(param)) {
+			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-			String result = odenCommonDao.getResultString("job", "info",
-					doubleQuotation + param + doubleQuotation);
-
-			String imgRun = "<img src='images/play.png'/>";
-			String imgDel = "<img src='images/ico_del.gif'/>";
-
-			if (result == null || "".equals(result)) {
-				return new Page(list, 1, list.size(), 1, 1);
-			}
-			JSONArray array = new JSONArray(result);
-			if (array.length() == 0) {
-				return new Page(list, 1, list.size(), 1, 1);
-			}
-
-			int recordSize = array.length();
-
-			for (int i = 0; i < recordSize; i++) {
-
-				JSONObject object = (JSONObject) array.get(i);
+			for (JSONObject object : objectArray) {
 				JSONArray commands = (JSONArray) object.get("commands");
 
 				for (int num = 0; num < commands.length(); num++) {
-					Command c = new Command();
-
-					JSONObject command = (JSONObject) commands.get(num);
-					String name = command.getString("name");
-					String path = command.getString("dir");
-					String cmd = command.getString("command");
+					JSONObject cmdObject = (JSONObject) commands.get(num);
+					Command c = JsonConverter.jsonToCommand(cmdObject);
 
 					String event = "";
-					event = event.concat(ahrefPre + "javascript:runScript('"
-							+ name + "');" + ahrefMid);
+					event = event.concat(OdenConstants.A_HREF_HEAD + "javascript:runScript('" + c.getName() + "');" + OdenConstants.A_HREF_MID);
 					if ("run".equals(opt)) {
-						event = event.concat(imgRun + ahrefPost);
+						event = event.concat(OdenConstants.IMG_TAG_RUN);
 					}
 					if ("del".equals(opt)) {
-						event = event.concat(imgDel + ahrefPost);
+						event = event.concat(OdenConstants.IMG_TAG_DEL);
 					}
 
-					c.setName(name);
-					c.setPath(path);
-					c.setCmd(cmd);
-					c.setHidden(event);
-					c.setHiddenname(name);
+					event = event.concat(OdenConstants.A_HREF_TAIL);
 
+					c.setHidden(event);
 					list.add(c);
 				}
 			}
+		}
 
-			if (list.isEmpty()) {
-				return new Page(list, 1, list.size(), 1, 1);
-			} else {
-				return new Page(list, 1, list.size(), list.size(), list.size());
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
+		}
+	}
+	
+	/**
+	 * Method for getting script list in certain job.
+	 * 
+	 * @param param, opt, objectArray
+	 * @param opt
+	 */
+	public Page findListByPk(String param, String opt, List<JSONObject> objectArray) throws Exception {
+		List<Command> list = new ArrayList<Command>();
+
+		if (!StringUtil.isEmpty(param)) {
+//			String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + param + OdenConstants.DOUBLE_QUOTATOIN);
+//			List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
+
+			for (JSONObject object : objectArray) {
+				JSONArray commands = (JSONArray) object.get("commands");
+
+				for (int num = 0; num < commands.length(); num++) {
+					JSONObject cmdObject = (JSONObject) commands.get(num);
+					Command c = JsonConverter.jsonToCommand(cmdObject);
+
+					String event = "";
+					event = event.concat(OdenConstants.A_HREF_HEAD + "javascript:runScript('" + c.getName() + "');" + OdenConstants.A_HREF_MID);
+					if ("run".equals(opt)) {
+						event = event.concat(OdenConstants.IMG_TAG_RUN);
+					}
+					if ("del".equals(opt)) {
+						event = event.concat(OdenConstants.IMG_TAG_DEL);
+					}
+
+					event = event.concat(OdenConstants.A_HREF_TAIL);
+
+					c.setHidden(event);
+					list.add(c);
+				}
 			}
+		}
+
+		if (list.isEmpty()) {
+			return new Page(list, 1, list.size(), 1, 1);
+		} else {
+			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
 
@@ -122,8 +141,7 @@ public class ScriptServiceimpl implements ScriptService {
 	 * @param jobName
 	 * @param scriptName
 	 */
-	public String run(String[] targets, String jobName, String scriptName)
-			throws Exception {
+	public String run(String[] targets, String jobName, String scriptName) throws Exception {
 		String returnString = "";
 
 		String options = "\"" + jobName + "\" " + "-t" + " ";
@@ -131,23 +149,16 @@ public class ScriptServiceimpl implements ScriptService {
 		for (int i = 0; i < targets.length; i++) {
 			options = options.concat("\"" + targets[i] + "\" ");
 		}
-
 		options = options.concat("-c" + " \"" + scriptName + "\"");
 
-		String result = odenCommonDao.getResultString("exec", "run", options);
+		String command = CommandUtil.getBasicCommand("exec", "run", options);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject object = (JSONObject) array.get(i);
-					String target = object.getString("target");
-					String resultScript = object.getString("result");
+		for (JSONObject object : objectArray) {
+			String target = object.getString("target");
+			String resultScript = object.getString("result");
 
-					returnString = returnString.concat("[" + target + "]\r"
-							+ resultScript + "\r\r\r");
-				}
-			}
+			returnString = returnString.concat("[" + target + "]\r" + resultScript + "\r\r\r");
 		}
 
 		return returnString;
@@ -160,33 +171,19 @@ public class ScriptServiceimpl implements ScriptService {
 	 * 
 	 * 
 	 */
-	@SuppressWarnings("PMD")
 	public List<Command> getCommandList(String jobName) throws Exception {
 		List<Command> cmds = new ArrayList<Command>();
 
-		String result = odenCommonDao.getResultString("job", "info",
-				doubleQuotation + jobName + doubleQuotation);
+		String command = CommandUtil.getBasicCommand("job", "info", OdenConstants.DOUBLE_QUOTATOIN + jobName + OdenConstants.DOUBLE_QUOTATOIN);
+		List<JSONObject> objectArray = odenCommonDao.jsonObjectArrays(command);
 
-		if (!(result == null) && !"".equals(result)) {
-			JSONArray array = new JSONArray(result);
-			if (!(array.length() == 0)) {
-				int recordSize = array.length();
+		for (JSONObject object : objectArray) {
+			JSONArray commands = (JSONArray) object.get("commands");
 
-				for (int i = 0; i < recordSize; i++) {
-
-					JSONObject object = (JSONObject) array.get(i);
-					JSONArray commands = (JSONArray) object.get("commands");
-
-					for (int num = 0; num < commands.length(); num++) {
-						Command c = new Command();
-
-						JSONObject command = (JSONObject) commands.get(num);
-						String name = command.getString("name");
-
-						c.setName(name);
-						cmds.add(c);
-					}
-				}
+			for (int num = 0; num < commands.length(); num++) {
+				JSONObject cmdObject = (JSONObject) commands.get(num);
+				Command c = JsonConverter.jsonToCommand(cmdObject);
+				cmds.add(c);
 			}
 		}
 

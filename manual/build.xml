@@ -13,7 +13,7 @@
 	 -->
 	<property name="dbf.home" value="E:/workspace/docbook" />
 	<property name="result.dir" location="../manual/target/oden"/>
-	<property name="version" value="2.5.0"/>
+	<property name="version" value="2.6.0"/>
 	<property name="link.dir" location="E:/Repo/anyframe-opensource/docs/deployer/${version}"/>
 	
 	<!--

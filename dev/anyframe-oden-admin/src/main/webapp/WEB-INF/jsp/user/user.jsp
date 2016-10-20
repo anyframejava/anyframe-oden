@@ -138,7 +138,6 @@ function setUserDetail(id){
 		$("#role_list option[value="+role+"]").attr("selected", "selected");
 		disOrEnableInput(role);
 		$("#user_id").attr("disabled", "disabled");
-
 		var jobs = data.autoData.job;
 		setComparedJobList(jobs);
 	});
@@ -156,8 +155,7 @@ function setComparedJobList(jobs){
 		var length = data.autoData.length;
 		for(var i=0; i<length; i++){
 			var flag = false;
-			var jobName = data.autoData[i].jobname;
-
+			var jobName = data.autoData[i].name;
 			if(substr_len>0){
 				for(var n=0; n<substr_len; n++){
 					if(trim(jobName) == trim(substr[n])){
@@ -181,7 +179,7 @@ function setAllJobList(){
 		var length = data.autoData.length;
 		var markup = '';
 		for(var i=0; i<length; i++){
-			markup += '<option>' + data.autoData[i].jobname + '</option>';
+			markup += '<option>' + data.autoData[i].name + '</option>';
 		}
 		$("#all_job_list").html(markup);
 	});

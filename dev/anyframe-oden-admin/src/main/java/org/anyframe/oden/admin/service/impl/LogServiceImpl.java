@@ -15,6 +15,9 @@
  */
 package org.anyframe.oden.admin.service.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.domain.Log;
 import org.anyframe.oden.admin.service.LogService;
@@ -28,7 +31,9 @@ import org.springframework.stereotype.Service;
 @Service("logService")
 public class LogServiceImpl implements LogService {
 
-	private final OdenCommonDao<Log> odenCommonDao = new OdenCommonDao<Log>();
+	@Inject
+	@Named("odenCommonDao")
+	OdenCommonDao<Log> odenCommonDao;
 
 	/**
 	 * Method for getting log with date.
