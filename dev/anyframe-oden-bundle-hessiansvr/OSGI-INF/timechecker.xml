@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="TimeChecker" immediate="true">
-   <implementation class="org.anyframe.oden.bundle.hessiansvr.TimeCheckerImpl"/>
-   <service>
-      <provide interface="org.anyframe.oden.bundle.deploy.TimeChecker"/>
-   </service>
-</component>

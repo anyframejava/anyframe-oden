@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-SymbolicName: anyframe-oden-bundle
-Main-Class: org.anyframe.oden.bundle.Oden
-Built-By: junghwan.hong
-Import-Package: javax.crypto
-Class-Path: ../bundle/felix.jar
