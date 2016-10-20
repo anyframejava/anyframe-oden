@@ -41,6 +41,7 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author Junghwan Hong
  * @see anyframe.oden.bundle.core.config.OdenConfigService
  */
+@SuppressWarnings("PMD")
 public class OdenConfigImpl implements OdenConfigService {
 
 	protected File CONFIG = null;
@@ -84,25 +85,29 @@ public class OdenConfigImpl implements OdenConfigService {
 				|| StringUtil.empty(agent.getAddr())
 				|| StringUtil.empty(agent.getPort())
 				|| agent.getDefaultLocValue() == null
-				|| agent.getBackupLocValue() == null)
+				|| agent.getBackupLocValue() == null) {
 			return false;
+		}
 		return true;
 	}
 
 	public String getBackupLocation(String agentName) throws OdenException {
 		AgentElement a = getAgent(agentName);
-		if (a == null)
+		if (a == null) {
 			throw new OdenException(
 					"Couldn't find any backup location from config.xml.");
+		}
 
 		String bak = a.getBackupLocValue();
-		if (bak == null)
+		if (bak == null) {
 			throw new OdenException("No backup-location in the config.xml.");
+		}
 
 		String def = a.getDefaultLocValue();
-		if (def == null || def.contains(bak))
+		if (def == null || def.contains(bak)) {
 			throw new OdenException(
 					"Default location should not include the backup location.");
+		}
 		return bak;
 	}
 
@@ -135,6 +140,7 @@ public class OdenConfigImpl implements OdenConfigService {
 		return _loadAgentList();
 	}
 
+	@SuppressWarnings("PMD")
 	protected synchronized List<AgentElement> _loadAgentList()
 			throws OdenException {
 		InputStream in = null;
@@ -206,8 +212,9 @@ public class OdenConfigImpl implements OdenConfigService {
 			throw new OdenException(e);
 		} finally {
 			try {
-				if (in != null)
+				if (in != null) {
 					in.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -217,11 +224,13 @@ public class OdenConfigImpl implements OdenConfigService {
 	protected String getAttributeValue(XmlPullParser parser, String attrib)
 			throws OdenParseException {
 		String name = parser.getAttributeValue(null, attrib);
-		if (name == null)
+		if (name == null) {
 			throw new OdenParseException(parser.getPositionDescription());
+		}
 		return name;
 	}
 
+	@SuppressWarnings("PMD")
 	protected synchronized void storeAgentList(List<AgentElement> agents)
 			throws OdenException {
 		PrintWriter writer = null;
@@ -247,8 +256,9 @@ public class OdenConfigImpl implements OdenConfigService {
 		} catch (FileNotFoundException e) {
 			throw new OdenException(e);
 		} finally {
-			if (writer != null)
+			if (writer != null) {
 				writer.close();
+			}
 		}
 	}
 

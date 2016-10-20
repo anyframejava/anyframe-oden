@@ -45,8 +45,9 @@ public class FileObjectInputStream extends FileInputStream {
 		byte[] bsize = new byte[4];
 		read(bsize);
 		int size = size(bsize);
-		if (size < 0)
+		if (size < 0) {
 			throw new IOException();
+		}
 
 		byte[] contents = new byte[size];
 		read(contents);
@@ -57,8 +58,9 @@ public class FileObjectInputStream extends FileInputStream {
 			return oin.readObject();
 		} finally {
 			try {
-				if (oin != null)
+				if (oin != null) {
 					oin.close();
+				}
 			} catch (IOException e) {
 			}
 		}

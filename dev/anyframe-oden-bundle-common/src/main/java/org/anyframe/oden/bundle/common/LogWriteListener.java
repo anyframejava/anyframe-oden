@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -59,8 +60,9 @@ public class LogWriteListener implements LogListener {
 
 		// check to write or not with log.level
 		final int level = entry.getLevel();
-		if (Integer.valueOf(context.getProperty("felix.log.level")) < level)
+		if (Integer.valueOf(context.getProperty("felix.log.level")) < level) {
 			return;
+		}
 
 		final long date = entry.getTime();
 
@@ -79,13 +81,14 @@ public class LogWriteListener implements LogListener {
 			System.err.println(format(this.getClass().getName(), 1,
 					System.currentTimeMillis(),
 					"Fail to write logs." + e.getMessage()));
-			;
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private static String stackTrace(Throwable t) {
-		if (t == null)
+		if (t == null) {
 			return "";
+		}
 
 		String s = t.getClass().getName();
 		String msg = t.getLocalizedMessage();
@@ -96,8 +99,9 @@ public class LogWriteListener implements LogListener {
 			buf.append("\tat " + trace + "\n");
 		}
 
-		if (t.getCause() != null)
+		if (t.getCause() != null) {
 			buf.append(stackTrace(t.getCause()));
+		}
 
 		return buf.toString();
 	}
@@ -110,12 +114,14 @@ public class LogWriteListener implements LogListener {
 	private void writeToCacheLog(String s, long date) throws IOException {
 		setupLogFile(date);
 		File parent = latestLogFile.getParentFile();
-		if (!parent.exists())
+		if (!parent.exists()) {
 			parent.mkdirs();
+		}
 
 		writeToFile(s);
 	}
 
+	@SuppressWarnings("PMD")
 	private void setupLogFile(long date) {
 		String cachedir = context.getProperty("felix.cache.rootdir");
 
@@ -127,8 +133,9 @@ public class LogWriteListener implements LogListener {
 		}
 
 		// if latest log file is not oversized, use this.
-		if (!latestLogFile.exists() || latestLogFile.length() < MAX_LOG_SIZE)
+		if (!latestLogFile.exists() || latestLogFile.length() < MAX_LOG_SIZE) {
 			return;
+		}
 
 		// if latest log file is oversized, backup this.
 		for (int i = 0; i < 100; i++) {
@@ -146,11 +153,13 @@ public class LogWriteListener implements LogListener {
 	}
 
 	private String onlyDate(long date) {
-		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).format(date);
+		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN, Locale.getDefault())
+				.format(date);
 	}
 
 	public static String toStringDate(long date) {
-		return new SimpleDateFormat(LOG_DATE_PATTERN).format(new Date(date));
+		return new SimpleDateFormat(LOG_DATE_PATTERN, Locale.getDefault())
+				.format(new Date(date));
 	}
 
 	private void writeToFile(String s) {
@@ -160,8 +169,9 @@ public class LogWriteListener implements LogListener {
 			pw.println(s);
 		} catch (IOException e) {
 		} finally {
-			if (pw != null)
+			if (pw != null) {
 				pw.close();
+			}
 		}
 	}
 

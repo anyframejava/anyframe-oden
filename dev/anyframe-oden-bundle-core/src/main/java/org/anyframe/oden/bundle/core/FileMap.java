@@ -33,10 +33,12 @@ public class FileMap extends HashMap<String, List<AgentFile>> {
 	 * @param file
 	 * @param agent
 	 */
+	@SuppressWarnings("PMD")
 	public synchronized void append(String file, AgentFile agent) {
 		List<AgentFile> agents = get(file);
-		if (agents == null)
+		if (agents == null) {
 			put(file, agents = new ArrayList<AgentFile>());
+		}
 
 		boolean contains = false;
 		for (AgentFile a : agents) {
@@ -45,8 +47,9 @@ public class FileMap extends HashMap<String, List<AgentFile>> {
 				break;
 			}
 		}
-		if (!contains)
+		if (!contains) {
 			agents.add(agent);
+		}
 	}
 
 }

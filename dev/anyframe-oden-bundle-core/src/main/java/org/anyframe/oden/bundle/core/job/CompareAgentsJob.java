@@ -45,6 +45,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class CompareAgentsJob extends Job {
 	private List<String> agentNames = new ArrayList<String>();
 
@@ -181,8 +182,9 @@ public class CompareAgentsJob extends Job {
 	}
 
 	public FileMap result() throws Exception {
-		if (error != null)
+		if (error != null) {
 			throw error;
+		}
 		return result;
 	}
 
@@ -201,22 +203,25 @@ public class CompareAgentsJob extends Job {
 
 			// get unique file name
 			String uniqName = uniqueFile(tmpdir.getPath(), alocs);
-			if (uniqName == null)
+			if (uniqName == null) {
 				throw new IOException("Fail to find unique file name.");
+			}
 
 			Map<AgentLoc, Long> dstimes = Collections.EMPTY_MAP;
 			// get ds times
 			dstimes = getDSTimes(alocs, uniqName);
-			if (dstimes.size() != alocs.size())
+			if (dstimes.size() != alocs.size()) {
 				throw new IOException("Fail to transfer file: " + uniqName);
+			}
 
 			// adjust diffs
 			long standard = 0;
 			for (AgentLoc aloc : alocs) {
 				DeployerService ds = agents.get(aloc);
 				final Long time = dstimes.get(ds);
-				if (time == null)
+				if (time == null) {
 					throw new IOException("Cannot be occured.");
+				}
 				if (standard == 0) {
 					standard = time;
 				} else {
@@ -225,6 +230,7 @@ public class CompareAgentsJob extends Job {
 			}
 		}
 
+		@SuppressWarnings("PMD")
 		private Map<AgentLoc, Long> getDSTimes(Set<AgentLoc> alocs,
 				final String uniqName) {
 			final Map dstimes = new HashMap<DeployerService, Long>();
@@ -284,10 +290,11 @@ public class CompareAgentsJob extends Job {
 
 		private String uniqueFile(String tmpdir, Set<AgentLoc> alocs) {
 			for (AgentLoc aloc : alocs) {
-				DeployerService ds = agents.get(aloc);
+//				DeployerService ds = agents.get(aloc);
 				final String uniq = uniqueFile(tmpdir, alocs);
-				if (isUnique(uniq, alocs))
+				if (isUnique(uniq, alocs)) {
 					return uniq;
+				}
 			}
 			return null;
 		}
@@ -296,8 +303,9 @@ public class CompareAgentsJob extends Job {
 			for (AgentLoc aloc : alocs) {
 				DeployerService ds = agents.get(aloc);
 				try {
-					if (ds.exist(aloc.location(), name))
+					if (ds.exist(aloc.location(), name)) {
 						return false;
+					}
 				} catch (Exception e) {
 					return false;
 				}
@@ -305,6 +313,7 @@ public class CompareAgentsJob extends Job {
 			return true;
 		}
 
+		@SuppressWarnings("PMD")
 		private String uniqueFile(String tmpdir, AgentLoc aloc) {
 			DeployerService ds = agents.get(aloc);
 			Exception excepn = null;

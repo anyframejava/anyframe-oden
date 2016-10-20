@@ -79,8 +79,9 @@ public class Account {
 				in = new BufferedInputStream(new FileInputStream(f));
 				prop.load(in);
 			} finally {
-				if (in != null)
+				if (in != null) {
 					in.close();
+				}
 			}
 		}
 
@@ -91,8 +92,9 @@ public class Account {
 			out = new BufferedOutputStream(new FileOutputStream(f));
 			prop.store(out, null);
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
+			}
 		}
 	}
 

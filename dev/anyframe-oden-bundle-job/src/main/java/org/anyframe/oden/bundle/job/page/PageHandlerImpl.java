@@ -46,6 +46,7 @@ import com.sleepycat.je.Transaction;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class PageHandlerImpl implements PageHandler {
 	private final String CACHE_LOC = "meta/pgcache";
 	private final String DB = "PAGE_CACHE";
@@ -251,8 +252,9 @@ public class PageHandlerImpl implements PageHandler {
 		while (i < opts.size()) {
 			Opt opt = opts.get(i);
 			if (!opt.getName().equals("json") && !opt.getName().equals("_user")
-					&& !opt.getName().equals("page"))
+					&& !opt.getName().equals("page")) {
 				i++;
+			}
 			opts.remove(i);
 		}
 		return cmd.toString();
@@ -266,8 +268,9 @@ public class PageHandlerImpl implements PageHandler {
 
 class PageBinding extends TupleBinding {
 	public Object entryToObject(TupleInput in) {
-		if (in.available() == 0)
+		if (in.available() == 0) {
 			return null;
+		}
 		return in.readString();
 	}
 

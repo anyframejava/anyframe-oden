@@ -62,5 +62,4 @@ public class Mapping implements Serializable {
 	public String getHiddenname() {
 		return hiddenname;
 	}
-
 }

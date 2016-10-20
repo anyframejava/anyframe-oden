@@ -120,10 +120,12 @@ public class RerunJob extends DeployJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void rerun() throws OdenException {
 		currentWork = "ready to reDeploy...";
-		if (deployFiles.size() == 0)
+		if (deployFiles.size() == 0) {
 			throw new OdenException("<txid> is not available.");
+		}
 		Iterator<DeployFile> it = deployFiles.iterator();
 		while (!stop && it.hasNext()) {
 			DeployFile f = it.next();
@@ -134,9 +136,10 @@ public class RerunJob extends DeployJob {
 				AgentLoc parent = f.getAgent();
 				DeployerService ds = txmitterService.getDeployer(parent
 						.agentAddr());
-				if (ds == null)
+				if (ds == null) {
 					throw new OdenException("Couldn't connect to the agent: "
 							+ parent.agentAddr());
+				}
 
 				DoneFileInfo d = null;
 
@@ -161,8 +164,9 @@ public class RerunJob extends DeployJob {
 				String[] args = f.getRepo().args();
 				RepositoryService repoSvc = repositoryProvider
 						.getRepoServiceByURI(args);
-				if (repoSvc == null)
+				if (repoSvc == null) {
 					throw new OdenException("Invalid Repository: " + args);
+				}
 				RepoManager repoMgr = new RepoManager(repoSvc, args);
 
 				in = repoMgr.resolve(FileUtil.combinePath(
@@ -192,6 +196,7 @@ public class RerunJob extends DeployJob {
 		return totalWorks - additionalWorks;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void done() {
 		try {
 			RecordElement2 r = new RecordElement2(id, deployFiles, user,
@@ -213,10 +218,12 @@ public class RerunJob extends DeployJob {
 	}
 
 	protected void setError(String msg) {
-		if (errorMessage == null)
+		if (errorMessage == null) {
 			errorMessage = msg;
+		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void writeDeployFiles(FatInputStream in,
 			Map<DeployFile, DeployerService> fmap) {
 		try {
@@ -228,9 +235,10 @@ public class RerunJob extends DeployJob {
 					DeployerService ds = fmap.get(f);
 					try {
 						if (!DeployerHelper.write(ds, f, new ByteArray(buf,
-								size)))
+								size))) {
 							throw new OdenException("Fail to write: "
 									+ f.getPath());
+						}
 					} catch (Exception e) { // while writing..
 						fmap.remove(f);
 						f.setSuccess(false);
@@ -248,6 +256,7 @@ public class RerunJob extends DeployJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void closeDeployFiles(Map<DeployFile, DeployerService> fmap,
 			final long originalFileSz) {
 		List<Thread> threads = new ArrayList<Thread>();
@@ -302,15 +311,17 @@ public class RerunJob extends DeployJob {
 		String _path = null;
 		Collection<AgentLoc> _targets = new HashSet<AgentLoc>();
 		for (DeployFile f : fmap.keySet()) {
-			if (_path == null)
+			if (_path == null) {
 				_path = f.getPath();
+			}
 			_targets.add(f.getAgent());
 		}
 
 		for (AgentLoc t : _targets) {
 			DeployerService ds = deployerManager.getDeployer(t.agentAddr());
-			if (ds == null)
+			if (ds == null) {
 				continue;
+			}
 
 			try {
 				ds.setDate(t.location(), _path, date);

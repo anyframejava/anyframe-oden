@@ -53,15 +53,15 @@
 	<bookinfo>
 
 		<copyright>
-			<year>2009-2012</year>
+			<year>2009-2013</year>
 			<holder>삼성SDS</holder>
 		</copyright>
 
-		<releaseinfo>version 2.4.0</releaseinfo>
+		<releaseinfo>version 2.5.0</releaseinfo>
 		
 		<productname>Anyframe ODEN</productname>
 
-		<pubdate lang="en">2012.12.28</pubdate>
+		<pubdate lang="en">2013.04.05</pubdate>
 
 		<authorgroup>
 			<corpauthor></corpauthor>
@@ -71,6 +71,9 @@
 			<imageobject>
 				<imagedata fileref="../image/common/logo_pdf.jpg" />
 			</imageobject>
+			<textobject>
+				<phrase>Anyframe 로고</phrase>
+			</textobject>
 		</mediaobject>
 		<legalnotice>
 			<para>본 문서의 저작권은 삼성SDS에 있으며 Anyframe 오픈소스 커뮤니티 활동의 목적하에서 자유로운 이용이 가능합니다.

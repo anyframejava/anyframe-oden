@@ -80,24 +80,29 @@ public class ExecCommandImpl implements CustomCommand {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	private String execute(Cmd cmd, boolean isJSON) throws Exception {
 		String action = cmd.getAction();
 		if (action.equals("run")) {
 			CfgJob job = jobConfig.getJob(cmd.getActionArg());
-			if (job == null)
+			if (job == null) {
 				throw new OdenException("Invalid Job Name: "
 						+ cmd.getActionArg());
+			}
 			List<String> commands = cmd.getOptionArgList(new String[] { "c" });
-			if (commands.size() == 0)
+			if (commands.size() == 0) {
 				throw new OdenException("Illegal arguments: -c");
+			}
 			List<CfgCommand> _cmds = job.getCommands(commands);
-			if (_cmds.size() == 0)
+			if (_cmds.size() == 0) {
 				throw new OdenException("Invalid command: " + commands);
+			}
 			List<String> targets = cmd.getOptionArgList(new String[] { "t" });
 			List<CfgTarget> _targets = getActiveTargets(job
 					.getAllTargets(targets));
-			if (_targets.size() == 0)
+			if (_targets.size() == 0) {
 				throw new OdenException("Invalid target: " + targets);
+			}
 			Map<String, String> result = execCommand(_cmds, _targets);
 
 			if (isJSON) {
@@ -110,9 +115,10 @@ public class ExecCommandImpl implements CustomCommand {
 			}
 
 			StringBuffer buf = new StringBuffer();
-			for (String targetName : result.keySet())
+			for (String targetName : result.keySet()) {
 				buf.append("::: " + targetName + " :::\n"
 						+ result.get(targetName));
+			}
 			return buf.toString();
 		} else {
 			throw new OdenException("Invalid Action: " + action);
@@ -123,12 +129,14 @@ public class ExecCommandImpl implements CustomCommand {
 		List<CfgTarget> activeTargets = new ArrayList<CfgTarget>();
 		for (CfgTarget t : targets) {
 			DeployerService ds = txmitter.getDeployer(t.getAddress());
-			if (ds != null)
+			if (ds != null) {
 				activeTargets.add(t);
+			}
 		}
 		return activeTargets;
 	}
 
+	@SuppressWarnings("PMD")
 	private Map<String, String> execCommand(List<CfgCommand> commands,
 			List<CfgTarget> targets) {
 		String _timeout = context.getProperty("exec.timeout");

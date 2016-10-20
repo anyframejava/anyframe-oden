@@ -45,6 +45,7 @@ import org.anyframe.oden.bundle.common.StringUtil;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	public static final String PROTOCOL = "file://";
 
@@ -346,6 +347,7 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	 * @return
 	 * @throws OdenException
 	 */
+	@SuppressWarnings("PMD")
 	public File getFile(String[] repoargs, String fpath, String destpath)
 			throws OdenException {
 		repoargs = normalizeArgs(repoargs);
@@ -374,13 +376,15 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 			throw new OdenException(e);
 		} finally {
 			try {
-				if (out != null)
+				if (out != null) {
 					out.close();
+				}
 			} catch (IOException e) {
 			}
 			try {
-				if (in != null)
+				if (in != null) {
 					in.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -398,14 +402,16 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	}
 
 	protected String normalizedPath(String[] args) {
-		if (args.length < 1)
+		if (args.length < 1) {
 			return null;
+		}
 		return toAbsolutePath(args[0].substring(getProtocol().length()));
 	}
 
 	private String toAbsolutePath(String path) {
-		if (StringUtil.empty(path) || FileUtil.isAbsolutePath(path))
+		if (StringUtil.empty(path) || FileUtil.isAbsolutePath(path)) {
 			return path;
+		}
 		return FileUtil.resolveDotNatationPath(BundleUtil.odenHome().getPath()
 				+ "/" + path);
 	}
@@ -418,19 +424,23 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		List<String> ret = new ArrayList<String>();
 		String root = normalizedPath(repoArgs);
 		File dir = new File(root);
-		if (!dir.exists())
+		if (!dir.exists()) {
 			return ret;
+		}
 
 		File src = findDirFile(dir, "src", null);
-		if (src == null)
+		if (src == null) {
 			return ret;
+		}
 		for (File f : src.listFiles()) {
-			if (f.isFile())
+			if (f.isFile()) {
 				continue;
+			}
 			if (f.getName().equals("main") || f.getName().equals("test")) {
 				for (File ff : f.listFiles()) {
-					if (ff.isFile())
+					if (ff.isFile()) {
 						continue;
+					}
 					if (ff.getName().equals("java")
 							|| ff.getName().equals("resources")) {
 						// src/main/java or src/main/resources
@@ -438,24 +448,29 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 								ff.getAbsolutePath()));
 					}
 				}
-				if (ret.isEmpty())
+				if (ret.isEmpty()) {
 					ret.add(FileUtil.getRelativePath(root, f.getAbsolutePath())); // src/main
+				}
 			}
-			if (!ret.isEmpty())
+			if (!ret.isEmpty()) {
 				break;
+			}
 		}
-		if (ret.isEmpty())
+		if (ret.isEmpty()) {
 			ret.add(FileUtil.getRelativePath(root, src.getAbsolutePath())); // src
+		}
 		return ret;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public String getAbsolutePathFromParent(String[] repoArgs, String name) {
 		File dir = new File(normalizedPath(repoArgs));
 
 		File parent = dir.getParentFile();
 		for (int i = 0; i < 4; i++) {
-			if (parent == null)
+			if (parent == null) {
 				break;
+			}
 			File f = new File(parent, name);
 			if (f.exists() && f.isDirectory()) {
 				return f.getAbsolutePath();
@@ -474,8 +489,9 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	public String findDir(String[] repoArgs, String dirName, String exclude) {
 		String root = normalizedPath(repoArgs);
 		File dir = new File(root);
-		if (!dir.exists())
+		if (!dir.exists()) {
 			return null;
+		}
 
 		File f = findDirFile(dir, dirName, exclude == null ? null : new File(
 				exclude));
@@ -488,12 +504,15 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		q.add(dir);
 		while (!q.isEmpty()) {
 			File f = q.remove();
-			if (f.isFile())
+			if (f.isFile()) {
 				continue;
+			}
 			if (f.getName().equals(dirName)
 					&& (exclude == null || !f.getAbsolutePath().equals(
-							exclude.getAbsolutePath())))
+							exclude.getAbsolutePath()))) {
+
 				return f;
+			}
 			q.addAll(Arrays.asList(f.listFiles()));
 		}
 		return null;

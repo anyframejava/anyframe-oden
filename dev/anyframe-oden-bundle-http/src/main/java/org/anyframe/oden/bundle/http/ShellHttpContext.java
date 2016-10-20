@@ -58,8 +58,9 @@ public class ShellHttpContext implements HttpContext {
 
 	public boolean handleSecurity(HttpServletRequest req,
 			HttpServletResponse res) throws IOException {
-		if (securityHandler == null)
+		if (securityHandler == null) {
 			return true;
+		}
 
 		try {
 			return securityHandler.handle(req, res);

@@ -33,6 +33,7 @@ import org.anyframe.oden.bundle.common.FileUtil;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ProcTest {
 	public static void main(String[] args) throws Exception {
 		test1();
@@ -139,6 +140,7 @@ public class ProcTest {
 
 }
 
+@SuppressWarnings("PMD")
 class StreamGobbler extends Thread {
 	BufferedReader in;
 	PrintWriter out;

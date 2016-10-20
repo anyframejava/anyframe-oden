@@ -2,6 +2,31 @@ Anyframe ODEN Admin CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.5.0 (2013-04-05)
+-------------------------------------
+* PMD RuleSet 검증 결과 조치.
+* 일괄 배포 기능을 통한 멀티 스레드 배포 처리 구현.
+* 다국어 처리 기능 구현.
+* ODEN Server/Agent 중지를 위한 Shutdown 스크립트 구현.
+* 동일 물리적 서버 내 다수 Agent 구동에 관한 이슈 사항 해결.
+
+
+* 소스 코드 변경
+    - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - 기존의 org.apache.felix.eventadmin-1.0.0.jar 파일을 org.apache.felix.eventadmin-1.2.4.jar로 버전 변경.
+  - 기존의 org.apache.felix.http.jetty-2.0.4.jar 파일을 org.apache.felix.http.jetty-2.2.0.jar로 버전 변경.
+
+* 해결된 이슈 목록
+ODEN-19	PMD RuleSet 검증 결과 조치
+ODEN-20	멀티 스레드 배포 처리기능 추가
+ODEN-23	국제화 지원
+ODEN-26	ODEN Server/Agent Shutdown 스크립트 작성
+ODEN-27	다 수개 Agent 기동에 관한 이슈 사항 해결
+
+
+
 Changes in version 2.4.0 (2012-12-28)
 -------------------------------------
 * 파일 전송 시 암호화 하여 전송하는 기능 구현.

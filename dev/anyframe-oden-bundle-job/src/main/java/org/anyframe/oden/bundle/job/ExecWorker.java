@@ -29,6 +29,7 @@ import org.anyframe.oden.bundle.job.config.CfgTarget;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ExecWorker extends Thread {
 	DeployerService deployer;
 

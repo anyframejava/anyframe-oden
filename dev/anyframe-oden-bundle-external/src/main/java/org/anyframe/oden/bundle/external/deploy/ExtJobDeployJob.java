@@ -58,6 +58,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ExtJobDeployJob extends DeployJob {
 	RepositoryProviderService repositoryProvider;
 	String backupLocation = null;

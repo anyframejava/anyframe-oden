@@ -15,8 +15,6 @@
  */
 package org.anyframe.oden.admin.common;
 
-import org.anyframe.oden.admin.exception.BrokerException;
-
 /**
  * This class provides some methods to interface server
  * 

@@ -1,10 +1,11 @@
 <project name="Oden Core" default="all-local" basedir=".">
 	
 	<property name="bundle.name" value="anyframe-oden-bundle-core" />
-	<property name="version" value="2.4.0"/>
+	<property name="version" value="2.5.0"/>
 			
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>
+	<property name="dbg" value="true"/>
 	
 	<target name="clean" description="clean up">
 		<delete dir="${dist}"/>
@@ -23,7 +24,7 @@
 			<not><isset property="dbg"/></not>
 		</condition>
 		<javac srcdir="${src}" destdir="${build}"
-				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
+				debug="true" debuglevel="lines,vars,source" encoding="utf-8">
 			<classpath>
 				<fileset dir="${bundle.loc}"/>
 				<!--<pathelement location="lib/javasysmon-0.2.1.jar"/>-->

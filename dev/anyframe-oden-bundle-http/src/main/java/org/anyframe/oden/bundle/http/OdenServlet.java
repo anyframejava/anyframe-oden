@@ -51,22 +51,25 @@ public class OdenServlet extends SecuredServlet {
 	}
 
 	@Override
+	@SuppressWarnings("PMD")
 	protected void doPost(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		String method = req.getParameter("method");
 		if (method == null || method.length() == 0) {
 			String forward = req.getParameter("forward");
-			if (forward == null || forward.length() == 0)
+			if (forward == null || forward.length() == 0) {
 				forward = "index";
+			}
 			req.getRequestDispatcher(forward + ".html").forward(req, res);
 			return;
 		}
 
 		// find class name from parameter
 		int classidx = method.indexOf('_');
-		if (classidx == -1)
+		if (classidx == -1) {
 			throw new ServletException(
 					"Allowed parameter: classname_methodname: " + method);
+		}
 		String classname = method.substring(0, classidx);
 		method = method.length() > classidx + 1 ? method
 				.substring(classidx + 1) : null;
@@ -79,8 +82,9 @@ public class OdenServlet extends SecuredServlet {
 				break;
 			}
 		}
-		if (obj == null)
+		if (obj == null) {
 			throw new ServletException("No proper WebService: " + classname);
+		}
 
 		// call matched method
 		try {

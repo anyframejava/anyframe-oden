@@ -39,7 +39,8 @@ public class StatusCommandImpl implements CustomCommand {
 	protected void setJobManager(JobManager jm) {
 		this.jobManager = jm;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public void execute(String line, PrintStream out, PrintStream err) {
 		boolean isJSON = false;
 		try {
@@ -84,8 +85,9 @@ public class StatusCommandImpl implements CustomCommand {
 				String id = cmd.getActionArg();
 				Job j = id.length() == 0 ? jobManager.job() : jobManager
 						.job(id);
-				if (j == null)
+				if (j == null) {
 					throw new OdenException("Couldn't find that job: " + id);
+				}
 				jobManager.cancel(j);
 			} else if (action.length() == 0 || "help".equals(action)) {
 				out.println(getFullUsage());
@@ -116,6 +118,7 @@ public class StatusCommandImpl implements CustomCommand {
 		return "status help";
 	}
 
+	@SuppressWarnings("PMD")
 	private String status(int s) {
 		switch (s) {
 		case 0:

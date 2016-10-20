@@ -39,12 +39,14 @@ class DeployFileComparator implements Comparator<DeployFile>, Serializable {
 
 	public int compare(DeployFile d1, DeployFile d2) {
 		int ret = d1.getRepo().toString().compareTo(d2.getRepo().toString());
-		if (ret != 0)
+		if (ret != 0) {
 			return ret;
+		}
 
 		ret = d1.getPath().compareTo(d2.getPath());
-		if (ret != 0)
+		if (ret != 0) {
 			return ret;
+		}
 
 		return d1.getAgent().agentName().compareTo(d2.getAgent().agentName());
 	}

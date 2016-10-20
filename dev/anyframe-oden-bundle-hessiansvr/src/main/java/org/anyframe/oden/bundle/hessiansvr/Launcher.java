@@ -22,6 +22,7 @@ import org.anyframe.oden.bundle.deploy.CfgReturnScript;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class Launcher {
 
 	Proc proc;
@@ -49,6 +50,7 @@ public class Launcher {
 	}
 }
 
+@SuppressWarnings("PMD")
 class Watchdog extends Thread {
 
 	WatchdogListener listener;
@@ -62,8 +64,9 @@ class Watchdog extends Thread {
 
 	@Override
 	public void run() {
-		if (timeout == -1L)
+		if (timeout == -1L) {
 			return;
+		}
 
 		long start = System.currentTimeMillis();
 		long remain;

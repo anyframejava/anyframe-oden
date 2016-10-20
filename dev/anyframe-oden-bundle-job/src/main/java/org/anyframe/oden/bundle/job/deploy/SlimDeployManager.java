@@ -76,8 +76,9 @@ public class SlimDeployManager {
 	 * @return null if couldn't connect that DeployerService
 	 */
 	public DeployerService getDeployer(String addr) {
-		if (addr == null)
+		if (addr == null) {
 			return null;
+		}
 
 		if (!pool.containsKey(addr)) {
 			DeployerService ds = transmitter.getDeployer(addr);

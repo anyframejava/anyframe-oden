@@ -37,8 +37,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Junghwan Hong
  */
 public class HsqlDB implements InitializingBean {
-	private String dbName = "odendb";
-	private Log logger = LogFactory.getLog(this.getClass());
+	String dbName = "odendb";
+	private final Log logger = LogFactory.getLog(this.getClass());
 	private String url;
 	private static Server hsqlServer;
 	private int port;
@@ -72,13 +72,15 @@ public class HsqlDB implements InitializingBean {
 	}
 
 	public void shutdown() {
-		if (hsqlServer != null)
+		if (hsqlServer != null) {
 			hsqlServer.shutdown();
+		}
 	}
 
 	private void startServer() {
-		if (!isDirectory())
+		if (!isDirectory()) {
 			new File(dbName).mkdirs();
+		}
 
 		hsqlServer = new Server();
 
@@ -106,7 +108,7 @@ public class HsqlDB implements InitializingBean {
 			try {
 				if (!isFileScript()) {
 					Class.forName("org.hsqldb.jdbcDriver");
-					System.out.println("DB url:" + " " + url);
+					logger.info("DB url:" + " " + url);
 					con = DriverManager.getConnection(url, "sa", "");
 
 					getInitData(con);
@@ -118,7 +120,7 @@ public class HsqlDB implements InitializingBean {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 	}
@@ -133,7 +135,7 @@ public class HsqlDB implements InitializingBean {
 				SqlFile file = new SqlFile(null, true, null);
 				file.execute(con, true);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			} finally {
 				resourceAsStream.close();
 			}
@@ -142,13 +144,22 @@ public class HsqlDB implements InitializingBean {
 	}
 
 	private boolean isFileScript() {
-		String[] exts = { ".log", ".properties", ".script" };
 
-		for (String ext : exts) {
-			File dbFile = new File(dbName + ext);
-			if (!dbFile.exists())
-				return false;
+		File logFile = new File(dbName + ".log");
+		if (!logFile.exists()) {
+			return false;
 		}
+
+		File propertyFile = new File(dbName + ".properties");
+		if (!propertyFile.exists()) {
+			return false;
+		}
+
+		File scriptFile = new File(dbName + ".script");
+		if (!scriptFile.exists()) {
+			return false;
+		}
+
 		return true;
 	}
 

@@ -63,8 +63,9 @@ public class SymNameBackingStoreImpl implements BackingStore {
 		this.bundleContext = context.getBundleContext();
 
 		String root = this.bundleContext.getProperty("prefs.root");
-		if (root == null)
+		if (root == null) {
 			root = this.bundleContext.getProperty("felix.cache.rootdir");
+		}
 		this.rootDirectory = new File(root);
 	}
 
@@ -109,7 +110,8 @@ public class SymNameBackingStoreImpl implements BackingStore {
 		}
 		return (Long[]) bundleIds.toArray(new Long[bundleIds.size()]);
 	}
-
+	
+	@SuppressWarnings("PMD")
 	protected PreferencesDescription getDescription(File file) {
 		final String fileName = file.getName();
 		// parse the file name to get: bundle id, user|system identifer
@@ -161,6 +163,7 @@ public class SymNameBackingStoreImpl implements BackingStore {
 	 * @see org.apache.felix.prefs.BackingStore#loadAll(org.apache.felix.prefs.BackingStoreManager,
 	 *      java.lang.Long)
 	 */
+	@SuppressWarnings("PMD")
 	public PreferencesImpl[] loadAll(BackingStoreManager manager, Long bundleId)
 			throws BackingStoreException {
 		this.checkAccess();
@@ -240,6 +243,7 @@ public class SymNameBackingStoreImpl implements BackingStore {
 	 * @param is
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	protected void read(PreferencesImpl prefs, InputStream is)
 			throws IOException {
 		this.readPreferences(prefs, is);
@@ -261,6 +265,7 @@ public class SymNameBackingStoreImpl implements BackingStore {
 	 * changeSet is neither updated nor cleared in order to provide an
 	 * update/sync functionality. This has to be done at a higher level.
 	 */
+	@SuppressWarnings("PMD")
 	protected void readPreferences(PreferencesImpl prefs, InputStream in)
 			throws IOException {
 		final ObjectInputStream ois = new ObjectInputStream(in);
@@ -296,6 +301,7 @@ public class SymNameBackingStoreImpl implements BackingStore {
 	/**
 	 * @see org.apache.felix.prefs.BackingStore#store(org.apache.felix.prefs.PreferencesImpl)
 	 */
+	@SuppressWarnings("PMD")
 	public void store(PreferencesImpl prefs) throws BackingStoreException {
 		// do we need to store at all?
 		if (!this.hasChanges(prefs)) {

@@ -18,7 +18,7 @@
 				$("#contents").val(result.autoData.contents);
 			},
 			error : function() {
-				alert('<anyframe:message code="log.load.error"/>');
+				alert('<spring:message code="log.load.error"/>');
 				$("#date").val("");
 				$("#contents").val("");
 			}
@@ -27,7 +27,7 @@
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="log.page.subtitle"/></h3>
+	<h3 class="subtitle_h3"><spring:message code="log.page.subtitle"/></h3>
 </div><!-- end pageSubtitle --> 
 <div id="body_log">
 	<!--START: input table-->
@@ -38,7 +38,7 @@
 				<caption>log search</caption>
 				<tbody>
 					<tr>
-						<th width="80" scope="row"><label for="DateRange"><anyframe:message code="log.label.date"/></label></th>
+						<th width="80" scope="row"><label for="DateRange"><spring:message code="log.label.date"/></label></th>
 						<td><input type="text" id="date" name="date" maxlength="10" value="" style="width:130px; height:18px;" /></td>
 						<td width="120" align="right"><a href="javascript:search();"><img src="<c:url value='/images/btn_search.gif'/>" width="73" height="20" alt="search" /></a></td>
 					</tr>

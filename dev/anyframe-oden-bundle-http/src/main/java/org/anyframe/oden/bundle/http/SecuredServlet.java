@@ -44,8 +44,9 @@ public class SecuredServlet extends HttpServlet {
 
 	protected void setSecurityHandler(SecurityHandler handler) {
 		this.securityHandler = handler;
-		if (httpContext != null) // handler is already binded.
+		if (httpContext != null) { // handler is already binded.
 			((ShellHttpContext) httpContext).setSecurityHandler(handler);
+		}
 	}
 
 	protected void unsetSecurityHandler(SecurityHandler handler) {

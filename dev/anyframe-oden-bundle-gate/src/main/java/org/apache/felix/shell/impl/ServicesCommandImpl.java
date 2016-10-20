@@ -30,6 +30,7 @@ import org.osgi.framework.ServiceReference;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ServicesCommandImpl implements Command {
 	private static final String IN_USE_SWITCH = "-u";
 	private static final String SHOW_ALL_SWITCH = "-a";

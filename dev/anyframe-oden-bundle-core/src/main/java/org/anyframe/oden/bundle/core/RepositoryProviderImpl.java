@@ -37,6 +37,7 @@ public class RepositoryProviderImpl implements RepositoryProviderService {
 
 	private BundleContext context;
 
+	@SuppressWarnings("PMD")
 	public RepositoryProviderImpl() {
 	}
 
@@ -73,8 +74,9 @@ public class RepositoryProviderImpl implements RepositoryProviderService {
 
 	public RepositoryAdaptor getRepositoryAdaptor(String[] args) {
 		RepositoryService svc = getRepoServiceByURI(args);
-		if (svc == null)
+		if (svc == null) {
 			return null;
+		}
 		return new RepositoryAdaptor(svc, args);
 	}
 

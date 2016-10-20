@@ -86,7 +86,7 @@ public class ExtCompressDeployJob extends CompressJob {
 			CompressFileResolver compResolver, DeployFileResolver resolver)
 			throws OdenException {
 
-		super(context, user, job.getRepoLocation(), resolver, compResolver);
+		super(context, desc, job.getRepoLocation(), resolver, compResolver);
 		deployerManager = new DeployerManager(context, id, false);
 
 		this.targets = targets;
@@ -111,8 +111,9 @@ public class ExtCompressDeployJob extends CompressJob {
 
 	String getBackupLocation(BundleContext ctx) {
 		undo = ctx.getProperty("deploy.undo");
-		if (!"true".equals(undo))
+		if (!"true".equals(undo)) {
 			return "snapshot";
+		}
 
 		String loc = ctx.getProperty("deploy.undo.loc");
 		return loc == null ? "snapshots" : loc;
@@ -146,11 +147,13 @@ public class ExtCompressDeployJob extends CompressJob {
 		String[] args = CfgUtil.toRepoArg(fileInfo.get(0).getExeDir());
 		RepositoryService repoSvc = repositoryProvider
 				.getRepoServiceByURI(args);
-		if (repoSvc == null)
+		if (repoSvc == null) {
 			throw new OdenException("Invalid Repository: " + args);
+		}
 		return new RepoManager(repoSvc, args);
 	}
 
+	@SuppressWarnings("PMD")
 	private Map<RepoFile, Collection<DeployFile>> groupByPath(
 			Collection<DeployFile> files) {
 		Map<RepoFile, Collection<DeployFile>> ret = new HashMap<RepoFile, Collection<DeployFile>>();
@@ -165,7 +168,8 @@ public class ExtCompressDeployJob extends CompressJob {
 		}
 		return ret;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	protected void compDeploy(Collection<DeployFile> compfiles)
 			throws OdenException {
 		// files having same path and diff agent
@@ -264,13 +268,15 @@ public class ExtCompressDeployJob extends CompressJob {
 			try {
 				DoneFileInfo info = DeployerHelper.close(deployer, f, null,
 						null);
-				if (info == null || info.size() == -1L)
+				if (info == null || info.size() == -1L) {
 					throw new IOException("Fail to close: " + f.getPath());
+				}
 
 			} catch (Exception e) {
 				f.setSuccess(false);
-				if (StringUtil.empty(f.errorLog()))
+				if (StringUtil.empty(f.errorLog())) {
 					f.setErrorLog(e.getMessage());
+				}
 				Logger.error(e);
 				setError(e.getMessage());
 			}
@@ -278,6 +284,7 @@ public class ExtCompressDeployJob extends CompressJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void deploy(Collection<DeployFile> repofiles)
 			throws OdenException {
 		// files having same path and diff agent
@@ -296,8 +303,6 @@ public class ExtCompressDeployJob extends CompressJob {
 		}
 
 		for (final AgentLoc al : fs.keySet()) {
-			Map<String, FileInfo> rtn = new HashMap<String, FileInfo>();
-
 			if (stop)
 				break;
 			currentWork = "extract to temp.zip @" + al.agentName();
@@ -416,6 +421,7 @@ public class ExtCompressDeployJob extends CompressJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	private Map<AgentLoc, Collection<DeployFile>> groupByAgent(
 			Collection<DeployFile> files) {
 		Map<AgentLoc, Collection<DeployFile>> ret = new HashMap<AgentLoc, Collection<DeployFile>>();
@@ -424,8 +430,9 @@ public class ExtCompressDeployJob extends CompressJob {
 			AgentLoc al = new AgentLoc(f.getAgent().agentName(), f.getAgent()
 					.agentAddr(), f.getAgent().location());
 			Collection<DeployFile> fs = ret.get(al);
-			if (fs == null)
+			if (fs == null) {
 				fs = new HashSet<DeployFile>();
+			}
 			fs.add(f);
 			ret.put(al, fs);
 		}
@@ -436,8 +443,9 @@ public class ExtCompressDeployJob extends CompressJob {
 			final Map<String, FileInfo> zfmap) {
 		try {
 			FileInfo info = zfmap.get(f.getPath());
-			if (info == null || info.size() == -1L)
+			if (info == null || info.size() == -1L) {
 				throw new IOException("Fail to close: " + f.getPath());
+			}
 			if (info.isSuccess()) {
 				f.setSuccess(true);
 				synchronized (nSuccess) {
@@ -451,8 +459,9 @@ public class ExtCompressDeployJob extends CompressJob {
 			}
 		} catch (Exception e) {
 			f.setSuccess(false);
-			if (StringUtil.empty(f.errorLog()))
+			if (StringUtil.empty(f.errorLog())) {
 				f.setErrorLog(e.getMessage());
+			}
 			Logger.error(e);
 			setError(e.getMessage());
 		}
@@ -461,10 +470,11 @@ public class ExtCompressDeployJob extends CompressJob {
 	private boolean hasSameTargets(Map<DeployFile, DeployerService> fmap) {
 		String addr = null;
 		for (DeployFile f : fmap.keySet()) {
-			if (addr == null)
+			if (addr == null) {
 				addr = f.getAgent().agentAddr();
-			else if (!f.getAgent().agentAddr().equals(addr))
+			} else if (!f.getAgent().agentAddr().equals(addr)) {
 				return false;
+			}
 		}
 		return true;
 
@@ -473,12 +483,15 @@ public class ExtCompressDeployJob extends CompressJob {
 	protected DeployFile getSameTargetFile(Collection<DeployFile> fs,
 			CfgTarget tg) {
 		AgentLoc t = CfgUtil.toAgentLoc(tg);
-		for (DeployFile f : fs)
-			if (f.getAgent().equals(t))
+		for (DeployFile f : fs) {
+			if (f.getAgent().equals(t)) {
 				return f;
+			}
+		}
 		return null;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void writeDeployFiles(FatInputStream in,
 			Map<DeployFile, DeployerService> fmap) {
 		try {
@@ -510,6 +523,7 @@ public class ExtCompressDeployJob extends CompressJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void writeDeployFilesAsThread(FatInputStream in,
 			final Map<DeployFile, DeployerService> fmap) {
 		// add or update
@@ -553,7 +567,8 @@ public class ExtCompressDeployJob extends CompressJob {
 			setError(e.getMessage());
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	protected void closeDeployFiles(Map<DeployFile, DeployerService> fmap) {
 		List<Thread> threads = new ArrayList<Thread>();
 
@@ -599,6 +614,7 @@ public class ExtCompressDeployJob extends CompressJob {
 		finishedWorks += 1;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void done() {
 		try {
 			RecordElement2 r = new RecordElement2(id, deployFiles, user,
@@ -627,7 +643,8 @@ public class ExtCompressDeployJob extends CompressJob {
 	}
 
 	protected void setError(String msg) {
-		if (errorMessage == null)
+		if (errorMessage == null) {
 			errorMessage = msg;
+		}
 	}
 }

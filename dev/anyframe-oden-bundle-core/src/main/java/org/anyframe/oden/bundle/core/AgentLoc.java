@@ -55,9 +55,10 @@ public class AgentLoc implements JSONizable, Serializable {
 
 		AgentElement agentinfo = null;
 		agentinfo = configsvc.getAgent(agentName);
-		if (agentinfo == null)
+		if (agentinfo == null) {
 			throw new OdenException("Fail to get agent information: "
 					+ agentName);
+		}
 
 		agentAddr = agentinfo.getAddr();
 
@@ -72,8 +73,9 @@ public class AgentLoc implements JSONizable, Serializable {
 
 	private String agentName(String args) {
 		int idx = args.indexOf(AGENT_SEP);
-		if (idx == -1)
+		if (idx == -1) {
 			return args;
+		}
 		return args.substring(0, idx);
 	}
 
@@ -85,26 +87,30 @@ public class AgentLoc implements JSONizable, Serializable {
 	 * @return
 	 * @throws OdenException
 	 */
+	@SuppressWarnings("PMD")
 	private String resolveLocation(String args, AgentElement info)
 			throws OdenException {
 		String path = secondToken(args, AGENT_SEP);
-		if (path == null)
+		if (path == null) {
 			throw new OdenException("Invalid format: " + args);
+		}
 
 		String parent = null;
 		String child = null;
 		if (path.startsWith("$")) {
 			String var = firstToken(path.substring(1), PATH_SEP);
 			parent = info.getLocValue(var);
-			if (parent == null)
+			if (parent == null) {
 				throw new OdenException(
 						"No such variable in the conf/config.xml: " + var);
+			}
 			child = secondToken(path, PATH_SEP);
 		} else if (path.startsWith("~")) {
 			parent = info.getDefaultLocValue();
-			if (parent == null)
+			if (parent == null) {
 				throw new OdenException(
 						"No default-location in the conf/config.xml");
+			}
 			child = secondToken(path, PATH_SEP);
 		} else {
 			parent = null;
@@ -122,12 +128,14 @@ public class AgentLoc implements JSONizable, Serializable {
 	 * @return
 	 */
 	private String firstToken(String var, char sep) {
-		if (var == null || var.length() == 0)
+		if (var == null || var.length() == 0) {
 			return null;
+		}
 
 		int idx = var.indexOf(sep);
-		if (idx == -1)
+		if (idx == -1) {
 			return var;
+		}
 		return var.substring(0, idx);
 	}
 
@@ -141,17 +149,19 @@ public class AgentLoc implements JSONizable, Serializable {
 	 */
 	private String secondToken(String var, char sep) {
 		int idx = var.indexOf(sep);
-		if (idx == -1 || var.length() == idx + 1)
+		if (idx == -1 || var.length() == idx + 1) {
 			return null;
+		}
 		return var.substring(idx + 1);
 	}
 
-	private String secondTokenStartWithSEP(String var, char sep) {
-		int idx = var.indexOf(sep);
-		if (idx == -1 || var.length() == idx)
-			return null;
-		return var.substring(idx);
-	}
+//	private String secondTokenStartWithSEP(String var, char sep) {
+//		int idx = var.indexOf(sep);
+//		if (idx == -1 || var.length() == idx) {
+//			return null;
+//		}
+//		return var.substring(idx);
+//	}
 
 
 //	private String resolveLocation(String args, AgentElement info) throws OdenException{
@@ -206,8 +216,9 @@ public class AgentLoc implements JSONizable, Serializable {
 			AgentLoc ra = (AgentLoc) obj;
 			if (equals(agentAddr, ra.agentAddr())
 					&& equals(agentName, ra.agentName())
-					&& equals(location, ra.location()))
+					&& equals(location, ra.location())) {
 				return true;
+			}
 		}
 		return false;
 	}

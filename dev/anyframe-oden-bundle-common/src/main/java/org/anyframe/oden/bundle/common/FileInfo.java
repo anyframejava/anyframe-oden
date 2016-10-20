@@ -47,9 +47,6 @@ public class FileInfo implements Serializable {
 
 	private boolean update;
 
-	public FileInfo() {
-	}
-
 	public FileInfo(String path, boolean isDir, long lastModified) {
 		this(FileUtil.normalize(path), isDir, lastModified, 0);
 	}
@@ -118,8 +115,9 @@ public class FileInfo implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof FileInfo))
+		if (!(o instanceof FileInfo)) {
 			return false;
+		}
 		FileInfo d = (FileInfo) o;
 		return path.equals(d.path);
 	}

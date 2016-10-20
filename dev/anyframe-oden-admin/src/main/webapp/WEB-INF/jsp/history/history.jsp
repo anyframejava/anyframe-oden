@@ -14,11 +14,11 @@
 			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=historyService.findByPk(page,cmd)&viewName=jsonView&cmd='/>" + cmd  ,
 			mtype : 'GET',
 			datatype : "json",
-			colNames : [ '<anyframe:message code="history.grid.statustxid"/>', 
-			 			 '<anyframe:message code="history.grid.job"/>', 
-			 			 '<anyframe:message code="history.grid.date"/>', 
-			 			 '<anyframe:message code="history.grid.counts"/>',
-			 			'<anyframe:message code="history.grid.user"/>'],
+			colNames : [ '<spring:message code="history.grid.statustxid"/>', 
+			 			 '<spring:message code="history.grid.job"/>', 
+			 			 '<spring:message code="history.grid.date"/>', 
+			 			 '<spring:message code="history.grid.counts"/>',
+			 			'<spring:message code="history.grid.user"/>'],
 			jsonReader : {
 				repeatitems : false
 			},
@@ -59,11 +59,11 @@
 			forceFit : true,
 			viewrecords : true,
 			pager : jQuery('#npager_history'),
-			rowNum : '<anyframe:message code="common.page.size"/>',
+			rowNum : '<spring:message code="common.page.size"/>',
 			sortable : true,
 			
 			loadError : function(xhr, st, err) {
-				alert('<anyframe:message code="history.load.error"/>');
+				alert('<spring:message code="history.load.error"/>');
 			}
 		});
 
@@ -83,7 +83,7 @@
 		if(isValidString(trim($("#itemname").val())) && trim($("#itemname").val()) !== ""
 			|| isValidString(trim($("#userid").val())) && trim($("#userid").val()) !== ""
 				){
-			alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 		}else{
 			if(trim($("#itemname").val()) !== "") {
 				params.push("-path" +" " + $("#itemname").val() + " "); 
@@ -126,7 +126,7 @@
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="history.page.subtitle"/></h3>
+	<h3 class="subtitle_h3"><spring:message code="history.page.subtitle"/></h3>
 </div><!-- end pageSubtitle --> 
 <div id="body_history">
 <form name="historyForm">
@@ -138,22 +138,22 @@
 				<caption>history search</caption>
 				<tbody>
 					<tr>
-						<th scope="row"><label for="itemname"><anyframe:message code="history.label.itemname"/></label></th>
+						<th scope="row"><label for="itemname"><spring:message code="history.label.itemname"/></label></th>
 						<td><input type="text" id="itemname" name="itemname" value="" style="width:130px; height:17px;" onKeyPress="if(event.keyCode==13) search();"/></td>
-						<th scope="row"><label for="user"><anyframe:message code="history.label.user"/></label></th>
+						<th scope="row"><label for="user"><spring:message code="history.label.user"/></label></th>
 						<td><input type="text" id="userid" name="userid" value="" style="width:100px; height:17px;" onKeyPress="if(event.keyCode==13) search();"/></td>
-						<th scope="row"><label for="jobname"><anyframe:message code="history.label.jobname"/></label></th>
+						<th scope="row"><label for="jobname"><spring:message code="history.label.jobname"/></label></th>
 						<td>
 							<select name="jobname" id="jobname" class="selectbox" style='width:150'>
-								<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
-									<option value="all"><anyframe:message code="history.select.all"/></option>
+								<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewName="addUser">
+									<option value="all"><spring:message code="history.select.all"/></option>
 								</iam:access>
 								<c:forEach var="job" items="${jobs}" varStatus="status">
 									<option value="${job.jobname}"><c:out value="${job.jobname}"></c:out>
 								</c:forEach>
 							</select>
 						</td>
-						<th scope="row" style="align:right;"><label for="fail"><anyframe:message code="history.label.fail"/></label></th>
+						<th scope="row" style="align:right;"><label for="fail"><spring:message code="history.label.fail"/></label></th>
 						<td><input type="checkbox"  id="failed" value="true" class="checkbox" checked/></td>
 						<td width="80" align="right"><a id="searchHistory" name="searchHistory" href="#"><img src="<c:url value='/images/btn_search.gif'/>" width="73" height="20" alt="search" /></a></td>
 					</tr>

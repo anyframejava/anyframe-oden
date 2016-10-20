@@ -62,8 +62,9 @@ public class CfgMapping {
 		if (obj instanceof CfgMapping) {
 			CfgMapping ct = (CfgMapping) obj;
 			if (StringUtil.equals(dir, ct.getDir())
-					&& StringUtil.equals(checkoutDir, ct.getCheckoutDir()))
+					&& StringUtil.equals(checkoutDir, ct.getCheckoutDir())) {
 				return true;
+			}
 		}
 		return false;
 	}

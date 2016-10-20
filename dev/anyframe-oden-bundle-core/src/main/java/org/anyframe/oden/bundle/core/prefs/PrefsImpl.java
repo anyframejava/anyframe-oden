@@ -24,6 +24,7 @@ import org.osgi.service.prefs.Preferences;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class PrefsImpl implements Prefs {
 	private String name;
 

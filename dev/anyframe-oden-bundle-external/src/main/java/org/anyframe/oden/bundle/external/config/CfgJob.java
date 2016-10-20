@@ -24,6 +24,7 @@ import org.anyframe.oden.bundle.common.Utils;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class CfgJob {
 
 	String id;

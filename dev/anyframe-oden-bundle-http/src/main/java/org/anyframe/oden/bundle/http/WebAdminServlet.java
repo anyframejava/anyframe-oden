@@ -57,8 +57,9 @@ public class WebAdminServlet extends HttpServlet {
 
 	protected void setSecurityHandler(SecurityHandler handler) {
 		this.securityHandler = handler;
-		if (httpContext != null) // handler is already binded.
+		if (httpContext != null) {// handler is already binded.
 			((ShellHttpContext) httpContext).setSecurityHandler(handler);
+		}
 	}
 
 	protected void unsetSecurityHandler(SecurityHandler handler) {
@@ -87,6 +88,7 @@ public class WebAdminServlet extends HttpServlet {
 		w.close();
 	}
 
+	@SuppressWarnings("PMD")
 	public List<Map<String, String>> taskList() {
 		List<Map<String, String>> tasks = new LinkedList<Map<String, String>>();
 

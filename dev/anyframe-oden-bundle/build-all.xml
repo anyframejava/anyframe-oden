@@ -1,8 +1,10 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.4.0"/>
+	<property name="version" value="2.5.0"/>
 	<property name="manual.dir" location="../../../manual/manual/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
+	<property name="artifactsDir" value="pack"/>
+	
 	
 	<target name="build.all">
 		<condition property="todo" else="all-local">
@@ -117,7 +119,7 @@
 			<fileset dir="pkrsc" includes="oden.ini,agent.ini,accounts.txt"/>
 		</copy>
 		<copy todir="${artifactsDir}/bin">
-			<fileset dir="pkrsc" includes="startup.cmd,acc.cmd,runc.cmd,startup.sh,acc.sh,runc.sh,startup-agent.sh,startup-agent.cmd"/>
+			<fileset dir="pkrsc" includes="startup.cmd,acc.cmd,runc.cmd,startup.sh,acc.sh,runc.sh,startup-agent.sh,startup-agent.cmd,shutdown.sh,shutdown.cmd,shutdown-agent.sh,shutdown-agent.cmd"/>
 		</copy>
 		<copy todir="${artifactsDir}/licenses">
 			<fileset dir="licenses"/>
@@ -211,9 +213,9 @@
 		<condition property="server.target" else="_pack.server">
 			<isset property="server.target"/>
 		</condition>
-		<condition property="artifactsDir" else="pack">
+		<!--condition property="artifactsDir" else="pack">
 			<isset property="artifactsDir"/>
-		</condition>
+		</condition-->
 		
 		<delete dir="${artifactsDir}"/>
 		

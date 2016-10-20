@@ -106,8 +106,9 @@ public class DeployerManager {
 	 * @return
 	 */
 	public String backupLocation(DeployFile f) throws OdenException {
-		if (!undo)
+		if (!undo) {
 			return null;
+		}
 		return backupLocation(f.getAgent().agentName());
 	}
 

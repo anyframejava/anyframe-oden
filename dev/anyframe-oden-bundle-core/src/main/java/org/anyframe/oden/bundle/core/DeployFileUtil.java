@@ -51,13 +51,15 @@ public class DeployFileUtil {
 	/**
 	 * group DeployFile by its repository property
 	 */
+	@SuppressWarnings("PMD")
 	public static Map<Repository, Set<DeployFile>> groupByRepository(
 			Collection<DeployFile> dfiles) {
 		Map<Repository, Set<DeployFile>> rfiles = new HashMap<Repository, Set<DeployFile>>();
 		for (DeployFile df : dfiles) {
 			Set<DeployFile> dfs = rfiles.get(df.getRepo());
-			if (dfs == null)
+			if (dfs == null) {
 				dfs = new HashSet<DeployFile>();
+			}
 			dfs.add(df);
 			rfiles.put(df.getRepo(), dfs);
 		}
@@ -67,13 +69,15 @@ public class DeployFileUtil {
 	/**
 	 * group DeployFile by its agent property
 	 */
+	@SuppressWarnings("PMD")
 	public static Map<AgentLoc, Set<DeployFile>> groupByAgent(
 			Set<DeployFile> files) {
 		Map<AgentLoc, Set<DeployFile>> afiles = new HashMap<AgentLoc, Set<DeployFile>>();
 		for (DeployFile f : files) {
 			Set<DeployFile> fs = afiles.get(f.getAgent());
-			if (fs == null)
+			if (fs == null) {
 				fs = new HashSet<DeployFile>();
+			}
 			fs.add(f);
 			afiles.put(f.getAgent(), fs);
 		}
@@ -100,12 +104,14 @@ public class DeployFileUtil {
 	/**
 	 * group DeployFile by its path property
 	 */
+	@SuppressWarnings("PMD")
 	public static Map<String, Set<DeployFile>> groupByPath(Set<DeployFile> files) {
 		Map<String, Set<DeployFile>> filemap = new HashMap<String, Set<DeployFile>>();
 		for (DeployFile f : files) {
 			Set<DeployFile> fs = filemap.get(f.getPath());
-			if (fs == null)
+			if (fs == null) {
 				fs = new HashSet<DeployFile>();
+			}
 			fs.add(f);
 			filemap.put(f.getPath(), fs);
 		}
@@ -133,22 +139,28 @@ public class DeployFileUtil {
 	 * @return
 	 */
 	public static String modeToString(Mode mode) {
-		if (mode == Mode.ADD)
+		if (mode == Mode.ADD) {
 			return "A";
-		if (mode == Mode.UPDATE)
+		}
+		if (mode == Mode.UPDATE) {
 			return "U";
-		if (mode == Mode.DELETE)
+		}
+		if (mode == Mode.DELETE) {
 			return "D";
+		}
 		return "N";
 	}
 
 	public static DeployFile.Mode stringToMode(String s) {
-		if (s.equals("C") || s.equals("A"))
+		if (s.equals("C") || s.equals("A")) {
 			return Mode.ADD;
-		if (s.equals("D"))
+		}
+		if (s.equals("D")) {
 			return Mode.DELETE;
-		if (s.equals("U"))
+		}
+		if (s.equals("U")) {
 			return Mode.UPDATE;
+		}
 		return Mode.NA;
 	}
 
@@ -160,12 +172,15 @@ public class DeployFileUtil {
 	 * @return
 	 */
 	public static Mode mergeMode(Mode m1, Mode m2) {
-		if (m1 == Mode.NA || m2 == Mode.NA)
+		if (m1 == Mode.NA || m2 == Mode.NA) {
 			return Mode.NA;
-		if (m1 == Mode.ADD || m2 == Mode.ADD)
+		}
+		if (m1 == Mode.ADD || m2 == Mode.ADD) {
 			return Mode.ADD;
-		if (m1 == Mode.UPDATE || m2 == Mode.UPDATE)
+		}
+		if (m1 == Mode.UPDATE || m2 == Mode.UPDATE) {
 			return Mode.UPDATE;
+		}
 		return Mode.DELETE;
 	}
 
@@ -194,9 +209,11 @@ public class DeployFileUtil {
 	}
 
 	private static boolean includeFail(Set<DeployFile> fs) {
-		for (DeployFile f : fs)
-			if (!f.isSuccess())
+		for (DeployFile f : fs) {
+			if (!f.isSuccess()) {
 				return true;
+			}
+		}
 		return false;
 	}
 
@@ -206,14 +223,16 @@ public class DeployFileUtil {
 	 * @param dfs
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static Map<String, Set<DeployFile>> groupBySameSource(
 			Collection<DeployFile> dfs) {
 		Map<String, Set<DeployFile>> result = new HashMap<String, Set<DeployFile>>();
 		for (DeployFile df : dfs) {
 			String key = df.getRepo() + ":" + df.getPath(); // make unique key
 			Set<DeployFile> fs = result.get(key);
-			if (fs == null)
+			if (fs == null) {
 				fs = new HashSet<DeployFile>();
+			}
 			fs.add(df);
 			result.put(key, fs);
 		}
@@ -248,8 +267,9 @@ public class DeployFileUtil {
 			Exception e) {
 		DeployFile f = new DeployFile(new Repository(new String[0]), path,
 				agent, 0L, 0L, Mode.NA);
-		if (e != null)
+		if (e != null) {
 			f.setErrorLog(Utils.rootCause(e));
+		}
 		return f;
 	}
 
@@ -265,8 +285,9 @@ public class DeployFileUtil {
 	public static DeployFile notBeDeployedFile(Repository repo, String path,
 			AgentLoc agent, Exception e) {
 		DeployFile f = new DeployFile(repo, path, agent, 0L, 0L, Mode.NA);
-		if (e != null)
+		if (e != null) {
 			f.setErrorLog(Utils.rootCause(e));
+		}
 		return f;
 	}
 }

@@ -93,7 +93,8 @@ public class HistoryCommandImpl extends OdenCommand {
 	}
 
 	private int backupcnt;
-
+	
+	@SuppressWarnings("PMD")
 	public void execute(String line, PrintStream out, PrintStream err) {
 		String consoleResult = "";
 		boolean isJSON = false;
@@ -113,8 +114,9 @@ public class HistoryCommandImpl extends OdenCommand {
 						cmd.getOptionArg(USER_OP), cmd.getOptionArg(AGENT_OP),
 						cmd.getOptionArg(PATH_OP),
 						cmd.getOption(FAILONLY_OP) != null);
-				if (r != null)
+				if (r != null) {
 					list.add(r);
+				}
 				if (isJSON) {
 					ja = jsonize(list);
 				} else {
@@ -134,10 +136,11 @@ public class HistoryCommandImpl extends OdenCommand {
 						JSONObject jo = new JSONObject().put("id", r.id())
 								.put("date", r.getDate()).put("status", status)
 								.put("desc", r.desc());
-						if (cmd.getOption(DETAIL_OPT) != null)
+						if (cmd.getOption(DETAIL_OPT) != null) {
 							jo.put("nitems", r.getNDeploys())
 									.put("nsuccess", r.getNDeploys())
 									.put("total", r.getNDeploys());
+						}
 						ja.put(jo);
 					}
 				} else {
@@ -158,10 +161,11 @@ public class HistoryCommandImpl extends OdenCommand {
 				String user = extractUserName(cmd);
 
 				String undo = context.getProperty("deploy.undo");
-				if (undo == null || !undo.startsWith("true"))
+				if (undo == null || !undo.startsWith("true")) {
 					throw new OdenException(
 							"Undo function is not activated. Check 'deploy.undo' property in oden.ini."
 									+ undo);
+				}
 
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = undo(id, paths, isSync, user);
@@ -169,20 +173,22 @@ public class HistoryCommandImpl extends OdenCommand {
 					RecordElement2 r = deploylog.search(txid, null, null, null,
 							false);
 					Assert.check(r != null, "Couldn't find a log: " + txid);
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid)
 								.put("status", r.isSuccess() ? "S" : "F")
 								.put("count", r.getDeployFiles().size()));
-					else
+					} else {
 						consoleResult = "Undo is finished. Transaction id: "
 								+ txid + (r.isSuccess() ? " Success" : " Fail")
 								+ "(" + r.getDeployFiles().size() + ")";
+					}
 				} else {
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid));
-					else
+					} else {
 						consoleResult = "Undo is scheduled. Transaction id is: "
 								+ txid;
+					}
 				}
 			} else if (REDEPLOY_ACTION.equals(action)) {
 				String id = cmd.getActionArg();
@@ -194,21 +200,23 @@ public class HistoryCommandImpl extends OdenCommand {
 					RecordElement2 r = deploylog.search(txid, null, null, null,
 							false);
 					Assert.check(r != null, "Couldn't find a log: " + txid);
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid)
 								.put("status", r.isSuccess() ? "S" : "F")
 								.put("count", r.getDeployFiles().size()));
-					else
+					} else {
 						consoleResult = "Redeploy is finished. Transaction id: "
 								+ txid
 								+ (r.isSuccess() ? " Success" : " Fail")
 								+ "(" + r.getDeployFiles().size() + ")";
+					}
 				} else {
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid));
-					else
+					} else {
 						consoleResult = "Redeploy is scheduled. Transaction id is: "
 								+ txid;
+					}
 				}
 			} else if (action.length() == 0 || Cmd.HELP_ACTION.equals(action)) {
 				consoleResult = getFullUsage();
@@ -217,10 +225,11 @@ public class HistoryCommandImpl extends OdenCommand {
 						+ action);
 			}
 
-			if (isJSON)
+			if (isJSON) {
 				out.println(ja.toString());
-			else if (consoleResult.length() > 0)
+			} else if (consoleResult.length() > 0) {
 				out.println(consoleResult);
+			}
 		} catch (OdenException e) {
 			if (isJSON) {
 				err.println(JSONUtil.jsonizedException(e));
@@ -240,21 +249,22 @@ public class HistoryCommandImpl extends OdenCommand {
 		System.gc();
 	}
 
-	private void appendDetails(JSONObject jo, Set<DeployFile> deployFiles) {
-		int nsuccess = 0;
-		Set<String> items = new HashSet<String>();
-		for (DeployFile f : deployFiles) {
-			items.add(f.getPath());
-			if (f.isSuccess())
-				nsuccess++;
-		}
-		try {
-			jo.put("nitems", items.size()).put("nsuccess", nsuccess)
-					.put("total", deployFiles.size());
-		} catch (JSONException e) {
-			// ignore
-		}
-	}
+//	private void appendDetails(JSONObject jo, Set<DeployFile> deployFiles) {
+//		int nsuccess = 0;
+//		Set<String> items = new HashSet<String>();
+//		for (DeployFile f : deployFiles) {
+//			items.add(f.getPath());
+//			if (f.isSuccess()) {
+//				nsuccess++;
+//			}
+//		}
+//		try {
+//			jo.put("nitems", items.size()).put("nsuccess", nsuccess)
+//					.put("total", deployFiles.size());
+//		} catch (JSONException e) {
+//			// ignore
+//		}
+//	}
 
 	private String redeploy(final String id, boolean isSync, String user)
 			throws OdenException {
@@ -272,19 +282,23 @@ public class HistoryCommandImpl extends OdenCommand {
 			}
 		});
 
-		if (isSync)
+		if (isSync) {
 			jobManager.syncRun(j);
-		else
+		} else {
 			jobManager.schedule(j);
+		}
 		return j.id(); // txid
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private String undo(String id, List<String> paths, boolean isSync,
 			String user) throws OdenException {
-		if (id.length() == 0)
+		if (id.length() == 0) {
 			throw new OdenException("<txid> is required.");
-		if ((paths.size() % 2) != 0)
+		}
+		if ((paths.size() % 2) != 0) {
 			throw new OdenException("Illegal <path> arguments error.");
+		}
 
 		Map<AgentLoc, String> m = new HashMap<AgentLoc, String>();
 		for (int i = 0; i < paths.size(); i++) {
@@ -317,18 +331,20 @@ public class HistoryCommandImpl extends OdenCommand {
 
 						DeployerService ds = txmitterService.getDeployer(parent
 								.agentAddr());
-						if (ds == null)
+						if (ds == null) {
 							throw new OdenException(
 									"Couldn't connect to the agent: "
 											+ parent.agentAddr());
+						}
 
 						DoneFileInfo d = null;
 						if (f.mode() == Mode.ADD || f.mode() == Mode.UPDATE) {
 							d = ds.backupNCopy(oldbak, file, parentLoc,
 									deployerManager.backupLocation(f),
 									backupcnt);
-							if (d != null)
+							if (d != null) {
 								f.setMode(d.isUpdate() ? Mode.UPDATE : Mode.ADD);
+							}
 						} else if (f.mode() == Mode.DELETE) {
 							d = ds.backupNRemove(parentLoc, file,
 									deployerManager.backupLocation(f),
@@ -347,20 +363,23 @@ public class HistoryCommandImpl extends OdenCommand {
 				}
 			}
 		};
-		if (isSync)
+		if (isSync) {
 			jobManager.syncRun(j);
-		else
+		} else {
 			jobManager.schedule(j);
+		}
 		return j.id();
 	}
 
+	@SuppressWarnings("PMD")
 	private Set<DeployFile> undoFiles(String id, Map<AgentLoc, String> paths)
 			throws OdenException {
 		Set<DeployFile> undos = new HashSet<DeployFile>();
 
 		RecordElement2 record = deploylog.search(id, null, null, null, false);
-		if (record == null)
+		if (record == null) {
 			throw new OdenException("Couldn't retrieve the history : " + id);
+		}
 
 		for (DeployFile f : record.getDeployFiles()) {
 			boolean matched = false;
@@ -372,8 +391,9 @@ public class HistoryCommandImpl extends OdenCommand {
 				}
 			}
 
-			if (paths.size() > 0 && !matched) // cancel 대상 아님
+			if (paths.size() > 0 && !matched) { // cancel 대상 아님
 				continue;
+			}
 
 			AgentLoc dest = f.getAgent();
 			String addr = dest.agentAddr();
@@ -382,9 +402,10 @@ public class HistoryCommandImpl extends OdenCommand {
 					configService.getBackupLocation(dest.agentName()), id);
 
 			DeployFile.Mode mode = cancelMode(f.mode());
-			if (mode == Mode.NA)
+			if (mode == Mode.NA) {
 				throw new OdenException("Can't be canceled: " + addr + "/"
 						+ path);
+			}
 
 			undos.add(new DeployFile(new Repository(addr, bakloc), path, dest,
 					0L, 0L, mode, false));
@@ -441,7 +462,8 @@ public class HistoryCommandImpl extends OdenCommand {
 		}
 		return buf.toString();
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private JSONArray jsonize(List<RecordElement2> list) throws OdenException {
 		JSONArray ja = new JSONArray();
 		for (RecordElement2 r : list) {

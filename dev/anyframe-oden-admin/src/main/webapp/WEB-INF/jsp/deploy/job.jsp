@@ -14,10 +14,10 @@ jQuery(document).ready(function() {
 		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.findList(cmd)&viewName=jsonView&cmd='/>"+ encodeURI('<%=roles%>'),
 		mtype : 'GET',
 		datatype : "json",
-		colNames : [ '<anyframe:message code="job.grid.job"/>', 
-		     		 '<anyframe:message code="job.grid.action"/>',
-		     		 '<anyframe:message code="job.grid.status"/>', 
-		     		 '<anyframe:message code="job.grid.id"/>'],
+		colNames : [ '<spring:message code="job.grid.job"/>', 
+		     		 '<spring:message code="job.grid.action"/>',
+		     		 '<spring:message code="job.grid.status"/>', 
+		     		 '<spring:message code="job.grid.id"/>'],
 		jsonReader : {
 			repeatitems : false
 		},
@@ -58,7 +58,7 @@ jQuery(document).ready(function() {
 		pager : jQuery('#pager_job'),
 
 		loadError : function(xhr, st, err) {
-			alert('<anyframe:message code="job.load.error"/>');
+			alert('<spring:message code="job.load.error"/>');
 		},
 		gridComplete: function() {
 			
@@ -89,7 +89,7 @@ function cleanDeploy(job){
 	var rowArray = new Array();
 	rowArray[0] = "."+"@oden@"+"."+"@oden@"+".";
 	
-	if(confirm('<anyframe:message code="job.confirm.cleandeploy"/>')){
+	if(confirm('<spring:message code="job.confirm.cleandeploy"/>')){
 		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page,cmd,user)&viewName=jsonView'/>",
 		       {
 	       		items : rowArray,
@@ -105,7 +105,7 @@ function cleanDeploy(job){
 }
 
 function delJob(jobName){
-	if(confirm('<anyframe:message code="job.confirm.deletejob"/>')){
+	if(confirm('<spring:message code="job.confirm.deletejob"/>')){
 		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.remove(id)&viewName=jsonView'/>",
 			       {id : jobName}, function(data) {
 			    	   jQuery("#grid_job").trigger("reloadGrid");
@@ -114,7 +114,7 @@ function delJob(jobName){
 }
 
 function stopDeployJob(txid){
-	if(confirm('<anyframe:message code="job.confirm.stopjob"/>')){
+	if(confirm('<spring:message code="job.confirm.stopjob"/>')){
 		$.ajax( {
 			url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.stop(id)&viewName=jsonView&id='/>"+txid ,
 			dataType : "json",
@@ -129,7 +129,7 @@ function stopDeployJob(txid){
 }
 
 function rollbackJob(txid){
-	if(confirm('<anyframe:message code="job.confirm.rollbackjob"/>')){
+	if(confirm('<spring:message code="job.confirm.rollbackjob"/>')){
 		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.rollback(txid)&viewName=jsonView'/>",
 		       {
 	       		txid : txid
@@ -155,10 +155,10 @@ function stopTimer(){
 		<tr>
 			<td>
 				<div class="pageSubtitle" style="padding-top: 10px;">
-					<h3 class="subtitle_h3"><anyframe:message code="job.page.subtitle"/></h3>
+					<h3 class="subtitle_h3"><spring:message code="job.page.subtitle"/></h3>
 				</div><!-- end pageSubtitle -->
 			</td>
-			<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
+			<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewName="addUser">
 				<td align=right style="padding-top: 10px;">
 					<a name="addlink" href="#"><img src="<c:url value='/images/btn_job.gif'/>" alt="add" /></a>
 				</td>

@@ -16,7 +16,7 @@
 				drawCompareGrid();
 				},
 			error : function() {
-				alert('<anyframe:message code="compare.load.error"/>');
+				alert('<spring:message code="compare.load.error"/>');
 			}
 	});
 
@@ -34,7 +34,7 @@
 					scroll : false,
 					viewrecords : true,
 					sortable : false,
-					rowNum : '<anyframe:message code="common.page.size"/>',
+					rowNum : '<spring:message code="common.page.size"/>',
 					viewrecords : true,
 					shrinkToFit:false,
 					pager : jQuery('#pager_compare'),
@@ -224,7 +224,7 @@
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="compare.page.subtitle"/><%=jobName %></h3>
+	<h3 class="subtitle_h3"><spring:message code="compare.page.subtitle"/><%=jobName %></h3>
 </div><!-- end pageSubtitle -->
 <div id="body_compare">
 <form method="post" target="hiddenDiv" id="compareForm" name="compareForm">
@@ -240,7 +240,7 @@
 						<td><a id="showColumns" href="javascript:openSelectColumnDlg();" style="text-decoration:underline;">Select Servers</a></td>
 <!--						<td height="auto"><div id="div_select_column"></div></td>-->
 						<td width="550"></td>
-						<th scope="row"><label for="fail"><anyframe:message code="history.label.fail"/></label></th>
+						<th scope="row"><label for="fail"><spring:message code="history.label.fail"/></label></th>
 						<td align="left"><input type="checkbox" id="comparefail" value="true" class="checkbox" checked/></td>
 						<td width="80" align="right"><a id="showGrid" href="javascript:gridCompareReload();"><img src="<c:url value='/images/btn_search.gif'/>" width="73" height="20" alt="search" /></a></td>
 					</tr>

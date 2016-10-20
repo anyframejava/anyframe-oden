@@ -64,6 +64,7 @@ import org.osgi.service.log.LogService;
  * @author Junghwan Hong
  * @see org.apache.felix.shell.impl.Activator
  */
+@SuppressWarnings("PMD")
 public class Activator implements BundleActivator {
 	private transient BundleContext m_context = null;
 	private transient ShellGate m_shell = null;
@@ -88,8 +89,7 @@ public class Activator implements BundleActivator {
 					m_shell.addCommand(event.getServiceReference());
 				} else if (event.getType() == ServiceEvent.UNREGISTERING) {
 					m_shell.removeCommand(event.getServiceReference());
-				} else {
-				}
+				} 
 			}
 		};
 

@@ -20,6 +20,7 @@ package org.anyframe.oden.bundle.job.log;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class LogError {
 	private String date;
 	private String contents;

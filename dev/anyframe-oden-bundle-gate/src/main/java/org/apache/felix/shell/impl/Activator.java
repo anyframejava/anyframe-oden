@@ -38,6 +38,7 @@ import org.osgi.framework.ServiceReference;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class Activator implements BundleActivator {
 	private transient BundleContext m_context = null;
 	private transient ShellServiceImpl m_shell = null;

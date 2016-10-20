@@ -39,6 +39,7 @@ import org.osgi.framework.BundleContext;
  * @author Junghwan Hong
  * @see org.anyframe.oden.bundle.core.job.Job
  */
+@SuppressWarnings("PMD")
 public abstract class CompressJob extends Job {
 
 	protected String errorMessage;

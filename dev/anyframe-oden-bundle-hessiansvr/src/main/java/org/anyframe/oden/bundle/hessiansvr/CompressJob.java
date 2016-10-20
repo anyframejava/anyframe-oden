@@ -50,10 +50,12 @@ public class CompressJob extends StoppableJob {
 		File s = new File(srcdir);
 		File d = new File(destFile);
 
-		if (!s.isAbsolute())
+		if (!s.isAbsolute()) {
 			throw new IOException("Absolute path is allowed only: " + s);
-		if (!d.isAbsolute())
+		}
+		if (!d.isAbsolute()) {
 			throw new IOException("Absolute path is allowed only: " + d);
+		}
 
 		return compress(s, d);
 	}
@@ -66,8 +68,9 @@ public class CompressJob extends StoppableJob {
 			return new DoneFileInfo(destFile.getName(), false,
 					destFile.lastModified(), destFile.length(), false, true);
 		} catch (IOException e) {
-			if (destFile != null)
+			if (destFile != null) {
 				destFile.delete();
+			}
 			throw e;
 		}
 	}
@@ -81,11 +84,13 @@ public class CompressJob extends StoppableJob {
 	 * @throws IOException
 	 */
 	private long _compress(File dir, File jar) throws IOException {
-		if (!dir.exists() || !dir.isDirectory())
+		if (!dir.exists() || !dir.isDirectory()) {
 			throw new IOException("Couldn't find: " + dir);
+		}
 		if (jar.exists()) {
-			if (jar.isDirectory())
+			if (jar.isDirectory()) {
 				throw new IOException("Fail to write: " + jar.getPath());
+			}
 			jar.delete();
 		}
 
@@ -96,8 +101,9 @@ public class CompressJob extends StoppableJob {
 			compressDir(dir, dir, jout);
 			return jar.length();
 		} finally {
-			if (jout != null)
+			if (jout != null) {
 				jout.close();
+			}
 		}
 	}
 
@@ -110,6 +116,7 @@ public class CompressJob extends StoppableJob {
 	 * @return size of the orginal dir
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	private void compressDir(final File root, File dir, ZipOutputStream out)
 			throws IOException {
 		File[] files = dir.listFiles();
@@ -139,8 +146,9 @@ public class CompressJob extends StoppableJob {
 					} catch (IOException e) {
 					}
 					try {
-						if (in != null)
+						if (in != null) {
 							in.close();
+						}
 					} catch (IOException e) {
 					}
 

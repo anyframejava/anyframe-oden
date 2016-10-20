@@ -58,6 +58,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class JobDeployJob extends DeployJob {
 	RepositoryProviderService repositoryProvider;
 	String backupLocation = null;
@@ -142,7 +143,9 @@ public class JobDeployJob extends DeployJob {
 			throws OdenException {
 		// files having same path and diff agent
 		currentWork = "ready to deploy...";
-		Map<RepoFile, Collection<DeployFile>> fs = groupByPath(repofiles);
+//		Map<RepoFile, Collection<DeployFile>> fs = groupByPath(repofiles);
+		Map<RepoFile, Collection<DeployFile>> fs = Collections.synchronizedMap(groupByPath(repofiles)); 
+			
 		for (RepoFile rf : fs.keySet()) {
 			if (stop)
 				break;
@@ -467,7 +470,8 @@ public class JobDeployJob extends DeployJob {
 	}
 
 	protected void setError(String msg) {
-		if (errorMessage == null)
+		if (errorMessage == null) {
 			errorMessage = msg;
+		}
 	}
 }

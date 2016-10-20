@@ -73,6 +73,7 @@ public class IndexWebService implements WebService {
 		w.close();
 	}
 
+	@SuppressWarnings("PMD")
 	private List<Map<String, String>> taskList() {
 		List<Map<String, String>> tasks = new LinkedList<Map<String, String>>();
 

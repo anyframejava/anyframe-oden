@@ -9,18 +9,18 @@
     http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
 	<!-- simple direct service controller -->
-	<bean name="/simplejsoncommon.do" class="anyframe.web.springmvc.controller.SimpleServiceController">
+	<bean name="/simplejsoncommon.do" class="org.anyframe.simpleweb.controller.SimpleServiceController">
 		<property name="beanMethodsRepo" ref="jsonBeanMethodsRepo" />
 	</bean>
 	
 	<!-- simple direct service controller with json-->
-	<bean name="/simplejson.do" class="anyframe.web.springmvc.controller.SimpleJSONController">
+	<bean name="/simplejson.do" class="org.anyframe.simpleweb.controller.SimpleJSONController">
 		<property name="beanMethodsRepo" ref="jsonBeanMethodsRepo" />
 	</bean>
 	
 	<!--  view resolver  for Tiles --> 
-	<bean id="ajaxViewResolver" class="anyframe.web.js.ajax.AjaxUrlBasedContentTypeViewResolver">
-		<property name="viewClass" value="anyframe.web.js.ajax.tiles2.AjaxParamTilesView"/>
+	<bean id="ajaxViewResolver" class="org.anyframe.simpleweb.js.ajax.AjaxUrlBasedContentTypeViewResolver">
+		<property name="viewClass" value="org.anyframe.simpleweb.js.ajax.tiles2.AjaxParamTilesView"/>
 		<property name="order" value="2"/>
 		<property name="contentType" value="text/html;charset=utf-8"/>	
 	</bean>

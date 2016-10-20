@@ -22,11 +22,10 @@ import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.domain.Server;
 import org.anyframe.oden.admin.domain.Target;
 import org.anyframe.oden.admin.service.ServerService;
+import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
-import anyframe.common.Page;
 
 /**
  * This is ServerServiceImpl Class
@@ -35,13 +34,13 @@ import anyframe.common.Page;
  */
 @Service("serverService")
 public class ServerServiceImpl implements ServerService {
-	private OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
+	private final OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
 
-	private String ahref_pre = "<a href=\"";
-	private String ahref_mid = "\">";
-	private String ahref_post = "</a>";
+	String ahrefPre = "<a href=\"";
+	String ahrefMid = "\">";
+	String ahrefPost = "</a>";
 
-	private String doubleQuotation = "\"";
+	String doubleQuotation = "\"";
 
 	/**
 	 * 
@@ -75,9 +74,10 @@ public class ServerServiceImpl implements ServerService {
 	 * 
 	 * @param param
 	 */
+	@SuppressWarnings("PMD")
 	public Page findListByPk(String param) throws Exception {
 
-		if (param.equals("")) {
+		if ("".equals(param)) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
@@ -91,10 +91,11 @@ public class ServerServiceImpl implements ServerService {
 			String imgStatusGreen = "<img src='images/status_green.png'/>";
 			String imgStatusGray = "<img src='images/status_gray.png'/>";
 
-			if (!(result == null) && !result.equals("")) {
+			if (!(result == null) && !"".equals(result)) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
 					int recordSize = array.length();
+
 					for (int i = 0; i < recordSize; i++) {
 
 						JSONObject object = (JSONObject) array.get(i);
@@ -120,9 +121,9 @@ public class ServerServiceImpl implements ServerService {
 							t.setUrl(address);
 							t.setPath(path);
 							t.setStatus(statusResult);
-							t.setHidden(ahref_pre + "javascript:delServer('"
-									+ name + "');" + ahref_mid + imgDel
-									+ ahref_post);
+							t.setHidden(ahrefPre + "javascript:delServer('"
+									+ name + "');" + ahrefMid + imgDel
+									+ ahrefPost);
 							t.setHiddenname(name);
 
 							list.add(t);
@@ -130,7 +131,7 @@ public class ServerServiceImpl implements ServerService {
 					}
 				}
 			}
-			if (list.size() == 0) {
+			if (list.isEmpty()) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
 				return new Page(list, 1, list.size(), list.size(), list.size());

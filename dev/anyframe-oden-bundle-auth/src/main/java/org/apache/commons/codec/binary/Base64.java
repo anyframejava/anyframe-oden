@@ -48,6 +48,7 @@ import org.apache.commons.codec.EncoderException;
  * @see RFC 2045
  * @version $Id: Base64.java 801706 2009-08-06 16:27:06Z niallp $
  */
+@SuppressWarnings("PMD")
 public class Base64 implements BinaryEncoder, BinaryDecoder {
 	private static final int DEFAULT_BUFFER_RESIZE_FACTOR = 2;
 

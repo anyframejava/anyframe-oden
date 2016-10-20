@@ -15,6 +15,7 @@
  */
 package org.anyframe.oden.bundle.external.deploy;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import org.anyframe.oden.bundle.external.config.CfgTarget;
  * handling remote files, register this service to the R-OSGi bundle. Your
  * service can access remote files using that registered service.
  * 
- * @author Junghwan Hong 
+ * @author Junghwan Hong
  */
 public interface ExtDeployerService {
 
@@ -44,6 +45,16 @@ public interface ExtDeployerService {
 	 * @throws Exception
 	 */
 	public CfgReturnVO execute(CfgJob job) throws Exception;
+
+	/**
+	 * External API method , which deploy batch in multi thread
+	 * 
+	 * @param job
+	 * @return
+	 * @throws Exception
+	 */
+	public LinkedList<CfgReturnVO> executeBatch(LinkedList<CfgJob> job)
+			throws Exception;
 
 	/**
 	 * External API method , which deploy root directory in all files

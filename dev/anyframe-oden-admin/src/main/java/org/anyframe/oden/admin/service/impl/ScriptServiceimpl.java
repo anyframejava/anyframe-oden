@@ -22,11 +22,10 @@ import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.domain.Command;
 import org.anyframe.oden.admin.domain.Server;
 import org.anyframe.oden.admin.service.ScriptService;
+import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
-import anyframe.common.Page;
 
 /**
  * This is ScriptServiceimpl Class
@@ -36,13 +35,13 @@ import anyframe.common.Page;
 @Service("scriptService")
 public class ScriptServiceimpl implements ScriptService {
 
-	private OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
+	private final OdenCommonDao<Server> odenCommonDao = new OdenCommonDao<Server>();
 
-	private String ahref_pre = "<a href=\"";
-	private String ahref_mid = "\">";
-	private String ahref_post = "</a>";
+	String ahrefPre = "<a href=\"";
+	String ahrefMid = "\">";
+	String ahrefPost = "</a>";
 
-	private String doubleQuotation = "\"";
+	String doubleQuotation = "\"";
 
 	/**
 	 * Method for getting script list in certain job.
@@ -50,9 +49,10 @@ public class ScriptServiceimpl implements ScriptService {
 	 * @param param
 	 * @param opt
 	 */
+	@SuppressWarnings("PMD")
 	public Page findListByPk(String param, String opt) throws Exception {
 
-		if (param.equals("")) {
+		if ("".equals(param)) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
@@ -64,46 +64,50 @@ public class ScriptServiceimpl implements ScriptService {
 			String imgRun = "<img src='images/play.png'/>";
 			String imgDel = "<img src='images/ico_del.gif'/>";
 
-			if (!(result == null) && !result.equals("")) {
-				JSONArray array = new JSONArray(result);
-				if (!(array.length() == 0)) {
-					int recordSize = array.length();
-					for (int i = 0; i < recordSize; i++) {
+			if (result == null || "".equals(result)) {
+				return new Page(list, 1, list.size(), 1, 1);
+			}
+			JSONArray array = new JSONArray(result);
+			if (array.length() == 0) {
+				return new Page(list, 1, list.size(), 1, 1);
+			}
 
-						JSONObject object = (JSONObject) array.get(i);
-						JSONArray commands = (JSONArray) object.get("commands");
+			int recordSize = array.length();
 
-						for (int num = 0; num < commands.length(); num++) {
-							Command c = new Command();
+			for (int i = 0; i < recordSize; i++) {
 
-							JSONObject command = (JSONObject) commands.get(num);
-							String name = command.getString("name");
-							String path = command.getString("dir");
-							String cmd = command.getString("command");
+				JSONObject object = (JSONObject) array.get(i);
+				JSONArray commands = (JSONArray) object.get("commands");
 
-							String event = "";
-							if (opt.equalsIgnoreCase("run")) {
-								event = ahref_pre + "javascript:runScript('"
-										+ name + "');" + ahref_mid + imgRun
-										+ ahref_post;
-							} else if (opt.equalsIgnoreCase("del")) {
-								event = ahref_pre + "javascript:delScript('"
-										+ name + "');" + ahref_mid + imgDel
-										+ ahref_post;
-							}
+				for (int num = 0; num < commands.length(); num++) {
+					Command c = new Command();
 
-							c.setName(name);
-							c.setPath(path);
-							c.setCmd(cmd);
-							c.setHidden(event);
-							c.setHiddenname(name);
+					JSONObject command = (JSONObject) commands.get(num);
+					String name = command.getString("name");
+					String path = command.getString("dir");
+					String cmd = command.getString("command");
 
-							list.add(c);
-						}
+					String event = "";
+					event = event.concat(ahrefPre + "javascript:runScript('"
+							+ name + "');" + ahrefMid);
+					if ("run".equals(opt)) {
+						event = event.concat(imgRun + ahrefPost);
 					}
+					if ("del".equals(opt)) {
+						event = event.concat(imgDel + ahrefPost);
+					}
+
+					c.setName(name);
+					c.setPath(path);
+					c.setCmd(cmd);
+					c.setHidden(event);
+					c.setHiddenname(name);
+
+					list.add(c);
 				}
 			}
-			if (list.size() == 0) {
+
+			if (list.isEmpty()) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
 				return new Page(list, 1, list.size(), list.size(), list.size());
@@ -125,14 +129,14 @@ public class ScriptServiceimpl implements ScriptService {
 		String options = "\"" + jobName + "\" " + "-t" + " ";
 
 		for (int i = 0; i < targets.length; i++) {
-			options += "\"" + targets[i] + "\" ";
+			options = options.concat("\"" + targets[i] + "\" ");
 		}
 
-		options += "-c" + " \"" + scriptName + "\"";
+		options = options.concat("-c" + " \"" + scriptName + "\"");
 
 		String result = odenCommonDao.getResultString("exec", "run", options);
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				for (int i = 0; i < array.length(); i++) {
@@ -140,8 +144,8 @@ public class ScriptServiceimpl implements ScriptService {
 					String target = object.getString("target");
 					String resultScript = object.getString("result");
 
-					returnString += "[" + target + "]\r" + resultScript
-							+ "\r\r\r";
+					returnString = returnString.concat("[" + target + "]\r"
+							+ resultScript + "\r\r\r");
 				}
 			}
 		}
@@ -156,16 +160,18 @@ public class ScriptServiceimpl implements ScriptService {
 	 * 
 	 * 
 	 */
+	@SuppressWarnings("PMD")
 	public List<Command> getCommandList(String jobName) throws Exception {
 		List<Command> cmds = new ArrayList<Command>();
 
 		String result = odenCommonDao.getResultString("job", "info",
 				doubleQuotation + jobName + doubleQuotation);
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				int recordSize = array.length();
+
 				for (int i = 0; i < recordSize; i++) {
 
 					JSONObject object = (JSONObject) array.get(i);

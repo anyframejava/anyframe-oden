@@ -17,24 +17,21 @@ package org.anyframe.oden.admin.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.anyframe.iam.core.reload.IResourceReloadService;
 import org.anyframe.oden.admin.common.OdenBrokerImpl;
 import org.anyframe.oden.admin.common.OdenBrokerService;
-import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.common.OdenUserDao;
-import org.anyframe.oden.admin.domain.Status;
 import org.anyframe.oden.admin.domain.User;
-import org.anyframe.oden.admin.service.Credential;
 import org.anyframe.oden.admin.service.UserService;
+import org.anyframe.pagination.Page;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import anyframe.common.Page;
-import anyframe.iam.core.reload.IResourceReloadService;
 
 /**
  * This is UserServiceImpl Class
@@ -45,15 +42,13 @@ import anyframe.iam.core.reload.IResourceReloadService;
 @Transactional(rollbackFor = { Exception.class })
 public class UserServiceImpl implements UserService {
 
-	private static OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	private static OdenBrokerService odenBroker = new OdenBrokerImpl();
 
 	@Value("#{contextProperties['oden.server'] ?: 'localhost'}")
 	private String server;
 
 	@Value("#{contextProperties['oden.port'] ?: '9860'}")
 	private String port;
-
-	private OdenCommonDao odenCommonDao = new OdenCommonDao<Status>();
 
 	@Inject
 	@Named("odenUserDao")
@@ -69,7 +64,7 @@ public class UserServiceImpl implements UserService {
 	 * @param userid
 	 * @throws Exception
 	 */
-	public boolean checkuser(Credential c) throws Exception {
+	public boolean checkuser(Properties c) throws Exception {
 		return request(c.getProperty("userid"), c.getProperty("password"));
 	}
 
@@ -79,7 +74,7 @@ public class UserServiceImpl implements UserService {
 	 * @throws Exception
 	 */
 	private boolean request(String userid, String password) throws Exception {
-		return OdenBroker.checkUser("http://" + server + ":" + port + "/shell",
+		return odenBroker.checkUser("http://" + server + ":" + port + "/shell",
 				userid, password);
 	}
 

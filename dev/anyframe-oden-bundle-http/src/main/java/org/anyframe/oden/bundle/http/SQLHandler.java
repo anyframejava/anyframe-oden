@@ -34,6 +34,7 @@ import java.util.Map;
 public class SQLHandler {
 	private static final String DB_URL = "jdbc:hsqldb:file:meta/db";
 
+	@SuppressWarnings("PMD")
 	public List<Map<String, String>> executeQuery(String sql)
 			throws SQLException {
 		Connection conn = null;
@@ -59,25 +60,29 @@ public class SQLHandler {
 
 			while (rs.next()) {
 				Map<String, String> m = new HashMap<String, String>();
-				for (int i = 0; i < cols.size(); i++)
+				for (int i = 0; i < cols.size(); i++) {
 					m.put(cols.get(i), rs.getString(i));
+				}
 				list.add(m);
 			}
 			return list;
 		} finally {
 			try {
-				if (rs != null)
+				if (rs != null) {
 					rs.close();
+				}
 			} catch (SQLException e) {
 			}
 			try {
-				if (ps != null)
+				if (ps != null) {
 					ps.close();
+				}
 			} catch (SQLException e) {
 			}
 			try {
-				if (conn != null)
+				if (conn != null) {
 					conn.close();
+				}
 			} catch (SQLException e) {
 			}
 		}
@@ -92,13 +97,15 @@ public class SQLHandler {
 			ps.executeUpdate(sql);
 		} finally {
 			try {
-				if (ps != null)
+				if (ps != null) {
 					ps.close();
+				}
 			} catch (SQLException e) {
 			}
 			try {
-				if (conn != null)
+				if (conn != null) {
 					conn.close();
+				}
 			} catch (SQLException e) {
 			}
 		}

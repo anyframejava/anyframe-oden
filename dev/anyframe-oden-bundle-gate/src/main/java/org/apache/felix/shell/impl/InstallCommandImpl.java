@@ -102,6 +102,7 @@ public class InstallCommandImpl implements Command {
 		return null;
 	}
 
+	@SuppressWarnings("PMD")
 	private String absoluteLocation(String location) {
 		try {
 			new URL(location);

@@ -52,8 +52,9 @@ public class RepoFile {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof RepoFile))
+		if (!(o instanceof RepoFile)) {
 			return false;
+		}
 		RepoFile f = (RepoFile) o;
 		return subdir.equals(f.getSubdir()) && file.equals(f.getFile());
 	}

@@ -105,8 +105,9 @@ public class AgentElement {
 	}
 
 	public void removeLoc(String name) throws OdenException {
-		if (name == null)
+		if (name == null) {
 			throw new OdenException("Can't remove default location");
+		}
 
 		for (AgentLocation loc : locs) {
 			if (name.equals(loc.getName())) {
@@ -134,20 +135,24 @@ public class AgentElement {
 
 	private AgentLocation getLoc(String name) {
 		AgentLocation locsetting = _getLoc(name);
-		if (locsetting == null)
+		if (locsetting == null) {
 			return null;
-		if (FileUtil.isAbsolutePath(locsetting.getValue()))
+		}
+		if (FileUtil.isAbsolutePath(locsetting.getValue())) {
 			return locsetting;
+		}
 
 		try {
-			if (agentHome == null)
+			if (agentHome == null) {
 				agentHome = getAgentHome();
+			}
 
 			String resolved = FileUtil.resolveDotNatationPath(agentHome + "/"
 					+ locsetting.getValue());
-			if (resolved == null)
+			if (resolved == null) {
 				throw new Exception("Illegal format: " + agentHome + "/"
 						+ locsetting.getValue());
+			}
 
 			locs.remove(locsetting);
 			AgentLocation result = new AgentLocation(this, name, resolved);
@@ -161,8 +166,9 @@ public class AgentElement {
 
 	private String getAgentHome() throws Exception {
 		DeployerService ds = txmitter.getDeployer(getAddr());
-		if (ds == null)
+		if (ds == null) {
 			throw new Exception("Access Fail: " + getAddr());
+		}
 
 		return ds.odenHome();
 	}
@@ -181,8 +187,9 @@ public class AgentElement {
 		List<String> names = new ArrayList<String>();
 		for (AgentLocation loc : locs) {
 			if (loc.getName() != DEFAULT_LOCATION
-					&& loc.getName() != BACKUP_LOCATION)
+					&& loc.getName() != BACKUP_LOCATION) {
 				names.add(loc.getName());
+			}
 		}
 		return names;
 	}

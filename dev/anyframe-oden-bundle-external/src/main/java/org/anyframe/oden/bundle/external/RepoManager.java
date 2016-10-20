@@ -69,8 +69,9 @@ public class RepoManager {
 	}
 
 	protected String[] makeToRepoArgs(String subdir) {
-		if (StringUtil.empty(subdir))
+		if (StringUtil.empty(subdir)) {
 			return repoArgs;
+		}
 		return new String[] { FileUtil.combinePath(repoArgs[0], subdir) };
 	}
 

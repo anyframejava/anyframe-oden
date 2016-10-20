@@ -62,8 +62,9 @@ public class CfgJob {
 		List<CfgCommand> cs = new ArrayList<CfgCommand>();
 		Set<String> names = new HashSet(commandNames);
 		for (CfgCommand c : commands) {
-			if (names.contains(c.getName()))
+			if (names.contains(c.getName())) {
 				cs.add(c);
+			}
 		}
 		return cs;
 	}
@@ -83,15 +84,18 @@ public class CfgJob {
 	 * @param targetNames
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public List<CfgTarget> getAllTargets(List<String> targetNames) {
-		if (targetNames == null || targetNames.size() == 0)
+		if (targetNames == null || targetNames.size() == 0) {
 			return targets;
+		}
 
 		List<CfgTarget> ts = new ArrayList<CfgTarget>();
 		Set<String> names = new HashSet(targetNames);
 		for (CfgTarget t : targets) {
-			if (names.contains(t.getName()))
+			if (names.contains(t.getName())) {
 				ts.add(t);
+			}
 		}
 		return ts;
 	}
@@ -102,13 +106,15 @@ public class CfgJob {
 		o.put("source", source.toJSON());
 
 		JSONArray ts = new JSONArray();
-		for (CfgTarget t : targets)
+		for (CfgTarget t : targets) {
 			ts.put(t.toJSON());
+		}
 		o.put("targets", ts);
 
 		JSONArray cs = new JSONArray();
-		for (CfgCommand c : commands)
+		for (CfgCommand c : commands) {
 			cs.put(c.toJSON());
+		}
 		o.put("commands", cs);
 		return new JSONArray(o);
 	}
@@ -119,8 +125,9 @@ public class CfgJob {
 			CfgJob cg = (CfgJob) obj;
 			if (equals(name, cg.getName()) && source.equals(cg.getSource())
 					&& targets.equals(cg.getTargets())
-					&& commands.equals(cg.getCommands()))
+					&& commands.equals(cg.getCommands())) {
 				return true;
+			}
 		}
 		return false;
 	}

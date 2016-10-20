@@ -18,6 +18,7 @@ package org.anyframe.oden.bundle.common;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Collections of utility methods manipulating java.util.Date class.
@@ -34,7 +35,8 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String toStringDate(long date) {
-		return new SimpleDateFormat(DATE_PATTERN).format(new Date(date));
+		return new SimpleDateFormat(DATE_PATTERN, Locale.getDefault())
+				.format(new Date(date));
 	}
 
 	/**
@@ -45,6 +47,7 @@ public class DateUtil {
 	 * @throws ParseException
 	 */
 	public static long toLongDate(String s) throws ParseException {
-		return new SimpleDateFormat(DATE_PATTERN).parse(s).getTime();
+		return new SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).parse(s)
+				.getTime();
 	}
 }

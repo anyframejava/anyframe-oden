@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -94,30 +96,43 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	private String port = null;
 
 	private boolean deployExcOpt;
-	
+
 	private Object lock = new Object();
 
 	public CfgReturnVO execute(final CfgJob job) throws Exception {
 		// service instance start
 		initServices();
 		synchronized (lock) {
-			return executeRun(job,false);
+			return executeRun(job, false);
 		}
 	}
-	
-	/* 
-	 * Root directory 하단의 파일들을 배포
-	 * @param job
+
+	/*
+	 * batch deploy , using by multi thread
 	 * 
+	 * @param job
+	 */
+	public LinkedList<CfgReturnVO> executeBatch(LinkedList<CfgJob> job)
+			throws Exception {
+		initServices();
+		synchronized (lock) {
+			return executeRunBatch(job);
+		}
+	}
+
+	/*
+	 * Root directory 하단의 파일들을 배포
+	 * 
+	 * @param job
 	 */
 	public CfgReturnVO executeRoot(CfgJob job) throws Exception {
 		// service instance start
 		initServices();
 		synchronized (lock) {
-			return executeRun(job,true);
+			return executeRun(job, true);
 		}
 	}
-	
+
 	/*
 	 * undo 기능 구현(txid를 키로 무조건 rollback을 수행한다)
 	 * 
@@ -132,14 +147,16 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 		String undo = context.getProperty("deploy.undo");
 
-		if (undo == null || !undo.startsWith("true"))
+		if (undo == null || !undo.startsWith("true")) {
 			throw new OdenException(
 					"Undo function is not activated. Check 'deploy.undo' property in oden.ini."
 							+ undo);
+		}
 		try {
-			if (txid.length() == 0 || txid.equals(""))
+			if (txid.length() == 0 || txid.equals("")) {
 				throw new OdenException(
 						"Undo function is not activated. Check 'transaction id'");
+			}
 		} catch (Exception e) {
 			throw new OdenException(
 					"Undo function is not activated. Check 'transaction id'");
@@ -166,8 +183,9 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		initJobManager();
 
 		Job j = id.length() == 0 ? jobManager.job() : jobManager.job(id);
-		if (j == null)
+		if (j == null) {
 			throw new OdenException("Couldn't find that job: " + id);
+		}
 		jobManager.cancel(j);
 		return j.getCurrentWork();
 	}
@@ -179,6 +197,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	 * org.anyframe.oden.bundle.external.deploy.ExtDeployerService#rollback(
 	 * java.lang.String)
 	 */
+	@SuppressWarnings("PMD")
 	public Map<String, List<CfgReturnPreview>> test(final CfgJob job)
 			throws Exception {
 		initServices();
@@ -214,13 +233,15 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			throws Exception {
 		// services initialize
 		initServicesLog();
-		DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss"); // HH=24h,
+		DateFormat df = new SimpleDateFormat("yyyyMMdd HH:mm:ss",
+				Locale.getDefault()); // HH=24h,
 		// hh=12h
 
 		ShortenRecord r = jobLogger.search(id);
 		final Mode mode = Mode.NA;
-		if (r == null)
+		if (r == null) {
 			throw new OdenException("No proper log: " + id);
+		}
 
 		List<CfgHistoryDetail> det = toListHistory(new SortedDeployFileSet(
 				jobLogger.show(id, "", mode, false)));
@@ -228,8 +249,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		List<CfgHistoryDetail> historydet = pageFilter(det, pageIndex, pageSize);
 
 		CfgHistory history = new CfgHistory(r.getId(), r.getUser(), r.getJob(),
-				String.valueOf(r.getTotal()), historydet, df
-						.format(r.getDate()), String.valueOf(r.isSuccess()));
+				String.valueOf(r.getTotal()), historydet,
+				df.format(r.getDate()), String.valueOf(r.isSuccess()));
 		return history;
 	}
 
@@ -242,6 +263,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	 * org.anyframe.oden.bundle.external.deploy.ExtDeployerService#run(org.anyframe
 	 * .oden.bundle.external.config.CfgScript)
 	 */
+	@SuppressWarnings("PMD")
 	public Map<String, CfgReturnScript> run(CfgScript script) throws Exception {
 		// TODO Auto-generated method stub
 		initTxmintter();
@@ -255,14 +277,16 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					.contains(":") ? target.getAddress() : target.getAddress()
 					+ port);
 			if (ds == null) {
-				result.put(target.getName(), new CfgReturnScript(
-						"Invalid agent: " + target.getName(), "executed: "
+				result.put(
+						target.getName(),
+						new CfgReturnScript("Invalid agent: "
+								+ target.getName(), "executed: "
 								+ script.getCommand() + " in the "
 								+ target.getPath(), 1));
 				continue;
 			}
-			result.put(target.getName(), ds.execShellCommand(script
-					.getCommand(), target.getPath(), timeout));
+			result.put(target.getName(), ds.execShellCommand(
+					script.getCommand(), target.getPath(), timeout));
 		}
 		return result;
 	}
@@ -281,9 +305,10 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		initTxmintter();
 
 		try {
-			if (agents.size() == 0 || agents == null)
+			if (agents.isEmpty() || agents == null) {
 				throw new OdenException(
 						"Agent list is empty. Check 'agent list'");
+			}
 		} catch (Exception e) {
 			throw new OdenException("Agent list is empty. Check 'agent list'");
 		}
@@ -292,11 +317,11 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			try {
 				DeployerService ds = txmitter.getDeployer(agent.getAddress()
 						.contains(":") ? agent.getAddress() : agent
-						.getAddress()
-						+ port);
+						.getAddress() + port);
 
-				if (ds.alive())
+				if (ds.alive()) {
 					rtn.put(agent.getName(), true);
+				}
 			} catch (Exception ex) {
 				rtn.put(agent.getName(), false);
 			}
@@ -311,25 +336,27 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	 * 
 	 * @see String id
 	 */
+	@SuppressWarnings("PMD")
 	public List<CfgReturnStatus> status(String id) throws Exception {
 		// TODO Auto-generated method stub
 		initJobManager();
 		Job[] jobs = jobManager.jobs();
 		List<CfgReturnStatus> status = new ArrayList<CfgReturnStatus>();
-		for (Job j : jobs)
+		for (Job j : jobs) {
 			status.add(new CfgReturnStatus(j.id(), j.status(), j.progress(), j
 					.getCurrentWork(), j.todoWorks(), j.date(), j.desc()));
+		}
 		return status;
 	}
-	
 
-	/* 
-	 * 오류 건 재 배포 메소드 
-	 * (non-Javadoc)
+	/*
+	 * 오류 건 재 배포 메소드 (non-Javadoc)
 	 * 
 	 * @see String id
-	 * @see String user 
+	 * 
+	 * @see String user
 	 */
+	@SuppressWarnings("PMD")
 	public CfgReturnVO reexecute(final String txid, String user)
 			throws Exception {
 		// TODO Auto-generated method stub
@@ -383,6 +410,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 				.getTotal()), String.valueOf(r.getnSuccess()), errs);
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgHistoryDetail> toListHistory(SortedDeployFileSet fs)
 			throws Exception {
 		List<CfgHistoryDetail> data = new ArrayList<CfgHistoryDetail>();
@@ -403,7 +431,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	private void initServices() throws OdenException {
 		this.context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
-//		this.port = context.getProperty("http.port") == null ? ":9872" : null;
+		// this.port = context.getProperty("http.port") == null ? ":9872" :
+		// null;
 		this.port = ":9872";
 
 		this.txmitter = (TransmitterService) BundleUtil.getService(context,
@@ -473,6 +502,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		return targets;
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<DeployFile> preview_(final CfgJob job)
 			throws OdenException {
 		final Collection<DeployFile> ret = new Vector<DeployFile>();
@@ -482,9 +512,11 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		for (CfgFileInfo fileInfo : job.getFileInfo()) {
 			for (CfgTarget target : fileInfo.getTargets()) {
 				if (!targets.containsKey(target.getName())) {
-					targets.put(target.getName(), txmitter.getDeployer(target
-							.getAddress().contains(":") ? target.getAddress()
-							: target.getAddress() + port));
+					targets.put(
+							target.getName(),
+							txmitter.getDeployer(target.getAddress().contains(
+									":") ? target.getAddress() : target
+									.getAddress() + port));
 				}
 			}
 		}
@@ -505,8 +537,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 						ret.add(new DeployFile(srcmgr.getRepository(), fileInfo
 								.getCiId(), CfgUtil.toAgentLoc(t), 0L, 0L,
 								Mode.DELETE));
-					else if (DeployerHelper.isNewFile(ds, t.getPath(), fileInfo
-							.getCiId()))
+					else if (DeployerHelper.isNewFile(ds, t.getPath(),
+							fileInfo.getCiId()))
 						ret.add(new DeployFile(srcmgr.getRepository(), fileInfo
 								.getCiId(), CfgUtil.toAgentLoc(t), 0L, 0L,
 								Mode.ADD));
@@ -515,10 +547,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 								.getCiId(), CfgUtil.toAgentLoc(t), 0L, 0L,
 								Mode.UPDATE));
 				} catch (Exception e) {
-					ret
-							.add(new DeployFile(srcmgr.getRepository(),
-									fileInfo.getCiId(), CfgUtil.toAgentLoc(t),
-									0L, 0L, Mode.NA));
+					ret.add(new DeployFile(srcmgr.getRepository(), fileInfo
+							.getCiId(), CfgUtil.toAgentLoc(t), 0L, 0L, Mode.NA));
 				}
 			}
 		}
@@ -528,6 +558,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		return ret;
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<DeployFile> preview(final CfgJob job)
 			throws OdenException {
 		final Collection<DeployFile> ret = new Vector<DeployFile>();
@@ -566,6 +597,7 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		return ret;
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<DeployFile> compPreview(final CfgJob job)
 			throws OdenException {
 		final Collection<DeployFile> ret = new Vector<DeployFile>();
@@ -593,9 +625,8 @@ public class ExtDeployerImpl implements ExtDeployerService {
 											srcTmp }), "temp.zip",
 									new AgentLoc(t.getName(), t.getAddress()
 											.contains(":") ? t.getAddress() : t
-											.getAddress()
-											+ port, targetTmp), 0L, 0L,
-									Mode.ADD));
+											.getAddress() + port, targetTmp),
+									0L, 0L, Mode.ADD));
 						}
 						srcmgr.close();
 					} catch (OdenException e) {
@@ -607,13 +638,15 @@ public class ExtDeployerImpl implements ExtDeployerService {
 			}
 		});
 
-		for (Thread t : ths)
+		for (Thread t : ths) {
 			t.start();
-		for (Thread t : ths)
+		}
+		for (Thread t : ths) {
 			try {
 				t.join();
 			} catch (InterruptedException e) {
 			}
+		}
 
 		return ret;
 	}
@@ -621,23 +654,24 @@ public class ExtDeployerImpl implements ExtDeployerService {
 	private String getTargetTmp(CfgTarget t) {
 		DeployerService ds = txmitter
 				.getDeployer(t.getAddress().contains(":") ? t.getAddress() : t
-						.getAddress()
-						+ port);
-		if (ds != null)
+						.getAddress() + port);
+		if (ds != null) {
 			try {
 				return ds.getTempDirectory();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		return "";
 	}
 
 	private SourceManager getSourceManager(String srcPath) throws OdenException {
 		RepositoryService repoSvc = repositoryProvider
 				.getRepoServiceByURI(CfgUtil.toRepoArg(srcPath));
-		if (repoSvc == null)
+		if (repoSvc == null) {
 			throw new OdenException("Invalid Repository: " + srcPath);
+		}
 		return new SourceManager(repoSvc, srcPath);
 	}
 
@@ -653,8 +687,10 @@ public class ExtDeployerImpl implements ExtDeployerService {
 		}
 		return detail;
 	}
-	
-	private CfgReturnVO executeRun(final CfgJob job, boolean isRoot) throws Exception {
+
+	@SuppressWarnings("PMD")
+	private CfgReturnVO executeRun(final CfgJob job, boolean isRoot)
+			throws Exception {
 		List<CfgTarget> targets = getTargets(job);
 
 		if (job == null || targets == null)
@@ -681,23 +717,22 @@ public class ExtDeployerImpl implements ExtDeployerService {
 					}, isRoot);
 		else
 			// 압축전송
-			j = new ExtCompressDeployJob(context, job, job.getUserId(), job
-					.getId(), targets, new CompressFileResolver() {
-				public Collection<DeployFile> compressDeployFiles()
-						throws OdenException {
-					return new SortedDeployFileSet(compPreview(job));
-				}
-			}, new DeployFileResolver() {
-				public Collection<DeployFile> resolveDeployFiles()
-						throws OdenException {
-					return new SortedDeployFileSet(preview(job));
-				}
-			});
+			j = new ExtCompressDeployJob(context, job, job.getUserId(),
+					job.getId(), targets, new CompressFileResolver() {
+						public Collection<DeployFile> compressDeployFiles()
+								throws OdenException {
+							return new SortedDeployFileSet(compPreview(job));
+						}
+					}, new DeployFileResolver() {
+						public Collection<DeployFile> resolveDeployFiles()
+								throws OdenException {
+							return new SortedDeployFileSet(preview(job));
+						}
+					});
 
 		if (job.isSync()) {
 			jobManager.syncRun(j);
 			ShortenRecord r = jobLogger.search(j.id());
-			List<CfgReturnErr> errList = new ArrayList<CfgReturnErr>();
 
 			Map<String, List<CfgReturnErr>> errs = new HashMap<String, List<CfgReturnErr>>();
 
@@ -726,13 +761,13 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 			// deploy exception option check. When true is, transaction is all
 			// or nothing
-			if (!r.isSuccess() && deployExcOpt)
+			if (!r.isSuccess() && deployExcOpt) {
 				rollback(j.id());
+			}
 
-			return new CfgReturnVO(job.getId(), j.id(), r.isSuccess(), !r
-					.isSuccess()
-					&& deployExcOpt ? "0" : String.valueOf(r.getTotal()),
-					String.valueOf(r.getnSuccess()), errs);
+			return new CfgReturnVO(job.getId(), j.id(), r.isSuccess(),
+					!r.isSuccess() && deployExcOpt ? "0" : String.valueOf(r
+							.getTotal()), String.valueOf(r.getnSuccess()), errs);
 
 		} else {
 			jobManager.schedule(j);
@@ -741,6 +776,97 @@ public class ExtDeployerImpl implements ExtDeployerService {
 
 			return new CfgReturnVO(job.getId(), j.id(), null, "0", null, null);
 		}
+	}
+
+	@SuppressWarnings("PMD")
+	private LinkedList<CfgReturnVO> executeRunBatch(
+			final LinkedList<CfgJob> jobs) throws Exception {
+
+		if (jobs.isEmpty())
+			throw new OdenException(
+					"Deploy function is not activated. Check 'jobs'");
+
+		long tm = System.currentTimeMillis();
+
+		LinkedList<Job> deployJobs = new LinkedList<Job>();
+
+		for (final CfgJob job : jobs) {
+			Job j;
+			List<CfgTarget> targets = getTargets(job);
+			if (!job.isCompress()) {
+				// 일반전송
+				j = new ExtJobDeployJob(context, job.getFileInfo(),
+						job.getUserId(), job.getId(), targets,
+						new DeployFileResolver() {
+							public Collection<DeployFile> resolveDeployFiles()
+									throws OdenException {
+								return new SortedDeployFileSet(preview(job));
+							}
+						}, false);
+			} else {
+				// 압축전송
+				j = new ExtCompressDeployJob(context, job, job.getUserId(),
+						job.getId(), targets, new CompressFileResolver() {
+							public Collection<DeployFile> compressDeployFiles()
+									throws OdenException {
+								return new SortedDeployFileSet(compPreview(job));
+							}
+						}, new DeployFileResolver() {
+							public Collection<DeployFile> resolveDeployFiles()
+									throws OdenException {
+								return new SortedDeployFileSet(preview(job));
+							}
+						});
+			}
+			deployJobs.add(j);
+		}
+
+		jobManager.batchRun(deployJobs);
+
+		LinkedList<CfgReturnVO> rtnList = new LinkedList<CfgReturnVO>();
+
+		for (Job j : deployJobs) {
+
+			ShortenRecord r = jobLogger.search(j.id());
+
+			Map<String, List<CfgReturnErr>> errs = new HashMap<String, List<CfgReturnErr>>();
+
+			Set<DeployFile> error = jobLogger.show(j.id(), "", Mode.NA, true);
+			Iterator its = error.iterator();
+
+			while (its.hasNext()) {
+				DeployFile data = (DeployFile) its.next();
+				String agentName = data.getAgent().agentName();
+				List<CfgReturnErr> fs = errs.get(agentName);
+
+				if (fs == null) {
+					fs = new ArrayList<CfgReturnErr>();
+					fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
+				} else {
+					fs.add(new CfgReturnErr(data.getPath(), data.errorLog()));
+				}
+
+				errs.put(agentName, fs);
+			}
+
+			Assert.check(r != null, "Fail to get log: " + j.id());
+
+			Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
+					+ "ms");
+
+			// deploy exception option check. When true is, transaction is all
+			// or nothing
+			if (!r.isSuccess() && deployExcOpt) {
+				rollback(j.id());
+			}
+
+			rtnList.add(new CfgReturnVO(j.id(), j.id(), r.isSuccess(), !r
+					.isSuccess() && deployExcOpt ? "0" : String.valueOf(r
+					.getTotal()), String.valueOf(r.getnSuccess()), errs));
+		}
+
+		return rtnList;
+
 	}
 
 }

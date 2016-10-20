@@ -30,6 +30,7 @@ public class ShortenRecord {
 	int nSuccess;
 	String log;
 
+	@SuppressWarnings("PMD")
 	public ShortenRecord() {
 	}
 

@@ -112,6 +112,7 @@ public class UpdateCommandImpl implements Command {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	private String absoluteLocation(String location) {
 		try {
 			new URL(location);

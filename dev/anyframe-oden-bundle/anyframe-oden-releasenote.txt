@@ -2,154 +2,179 @@ Anyframe Oden CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.5.0 (2013-04-05)
+-------------------------------------
+* PMD RuleSet ê²€ì¦ ê²°ê³¼ ì¡°ì¹˜.
+* ì¼ê´„ ë°°í¬ ê¸°ëŠ¥ì„ í†µí•œ ë©€í‹° ìŠ¤ë ˆë“œ ë°°í¬ ì²˜ë¦¬ êµ¬í˜„.
+* ë‹¤êµ­ì–´ ì²˜ë¦¬ ê¸°ëŠ¥ êµ¬í˜„.
+* ODEN Server/Agent ì¤‘ì§€ë¥¼ ìœ„í•œ Shutdown ìŠ¤í¬ë¦½íŠ¸ êµ¬í˜„.
+* ë™ì¼ ë¬¼ë¦¬ì  ì„œë²„ ë‚´ ë‹¤ìˆ˜ Agent êµ¬ë™ì— ê´€í•œ ì´ìŠˆ ì‚¬í•­ í•´ê²°.
+
+
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe-oden-bundle-core ë³€ê²½,  anyframe-oden-bundle-external ë³€ê²½,  anyframe-oden-bundle-external ë³€ê²½,  anyframe-oden-bundle-hessiansvr ë³€ê²½,  anyframe-oden-bundle-job ë³€ê²½,  anyframe-oden-bundle-job ë³€ê²½ 
+
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
+  - ê¸°ì¡´ì˜ org.apache.felix.eventadmin-1.0.0.jar íŒŒì¼ì„ org.apache.felix.eventadmin-1.2.4.jarë¡œ ë²„ì „ ë³€ê²½.
+  - ê¸°ì¡´ì˜ org.apache.felix.http.jetty-2.0.4.jar íŒŒì¼ì„ org.apache.felix.http.jetty-2.2.0.jarë¡œ ë²„ì „ ë³€ê²½.
+
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-19	PMD RuleSet ê²€ì¦ ê²°ê³¼ ì¡°ì¹˜
+ODEN-20	ë©€í‹° ìŠ¤ë ˆë“œ ë°°í¬ ì²˜ë¦¬ê¸°ëŠ¥ ì¶”ê°€
+ODEN-23	êµ­ì œí™” ì§€ì›
+ODEN-26	ODEN Server/Agent Shutdown ìŠ¤í¬ë¦½íŠ¸ ì‘ì„±
+ODEN-27	ë‹¤ ìˆ˜ê°œ Agent ê¸°ë™ì— ê´€í•œ ì´ìŠˆ ì‚¬í•­ í•´ê²°
+
+
+
 Changes in version 2.4.0 (2012-12-28)
 -------------------------------------
-* ÆÄÀÏ Àü¼Û ½Ã ¾ÏÈ£È­ ÇÏ¿© Àü¼ÛÇÏ´Â ±â´É ±¸Çö.
-* ODEN Agent ¿¡¼­ Çã¿ë µÇ´Â Server ÀÎÁõ ±â´É ±¸Çö.
+* íŒŒì¼ ì „ì†¡ ì‹œ ì•”í˜¸í™” í•˜ì—¬ ì „ì†¡í•˜ëŠ” ê¸°ëŠ¥ êµ¬í˜„.
+* ODEN Agent ì—ì„œ í—ˆìš© ë˜ëŠ” Server ì¸ì¦ ê¸°ëŠ¥ êµ¬í˜„.
 
 
-* ¼Ò½º ÄÚµå º¯°æ
-    - anyframe-oden-bundle-common º¯°æ,  anyframe-oden-bundle-core º¯°æ,  anyframe-oden-bundle-external º¯°æ,  anyframe-oden-bundle-hessiansvr º¯°æ,  anyframe-oden-bundle-http º¯°æ,  anyframe-oden-bundle-job º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe-oden-bundle-common ë³€ê²½,  anyframe-oden-bundle-core ë³€ê²½,  anyframe-oden-bundle-external ë³€ê²½,  anyframe-oden-bundle-hessiansvr ë³€ê²½,  anyframe-oden-bundle-http ë³€ê²½,  anyframe-oden-bundle-job ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
-  - icu4j-4.6.1.jar Ãß°¡.
-  - commons-logging-1.1.1.jar Ãß°¡.
-  - org.apache.servicemix.bundles.jasypt-1.7_1.jar Ãß°¡.
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
+  - icu4j-4.6.1.jar ì¶”ê°€.
+  - commons-logging-1.1.1.jar ì¶”ê°€.
+  - org.apache.servicemix.bundles.jasypt-1.7_1.jar ì¶”ê°€.
 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-15	¹èÆ÷ ÆÄÀÏ Á¤º¸ ¾ÏÈ£È­ ±â´É ±¸Çö
-ODEN-16	ODEN Agent ¿¡¼­ Çã¿ëµÇ´Â Server ÀÎÁõ ±â´É ±¸Çö
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-15	ë°°í¬ íŒŒì¼ ì •ë³´ ì•”í˜¸í™” ê¸°ëŠ¥ êµ¬í˜„
+ODEN-16	ODEN Agent ì—ì„œ í—ˆìš©ë˜ëŠ” Server ì¸ì¦ ê¸°ëŠ¥ êµ¬í˜„
 
 
 
 Changes in version 2.3.1 (2012-06-15)
 -------------------------------------
-* JDK 7 È¯°æ ±¸µ¿À» À§ÇÑ °³¼±.
-* ant ¿¬°è ½Ã Exit code ¹İÈ¯À» ÅëÇÑ ¼º°ø ¿©ºÎ È®ÀÎ ±â´É Ãß°¡.
-* ·Î±× ¸Ş¼¼Áö ³»¿ë Ãß°¡¸¦ ÅëÇÑ »ç¿ëÀÚ °¡µ¶¼º ÀÌ½´ °³¼±.
-* ¸Å´º¾ó¿¡ ¹èÆ÷ ¿É¼Ç µî¿¡ °üÇÑ ³»¿ë Ãß°¡.
+* JDK 7 í™˜ê²½ êµ¬ë™ì„ ìœ„í•œ ê°œì„ .
+* ant ì—°ê³„ ì‹œ Exit code ë°˜í™˜ì„ í†µí•œ ì„±ê³µ ì—¬ë¶€ í™•ì¸ ê¸°ëŠ¥ ì¶”ê°€.
+* ë¡œê·¸ ë©”ì„¸ì§€ ë‚´ìš© ì¶”ê°€ë¥¼ í†µí•œ ì‚¬ìš©ì ê°€ë…ì„± ì´ìŠˆ ê°œì„ .
+* ë§¤ë‰´ì–¼ì— ë°°í¬ ì˜µì…˜ ë“±ì— ê´€í•œ ë‚´ìš© ì¶”ê°€.
 
-* ¼Ò½º ÄÚµå º¯°æ
-    - anyframe-oden-bundle-core º¯°æ,  anyframe-oden-bundle-external º¯°æ,  anyframe-oden-bundle-http º¯°æ,  anyframe-oden-bundle-job º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe-oden-bundle-core ë³€ê²½,  anyframe-oden-bundle-external ë³€ê²½,  anyframe-oden-bundle-http ë³€ê²½,  anyframe-oden-bundle-job ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
-  - ±âÁ¸ÀÇ fellix(2.0.2).jar ÆÄÀÏÀ» fellix(4.0.2).jar·Î ¹öÀü º¯°æ 
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
+  - ê¸°ì¡´ì˜ fellix(2.0.2).jar íŒŒì¼ì„ fellix(4.0.2).jarë¡œ ë²„ì „ ë³€ê²½ 
 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-10	Shell Script ¸¦ ÀÌ¿ëÇÑ ¹èÆ÷ °³¼±
-ODEN-11	·Î±× ¸Ş¼¼Áö °³¼±
-ODEN-12 JDK 7 È¯°æ ÀÌ½´
-ODEN-13 ¸Å´º¾ó ¼öÁ¤
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-10	Shell Script ë¥¼ ì´ìš©í•œ ë°°í¬ ê°œì„ 
+ODEN-11	ë¡œê·¸ ë©”ì„¸ì§€ ê°œì„ 
+ODEN-12 JDK 7 í™˜ê²½ ì´ìŠˆ
+ODEN-13 ë§¤ë‰´ì–¼ ìˆ˜ì •
 
 
 
 Changes in version 2.3.0 (2012-04-10)
 -------------------------------------
-* ¾ĞÃà ¹èÆ÷ Àü¼Û ±â´É ±¸Çö.
-* Àç ¹èÆ÷ ±â´É ±¸Çö.
-* ½Ã½ºÅÛ °£ ¿¬°è¸¦ À§ÇÑ Interface ±¸Çö.
+* ì••ì¶• ë°°í¬ ì „ì†¡ ê¸°ëŠ¥ êµ¬í˜„.
+* ì¬ ë°°í¬ ê¸°ëŠ¥ êµ¬í˜„.
+* ì‹œìŠ¤í…œ ê°„ ì—°ê³„ë¥¼ ìœ„í•œ Interface êµ¬í˜„.
 
-* ¼Ò½º ÄÚµå º¯°æ
-    - anyframe-oden-bundle-job º¯°æ,  anyframe-oden-bundle º¯°æ,  anyframe-oden-bundle-hessiancli º¯°æ,  anyframe-oden-bundle-core º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe-oden-bundle-job ë³€ê²½,  anyframe-oden-bundle ë³€ê²½,  anyframe-oden-bundle-hessiancli ë³€ê²½,  anyframe-oden-bundle-core ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
   - N/A.
 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-7	ODEN ID Áßº¹ ¹ß»ı ¹®Á¦
-ODEN-8	¹èÆ÷ ¿øº¹ ½Ã ¼Óµµ ÀúÇÏ ¹®Á¦
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-7	ODEN ID ì¤‘ë³µ ë°œìƒ ë¬¸ì œ
+ODEN-8	ë°°í¬ ì›ë³µ ì‹œ ì†ë„ ì €í•˜ ë¬¸ì œ
 
 
 
 Changes in version 2.2.0 (2011-06-30)
 -------------------------------------
-* ¹èÆ÷ ¿øº¹ ±â´É ±¸Çö.
-* ¹èÆ÷ ¿À·ù ¿É¼Ç Ãß°¡.
-* ÆĞÅ°Áö ±¸Á¶ º¯°æ(anyframe- --> org.anyframe.-).
+* ë°°í¬ ì›ë³µ ê¸°ëŠ¥ êµ¬í˜„.
+* ë°°í¬ ì˜¤ë¥˜ ì˜µì…˜ ì¶”ê°€.
+* íŒ¨í‚¤ì§€ êµ¬ì¡° ë³€ê²½(anyframe- --> org.anyframe.-).
 
-* ¼Ò½º ÄÚµå º¯°æ
-    - anyframe-oden-admin,  anyframe-oden-bundle-job º¯°æ,  anyframe-oden-bundle-hessiansvr º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe-oden-admin,  anyframe-oden-bundle-job ë³€ê²½,  anyframe-oden-bundle-hessiansvr ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
   - N/A.
 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
   - N/A.
  
 
 
 Changes in version 2.1.0 (2010-12-21)
 -------------------------------------
-* »ç¿ëÀÚ °ü¸® ¹× ±ÇÇÑ°ü¸® ±¸Çö.
-* ¹èÆ÷ ÈÄ Æ¯Á¤ ½ºÅ©¸³Æ®¸¦ ±¸µ¿ÇÒ ¼ö ÀÖÀ½.
-* Anyframe IAM ±â¹İ À¸·Î Secutiry °ü·Ã ¼³Á¤.
-* »ç¿ë °èÁ¤¿¡ µû¸¥ ¹èÆ÷ ÀÌ·Â ÃßÀû ±â´É ±¸Çö.
+* ì‚¬ìš©ì ê´€ë¦¬ ë° ê¶Œí•œê´€ë¦¬ êµ¬í˜„.
+* ë°°í¬ í›„ íŠ¹ì • ìŠ¤í¬ë¦½íŠ¸ë¥¼ êµ¬ë™í•  ìˆ˜ ìˆìŒ.
+* Anyframe IAM ê¸°ë°˜ ìœ¼ë¡œ Secutiry ê´€ë ¨ ì„¤ì •.
+* ì‚¬ìš© ê³„ì •ì— ë”°ë¥¸ ë°°í¬ ì´ë ¥ ì¶”ì  ê¸°ëŠ¥ êµ¬í˜„.
 
-* ¼Ò½º ÄÚµå º¯°æ
-    - anyframe.oden.bundle.ent.http,  anyframe.oden.admin º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+    - anyframe.oden.bundle.ent.http,  anyframe.oden.admin ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
-  - spring-3.0.4. °ü·Ã jar Ãß°¡.
-  - Anyframe IAM °ü·Ã jar Ãß°¡.
-  - Anyframe.query-4.5.2.jar Ãß°¡.
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
+  - spring-3.0.4. ê´€ë ¨ jar ì¶”ê°€.
+  - Anyframe IAM ê´€ë ¨ jar ì¶”ê°€.
+  - Anyframe.query-4.5.2.jar ì¶”ê°€.
 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-412	Bug fix ÇÑ±Û encoding ¹®Á¦
-ODEN-413	IAMÀ» Àû¿ëÇÏ¿© °èÁ¤°ü¸®¿Í ±ÇÇÑ °ü¸®°¡ °¡´ÉÇÏµµ·Ï Á¶Ä¡
-ODEN-414	¹èÆ÷ ÈÄ ½ºÅ©¸³Æ® µ¿ÀÛ
-ODEN-415	Histoy ¹× Job °ü¸® È­¸é ±ÇÇÑ °ü¸® Á¶Ä¡
-ODEN-416	User ±ÇÇÑ Á¦¾î È­¸é ±¸Çö
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-412	Bug fix í•œê¸€ encoding ë¬¸ì œ
+ODEN-413	IAMì„ ì ìš©í•˜ì—¬ ê³„ì •ê´€ë¦¬ì™€ ê¶Œí•œ ê´€ë¦¬ê°€ ê°€ëŠ¥í•˜ë„ë¡ ì¡°ì¹˜
+ODEN-414	ë°°í¬ í›„ ìŠ¤í¬ë¦½íŠ¸ ë™ì‘
+ODEN-415	Histoy ë° Job ê´€ë¦¬ í™”ë©´ ê¶Œí•œ ê´€ë¦¬ ì¡°ì¹˜
+ODEN-416	User ê¶Œí•œ ì œì–´ í™”ë©´ êµ¬í˜„
 
 
 
 Changes in version 2.0.0 (2010-09-29)
 -------------------------------------
-* ¹èÆ÷ ¼³Á¤ÀÌ task¿Í policy°¡ ¾Æ´Ñ jobÀÌ¶ó´Â ÇüÅÂ·Î xml¿¡ ÀúÀåµÊ.
-* ¹èÆ÷ ÀÌ·ÂÀ» ´õ ÀÌ»ó ÆÄÀÏ¿¡ ÀúÀåÇÏÁö ¾ÊÀ½. DB»ç¿ë.
-* ¹èÆ÷µÈ ÆÄÀÏ Áß ¿øº»¿¡ ¾ø´Â ÆÄÀÏµéÀ» °¨ÁöÇÏ¿© »èÁ¦ÇÒ ¼ö ÀÖÀ½.
-* antÀÇ incremental ºôµå¸¦ »ç¿ëÇÏÁö ¾Ê°íµµ º¯°æµÈ ÆÄÀÏ °¨Áö °¡´É.
-* ¹èÆ÷ ¸ñ·Ï ÃßÃâ ¼Óµµ°¡ ºñ¾àÀûÀ¸·Î Çâ»óµÊ(ºĞ´ÜÀ§¿¡¼­ ÃÊ´ÜÀ§·Î)
-* ±â Á¦°øµÇ´ø ÃÖ½Å¹èÆ÷ Ãë¼Ò ±â´É, Àç¹èÆ÷ ±â´É, ¹é¾÷ ±â´É ¹Ì ±¸Çö.
-* »õ ¸í·É¾î Ãß°¡(job, deploy, log, exec)
+* ë°°í¬ ì„¤ì •ì´ taskì™€ policyê°€ ì•„ë‹Œ jobì´ë¼ëŠ” í˜•íƒœë¡œ xmlì— ì €ì¥ë¨.
+* ë°°í¬ ì´ë ¥ì„ ë” ì´ìƒ íŒŒì¼ì— ì €ì¥í•˜ì§€ ì•ŠìŒ. DBì‚¬ìš©.
+* ë°°í¬ëœ íŒŒì¼ ì¤‘ ì›ë³¸ì— ì—†ëŠ” íŒŒì¼ë“¤ì„ ê°ì§€í•˜ì—¬ ì‚­ì œí•  ìˆ˜ ìˆìŒ.
+* antì˜ incremental ë¹Œë“œë¥¼ ì‚¬ìš©í•˜ì§€ ì•Šê³ ë„ ë³€ê²½ëœ íŒŒì¼ ê°ì§€ ê°€ëŠ¥.
+* ë°°í¬ ëª©ë¡ ì¶”ì¶œ ì†ë„ê°€ ë¹„ì•½ì ìœ¼ë¡œ í–¥ìƒë¨(ë¶„ë‹¨ìœ„ì—ì„œ ì´ˆë‹¨ìœ„ë¡œ)
+* ê¸° ì œê³µë˜ë˜ ìµœì‹ ë°°í¬ ì·¨ì†Œ ê¸°ëŠ¥, ì¬ë°°í¬ ê¸°ëŠ¥, ë°±ì—… ê¸°ëŠ¥ ë¯¸ êµ¬í˜„.
+* ìƒˆ ëª…ë ¹ì–´ ì¶”ê°€(job, deploy, log, exec)
 
-* ¼Ò½º ÄÚµå º¯°æ
-  - anyframe.oden.bundle.job Ãß°¡. 
-  - anyframe.oden.bundle.ent.misc »èÁ¦. anyframe.oden.bundle.ent.repository »èÁ¦. anyframe.oden.bundle.ent.snapshot »èÁ¦.
-  - anyframe.common.bundle.gate, anyframe.oden.bundle, anyframe.oden.bundle.common, anyframe.oden.bundle.core, anyframe.oden.bundle.hessiansvr º¯°æ 
+* ì†ŒìŠ¤ ì½”ë“œ ë³€ê²½
+  - anyframe.oden.bundle.job ì¶”ê°€. 
+  - anyframe.oden.bundle.ent.misc ì‚­ì œ. anyframe.oden.bundle.ent.repository ì‚­ì œ. anyframe.oden.bundle.ent.snapshot ì‚­ì œ.
+  - anyframe.common.bundle.gate, anyframe.oden.bundle, anyframe.oden.bundle.common, anyframe.oden.bundle.core, anyframe.oden.bundle.hessiansvr ë³€ê²½ 
 
-* ÂüÁ¶ ¶óÀÌºê·¯¸® º¯°æ
-  - berkelydb-4.0.103.jar Ãß°¡. 
+* ì°¸ì¡° ë¼ì´ë¸ŒëŸ¬ë¦¬ ë³€ê²½
+  - berkelydb-4.0.103.jar ì¶”ê°€. 
 
-* Ãß°¡µÈ ±â´É 
-  - »õ ¸í·É¾î Ãß°¡
+* ì¶”ê°€ëœ ê¸°ëŠ¥ 
+  - ìƒˆ ëª…ë ¹ì–´ ì¶”ê°€
     . job info, job compare, job mapping-scan
     . deploy test, deploy run
   	. log show, log search, log error
   	. exec run
   	 
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-397	incremental build¾ø´Â update±â´É
-ODEN-388	group compare ½ºÄÉÁì¸µ ¾øÀÌ ¹Ù·Î
-ODEN-384	exec ¸í·É¾î Ãß°¡
-ODEN-380	logÁ¶È¸ ¸í·É¾î Ãß°¡
-ODEN-379	history ¸í·É¾î º¯°æ
-ODEN-378	deploy ¸í·É¾î Ãß°¡
-ODEN-377	group ¸í·É¾î Ãß°¡
-ODEN-325	Jetty SecureRandom°ü·Ã ÀÌ½´ ¹İ¿µ
-ODEN-343	task ¸í·É¾î ÅëÇÑ ÆÄÀÏ »èÁ¦½Ã Æú´õ »èÁ¦ ¾ÈµÊ
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-397	incremental buildì—†ëŠ” updateê¸°ëŠ¥
+ODEN-388	group compare ìŠ¤ì¼€ì¥´ë§ ì—†ì´ ë°”ë¡œ
+ODEN-384	exec ëª…ë ¹ì–´ ì¶”ê°€
+ODEN-380	logì¡°íšŒ ëª…ë ¹ì–´ ì¶”ê°€
+ODEN-379	history ëª…ë ¹ì–´ ë³€ê²½
+ODEN-378	deploy ëª…ë ¹ì–´ ì¶”ê°€
+ODEN-377	group ëª…ë ¹ì–´ ì¶”ê°€
+ODEN-325	Jetty SecureRandomê´€ë ¨ ì´ìŠˆ ë°˜ì˜
+ODEN-343	task ëª…ë ¹ì–´ í†µí•œ íŒŒì¼ ì‚­ì œì‹œ í´ë” ì‚­ì œ ì•ˆë¨
  
 
 
 Changes in version 1.3.0 (2010-07-09)
 -------------------------------------
-* ÇØ°áµÈ ÀÌ½´ ¸ñ·Ï
-ODEN-338 	FIXED		history info½Ã ÃÖ±Ù²¬·Î
-ODEN-342 	FIXED 		server, agent ÇÏ³ª·Î ¹èÆ÷
-ODEN-341 	FIXED 		»ó ´ë°æ·Î Áö¿ø 	
-ODEN-339 	FIXED		ÇÏ ³ªÀÇ ¹°¸®Àûagent¸¦ ¿©·¯°³ ³í¸®Àûagent·Î ºĞ¸®½Ã compare¹®Á¦ 
-ODEN-300 	FIXED		Ä¿ ¸Çµå¶óÀÎ¿¡¼­ ¸í·É¾î ½ÇÇà½Ã °èÁ¤¼³Á¤ °³¼±.. 	
-ODEN-316 	FIXED		ant ¿¬°è±â´É Á¦°ø  
-task, policy ÇÑ¹ø¿¡ Ãß°¡ÇÒ ¼ö ÀÖ´Â ¸í·É¾î Á¦°ø
-Ä¿¸Çµå¶óÀÎÀ¸·Î Oden¸í·É ½ÇÇàÅä·Ï..
-Enterprise¹öÀü Á¦°Å ¹× ÀÏºÎ±â´É Community·Î ¿ÀÇÂ 
+* í•´ê²°ëœ ì´ìŠˆ ëª©ë¡
+ODEN-338 	FIXED		history infoì‹œ ìµœê·¼ê»„ë¡œ
+ODEN-342 	FIXED 		server, agent í•˜ë‚˜ë¡œ ë°°í¬
+ODEN-341 	FIXED 		ìƒ ëŒ€ê²½ë¡œ ì§€ì› 	
+ODEN-339 	FIXED		í•˜ ë‚˜ì˜ ë¬¼ë¦¬ì agentë¥¼ ì—¬ëŸ¬ê°œ ë…¼ë¦¬ì agentë¡œ ë¶„ë¦¬ì‹œ compareë¬¸ì œ 
+ODEN-300 	FIXED		ì»¤ ë§¨ë“œë¼ì¸ì—ì„œ ëª…ë ¹ì–´ ì‹¤í–‰ì‹œ ê³„ì •ì„¤ì • ê°œì„ .. 	
+ODEN-316 	FIXED		ant ì—°ê³„ê¸°ëŠ¥ ì œê³µ  
+task, policy í•œë²ˆì— ì¶”ê°€í•  ìˆ˜ ìˆëŠ” ëª…ë ¹ì–´ ì œê³µ
+ì»¤ë§¨ë“œë¼ì¸ìœ¼ë¡œ Odenëª…ë ¹ ì‹¤í–‰í† ë¡..
+Enterpriseë²„ì „ ì œê±° ë° ì¼ë¶€ê¸°ëŠ¥ Communityë¡œ ì˜¤í”ˆ 
 

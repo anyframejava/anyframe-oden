@@ -28,6 +28,7 @@ import org.anyframe.oden.bundle.common.FileUtil;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class DeployerUtils {
 	private static int MAX_UNDO;
 
@@ -51,8 +52,9 @@ public class DeployerUtils {
 			// FileUtil.copy(new File(parentPath, filePath), destFile);
 			FileUtil.touchcopy(new File(parentPath, filePath), destFile);
 		} catch (IOException e) {
-			if (destFile != null && created)
+			if (destFile != null && created) {
 				destFile.delete();
+			}
 			throw e;
 		}
 	}
@@ -73,12 +75,14 @@ public class DeployerUtils {
 			String bakPath, int backupcnt) throws IOException {
 		MAX_UNDO = backupcnt;
 
-		if (bakPath == null)
+		if (bakPath == null) {
 			return new File(parentPath, filePath).exists();
+		}
 
 		if (!new File(parentPath, filePath).exists()
-				|| !new File(bakPath).isAbsolute())
+				|| !new File(bakPath).isAbsolute()) {
 			return false;
+		}
 
 		removeOldUndos(new File(bakPath).getParent());
 		copy(parentPath, filePath, bakPath);
@@ -90,6 +94,7 @@ public class DeployerUtils {
 	 * 
 	 * @param bakDir
 	 */
+	@SuppressWarnings("PMD")
 	public static void removeOldUndos(String bakDir) {
 		File bak = new File(bakDir);
 		if (!bak.exists() || !bak.isDirectory())

@@ -40,7 +40,8 @@ public class Assert {
 	 * @throws OdenException
 	 */
 	public static void check(boolean must, String msg) throws OdenException {
-		if (!must)
+		if (!must) {
 			throw new OdenException(msg);
+		}
 	}
 }

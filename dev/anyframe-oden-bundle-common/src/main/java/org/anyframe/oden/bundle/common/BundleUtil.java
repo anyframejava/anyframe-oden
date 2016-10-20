@@ -32,8 +32,9 @@ import org.osgi.framework.ServiceReference;
 public class BundleUtil {
 	public static Object getService(BundleContext ctx, Class clz) {
 		List<Object> svcs = getServices(ctx, clz);
-		if (svcs.size() == 0)
+		if (svcs.isEmpty()) {
 			return null;
+		}
 		return svcs.get(0);
 	}
 
@@ -49,8 +50,9 @@ public class BundleUtil {
 			ServiceReference[] refs = ctx.getServiceReferences(clz.getName(),
 					null);
 			List<Object> svcs = new ArrayList<Object>();
-			for (int i = 0; i < refs.length; i++)
+			for (int i = 0; i < refs.length; i++) {
 				svcs.add(ctx.getService(refs[i]));
+			}
 			return svcs;
 		} catch (Throwable t) {
 		}

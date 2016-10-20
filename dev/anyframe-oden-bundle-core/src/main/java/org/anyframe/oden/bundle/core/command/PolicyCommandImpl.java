@@ -89,6 +89,7 @@ public class PolicyCommandImpl extends OdenCommand {
 		this.txmitterService = tx;
 	}
 
+	@SuppressWarnings("PMD")
 	public PolicyCommandImpl() {
 	}
 
@@ -110,9 +111,10 @@ public class PolicyCommandImpl extends OdenCommand {
 				String policyName = cmd.getActionArg();
 				if (policyName.length() > 0) {
 					ja = doInfoActionJ(policyName);
-					if (ja.length() == 0)
+					if (ja.length() == 0) {
 						throw new OdenException("Couldn't find a policy: "
 								+ policyName);
+					}
 				} else {
 					ja = doListActionJ();
 				}
@@ -128,10 +130,10 @@ public class PolicyCommandImpl extends OdenCommand {
 			} else if (Cmd.REMOVE_ACTION.equals(action)) {
 				if (cmd.getActionArg().length() > 0) {
 					String policyName = cmd.getActionArg();
-					if (policyInfo(policyName).length() == 0)
+					if (policyInfo(policyName).length() == 0) {
 						throw new OdenException("Couldn't find a policy: "
 								+ cmd.getActionArg());
-					else {
+					} else {
 						removePolicy(policyName);
 						consoleResult = cmd.getActionArg() + " is removed.";
 					}
@@ -139,8 +141,9 @@ public class PolicyCommandImpl extends OdenCommand {
 					throw new OdenException("Couldn't execute command.");
 				}
 			} else if (TEST_ACTION.equals(action)) {
-				if (cmd.getActionArg().length() <= 1)
+				if (cmd.getActionArg().length() <= 1) {
 					throw new OdenException("Couldn't execute command.");
+				}
 
 				String policyName = cmd.getActionArg();
 				Set<DeployFile> dfiles = doTestAction(policyName);
@@ -163,12 +166,13 @@ public class PolicyCommandImpl extends OdenCommand {
 						+ action);
 			}
 
-			if (isJSON)
+			if (isJSON) {
 				out.println(ja.toString());
-			else if (consoleResult.length() > 0)
+			} else if (consoleResult.length() > 0) {
 				out.println(consoleResult);
-			else
+			} else {
 				out.println(JSONUtil.toString(ja));
+			}
 
 		} catch (OdenException e) {
 			if (isJSON) {
@@ -192,6 +196,7 @@ public class PolicyCommandImpl extends OdenCommand {
 		getPrefs().remove(policyName);
 	}
 
+	@SuppressWarnings("PMD")
 	public void addPolicy(String policyName, String args) throws OdenException {
 		Cmd policyInfo = new Cmd("c a \"" + policyName + "\" " + args);
 
@@ -207,23 +212,25 @@ public class PolicyCommandImpl extends OdenCommand {
 		String[] repos = policyInfo
 				.getOptionArgArray(PolicyCommandImpl.REPO_OPT);
 		if (repos.length == 0
-				&& policyInfo.getOption(PolicyCommandImpl.DELETE_OPT) == null)
+				&& policyInfo.getOption(PolicyCommandImpl.DELETE_OPT) == null) {
 			throw new OdenException("-repo or -del option is required.");
-		if (repos.length > 0 && !repositoryProvider.availableRepository(repos))
+		}
+		if (repos.length > 0 && !repositoryProvider.availableRepository(repos)) {
 			throw new OdenException("Invalid repository arguments: "
 					+ policyInfo.getOption(PolicyCommandImpl.REPO_OPT)
 							.toString());
+		}
 
 		getPrefs().put(policyName, args);
 	}
 
-	private void validateDestination(String[] destargs) throws OdenException {
-		for (String destarg : destargs) {
-			AgentLoc agent = new AgentLoc(destarg, configService);
-			if (txmitterService.getDeployer(agent.agentAddr()) == null)
-				throw new OdenException("Couldn't access the agent: " + destarg);
-		}
-	}
+//	private void validateDestination(String[] destargs) throws OdenException {
+//		for (String destarg : destargs) {
+//			AgentLoc agent = new AgentLoc(destarg, configService);
+//			if (txmitterService.getDeployer(agent.agentAddr()) == null)
+//				throw new OdenException("Couldn't access the agent: " + destarg);
+//		}
+//	}
 
 	private void availableRepository(Repository repo) throws OdenException {
 		try {
@@ -241,14 +248,16 @@ public class PolicyCommandImpl extends OdenCommand {
 		JSONArray arr = new JSONArray();
 		try {
 			String info = getPrefs().get(policyName);
-			if (info.length() > 0)
+			if (info.length() > 0) {
 				arr.put(new JSONObject().put(policyName, info));
+			}
 		} catch (JSONException e) {
 			return null;
 		}
 		return arr;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private JSONArray doListActionJ() throws OdenException, JSONException {
 		JSONArray arr = new JSONArray();
 		for (String name : getPrefs().keys()) {
@@ -259,6 +268,7 @@ public class PolicyCommandImpl extends OdenCommand {
 		return arr;
 	}
 
+	@SuppressWarnings("PMD")
 	public void preview(Set<DeployFile> dfiles, Cmd policyInfo)
 			throws OdenException {
 		Repository repo = new Repository(
@@ -271,15 +281,17 @@ public class PolicyCommandImpl extends OdenCommand {
 		List<String> dests = policyInfo
 				.getOptionArgList(PolicyCommandImpl.DEST_OPT);
 		boolean del = policyInfo.getOption(PolicyCommandImpl.DELETE_OPT) != null;
-		if (includes.size() < 1 || dests.size() < 1)
+		if (includes.size() < 1 || dests.size() < 1) {
 			throw new OdenParseException(policyInfo.toString());
+		}
 
 		resolveDests(dests);
 		Set<AgentLoc> agents = new HashSet<AgentLoc>();
 		for (String destargs : dests) {
 			AgentLoc ra = new AgentLoc(destargs, configService);
-			if (!agents.contains(ra))
+			if (!agents.contains(ra)) {
 				agents.add(ra);
+			}
 		}
 
 		if (del) {
@@ -293,9 +305,9 @@ public class PolicyCommandImpl extends OdenCommand {
 	}
 
 	private void resolveDests(List<String> dests) throws OdenException {
-		if (dests.size() != 1 || !dests.get(0).startsWith("*:"))
+		if (dests.size() != 1 || !dests.get(0).startsWith("*:")) {
 			return;
-
+		}	
 		final String loc = dests.remove(0).substring(2);
 		for (String agent : configService.getAgentNames()) {
 			dests.add(agent + ":" + loc);
@@ -308,16 +320,18 @@ public class PolicyCommandImpl extends OdenCommand {
 			try {
 				DeployerService ds = txmitterService.getDeployer(agent
 						.agentAddr());
-				if (ds == null)
+				if (ds == null) {
 					throw new OdenException("Couldn't connect to the agent: "
 							+ agent.agentName() + "(" + agent.agentAddr() + ")");
+				}
 
 				List<String> fs = ds.resolveFileRegex(agent.location(),
 						includes, excludes);
 				for (String path : fs) {
 					FileInfo f = ds.fileInfo(agent.location(), path);
-					if (!ds.writable(agent.location(), path))
+					if (!ds.writable(agent.location(), path)) {
 						throw new OdenException("Not writable file.");
+					}
 					DeployFileUtil.updateDeployFiles(dfiles, DeployFileUtil
 							.beRemovedFile(agent, path, f.size(),
 									f.lastModified()));
@@ -332,7 +346,8 @@ public class PolicyCommandImpl extends OdenCommand {
 			}
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private void preview(Set<DeployFile> dfiles, Repository repo,
 			List<String> includes, List<String> excludes, boolean update,
 			Set<AgentLoc> agents) throws OdenException {
@@ -420,8 +435,9 @@ public class PolicyCommandImpl extends OdenCommand {
 				}
 			} finally {
 				try {
-					if (in != null)
+					if (in != null) {
 						in.close();
+					}
 				} catch (IOException e) {
 				}
 			}
@@ -436,23 +452,23 @@ public class PolicyCommandImpl extends OdenCommand {
 		return dfiles;
 	}
 
-	private String formatTest(JSONArray ja) throws JSONException {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < ja.length(); i++) {
-			JSONObject repos = ja.getJSONObject(i);
-			for (Iterator<String> it = repos.keys(); it.hasNext();) {
-				String repo = it.next();
-				buf.append("REPOSITORY: " + repo + "\nFILES:\n");
-				JSONObject files = repos.getJSONObject(repo);
-				for (Iterator<String> it2 = files.keys(); it2.hasNext();) {
-					String file = it2.next();
-					buf.append("\t" + file + " >> "
-							+ JSONUtil.toString(files.getJSONArray(file)));
-				}
-			}
-		}
-		return buf.toString();
-	}
+//	private String formatTest(JSONArray ja) throws JSONException {
+//		StringBuffer buf = new StringBuffer();
+//		for (int i = 0; i < ja.length(); i++) {
+//			JSONObject repos = ja.getJSONObject(i);
+//			for (Iterator<String> it = repos.keys(); it.hasNext();) {
+//				String repo = it.next();
+//				buf.append("REPOSITORY: " + repo + "\nFILES:\n");
+//				JSONObject files = repos.getJSONObject(repo);
+//				for (Iterator<String> it2 = files.keys(); it2.hasNext();) {
+//					String file = it2.next();
+//					buf.append("\t" + file + " >> "
+//							+ JSONUtil.toString(files.getJSONArray(file)));
+//				}
+//			}
+//		}
+//		return buf.toString();
+//	}
 
 	public String getName() {
 		return "policy";
@@ -484,11 +500,13 @@ public class PolicyCommandImpl extends OdenCommand {
 		for (Iterator<String> it = repositoryProvider.getRepositoryUsages()
 				.iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");
-			if (it.hasNext())
+			if (it.hasNext()) {
 				usages.append(" | ");
+			}
 		}
-		if (usages.length() == 0)
+		if (usages.length() == 0) {
 			throw new OdenException("Couldn't find any repository services.");
+		}
 		return usages.toString();
 	}
 

@@ -28,6 +28,7 @@ import java.net.URLConnection;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ShellServletTest {
 	private final static String SHELL_URL = "http://localhost:9860/shell";
 	public final static String KNOWN_EXCEPTION = "KnownException";

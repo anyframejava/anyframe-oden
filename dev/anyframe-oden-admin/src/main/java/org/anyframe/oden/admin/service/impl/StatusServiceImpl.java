@@ -18,9 +18,8 @@ package org.anyframe.oden.admin.service.impl;
 import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.domain.Status;
 import org.anyframe.oden.admin.service.StatusService;
+import org.anyframe.pagination.Page;
 import org.springframework.stereotype.Service;
-
-import anyframe.common.Page;
 
 /**
  * This is StatusServiceImpl Class
@@ -30,7 +29,7 @@ import anyframe.common.Page;
 @Service("statusService")
 public class StatusServiceImpl implements StatusService {
 
-	private OdenCommonDao<Status> odenCommonDao = new OdenCommonDao<Status>();
+	private final OdenCommonDao<Status> odenCommonDao = new OdenCommonDao<Status>();
 
 	/**
 	 * Method for getting job list in progess.

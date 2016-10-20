@@ -16,13 +16,18 @@
 package org.anyframe.oden.bundle.hessiansvr;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.anyframe.oden.bundle.common.FileUtil;
+import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.deploy.DoneFileInfo;
 
 /**
@@ -39,10 +44,22 @@ public class DeployOutputStream {
 	private File tmpfile;
 	private long date;
 	boolean isUpdated = false;
+	private Map<String, String> ownerShip = new HashMap<String, String>();
+
+	public Map<String, String> getOwnerShip() {
+		return ownerShip;
+	}
 
 	public DeployOutputStream(String parent, String path, long date)
 			throws IOException {
 		this(parent, path, date, true);
+	}
+
+	public DeployOutputStream(String parent, String path, long date,
+			boolean useTmp, Map<String, String> ownerShip) throws IOException {
+		this(parent, path, date, useTmp);
+
+		this.ownerShip = ownerShip;
 	}
 
 	boolean useTmp = true;
@@ -59,22 +76,25 @@ public class DeployOutputStream {
 						String.valueOf(System.currentTimeMillis()));
 			} else {
 				tmpfile = new File(parentPath, filePath);
-				if (tmpfile.exists())
+				if (tmpfile.exists()) {
 					isUpdated = true;
-				else
+				} else {
 					FileUtil.mkdirs(tmpfile);
+				}
 			}
 			this.date = date;
 
 			this.out = new BufferedOutputStream(new FileOutputStream(tmpfile));
 		} catch (IOException e) {
 			try {
-				if (out != null)
+				if (out != null) {
 					out.close();
+				}
 			} catch (IOException e2) {
 			}
-			if (tmpfile != null && useTmp)
+			if (tmpfile != null && useTmp) {
 				tmpfile.delete();
+			}
 			throw e;
 		}
 	}
@@ -111,20 +131,24 @@ public class DeployOutputStream {
 	 * @throws IOException
 	 */
 	public DoneFileInfo close(List<String> updatefiles, String bakdir,
-			int backupcnt) throws IOException {
+			int backupcnt) throws Exception {
 		try {
-			if (this.out != null)
+			if (this.out != null) {
 				this.out.close();
+			}
 			// tmpfile can have 0 size cause File.createTempFile method.
-			if (tmpfile == null || !tmpfile.exists())
+			if (tmpfile == null || !tmpfile.exists()) {
 				throw new IOException("Fail to transfer file: " + filePath);
-			if (date > -1)
+			}
+			if (date > -1) {
 				tmpfile.setLastModified(date);
+			}
 
-			if (!useTmp)
+			if (!useTmp) {
 				return new DoneFileInfo(filePath, false,
 						tmpfile.lastModified(), tmpfile.length(), isUpdated,
 						true);
+			}
 
 			File destfile = new File(parentPath, filePath);
 
@@ -142,11 +166,40 @@ public class DeployOutputStream {
 			} else {
 				FileUtil.copy(tmpfile, destfile);
 			}
+			// set chown
+			Process p;
+			boolean isWin = System.getProperty("os.name").startsWith("Windows");
+
+			if (!ownerShip.isEmpty()) {
+				if (isWin) {
+					p = Runtime.getRuntime().exec(
+							new String[] {
+									"cmd",
+									"/c",
+									"subinacl /onlyfile " + parentPath
+											+ File.separator + filePath + " "
+											+ "/setowner="
+											+ ownerShip.get("owner") });
+
+				} else {
+					p = Runtime.getRuntime().exec(
+							"chown " + ownerShip.get("owner") + ":"
+									+ ownerShip.get("group") + " " + parentPath
+									+ File.separator + filePath);
+				}
+				int exitValue = p.waitFor();
+				if (exitValue != 0) {
+					throw new OdenException(
+							"Fail to get diretory's imformation:" + parentPath);
+				}
+			}
+
 			return new DoneFileInfo(filePath, false, destfile.lastModified(),
 					destfile.length(), isUpdated, true);
 		} finally {
-			if (tmpfile != null && useTmp)
+			if (tmpfile != null && useTmp) {
 				tmpfile.delete();
+			}
 		}
 	}
 

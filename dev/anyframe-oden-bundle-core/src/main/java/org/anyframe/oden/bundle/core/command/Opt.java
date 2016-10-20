@@ -24,6 +24,7 @@ import java.util.List;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class Opt {
 
 	protected String name = "";
@@ -37,8 +38,9 @@ public class Opt {
 	public Opt(String sOpt) {
 		String[] sArgs = CommandUtil.split(sOpt);
 		name = sArgs[0];
-		for (int i = 1; i < sArgs.length; i++)
+		for (int i = 1; i < sArgs.length; i++) {
 			args.add(sArgs[i]);
+		}
 	}
 
 	public String getName() {
@@ -47,8 +49,9 @@ public class Opt {
 
 	public List<String> getArgList() {
 		List<String> list = new ArrayList<String>();
-		for (String s : args)
+		for (String s : args) {
 			list.add(s);
+		}
 		return list;
 	}
 

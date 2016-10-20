@@ -40,11 +40,12 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 @RequestMapping("/excel.do")
+@SuppressWarnings("PMD")
 public class ExcelDownloadController {
 	@Resource
-	private HistoryService historyService = null;
+	private HistoryService historyService;
 	@Resource
-	private JobService jobService = null;
+	private JobService jobService;
 
 	@RequestMapping(params = "method=history")
 	public void export2excelHistory(@RequestParam("cmd") String cmd,
@@ -67,6 +68,7 @@ public class ExcelDownloadController {
 		row0.createCell(4).setCellValue(new HSSFRichTextString("USER ID"));
 
 		int irow = 1;
+		
 		for (Log p : logs) {
 			HSSFRow row = sheet.createRow(irow++);
 

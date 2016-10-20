@@ -15,7 +15,7 @@
  */
 package org.anyframe.oden.admin.service;
 
-import anyframe.common.Page;
+import org.anyframe.pagination.Page;
 
 /**
  * This is ServerService Interface

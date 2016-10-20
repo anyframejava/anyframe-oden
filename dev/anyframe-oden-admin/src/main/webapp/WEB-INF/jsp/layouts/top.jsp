@@ -6,7 +6,7 @@
 <title>Welcome to Oden</title>
 <script type="text/javascript">
 function fncLogOut() {
-	if(confirm('<anyframe:message code="top.confirm.logout"/>')) {
+	if(confirm('<spring:message code="top.confirm.logout"/>')) {
 		document.logoutForm.target="_top";
 	    //document.logoutForm.action="<c:url value='/logout.do'/>";
 	    document.logoutForm.action="<c:url value='/j_spring_security_logout'/>";
@@ -37,7 +37,7 @@ margin:0;
 			<td height="30" colspan="2" align="right">
 				<table width="400" border="0" cellpadding="0" cellspacing="0">
 					<tr> 
-						<td align="right" style="padding-right:8px">Welcome to <%= session.getAttribute("userid") %> ~ !!!</td>
+						<td align="right" style="padding-right:8px"><spring:message code="top.welcome.user"/> <%= session.getAttribute("userid") %> ~ !!!</td>
 						<td width="62" colspan="2" align="right" style="padding-right:18px">
 						<a href="javascript:fncLogOut();"> 
 						<img src="<c:url value='/images/btn_logout.gif'/>" alt="로그아웃" width="63" height="15" border="0" /></a></td>

@@ -54,6 +54,7 @@ public class JobConfigImpl implements JobConfigService {
 		this.CONFIG_FILE = new File(BundleUtil.odenHome(), "conf/jobs.xml");
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized void addJob(CfgJob job) throws Exception {
 		parse();
 
@@ -62,8 +63,9 @@ public class JobConfigImpl implements JobConfigService {
 
 		// source
 		CfgSource source = job.getSource();
-		if (source == null)
+		if (source == null) {
 			throw new Exception("source is required.");
+		}
 		gnode.appendChild(createSourceNode(source));
 
 		// targets
@@ -91,11 +93,13 @@ public class JobConfigImpl implements JobConfigService {
 		NodeList childs = root.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node node = childs.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+			}
 			Element job = (Element) node;
-			if (name.equals(job.getAttribute("name")))
+			if (name.equals(job.getAttribute("name"))) {
 				return job;
+			}
 		}
 		return null;
 	}
@@ -119,9 +123,10 @@ public class JobConfigImpl implements JobConfigService {
 	private Element createSourceNode(CfgSource source) throws Exception {
 		Element srcnode = doc.createElement("source");
 		srcnode.setAttribute("dir", notNull(source.getPath()));
-		if (source.getExcludes().size() != 0)
+		if (source.getExcludes().size() != 0) {
 			srcnode.setAttribute("excludes",
 					StringUtil.collectionToString(source.getExcludes()));
+		}
 
 		for (CfgMapping mapping : source.getMappings()) {
 			Element subnode = doc.createElement("mapping");
@@ -136,6 +141,7 @@ public class JobConfigImpl implements JobConfigService {
 		return s == null ? "" : s;
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized void removeJob(String name) throws Exception {
 		parse();
 
@@ -156,6 +162,7 @@ public class JobConfigImpl implements JobConfigService {
 		store();
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized List<String> listJobs() throws Exception {
 		parse();
 
@@ -164,14 +171,16 @@ public class JobConfigImpl implements JobConfigService {
 
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node node = childs.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+			}
 			Element job = (Element) node;
 			jobs.add(job.getAttribute("name"));
 		}
 		return jobs;
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized CfgJob getJob(String name) throws Exception {
 		if (StringUtil.empty(name))
 			return null;
@@ -195,12 +204,14 @@ public class JobConfigImpl implements JobConfigService {
 		return null;
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgCommand> getCommands(NodeList nodes) throws Exception {
 		List<CfgCommand> cmds = new ArrayList<CfgCommand>();
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+			}
 			Element ele = (Element) node;
 			CfgCommand cmd = new CfgCommand(reqAttrib(ele, "name"), reqAttrib(
 					ele, "command"), reqAttrib(ele, "dir").replaceAll("\\\\",
@@ -210,50 +221,58 @@ public class JobConfigImpl implements JobConfigService {
 		return cmds;
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgTarget> getTargets(NodeList nodes) throws Exception {
 		List<CfgTarget> cmds = new ArrayList<CfgTarget>();
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+			}
 			Element ele = (Element) node;
 			CfgTarget cmd = new CfgTarget(reqAttrib(ele, "name"), reqAttrib(
 					ele, "address"), reqAttrib(ele, "dir").replaceAll("\\\\",
 					"/"));
 			cmds.add(cmd);
 		}
-		if (cmds.size() == 0)
+		if (cmds.size() == 0) {
 			throw new Exception("at least 1 target is required.");
+		}
 		return cmds;
 	}
 
 	private String reqAttrib(Element ele, String name) throws Exception {
 		String attrib = ele.getAttribute(name);
-		if (attrib == null || "".equals(attrib))
+		if (attrib == null || "".equals(attrib)) {
 			throw new Exception(ele.getTagName() + "\'s " + name
 					+ " attribute is required.");
+		}
 		return attrib;
 	}
 
 	private CfgSource getSource(NodeList nodes) throws Exception {
-		if (nodes.getLength() != 1)
+		if (nodes.getLength() != 1) {
 			throw new Exception("only one source is allowed.");
+		}
 
 		Node node = nodes.item(0);
-		if (node.getNodeType() != Node.ELEMENT_NODE)
+		if (node.getNodeType() != Node.ELEMENT_NODE) {
 			throw new Exception("source is required.");
+		}
 		Element ele = (Element) node;
 
 		return new CfgSource(reqAttrib(ele, "dir").replaceAll("\\\\", "/"),
 				ele.getAttribute("excludes"), getMappings(ele.getChildNodes()));
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgMapping> getMappings(NodeList nodes) throws Exception {
 		List<CfgMapping> ret = new ArrayList<CfgMapping>();
 		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
-			if (node.getNodeType() != Node.ELEMENT_NODE)
+			if (node.getNodeType() != Node.ELEMENT_NODE) {
 				continue;
+			}
 			Element ele = (Element) node;
 			String dir = reqAttrib(ele, "dir").replaceAll("\\\\", "/");
 			String checkoutDir = reqAttrib(ele, "checkout-dir").replaceAll(
@@ -267,11 +286,13 @@ public class JobConfigImpl implements JobConfigService {
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
 				.newDocumentBuilder();
 
-		if (!CONFIG_FILE.exists())
+		if (!CONFIG_FILE.exists()) {
 			createNewFile();
+		}
 
-		if (loadtime == CONFIG_FILE.lastModified())
+		if (loadtime == CONFIG_FILE.lastModified()) {
 			return;
+		}
 
 		doc = builder.parse(CONFIG_FILE);
 		loadtime = CONFIG_FILE.lastModified();
@@ -295,8 +316,9 @@ public class JobConfigImpl implements JobConfigService {
 			writer.write("<oden>");
 			writer.write("</oden>");
 		} finally {
-			if (writer != null)
+			if (writer != null) {
 				writer.close();
+			}
 		}
 	}
 
@@ -315,8 +337,9 @@ public class JobConfigImpl implements JobConfigService {
 					new StreamResult(w));
 			loadtime = CONFIG_FILE.lastModified();
 		} finally {
-			if (w != null)
+			if (w != null) {
 				w.close();
+			}
 		}
 	}
 }

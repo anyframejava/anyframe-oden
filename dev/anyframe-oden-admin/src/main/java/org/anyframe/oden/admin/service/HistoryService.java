@@ -19,8 +19,7 @@ import java.util.List;
 
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Log;
-
-import anyframe.common.Page;
+import org.anyframe.pagination.Page;
 
 /**
  * This is HistoryService Interface

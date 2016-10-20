@@ -18,11 +18,11 @@ jQuery(document).ready(function() {
 		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=userService.findList(cmd)&viewName=jsonView&cmd='/>"+ '<%=roles%>',
 		mtype : 'POST',
 		datatype : "json",
-		colNames : [ '<anyframe:message code="user.grid.userid"/>',
-		    		 '<anyframe:message code="user.grid.role"/>',
-		     		 '<anyframe:message code="user.grid.job"/>',
-		     		 '<anyframe:message code="user.grid.action"/>',
-		     		 '<anyframe:message code="user.grid.hiddenpw"/>'],
+		colNames : [ '<spring:message code="user.grid.userid"/>',
+		    		 '<spring:message code="user.grid.role"/>',
+		     		 '<spring:message code="user.grid.job"/>',
+		     		 '<spring:message code="user.grid.action"/>',
+		     		 '<spring:message code="user.grid.hiddenpw"/>'],
 		jsonReader : {
 			repeatitems : false
 		},
@@ -74,7 +74,7 @@ jQuery(document).ready(function() {
 		},
 
 		loadError : function(xhr, st, err) {
-			alert('<anyframe:message code="user.load.error"/>');
+			alert('<spring:message code="user.load.error"/>');
 		}
 	});
 
@@ -227,18 +227,18 @@ function clearUserDetail(){
 }
 
 function saveUserAction(){
-	if(confirm('<anyframe:message code="user.confirm.save"/>')){
+	if(confirm('<spring:message code="user.confirm.save"/>')){
 		saveUser();
 	}
 }
 
 function saveUser(){
 	if($("#user_id").val()==""){
-		alert('<anyframe:message code="user.alert.idempty"/>');
+		alert('<spring:message code="user.alert.idempty"/>');
 	}else if($("#user_pw").val()==""){
-		alert('<anyframe:message code="user.alert.pwempty"/>');
+		alert('<spring:message code="user.alert.pwempty"/>');
 	}else if($("#user_re_pw").val()==""){
-		alert('<anyframe:message code="user.alert.repwempty"/>');
+		alert('<spring:message code="user.alert.repwempty"/>');
 	}else if($("#user_pw").val() == $("#user_re_pw").val()){
 		var role = $("#role_list").val();
 		var id = $("#user_id").val();
@@ -263,9 +263,9 @@ function saveUser(){
 
 
 		if(isValidString(id) || isValidString(pw) || jobListIsValid){
-			alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 		}else if(jobList.length < 1){
-			alert('<anyframe:message code="user.alert.nonejob"/>');
+			alert('<spring:message code="user.alert.nonejob"/>');
 		}else{
 			if(isModify){
 				$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=userService.updateUser(role,id,pw,jobs)&viewName=jsonView'/>",
@@ -290,12 +290,12 @@ function saveUser(){
 			}
 		}
 	}else{
-		alert('<anyframe:message code="user.alert.wrongpassword"/>');
+		alert('<spring:message code="user.alert.wrongpassword"/>');
 	}
 }
 
 function deleteUser(id){
-	if(confirm('<anyframe:message code="user.confirm.removeuser"/>')){
+	if(confirm('<spring:message code="user.confirm.removeuser"/>')){
 		$.post("<c:url value='/simplejson.do?layout=jsonLayout&service=userService.removeUser(id)&viewName=jsonView'/>",
 		       {id : id}, function(data) {
 		    	   javascript:fn_addTab('07user', 'User');
@@ -332,7 +332,7 @@ function removeAllJobs(){
 		<tr>
 			<td>
 				<div class="pageSubtitle" style="padding-top: 10px;">
-					<h3 class="subtitle_h3">User</h3>
+					<h3 class="subtitle_h3"><spring:message code="user.page.subtitle"/> </h3>
 				</div><!-- end pageSubtitle -->
 			</td>
 			<td align=right style="padding-top: 10px;">
@@ -354,7 +354,7 @@ function removeAllJobs(){
 	
 	<div id="userDetail" style="display:none;">
 		<div class="pageSubtitle" style="padding-top:10px;">
-			<h4 class="subtitle_h4">User Detail</h4>
+			<h4 class="subtitle_h4"><spring:message code="user.userdetail.subtitle"/> </h4>
 		</div>
 		<fieldset>
 			<legend>register</legend>
@@ -363,29 +363,29 @@ function removeAllJobs(){
 					<caption>user</caption>
 					<tbody>
 						<tr>
-							<th scope="row"><label for="user_id">User ID* : </label></th>
+							<th scope="row"><label for="user_id"><spring:message code="user.label.userid"/> </label></th>
 							<td><input type="text" id="user_id" name="user_id" size="40" style="height:18px;width:250px;" /></td>
-							<anyframe:validate id="user_id" required="true" promptMessage="Enter User ID."/>
+							<simpleweb:validate id="user_id" required="true" promptMessage="Enter User ID."/>
 							<td></td>
-							<th scope="row"><label for="name">Role Name* : </label></th>
+							<th scope="row"><label for="name"><spring:message code="user.label.role"/> </label></th>
 							<td>
 								<select id="role_list" class="selectbox" style='width:100'>
-									<option value="Admin">Admin</option>
-									<option value="Deployer">Deployer</option>
+									<option value="Admin"><spring:message code="user.select.admin"/> </option>
+									<option value="Deployer"><spring:message code="user.select.deployer"/> </option>
 								</select>
 							</td>
 						</tr>
 						<tr>
-							<th scope="row"><label for="user_pw">Password* : </label></th>
+							<th scope="row"><label for="user_pw"><spring:message code="user.label.passworld"/> </label></th>
 							<td><input type="password" id="user_pw" name="user_pw" size="40" style="height:18px;width:300px;" /></td>
-							<anyframe:validate id="user_pw" required="true" promptMessage="Enter Password."/>
+							<simpleweb:validate id="user_pw" required="true" promptMessage="Enter Password."/>
 							<td></td>
-							<th scope="row"><label for="user_re_pw">Confirm Password* : </label></th>
+							<th scope="row"><label for="user_re_pw"><spring:message code="user.label.confirmpw"/> </label></th>
 							<td><input type="password" id="user_re_pw" name="user_re_pw" size="40" style="height:18px;width:250px;" /></td>
-							<anyframe:validate id="user_re_pw" required="true" promptMessage="Enter Password again."/>
+							<simpleweb:validate id="user_re_pw" required="true" promptMessage="Enter Password again."/>
 						</tr>
 						<tr>
-							<th scope="row" colspan="5"><label for="job">Assign Job* : </label></th>
+							<th scope="row" colspan="5"><label for="job"><spring:message code="user.label.assignjob"/> </label></th>
 						</tr>
 						<tr>
 							<td colspan="2" rowspan="6" align="center">
@@ -422,9 +422,9 @@ function removeAllJobs(){
 							<td></td>
 						</tr>
 						<tr>
-							<td colspan="2" align="center">[All Job List]</td>
+							<td colspan="2" align="center"><spring:message code="user.label.alljoblist"/> </td>
 							<td></td>
-							<td colspan="2" align="center">[Assigned Job List]</td>
+							<td colspan="2" align="center"><spring:message code="user.label.assignedjoblist"/> </td>
 						</tr>
 						<tr>
 							<td class="btn_pad" colspan="5" align="right">

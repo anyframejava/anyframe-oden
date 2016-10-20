@@ -40,14 +40,16 @@ public class SourceManager extends RepoManager {
 	CfgSource src;
 	List<Pair> dirSrcMap = new ArrayList<Pair>();
 
+	@SuppressWarnings("PMD")
 	public SourceManager(RepositoryService repo, CfgSource src) {
 		super(repo, CfgUtil.toRepoArg(src));
 		this.src = src;
 		List<CfgMapping> maps = new ArrayList<CfgMapping>(src.getMappings());
 		sortMappings(maps);
-		for (CfgMapping map : maps)
+		for (CfgMapping map : maps) {
 			dirSrcMap.add(new Pair(map.getDir().replaceAll("^\\.(/|$)", ""),
 					map.getCheckoutDir()));
+		}
 	}
 
 	private void sortMappings(List<CfgMapping> subs) {
@@ -57,15 +59,18 @@ public class SourceManager extends RepoManager {
 			}
 
 			private int countSlash(String path) {
-				if (path.startsWith("*")) // take to first
+				if (path.startsWith("*")) { // take to first
 					return 100;
-				if (path.length() < 2)
+				}
+				if (path.length() < 2) {
 					return 0;
+				}
 				int cnt = 0;
 				// ignore first & last slash
 				for (int i = 1; i < path.length() - 1; i++) {
-					if (path.charAt(i) == '/')
+					if (path.charAt(i) == '/') {
 						cnt++;
+					}
 				}
 				return cnt;
 			}
@@ -122,6 +127,7 @@ public class SourceManager extends RepoManager {
 	// return ret;
 	// }
 
+	@SuppressWarnings("PMD")
 	public List<RepoFile> getCandidates() throws OdenException {
 		List<RepoFile> ret = new ArrayList<RepoFile>();
 		for (String s : repo.listAllFiles(repoArgs, null, src.getExcludes())) {
@@ -162,8 +168,9 @@ public class SourceManager extends RepoManager {
 
 	private String getSrcFileName(String classFile) {
 		int i = classFile.indexOf('$');
-		if (i > 0)
+		if (i > 0) {
 			return classFile.substring(0, i) + ".java";
+		}
 		return classFile.substring(0, classFile.length() - ".class".length())
 				+ ".java";
 	}

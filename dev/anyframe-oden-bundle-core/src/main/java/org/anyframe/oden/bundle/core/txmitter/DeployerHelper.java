@@ -126,7 +126,8 @@ public class DeployerHelper {
 	// 		}
 	// 		return success;
 	// }
-
+	
+	@SuppressWarnings("PMD")
 	public static void restore(DeployerService ds, String txid,
 			Set<DeployFile> fs, DeployFile snapshot) throws OdenException {
 		String[] repo = snapshot.getRepo().args(); // snapshot
@@ -154,10 +155,11 @@ public class DeployerHelper {
 				}
 			}
 
-			if (!contains) // add mode
+			if (!contains) {// add mode
 				fs.add(new DeployFile(snapshot.getRepo(), d.getPath(), snapshot
 						.getAgent(), d.size(), d.lastModified(),
 						DeployFile.Mode.ADD, d.success()));
+			}
 
 		}
 	}

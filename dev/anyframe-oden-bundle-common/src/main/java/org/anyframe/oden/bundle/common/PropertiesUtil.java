@@ -45,8 +45,9 @@ public class PropertiesUtil {
 			prop.load(in);
 		} finally {
 			try {
-				if (in != null)
+				if (in != null) {
 					in.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -59,7 +60,8 @@ public class PropertiesUtil {
 		StringBuffer buf = new StringBuffer();
 		Properties prop = PropertiesUtil.loadProperties(name);
 		for (Object key : prop.keySet()) {
-			buf.append(key.toString() + "\n");
+			buf.append(key.toString());
+			buf.append("\n");
 		}
 		return buf.toString();
 	}
@@ -75,8 +77,9 @@ public class PropertiesUtil {
 			prop.store(out, null);
 		} finally {
 			try {
-				if (out != null)
+				if (out != null) {
 					out.close();
+				}
 			} catch (IOException e) {
 			}
 		}

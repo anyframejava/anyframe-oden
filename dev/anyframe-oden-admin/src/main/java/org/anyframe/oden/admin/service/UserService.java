@@ -15,9 +15,10 @@
  */
 package org.anyframe.oden.admin.service;
 
-import org.anyframe.oden.admin.domain.User;
+import java.util.Properties;
 
-import anyframe.common.Page;
+import org.anyframe.oden.admin.domain.User;
+import org.anyframe.pagination.Page;
 
 /**
  * This is CfgTarget Class
@@ -32,7 +33,7 @@ public interface UserService {
 	 * @param password
 	 * @throws Exception
 	 */
-	public boolean checkuser(Credential c) throws Exception;
+	public boolean checkuser(Properties c) throws Exception;
 
 	public Page findList(String domain) throws Exception;
 

@@ -15,7 +15,6 @@
  */
 package org.anyframe.oden.bundle.hessiansvr;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -36,35 +35,34 @@ import com.caucho.hessian.server.HessianServlet;
  * Servlet to make availble to execute commands in the OSGi Shell.
  * 
  * @author Junghwan Hong
- *
+ * 
  */
-public class OdenHessianServlet extends HessianServlet{
+@SuppressWarnings("PMD")
+public class OdenHessianServlet extends HessianServlet {
 	private static final long serialVersionUID = 7131549884014328694L;
-	
+
 	public final static String NAME = "deploy";
-	
+
 	private static String CONFIG_FILE = "conf/agent.ini";
-	
-	protected void setHttpService(HttpService hs){
+
+	protected void setHttpService(HttpService hs) {
 		try {
-			// HessianServlet uses currentThread's contextClassLoader to load the
+			// HessianServlet uses currentThread's contextClassLoader to load
+			// the
 			// home-api and home-class instances.
-			Thread.currentThread().setContextClassLoader(DeployerImpl.class.getClassLoader());
-			
-			Hashtable<String, String> prop  = new Hashtable<String, String>();
+			Thread.currentThread().setContextClassLoader(
+					DeployerImpl.class.getClassLoader());
+
+			Hashtable<String, String> prop = new Hashtable<String, String>();
 			prop.put("home-api", DeployerService.class.getName());
 			prop.put("home-class", DeployerImpl.class.getName());
-			
-			hs.registerServlet(
-					"/" + OdenHessianServlet.NAME, 
-					this, 
-					prop, 
-					null);
+
+			hs.registerServlet("/" + OdenHessianServlet.NAME, this, prop, null);
 		} catch (Exception e) {
 			Logger.error(e);
 		}
 	}
-	
+
 	@Override
 	public void service(ServletRequest request, ServletResponse response)
 			throws IOException, ServletException {
@@ -86,10 +84,12 @@ public class OdenHessianServlet extends HessianServlet{
 		BundleContext context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
 		String rightIp = context.getProperty("server.ip");
-		if(rightIp == null)
+		if (rightIp == null) {
 			return true;
-		if (clientIp.equals(rightIp) && !(rightIp == null) )
+		}
+		if (clientIp.equals(rightIp) && !(rightIp == null)) {
 			return true;
+		}
 		return false;
 	}
 }

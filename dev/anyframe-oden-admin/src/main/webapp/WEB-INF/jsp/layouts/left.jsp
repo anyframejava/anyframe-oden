@@ -40,7 +40,7 @@ margin:0;
 						   <a href="javascript:fn_addTab('06status', 'Status');"></a>
 						</td>
 					</tr>
-					<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewResourceId="addUser">
+					<iam:access hasPermission="${iam:getPermissionMask(\"CREATE\")}" viewName="addUser">
 						<tr>
 							<td valign="top" bgcolor="#eeeeee" class="depth04">
 							   <a href="javascript:fn_addTab('05log', 'Log','','&amp;initdataService=logService.findList(cmd)&amp;initdataResult=logs');"></a>

@@ -77,8 +77,9 @@ public class SlimDeployJob extends Job {
 		this.user = user;
 		this.resolver = resolver;
 
-		for (CfgTarget t : targets)
+		for (CfgTarget t : targets) {
 			targetCfgMap.put(t.getName(), t);
+		}
 
 		// to record deploy logs
 		jobLogger = (JobLogService) BundleUtil.getService(context,
@@ -100,8 +101,9 @@ public class SlimDeployJob extends Job {
 
 	private String getBackupLocation(BundleContext ctx) {
 		String undo = ctx.getProperty("deploy.undo");
-		if (!"true".equals(undo))
+		if (!"true".equals(undo)) {
 			return null;
+		}
 
 		String loc = ctx.getProperty("deploy.undo.loc");
 		return loc == null ? "snapshots" : loc;
@@ -111,8 +113,9 @@ public class SlimDeployJob extends Job {
 			CfgSource source) throws OdenException {
 		String[] args = CfgUtil.toRepoArg(source);
 		RepositoryService repoSvc = repoProvider.getRepoServiceByURI(args);
-		if (repoSvc == null)
+		if (repoSvc == null) {
 			throw new OdenException("Invalid Repository: " + args);
+		}
 		return new RepoManager(repoSvc, args);
 	}
 
@@ -143,19 +146,22 @@ public class SlimDeployJob extends Job {
 		finishedWorks = totalWorks - 1; // 1 is kind of additional work
 	}
 
+	@SuppressWarnings("PMD")
 	private Map<RepoFile, Collection<SlimDeployFile>> groupByPath() {
 		Map<RepoFile, Collection<SlimDeployFile>> ret = new HashMap<RepoFile, Collection<SlimDeployFile>>();
 		for (SlimDeployFile f : deployFiles) {
 			RepoFile rf = new RepoFile("", f.getPath());
 			Collection<SlimDeployFile> fs = ret.get(rf);
-			if (fs == null)
+			if (fs == null) {
 				fs = new HashSet<SlimDeployFile>();
+			}
 			fs.add(f);
 			ret.put(rf, fs);
 		}
 		return ret;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void deploy() throws OdenException {
 		// files having same path and diff agent
 		currentWork = "ready to deploy...";
@@ -259,18 +265,20 @@ public class SlimDeployJob extends Job {
 		}
 
 		// close repository service
-		if (reposvc != null)
+		if (reposvc != null) {
 			reposvc.close();
+		}
 	}
 
 	private boolean hasSameTargets(Map<SlimDeployFile, DeployerService> fmap) {
 		String addr = null;
 		for (SlimDeployFile f : fmap.keySet()) {
 			String _addr = targetCfgMap.get(f.getTarget()).getAddress();
-			if (addr == null)
+			if (addr == null) {
 				addr = _addr;
-			else if (!_addr.equals(addr))
+			} else if (!_addr.equals(addr)) {
 				return false;
+			}
 		}
 		return true;
 
@@ -290,15 +298,17 @@ public class SlimDeployJob extends Job {
 		String _path = null;
 		Collection<CfgTarget> _targets = new HashSet<CfgTarget>();
 		for (SlimDeployFile f : fmap.keySet()) {
-			if (_path == null)
+			if (_path == null) {
 				_path = f.getPath();
+			}
 			_targets.add(targetCfgMap.get(f));
 		}
 
 		for (CfgTarget t : otherTargets(_targets)) {
 			DeployerService ds = deployMgr.getDeployer(t.getAddress());
-			if (ds == null)
+			if (ds == null) {
 				continue;
+			}
 
 			try {
 				ds.setDate(t.getPath(), _path, date);
@@ -309,25 +319,30 @@ public class SlimDeployJob extends Job {
 	}
 
 	private List<CfgTarget> otherTargets(Collection<CfgTarget> _targets) {
-		if (targets.size() == _targets.size())
+		if (targets.size() == _targets.size()) {
 			return Collections.EMPTY_LIST;
+		}
 
 		List<CfgTarget> ret = new ArrayList<CfgTarget>();
 		for (CfgTarget t : targets) {
-			if (!_targets.contains(t))
+			if (!_targets.contains(t)) {
 				ret.add(t);
+			}
 		}
 		return ret;
 	}
 
 	protected SlimDeployFile getSameTargetFile(Collection<SlimDeployFile> fs,
 			CfgTarget t) {
-		for (SlimDeployFile f : fs)
-			if (t.equals(targetCfgMap.get(f)))
+		for (SlimDeployFile f : fs) {
+			if (t.equals(targetCfgMap.get(f))) {
 				return f;
+			}
+		}
 		return null;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void writeDeployFiles(FatInputStream in,
 			Map<SlimDeployFile, DeployerService> fmap) {
 		try {
@@ -339,9 +354,10 @@ public class SlimDeployJob extends Job {
 					DeployerService ds = fmap.get(f);
 					try {
 						if (!ds.write(targetCfgMap.get(f).getPath(),
-								f.getPath(), new ByteArray(buf, size)))
+								f.getPath(), new ByteArray(buf, size))) {
 							throw new OdenException("Fail to write: "
 									+ f.getPath());
+						}
 					} catch (Exception e) { // while writing..
 						fmap.remove(f);
 						f.setSuccess(false);
@@ -359,6 +375,7 @@ public class SlimDeployJob extends Job {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void writeDeployFilesAsThread(FatInputStream in,
 			final Map<SlimDeployFile, DeployerService> fmap) {
 		// add or update
@@ -374,9 +391,10 @@ public class SlimDeployJob extends Job {
 							DeployerService ds = fmap.get(f);
 							try {
 								if (!ds.write(targetCfgMap.get(f).getPath(),
-										f.getPath(), ba))
+										f.getPath(), ba)) {
 									throw new OdenException("Fail to write: "
 											+ f.getPath());
+								}
 							} catch (Exception e) { // while writing..
 								fmap.remove(f);
 								f.setSuccess(false);
@@ -404,6 +422,7 @@ public class SlimDeployJob extends Job {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void closeDeployFiles(Map<SlimDeployFile, DeployerService> fmap,
 			final long originalFileSz) {
 		List<Thread> threads = new ArrayList<Thread>();
@@ -415,12 +434,14 @@ public class SlimDeployJob extends Job {
 					try {
 						DoneFileInfo info = ds.close(targetCfgMap.get(f)
 								.getPath(), f.getPath(), null, backupLocation);
-						if (info == null || info.size() == -1L)
+						if (info == null || info.size() == -1L) {
 							throw new IOException("Fail to close: "
 									+ f.getPath());
-						if (info.size() != originalFileSz)
+						}
+						if (info.size() != originalFileSz) {
 							throw new IOException("Diffrent size: "
 									+ info.size() + "/" + originalFileSz);
+						}
 						f.setSuccess(true);
 						synchronized (nSuccess) {
 							nSuccess++;
@@ -428,8 +449,9 @@ public class SlimDeployJob extends Job {
 						f.setMode(info.isUpdate() ? Mode.UPDATE : Mode.ADD);
 					} catch (Exception e) {
 						f.setSuccess(false);
-						if (StringUtil.empty(f.getError()))
+						if (StringUtil.empty(f.getError())) {
 							f.setError(e.getMessage());
+						}
 						Logger.error(e);
 						setError(e.getMessage());
 					}
@@ -447,6 +469,7 @@ public class SlimDeployJob extends Job {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void done() {
 		try {
 			jobLogger.record(id, user, System.currentTimeMillis(), desc,
@@ -459,7 +482,8 @@ public class SlimDeployJob extends Job {
 	}
 
 	protected void setError(String msg) {
-		if (errorMessage == null)
+		if (errorMessage == null) {
 			errorMessage = msg;
+		}
 	}
 }

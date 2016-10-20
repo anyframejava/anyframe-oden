@@ -488,7 +488,7 @@ input, select, textarea {
 
 /* login --------------------------------------------------------------------------------------------------------------*/
  /* login layout */
-.hidden {position:absolute;visibility:hidden; top:-10000px; left:-10000px;}
+.hidden {position:absolute;visibility:hidden; top:300px; left:300px;}
 .clear {clear: both;}
 .btn {display:block;text-indent:-1000em; overflow:hidden;}
 
@@ -502,8 +502,9 @@ input, select, textarea {
 #loginForm .ubtn{position:absolute;width:60px;height:45px ;top:28px; left:142px;}
 #loginForm .ubtn label{position:absolute; top:-2px; left:17px;}
 #loginForm .uid {position:absolute; top:0; left:175px;}
-#loginForm .upw {position:absolute; top:0; left:282px;}
-#loginForm #loginBtn {position:absolute;display:block;width: 47px; height: 21px; background: url(../images/btn_login.gif) no-repeat left top; top:0; left:109px;}
+#loginForm .upw {position:absolute; top:0; left:267px;}
+#loginForm .ulan {position:absolute; top:0; left:359px;}
+#loginForm #loginBtn {position:absolute;display:block;width: 47px; height: 21px; background: url(../images/btn_login.gif) no-repeat left top; top:0; left:99px;}
 
 .issue		{ width:672px; background-color:#E9ECF1; border:1px solid #C7C7C9; text-align:left; margin-top:2px;} 
 .issue td	{ font-size: 12px; font-family:"dotum" color:#777; line-height:16px;}

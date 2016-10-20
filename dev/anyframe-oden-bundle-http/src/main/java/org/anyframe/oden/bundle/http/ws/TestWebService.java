@@ -60,6 +60,7 @@ public class TestWebService implements WebService {
 		req.getRequestDispatcher("wadmin.html").forward(req, res);
 	}
 
+	@SuppressWarnings("PMD")
 	private List<Map<String, String>> taskList() {
 		List<Map<String, String>> tasks = new LinkedList<Map<String, String>>();
 

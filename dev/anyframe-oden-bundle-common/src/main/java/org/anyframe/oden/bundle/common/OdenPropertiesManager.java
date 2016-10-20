@@ -33,6 +33,7 @@ public class OdenPropertiesManager {
 		this.name = name;
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized Properties loadProperties() throws OdenException {
 		try {
 			return PropertiesUtil.loadProperties(name);
@@ -43,6 +44,7 @@ public class OdenPropertiesManager {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized String getKeys() throws OdenException {
 		try {
 			return PropertiesUtil.getKeys(name);
@@ -53,6 +55,7 @@ public class OdenPropertiesManager {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized void storeProperties(Properties prop)
 			throws OdenException {
 		try {
@@ -64,24 +67,28 @@ public class OdenPropertiesManager {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized String getProp(String key) throws OdenException {
 		Properties prop = loadProperties();
 		return prop.getProperty(key);
 	}
 
+	@SuppressWarnings("PMD")
 	public synchronized void addProp(String key, String value)
 			throws OdenException {
 		Properties prop = loadProperties();
 		prop.put(key, value);
 		storeProperties(prop);
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public synchronized void removeProp(String key) throws OdenException {
 		Properties prop = loadProperties();
 		prop.remove(key);
 		storeProperties(prop);
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public synchronized String toString(String name) throws OdenException {
 		try {
 			return PropertiesUtil.toString(name);

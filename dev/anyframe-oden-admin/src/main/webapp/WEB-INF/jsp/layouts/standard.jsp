@@ -13,8 +13,8 @@
 	<!-- dojo -->
 	<script type="text/javascript" src="<c:url value="/resources/dojo/dojo.js" />"></script>  
     <script type="text/javascript" src="<c:url value="/resources/dojo/io/iframe.js" />"></script>  
-    <script type="text/javascript" src="<c:url value="/resources/anyframe/spring/Anyframe-Spring.js" />"></script>
-    <script type="text/javascript" src="<c:url value="/resources/anyframe/spring/Anyframe-Spring-Dojo.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/resources/org/anyframe/spring/Anyframe-Spring.js" />"></script>
+    <script type="text/javascript" src="<c:url value="/resources/org/anyframe/spring/Anyframe-Spring-Dojo.js" />"></script>
     
 	<!-- for jquery -->
 	<script type="text/javascript" src="<c:url value='/jquery/jquery-1.4.2.min.js'/>"></script>

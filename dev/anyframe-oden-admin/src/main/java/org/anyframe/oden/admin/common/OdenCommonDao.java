@@ -21,16 +21,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Log;
+import org.anyframe.oden.admin.exception.BrokerException;
+import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import anyframe.common.Page;
 
 /**
  * This class provides some common methods.
@@ -39,11 +40,11 @@ import anyframe.common.Page;
  * @author Sujeong Lee
  */
 public class OdenCommonDao<T> {
-	private String domainName = "org.anyframe.oden.admin.domain.";
-	private String ahref_pre = "<a href=\"";
-	private String ahref_mid = "\">";
-	private String ahref_post = "</a>";
-
+	String domainName = "org.anyframe.oden.admin.domain.";
+	String ahrefPre = "<a href=\"";
+	String ahrefMid = "\">";
+	String ahrefPost = "</a>";
+	
 	@Inject
 	@Named("brokerHandler")
 	private BrokerHandler brokerHandler;
@@ -64,10 +65,11 @@ public class OdenCommonDao<T> {
 	public String getResultString(String cmd, String opt, String param)
 			throws Exception {
 		String command = "";
-		if (param == null || param.length() == 0)
+		if (param == null || param.length() == 0) {
 			command = cmd + " " + opt + " " + "-json";
-		else
+		} else {
 			command = cmd + " " + opt + " " + param + " " + "-json";
+		}
 
 		return brokerHandler.cmdConnect(command);
 	}
@@ -75,9 +77,9 @@ public class OdenCommonDao<T> {
 	public String getResultString(String cmd, String opt, String[] param)
 			throws Exception {
 		String command = "";
-		if (param == null || param.length == 0)
+		if (param == null || param.length == 0) {
 			command = cmd + " " + opt + " " + "-json";
-		else {
+		} else {
 			command = cmd + " " + opt + " " + param + " " + "-json";
 		}
 		return brokerHandler.cmdConnect(command);
@@ -89,35 +91,39 @@ public class OdenCommonDao<T> {
 
 	public Page getList(String cmd, String opt, String param) throws Exception {
 		String command = "";
-		if (param == null || param.length() == 0)
+		if (param == null || param.length() == 0) {
 			command = cmd + " " + opt + " " + "-json";
-		else
+		} else {
 			command = cmd + " " + opt + " " + param + " " + "-json";
+		}
 		String result = brokerHandler.cmdConnect(command);
 
 		List<T> list = new ArrayList();
-		if (cmd.equals("status")) {
+		
+		if ("status".equals(cmd)) {
 			list = strToJsonList1(cmd, result, false);
 		} else {
 			list = strToJsonList(cmd, result, false);
 		}
-
-		if (list.size() == 0) {
+		
+		if (list.isEmpty()) {
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
 			return new Page(list, 1, list.size(), list.size(), list.size());
 		}
 	}
 
-	public ArrayList<Job> findJob(String cmd, String opt,
-			ArrayList<String> roles) throws Exception {
+	@SuppressWarnings("PMD")
+	public List<Job> findJob(String cmd, String opt, List<String> roles)
+			throws Exception {
 		String command = "";
-		ArrayList<Job> list = new ArrayList<Job>();
+		List<Job> list = new ArrayList<Job>();
 
 		command = cmd + " " + opt + " " + "-json";
 
 		String result = brokerHandler.cmdConnect(command);
 		JSONArray jobs = new JSONArray(result);
+		
 		for (int i = 0; i < jobs.length(); i++) {
 			if (roles.contains(jobs.getString(i))
 					|| roles.get(0).equals("ROLE_ADMIN")) {
@@ -137,11 +143,12 @@ public class OdenCommonDao<T> {
 		String command = "";
 		Log log = new Log();
 
-		if (param == null || param.length() == 0)
+		if (param == null || param.length() == 0) {
 			command = cmd + " " + opt + " " + "-json";
-		else
+		} else {
 			command = cmd + " " + opt + " " + "-date" + " " + param + " "
 					+ "-json";
+		}
 
 		String result = brokerHandler.cmdConnect(command);
 		JSONArray logs = new JSONArray(result);
@@ -209,10 +216,10 @@ public class OdenCommonDao<T> {
 	private List<T> strToJsonList(String cmd, String result, boolean isList)
 			throws Exception {
 		boolean multiArr = false;
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
-				ArrayList<T> list = new ArrayList<T>();
+				List<T> list = new ArrayList<T>();
 
 				int recordSize = array.length();
 				for (int i = 0; i < recordSize; i++) {
@@ -236,7 +243,9 @@ public class OdenCommonDao<T> {
 									if (isList) {
 										list.addAll(setToList(cmd, key, value));
 									} else {
-										list.addAll(setToObject(cmd, key, value));
+										list
+												.addAll(setToObject(cmd, key,
+														value));
 									}
 								}
 							} else {
@@ -246,9 +255,11 @@ public class OdenCommonDao<T> {
 								// 이런식으로 CRUD 할 예정
 								String[] keys = dataObj.getNames(dataObj);
 
-								for (String key : keys)
-									if (key.equals("files"))
+								for (String key : keys) {
+									if ("files".equals(key)) {
 										multiArr = true;
+									}
+								}
 								if (multiArr) {
 									list = multiJson(cmd, dataObj);
 								} else {
@@ -272,10 +283,10 @@ public class OdenCommonDao<T> {
 	private List<T> strToJsonList1(String cmd, String result, boolean isList)
 			throws Exception {
 		boolean multiArr = false;
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
-				ArrayList<T> list = new ArrayList<T>();
+				List<T> list = new ArrayList<T>();
 
 				int recordSize = array.length();
 				for (int i = 0; i < recordSize; i++) {
@@ -303,9 +314,11 @@ public class OdenCommonDao<T> {
 						// 이런식으로 CRUD 할 예정
 						String[] keys = object.getNames(object);
 
-						for (String key : keys)
-							if (key.equals("files"))
+						for (String key : keys) {
+							if ("files".equals(key)) {
 								multiArr = true;
+							}
+						}
 						if (multiArr) {
 							list = multiJson(cmd, object);
 						} else {
@@ -323,9 +336,9 @@ public class OdenCommonDao<T> {
 		}
 	}
 
-	private ArrayList<T> multiJson(String cmd, JSONObject object)
+	private List<T> multiJson(String cmd, JSONObject object)
 			throws Exception {
-		ArrayList<T> list = new ArrayList<T>();
+		List<T> list = new ArrayList<T>();
 		Class<T> objClass = getClassName(cmd);
 		JSONArray detailInfo = (JSONArray) object.get("files");
 
@@ -351,33 +364,30 @@ public class OdenCommonDao<T> {
 			fields[i].setAccessible(true);
 			String name = fields[i].getName();
 			if (object.has(name)) {
-				if (name.equals("progress")) {
+				if ("progress".equals(name)) {
 					String workfile = (String) object.get("currentWork");
 
 					if (workfile.length() > 40) {
 						int num = workfile.length();
 						workfile = "..." + workfile.substring(num - 40);
-					} else {
 					}
 
 					String progress = object.get(name).equals(0) ? "[Preparing...]"
 							: workfile + "[" + object.get(name) + "%]";
 
-					fields[i].set(
-							c,
-							progress + " " + "|" + " " + ahref_pre
-									+ "javascript:stopDeploy('"
-									+ object.getString("id") + "');"
-									+ ahref_mid + imgStop + ahref_post);
-				} else if (classname.endsWith("Status") && name.equals("date"))
-					fields[i].set(c,
-							chgDateFormat(Long.valueOf(object.getString(name)))
-									+ "");
-				else
+					fields[i].set(c, progress + " " + "|" + " " + ahrefPre
+							+ "javascript:stopDeploy('"
+							+ object.getString("id") + "');" + ahrefMid
+							+ imgStop + ahrefPost);
+				} else if (classname.endsWith("Status") && "date".equals(name)) {
+					fields[i].set(c, chgDateFormat(Long.valueOf(object
+							.getString(name)))
+							+ "");
+				} else {
 					fields[i].set(c, object.get(name) + "");
-
+				}
 			}
-			if (name.equals("counts")) {
+			if ("counts".equals(name)) {
 				String counts = object.get("nsuccess") + "/"
 						+ object.get("total");
 				fields[i].set(c, counts + "");
@@ -391,28 +401,35 @@ public class OdenCommonDao<T> {
 			throws Exception {
 		T c = objClass.newInstance();
 		Field[] fields = c.getClass().getDeclaredFields();
+		
 		for (Field field : fields) {
 			field.setAccessible(true);
 			String name = field.getName();
 
 			if (obj.has(name)) {
-				if (name.equals("success"))
+				if ("success".equals(name)) {
 					field.set(c, obj.get("success").equals("true") ? "Success"
 							: "Failed" + "");
-				else
+				} else {
 					field.set(c, obj.get(name) + "");
-			} else if (name.equals("group")) {
-				JSONObject agents = new JSONObject(obj.getString("agent"));
+				}
+			} else if ("group".equals(name)) {
+				JSONObject agents = getJsonObject(obj.getString("agent"));
 				field.set(c, agents.getString("name") + "");
-			} else if (name.equals("id"))
+			} else if ("id".equals(name)) {
 				field.set(c, no + "");
+			}
 		}
 		return c;
 	}
-
+	
+	private JSONObject getJsonObject(String agent) throws Exception {
+		return new JSONObject(agent);
+	}
+	
 	// TODO
 	// json 설정값 정해지면 수정
-	private Collection<T> setToObject(String cmd, String key, String value) {
+	private Collection<T> setToObject(String cmd, String key, String value) throws Exception {
 		ArrayList<T> list = new ArrayList<T>();
 		try {
 			Class<T> t = getClassName(cmd);
@@ -425,7 +442,7 @@ public class OdenCommonDao<T> {
 					.getOptionArgArray(new String[] { "r", "repo" });
 			String[] destArray = c
 					.getOptionArgArray(new String[] { "d", "dest" });
-			String desc = c.getOptionArg(new String[] { "desc" });
+//			String desc = c.getOptionArg(new String[] { "desc" });
 			String[] includeArray = c.getOptionArgArray(new String[] { "i",
 					"include" });
 			String[] excludeArray = c.getOptionArgArray(new String[] { "e",
@@ -460,14 +477,14 @@ public class OdenCommonDao<T> {
 			}
 			list.add(tobj);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new BrokerException(e.getMessage());
 		}
 		return list;
 	}
 
 	// name-value
-	private ArrayList<T> setToList(String cmd, String key, String value) {
-		ArrayList<T> list = new ArrayList<T>();
+	private List<T> setToList(String cmd, String key, String value) throws Exception {
+		List<T> list = new ArrayList<T>();
 		try {
 			Class<T> t = getClassName(cmd);
 			T tobj = t.newInstance();
@@ -484,7 +501,7 @@ public class OdenCommonDao<T> {
 			}
 			list.add(tobj);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new BrokerException(e.getMessage());
 		}
 		return list;
 	}
@@ -492,7 +509,7 @@ public class OdenCommonDao<T> {
 	private String arrayToString(String[] str) {
 		String result = "";
 		for (int i = 0; i < str.length; i++) {
-			result += str[i] + " ";
+			result = result.concat(str[i] + " ");
 		}
 		return result.trim();
 	}
@@ -522,7 +539,8 @@ public class OdenCommonDao<T> {
 	 * milisecond 를 yyyymmdd hhmmss 형태로 변환
 	 */
 	public String chgDateFormat(Long input) {
-		return new SimpleDateFormat("yyyy.MM.dd aa hh:mm:ss").format(input);
+		return new SimpleDateFormat("yyyy.MM.dd aa hh:mm:ss", Locale
+				.getDefault()).format(input);
 	}
 
 	// only for job command
@@ -531,11 +549,9 @@ public class OdenCommonDao<T> {
 		String result = brokerHandler.cmdConnect(string + " "
 				+ object.toString() + " " + "-json");
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
-				ArrayList<T> list = new ArrayList<T>();
-
 				int recordSize = array.length();
 				for (int i = 0; i < recordSize; i++) {
 					result_list.add(array.get(i) + "");

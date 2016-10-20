@@ -82,6 +82,7 @@ public class RequiresCommandImpl implements Command {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	private void getImportedPackages(Bundle bundle, PrintStream out,
 			PrintStream err) {
 		// Get package admin service.

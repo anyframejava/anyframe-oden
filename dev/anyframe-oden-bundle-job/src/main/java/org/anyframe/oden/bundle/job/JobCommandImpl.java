@@ -44,7 +44,6 @@ import org.anyframe.oden.bundle.deploy.DeployerService;
 import org.anyframe.oden.bundle.gate.CustomCommand;
 import org.anyframe.oden.bundle.job.config.CfgCommand;
 import org.anyframe.oden.bundle.job.config.CfgJob;
-import org.anyframe.oden.bundle.job.config.CfgSource;
 import org.anyframe.oden.bundle.job.config.CfgTarget;
 import org.anyframe.oden.bundle.job.config.CfgUtil;
 import org.anyframe.oden.bundle.job.config.JobConfigService;
@@ -116,25 +115,29 @@ public class JobCommandImpl implements CustomCommand {
 			Logger.error(e);
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private String execute(Cmd cmd, boolean isJSON) throws Exception {
 		String action = cmd.getAction();
 		if (action.equals("info")) {
 			if (StringUtil.empty(cmd.getActionArg())) {
 				List<String> jobs = jobConfig.listJobs();
-				if (isJSON)
+				if (isJSON) {
 					return new JSONArray(jobs).toString();
+				}
 
 				StringBuffer buf = new StringBuffer();
-				for (String s : jobs)
+				for (String s : jobs) {
 					buf.append(s + "\n");
+				}
 				return buf.toString();
 			}
 
 			CfgJob job = jobConfig.getJob(cmd.getActionArg());
-			if (job == null)
+			if (job == null) {
 				throw new OdenException("Invalid Job Name: "
 						+ cmd.getActionArg());
+			}
 			if (isJSON) {
 				JSONObject jo = new JSONObject();
 				jo.put("name", job.getName());
@@ -143,8 +146,9 @@ public class JobCommandImpl implements CustomCommand {
 						new JSONArray(allTargetStatus(job.getTargets())));
 
 				JSONArray cs = new JSONArray();
-				for (CfgCommand c : job.getCommands())
+				for (CfgCommand c : job.getCommands()) {
 					cs.put(c.toJSON());
+				}
 				jo.put("commands", cs);
 				return new JSONArray().put(jo).toString();
 			}
@@ -153,17 +157,20 @@ public class JobCommandImpl implements CustomCommand {
 			buf.append("name: " + job.getName() + "\n");
 			buf.append("source: " + job.getSource().toJSON() + "\n");
 			buf.append("targets: \n");
-			for (JSONObject targetStatus : allTargetStatus(job.getTargets()))
+			for (JSONObject targetStatus : allTargetStatus(job.getTargets())) {
 				buf.append("\t" + targetStatus + "\n");
+			}
 			buf.append("commands: \n");
-			for (CfgCommand c : job.getCommands())
+			for (CfgCommand c : job.getCommands()) {
 				buf.append("\t" + c.toJSON() + "\n");
+			}
 			return buf.toString();
 		} else if (action.equals("compare")) {
 			final CfgJob job = jobConfig.getJob(cmd.getActionArg());
-			if (job == null)
+			if (job == null) {
 				throw new OdenException("Invalid Job Name: "
 						+ cmd.getActionArg());
+			}
 			final List<String> targetNames = cmd
 					.getOptionArgList(new String[] { "t" });
 			final List<CfgTarget> targets = getActiveTargets(job
@@ -214,8 +221,9 @@ public class JobCommandImpl implements CustomCommand {
 													}
 												}
 											}
-											if (failonly && equal)
+											if (failonly && equal) {
 												continue;
+											}
 
 											jo.put("equal", equal ? "T" : "F");
 											jo.put("targets", ja2);
@@ -250,8 +258,9 @@ public class JobCommandImpl implements CustomCommand {
 						}
 					}
 				}
-				if (failonly && equal)
+				if (failonly && equal) {
 					continue;
+				}
 
 				buf.append((equal ? "(T)" : "(F)") + " " + path + " ["
 						+ tbuf.toString() + "]\n");
@@ -259,14 +268,16 @@ public class JobCommandImpl implements CustomCommand {
 			return buf.toString();
 		} else if (action.equals("mapping-scan")) {
 			CfgJob job = jobConfig.getJob(cmd.getActionArg());
-			if (job == null)
+			if (job == null) {
 				throw new OdenException("Invalid job: " + cmd.getActionArg());
+			}
 
 			List<Pair> maps = getSCMRoot(job);
 			JSONArray ret = new JSONArray();
-			for (Pair p : maps)
+			for (Pair p : maps) {
 				ret.put(new JSONObject().put("dir", p.getArg0()).put(
 						"checkout-dir", p.getArg1()));
+			}
 			return ret.toString();
 		} else {
 			throw new OdenException("Invalid Action: " + action);
@@ -277,31 +288,36 @@ public class JobCommandImpl implements CustomCommand {
 		List<CfgTarget> activeTargets = new ArrayList<CfgTarget>();
 		for (CfgTarget t : targets) {
 			DeployerService ds = txmitter.getDeployer(t.getAddress());
-			if (ds != null)
+			if (ds != null) {
 				activeTargets.add(t);
+			}
 		}
 		return activeTargets;
 	}
 
+	@SuppressWarnings("PMD")
 	private List<Pair> getMappings(CfgJob job, String chkoutDir)
 			throws OdenException {
 		RepositoryService repoSvc = repositoryProvider
 				.getRepoServiceByURI(CfgUtil.toRepoArg(job.getSource()));
 		RepoManager repo = new RepoManager(repoSvc, CfgUtil.toRepoArg(job
 				.getSource()));
-		if (repo == null)
+		if (repo == null) {
 			throw new OdenException("Invalid Repository: "
 					+ job.getSource().getPath());
+		}
 
 		RepoManager scm = new RepoManager(repoSvc, new String[] { "file://"
 				+ chkoutDir });
-		if (scm == null)
+		if (scm == null) {
 			throw new OdenException("Invalid Checkout dir: " + chkoutDir);
+		}
 
 		List<Pair> ret = new ArrayList<Pair>();
 		String webinf = repo.findDir("WEB-INF", null);
-		if (webinf == null)
+		if (webinf == null) {
 			return ret;
+		}
 		String webinfOriginal = scm.findDir("WEB-INF",
 				FileUtil.combinePath(job.getSource().getPath(), webinf));
 		if (webinfOriginal == null)
@@ -331,25 +347,28 @@ public class JobCommandImpl implements CustomCommand {
 		RepoManager repo = new RepoManager(repoSvc, CfgUtil.toRepoArg(job
 				.getSource()));
 		String srcpath = repo.getAbolutePathFromParent("src");
-		if (srcpath == null)
+		if (srcpath == null) {
 			return Collections.EMPTY_LIST;
+		}
 		return getMappings(job, FileUtil.parentPath(srcpath));
 	}
 
-	private SourceManager getSourceManager(CfgSource src) {
-		RepositoryService repoSvc = repositoryProvider
-				.getRepoServiceByURI(CfgUtil.toRepoArg(src));
-		return new SourceManager(repoSvc, src);
-	}
+//	private SourceManager getSourceManager(CfgSource src) {
+//		RepositoryService repoSvc = repositoryProvider
+//				.getRepoServiceByURI(CfgUtil.toRepoArg(src));
+//		return new SourceManager(repoSvc, src);
+//	}
 
+	@SuppressWarnings("PMD")
 	private FileMap getAllTargetFiles(List<CfgTarget> targets)
 			throws OdenException {
 		// get target:ds map
 		final Map<CfgTarget, DeployerService> agents = new HashMap<CfgTarget, DeployerService>();
 		for (CfgTarget ct : targets) {
 			DeployerService ds = txmitter.getDeployer(ct.getAddress());
-			if (ds == null)
+			if (ds == null) {
 				throw new OdenException("Invalid address: " + ct.getAddress());
+			}
 			agents.put(ct, ds);
 		}
 
@@ -404,6 +423,7 @@ public class JobCommandImpl implements CustomCommand {
 		return t.toJSON().put("status", (alive ? "T" : "F"));
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<JSONObject> allTargetStatus(Collection<CfgTarget> targets) {
 		final Collection<JSONObject> ret = new Vector<JSONObject>();
 		List<Thread> ths = new ArrayList<Thread>();

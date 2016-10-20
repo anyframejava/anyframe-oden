@@ -14,6 +14,9 @@
 			<imagedata fileref="../image/Overview/overview_somethingmissing.png"
 				align="left" width="6in"/>
 		</imageobject>
+		<textobject>
+			<phrase>일반적인 개발 방법론에 의하면 각 단계별 이용이 가능한 다양한 도구가 있으나 구현 이나 유지보수 시 배포에 관한 도구는 선택의 폭이 작다.</phrase>
+		</textobject> 
 	</mediaobject>
 
 	<para>

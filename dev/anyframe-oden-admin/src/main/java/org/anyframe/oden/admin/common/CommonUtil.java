@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * CommandUtil : parsing response data getOptionArgs : option name remove ,
@@ -39,10 +40,11 @@ public class CommonUtil {
 				int idx = _opt.length();
 				if (option.length() > idx + 1
 						&& Character.isWhitespace(option.charAt(idx))
-						&& !Character.isWhitespace(option.charAt(idx + 1)))
+						&& !Character.isWhitespace(option.charAt(idx + 1))) {
 					return option.substring(idx + 1);
-				else
+				} else {
 					return "";
+				}
 			}
 		}
 		return null;
@@ -73,8 +75,9 @@ public class CommonUtil {
 			}
 			arg.append(c);
 		}
-		if (arg.length() > 0)
+		if (arg.length() > 0) {
 			args.add(arg.toString());
+		}
 
 		return args.toArray(new String[args.size()]);
 	}
@@ -85,11 +88,12 @@ public class CommonUtil {
 	 * @param arg
 	 * @return
 	 */
-	public static ArrayList<String> getRoleList(String role) {
-		ArrayList<String> roleList = new ArrayList<String>();
+	public static List<String> getRoleList(String role) {
+		List<String> roleList = new ArrayList<String>();
 		String[] roles = role.split(",");
-		for (String r : roles)
+		for (String r : roles) {
 			roleList.add(r);
+		}
 		return roleList;
 	}
 
@@ -100,8 +104,10 @@ public class CommonUtil {
 	 * @return
 	 */
 	public static String getCurrentDate() {
+
 		Date date = new Date();
-		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale
+				.getDefault());
 
 		return format.format(date);
 	}

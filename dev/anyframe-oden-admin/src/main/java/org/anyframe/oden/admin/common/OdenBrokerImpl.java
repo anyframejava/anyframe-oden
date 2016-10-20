@@ -25,13 +25,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 
-import org.anyframe.oden.admin.domain.User;
+import org.anyframe.idgen.impl.Base64;
 import org.anyframe.oden.admin.exception.BrokerException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import anyframe.core.idgen.impl.Base64;
 
 /**
  * This class provides some methods to interface server
@@ -39,11 +37,9 @@ import anyframe.core.idgen.impl.Base64;
  * @author Junghwan Hong
  */
 public class OdenBrokerImpl implements OdenBrokerService {
-	private final int TIMEOUT = 15000; // millis
-	public final String KNOWN_EXCEPTION = "KnownException";
-	public final String UNKNOWN_EXCEPTION = "UnknownException";
-	private static String userid = "";
-	private static String password = "";
+	private final static int TIMEOUT = 15000; // millis
+	public final static String KNOWN_EXCEPTION = "KnownException";
+	public final static String UNKNOWN_EXCEPTION = "UnknownException";
 
 	/**
 	 * Send request and get response, Interface server with http protocol
@@ -84,10 +80,8 @@ public class OdenBrokerImpl implements OdenBrokerService {
 	}
 
 	public boolean checkUser(String shellUrl, String userid, String password)
-			throws Exception {
+			throws BrokerException {
 		PrintWriter writer = null;
-		this.userid = userid;
-		this.password = password;
 
 		if (shellUrl != null && !(shellUrl.equals(""))) {
 			try {
@@ -106,11 +100,11 @@ public class OdenBrokerImpl implements OdenBrokerService {
 				reader = new BufferedReader(new InputStreamReader(
 						conn.getInputStream(), "utf-8"));
 
-				String result = readAll(reader);
+				readAll(reader);
 
 			} catch (ConnectException e) {
 				// throw new BrokerException("broker.info.notavail");
-				throw new BrokerException("Oden Server is not available");
+				throw new BrokerException("oden.server.notrunning");
 			} catch (IOException e) {
 				throw new BrokerException("broker.info.notauth");
 			} finally {
@@ -139,14 +133,13 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		} catch (JSONException e) {
 			if (result.contains("Command not found")) {
 				throw new BrokerException("broker.exception.notcommand");
-			} else {
-				// throw new BrokerException("broker.info.notdata");
-			}
+			} 
 		} catch (BrokerException e) {
 			throw new BrokerException(e.getMessage());
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				reader.close();
+			}
 		}
 		return result;
 	}
@@ -170,17 +163,10 @@ public class OdenBrokerImpl implements OdenBrokerService {
 			Object obj = ja.get(0);
 			if (obj instanceof JSONObject) {
 				final JSONObject json = (JSONObject) obj;
-				if (json.has(KNOWN_EXCEPTION)) {
-					// TODO known
-					// throw new
-					// BrokerException(json.getString(KNOWN_EXCEPTION));
-					// throw new BrokerException("broker.info.notdata");
-				} else if (json.has(UNKNOWN_EXCEPTION)) {
+				if (json.has(UNKNOWN_EXCEPTION)) {
 					// TODO unknown
 					throw new BrokerException(json.getString(UNKNOWN_EXCEPTION));
-				} else {
-					// this is not a kind of exception
-				}
+				} 
 			}
 		} catch (JSONException jexc) {
 			throw new IOException(jexc.getMessage());
@@ -189,16 +175,16 @@ public class OdenBrokerImpl implements OdenBrokerService {
 
 	private String readAll(BufferedReader reader) throws IOException {
 		StringBuffer buf = new StringBuffer();
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			buf.append(line + "\n"); //$NON-NLS-1$
+
+		for ( String line; (line = reader.readLine()) != null; ) {
+			buf.append(line);
+			buf.append("\n");
 		}
 		return buf.toString();
 	}
 
 	private URLConnection init(String url) throws MalformedURLException,
 			IOException {
-		User user;
 		URLConnection con = new URL(url).openConnection();
 
 		con.setUseCaches(false);
@@ -207,9 +193,10 @@ public class OdenBrokerImpl implements OdenBrokerService {
 		con.setConnectTimeout(TIMEOUT);
 
 		// 우선 Oden Server 계정 상수로 세팅
-		if (url != null)
+		if (url != null) {
 			con.addRequestProperty("Authorization",
 					"Basic " + encode("oden", "oden0"));
+		}
 
 		return con;
 	}

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.anyframe.oden.bundle.common.OdenException;
@@ -58,8 +59,9 @@ public class DeployLogImpl implements DeployLogService {
 	public void record(RecordElement2 r) throws OdenException {
 		File f = getHistoryFile(r.getDate());
 		File parent = f.getParentFile();
-		if (!parent.exists())
+		if (!parent.exists()) {
 			parent.mkdirs();
+		}
 		synchronized (latch) {
 			writeObject(f, r);
 		}
@@ -83,15 +85,17 @@ public class DeployLogImpl implements DeployLogService {
 			throw new OdenException(e);
 		} finally {
 			try {
-				if (fout != null)
+				if (fout != null) {
 					fout.close();
+				}
 			} catch (IOException e) {
 			}
 		}
 	}
 
 	private String onlyDateForFile(long date) {
-		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).format(date);
+		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN, Locale.getDefault())
+				.format(date);
 	}
 
 	/**
@@ -104,9 +108,10 @@ public class DeployLogImpl implements DeployLogService {
 		try {
 			if (!empty(txid)) { // retrieve data by transaction id
 				RecordElement2 r = getRecord(txid);
-				if (r == null)
+				if (r == null) {
 					throw new OdenException(
 							"Couldn't find that transaction log: " + txid);
+				}
 				result.add(r);
 			} else if (!empty(startdate)) { // retrieve data by date
 				long start = empty(startdate) ? Long.MIN_VALUE
@@ -116,21 +121,26 @@ public class DeployLogImpl implements DeployLogService {
 				result = getRecords(start, end);
 			} else { // retrieve latest data
 				RecordElement2 r = latestRecord(failonly);
-				if (r != null)
+				if (r != null) {
 					result.add(r);
+				}
 			}
 
-			if (!empty(user))
+			if (!empty(user)) {
 				result = searchByUser(user, result);
+			}
 
-			if (!empty(agent))
+			if (!empty(agent)) {
 				result = searchByAgent(agent, result);
+			}
 
-			if (!empty(path))
+			if (!empty(path)) {
 				result = searchByPath(path, result);
+			}
 
-			if (failonly)
+			if (failonly) {
 				result = refineFailonly(result);
+			}
 
 			return result;
 		} catch (ParseException e) {
@@ -157,11 +167,13 @@ public class DeployLogImpl implements DeployLogService {
 				result = getMiniRecords(start, end);
 			}
 
-			if (!empty(user))
+			if (!empty(user)) {
 				result = searchMiniByUser(user, result);
+			}
 
-			if (failonly)
+			if (failonly) {
 				result = refineFailRecordonly(result);
+			}
 			return result;
 		} catch (ParseException e) {
 			throw new OdenException("Fail to convert to date: " + startdate
@@ -172,42 +184,51 @@ public class DeployLogImpl implements DeployLogService {
 	/**
 	 * for history show command
 	 */
+	@SuppressWarnings("PMD")
 	public RecordElement2 search(String txid, String user, String agent,
 			String path, boolean failonly) throws OdenException {
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
 		if (!empty(txid)) { // retrieve data by transaction id
 			RecordElement2 r = getRecord(txid);
-			if (r == null)
+			if (r == null) {
 				throw new OdenException("Couldn't find that transaction log: "
 						+ txid);
+			}
 			result.add(r);
 		} else { // retrieve latest data
 			RecordElement2 r = latestRecord(failonly);
-			if (r != null)
+			if (r != null) {
 				result.add(r);
+			}
 		}
 
-		if (!empty(user))
+		if (!empty(user)) {
 			result = searchByUser(user, result);
+		}
 
-		if (!empty(agent))
+		if (!empty(agent)) {
 			result = searchByAgent(agent, result);
+		}
 
-		if (!empty(path))
+		if (!empty(path)) {
 			result = searchByPath(path, result);
+		}
 
-		if (failonly)
+		if (failonly) {
 			result = refineFailonly(result);
+		}
 
-		return result.size() == 0 ? null : result.get(0);
+		return result.isEmpty() ? null : result.get(0);
 	}
 
 	private long longDate(String s) throws ParseException {
-		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).parse(s).getTime();
+		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN, Locale.getDefault())
+				.parse(s).getTime();
 	}
 
 	private long longTime(String s) throws ParseException {
-		return new SimpleDateFormat("yyyyMMddHH").parse(s).getTime();
+		return new SimpleDateFormat("yyyyMMddHH", Locale.getDefault()).parse(s)
+				.getTime();
 	}
 
 	private boolean empty(String s) {
@@ -268,10 +289,11 @@ public class DeployLogImpl implements DeployLogService {
 
 	private RecordElement2 latestRecord(boolean failonly) throws OdenException {
 		File f = latestFile(logfiles());
-		if (f != null && f.exists())
+		if (f != null && f.exists()) {
 			synchronized (latch) {
 				return latestRecord(f, failonly);
 			}
+		}
 		return null;
 	}
 
@@ -292,16 +314,19 @@ public class DeployLogImpl implements DeployLogService {
 			throw new OdenStoreException(f.getAbsolutePath());
 		} finally {
 			try {
-				if (fin != null)
+				if (fin != null) {
 					fin.close();
+				}
 			} catch (IOException e) {
 			}
 		}
-		if (o == null)
+		if (o == null) {
 			return null;
+		}
 		RecordElement2 r = (RecordElement2) o;
-		if (failonly)
+		if (failonly) {
 			refineFailonly(r);
+		}
 		return r;
 	}
 
@@ -356,16 +381,18 @@ public class DeployLogImpl implements DeployLogService {
 			String fname = logf.getName();
 			String logdate = fname.substring(LOG_FILE_PREFIX.length(),
 					fname.length() - LOG_FILE_EXT.length());
-			if (onlyDateForFile(txdate).equals(logdate))
+			if (onlyDateForFile(txdate).equals(logdate)) {
 				return logf;
+			}
 		}
 		return null;
 	}
 
 	private RecordElement2 getRecord(String txid) throws OdenException {
 		File f = matchedFile(txid);
-		if (f == null)
+		if (f == null) {
 			return null;
+		}
 
 		FileObjectInputStream fin = null;
 		try {
@@ -373,8 +400,9 @@ public class DeployLogImpl implements DeployLogService {
 				fin = new FileObjectInputStream(f);
 				while (fin.available() > 0) {
 					RecordElement2 r = (RecordElement2) fin.readObject();
-					if (txid.equals(r.id()))
+					if (txid.equals(r.id())) {
 						return r;
+					}
 				}
 			}
 		} catch (ClassNotFoundException e) {
@@ -383,8 +411,9 @@ public class DeployLogImpl implements DeployLogService {
 			throw new OdenStoreException(f.getAbsolutePath());
 		} finally {
 			try {
-				if (fin != null)
+				if (fin != null) {
 					fin.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -407,14 +436,16 @@ public class DeployLogImpl implements DeployLogService {
 			throw new OdenStoreException(logfile.getAbsolutePath());
 		} finally {
 			try {
-				if (fin != null)
+				if (fin != null) {
 					fin.close();
+				}
 			} catch (IOException e) {
 			}
 		}
 	}
 
 	// use this to reduce memory usage instead of collectRecords().
+	@SuppressWarnings("PMD")
 	private void collectMiniRecords(File logfile,
 			List<MiniRecordElement> records) throws OdenException {
 		FileObjectInputStream fin = null;
@@ -435,8 +466,9 @@ public class DeployLogImpl implements DeployLogService {
 			throw new OdenException(e);
 		} finally {
 			try {
-				if (fin != null)
+				if (fin != null) {
 					fin.close();
+				}
 			} catch (IOException e) {
 			}
 		}
@@ -461,8 +493,9 @@ public class DeployLogImpl implements DeployLogService {
 			List<RecordElement2> records) {
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
 		for (RecordElement2 record : records) {
-			if (record.getUser().startsWith(user))
+			if (record.getUser().startsWith(user)) {
 				result.add(record);
+			}
 		}
 		return result;
 	}
@@ -471,8 +504,9 @@ public class DeployLogImpl implements DeployLogService {
 			List<MiniRecordElement> records) {
 		List<MiniRecordElement> result = new ArrayList<MiniRecordElement>();
 		for (MiniRecordElement record : records) {
-			if (record.getUser().startsWith(user))
+			if (record.getUser().startsWith(user)) {
 				result.add(record);
+			}
 		}
 		return result;
 	}
@@ -482,17 +516,20 @@ public class DeployLogImpl implements DeployLogService {
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
 		for (RecordElement2 record : records) {
 			refineMatchedAgentOnly(record, agent);
-			if (record.getDeployFiles().size() > 0)
+			if (record.getDeployFiles().size() > 0) {
 				result.add(record);
+			}
 		}
 		return result;
 	}
 
 	private void refineMatchedAgentOnly(RecordElement2 r, String agentName) {
 		Set<DeployFile> s = new HashSet<DeployFile>();
-		for (DeployFile f : r.getDeployFiles())
-			if (f.getAgent().agentName().contains(agentName))
+		for (DeployFile f : r.getDeployFiles()) {
+			if (f.getAgent().agentName().contains(agentName)) {
 				s.add(f);
+			}
+		}
 		r.setFiles(s);
 	}
 
@@ -501,17 +538,20 @@ public class DeployLogImpl implements DeployLogService {
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
 		for (RecordElement2 record : records) {
 			refineMatchedPathOnly(record, fname);
-			if (record.getDeployFiles().size() > 0)
+			if (record.getDeployFiles().size() > 0) {
 				result.add(record);
+			}
 		}
 		return result;
 	}
 
 	private void refineMatchedPathOnly(RecordElement2 r, String fname) {
 		Set<DeployFile> s = new HashSet<DeployFile>();
-		for (DeployFile f : r.getDeployFiles())
-			if (f.getPath().contains(fname))
+		for (DeployFile f : r.getDeployFiles()) {
+			if (f.getPath().contains(fname)) {
 				s.add(f);
+			}
+		}
 		r.setFiles(s);
 	}
 
@@ -519,17 +559,20 @@ public class DeployLogImpl implements DeployLogService {
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
 		for (RecordElement2 record : records) {
 			refineFailonly(record);
-			if (!record.isSuccess())
+			if (!record.isSuccess()) {
 				result.add(record);
+			}
 		}
 		return result;
 	}
 
 	private void refineFailonly(RecordElement2 r) {
 		Set<DeployFile> s = new HashSet<DeployFile>();
-		for (DeployFile f : r.getDeployFiles())
-			if (!f.isSuccess())
+		for (DeployFile f : r.getDeployFiles()) {
+			if (!f.isSuccess()) {
 				s.add(f);
+			}
+		}
 		r.setFiles(s);
 	}
 
@@ -537,8 +580,9 @@ public class DeployLogImpl implements DeployLogService {
 			List<MiniRecordElement> records) {
 		List<MiniRecordElement> result = new ArrayList<MiniRecordElement>();
 		for (MiniRecordElement record : records) {
-			if (!record.isSuccess())
+			if (!record.isSuccess()) {
 				result.add(record);
+			}
 		}
 		return result;
 	}

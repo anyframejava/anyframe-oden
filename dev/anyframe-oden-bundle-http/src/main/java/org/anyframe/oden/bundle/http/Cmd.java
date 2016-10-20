@@ -75,23 +75,27 @@ public class Cmd {
 		home = odenHome().getPath();
 	}
 
+	@SuppressWarnings("PMD")
 	private String toCommand(String[] ss) {
 		StringBuffer buf = new StringBuffer(ss[0] + " ");
 		int i = 1;
 		// before meeting '-'
 		while (i < ss.length) {
-			if (ss[i].startsWith("-"))
+			if (ss[i].startsWith("-")) {
 				break;
-			buf.append(ss[i] + " ");
+			}
+			buf.append(ss[i]);
+			buf.append(" ");
 			i++;
 		}
 
 		// after meeting '-'
 		while (i < ss.length) {
-			if (!ss[i].startsWith("-"))
+			if (!ss[i].startsWith("-")) {
 				buf.append("\"" + ss[i] + "\" ");
-			else
+			} else {
 				buf.append(ss[i] + " ");
+			}
 			i++;
 		}
 		return buf.substring(0, buf.length() - 1);
@@ -99,13 +103,15 @@ public class Cmd {
 
 	private void loadINI() throws Exception {
 		Properties prop = loadINI(CONFIG_FILE);
-		if (prop == null)
+		if (prop == null) {
 			throw new FileNotFoundException(CONFIG_FILE);
+		}
 
 		String port = prop.getProperty("http.port");
-		if (port == null)
+		if (port == null) {
 			throw new IOException("http.port is not defined. See "
 					+ CONFIG_FILE);
+		}
 
 		odenURL = "http://localhost:" + port + "/shell";
 
@@ -128,11 +134,12 @@ public class Cmd {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				if (in != null)
+				if (in != null) {
 					try {
 						in.close();
 					} catch (IOException e) {
 					}
+				}
 			}
 		}
 		return info;
@@ -175,8 +182,9 @@ public class Cmd {
 			// receive
 			result = handleResult(conn);
 		} finally {
-			if (writer != null)
+			if (writer != null) {
 				writer.close();
+			}
 		}
 		return result;
 
@@ -191,8 +199,9 @@ public class Cmd {
 
 			result = readAll(reader);
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				reader.close();
+			}
 		}
 		return result;
 	}
@@ -203,11 +212,13 @@ public class Cmd {
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
-		if (user != null)
+		if (user != null) {
 			con.setRequestProperty(HEADER_AUTHORIZATION, "Basic " + user);
+		}
 		return con;
 	}
 
+	@SuppressWarnings("PMD")
 	private String readAll(BufferedReader reader) throws IOException {
 		StringBuffer buf = new StringBuffer();
 		String line = null;

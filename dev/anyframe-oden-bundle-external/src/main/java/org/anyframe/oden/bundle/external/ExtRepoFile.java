@@ -23,27 +23,31 @@ import org.anyframe.oden.bundle.job.RepoFile;
  * 
  * @author Junghwan Hong
  */
-public class ExtRepoFile extends RepoFile{
-	//String subdir;
+public class ExtRepoFile extends RepoFile {
+	// String subdir;
 	String file;
-	public ExtRepoFile(String file){
+
+	public ExtRepoFile(String file) {
 		super(file);
 		this.file = file;
 	}
-	
-//	public String getSubdir(){
-//		return subdir;
-//	}
-	public String getFile(){
+
+	// public String getSubdir(){
+	// return subdir;
+	// }
+	public String getFile() {
 		return file;
 	}
+
 	@Override
 	public boolean equals(Object o) {
-		if(!(o instanceof ExtRepoFile))
+		if (!(o instanceof ExtRepoFile)) {
 			return false;
-		ExtRepoFile f = (ExtRepoFile)o;
+		}
+		ExtRepoFile f = (ExtRepoFile) o;
 		return file.equals(f.getFile());
 	}
+
 	@Override
 	public int hashCode() {
 		return Utils.hashCode(file);

@@ -22,27 +22,28 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.anyframe.iam.core.acl.IViewResourceAccessService;
+import org.anyframe.iam.core.reload.IResourceReloadService;
 import org.anyframe.oden.admin.common.CommonUtil;
 import org.anyframe.oden.admin.common.OdenCommonDao;
 import org.anyframe.oden.admin.dao.JobDao;
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Mapping;
 import org.anyframe.oden.admin.service.JobService;
+import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import anyframe.common.Page;
-import anyframe.iam.core.acl.IViewResourceAccessService;
-import anyframe.iam.core.reload.IResourceReloadService;
 
 /**
  * This is JobServiceImpl Class
@@ -53,16 +54,16 @@ import anyframe.iam.core.reload.IResourceReloadService;
 @Transactional(rollbackFor = { Exception.class })
 public class JobServiceImpl implements JobService {
 
-	private OdenCommonDao<Job> odenCommonDao = new OdenCommonDao<Job>();
+	private final OdenCommonDao<Job> odenCommonDao = new OdenCommonDao<Job>();
 
-	private String ahref_pre = "<a href=\"";
-	private String ahref_mid = "\">";
-	private String ahref_post = "</a>";
+	String ahrefPre = "<a href=\"";
+	String ahrefMid = "\">";
+	String ahrefPost = "</a>";
 
-	private String doubleQuotation = "\"";
+	String doubleQuotation = "\"";
 
-	private HashMap runningMap;
-	private HashMap waitMap;
+	private Map runningMap;
+	private Map waitMap;
 
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
@@ -76,6 +77,7 @@ public class JobServiceImpl implements JobService {
 
 	@Inject
 	@Named("resourceReloadService")
+	
 	IResourceReloadService service;
 
 	@Inject
@@ -90,6 +92,7 @@ public class JobServiceImpl implements JobService {
 	 * @param opt
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public Page test(Object objPage, String param, String opt) throws Exception {
 
 		String option = "";
@@ -97,17 +100,17 @@ public class JobServiceImpl implements JobService {
 		int page = Integer.parseInt(objPage + "");
 
 		if (opt.indexOf("i") != -1) {
-			option += "-i ";
+			option = option.concat("-i ");
 		} else if (opt.indexOf("u") != -1) {
-			option += "-u ";
+			option = option.concat("-u ");
 		}
 		if (opt.indexOf("d") != -1) {
-			option += "-del ";
+			option = option.concat("-del ");
 		}
 
-		option += "-page" + " " + (page - 1) + " ";
-
-		option += "-pgscale" + " " + previewPageUnit;
+		option = option.concat("-page" + " " + (page - 1) + " ");
+		
+		option = option.concat("-pgscale" + " " + previewPageUnit);
 
 		String result = odenCommonDao.getResultString("deploy", "test",
 				doubleQuotation + param + doubleQuotation + " " + option);
@@ -117,13 +120,13 @@ public class JobServiceImpl implements JobService {
 		// String toggle =
 		// "<input type='button' onClick='javascript:toggleRemoveList();'>"+
 		// imgSuccess +"</input>";
-		String toggle = ahref_pre + "javascript:toggleRemoveList();"
-				+ ahref_mid + imgSuccess + ahref_post;
+		String toggle = ahrefPre + "javascript:toggleRemoveList();"
+				+ ahrefMid + imgSuccess + ahrefPost;
 
 		List list = new ArrayList();
 
 		int totalNum = 0;
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				for (int i = 0; i < array.length(); i++) {
@@ -139,7 +142,7 @@ public class JobServiceImpl implements JobService {
 							JSONArray targets = dataObj.getJSONArray("targets");
 							String target = "";
 							for (int n = 0; n < targets.length(); n++) {
-								target += "[" + targets.get(n) + "] ";
+								target = target.concat("[" + targets.get(n) + "] ");
 							}
 							target = target.substring(0, target.length() - 1);
 
@@ -184,15 +187,15 @@ public class JobServiceImpl implements JobService {
 		String option_user = "";
 
 		if (opt.indexOf("i") != -1) {
-			option_iu += "-i ";
+			option_iu = option_iu.concat("-i ");
 		} else if (opt.indexOf("u") != -1) {
-			option_iu += "-u ";
+			option_iu = option_iu.concat("-u ");
 		}
 		if (opt.indexOf("d") != -1) {
-			option_d += "-del ";
+			option_d = option_d.concat("-del ");
 		}
 		if (opt.indexOf("c") != -1) {
-			option_c += "-c ";
+			option_c = option_c.concat("-c ");
 		}
 
 		List paramList = new ArrayList();
@@ -221,9 +224,7 @@ public class JobServiceImpl implements JobService {
 			paramList.add(temp);
 		}
 
-		if (boolDeployAll) {
-			// deploy all whole page
-		} else {
+		if (! boolDeployAll) {
 			Set wholeList = getListByPage(job, option_iu + option_d, objPage);
 
 			option_iu = option_iu.replaceAll("u", "i");
@@ -231,34 +232,33 @@ public class JobServiceImpl implements JobService {
 			Iterator itr = wholeList.iterator();
 			while (itr.hasNext()) {
 				String strList = itr.next() + "";
-				if (paramList.contains(strList)) {
-				} else {
+				if (! paramList.contains(strList)) {
 					String[] values = strList.split("@oden@");
 
 					String mode = values[0];
 					String file = values[1];
 
 					if (mode.equalsIgnoreCase("add")) {
-						option_iu += doubleQuotation + file + doubleQuotation
-								+ " ";
+						option_iu = option_iu.concat(doubleQuotation + file
+								+ doubleQuotation + " ");
 					} else if (mode.equalsIgnoreCase("update")) {
-						option_iu += doubleQuotation + file + doubleQuotation
-								+ " ";
+						option_iu = option_iu.concat(doubleQuotation + file
+								+ doubleQuotation + " ");
 					} else if (mode.equalsIgnoreCase("delete")) {
-						option_d += doubleQuotation + file + doubleQuotation
-								+ " ";
+						option_d = option_d.concat(doubleQuotation + file
+								+ doubleQuotation + " ");
 					}
 				}
 			}
 		}
 		// 배포 후 스크립트 구동 옵션
-		if (!(cmd.equals(null) || cmd.equals("")))
+		if (!(cmd == null || "".equals(cmd))) {
 			option_script = "-after" + " " + cmd + " ";
-
+		}
 		// 배포 실행 계정
-		if (!(userid.equals(null) || userid.equals("")))
+		if (!(userid == null || "".equals(userid))) {
 			option_user = "-_user" + " " + userid + " ";
-
+		}
 		option_result = option_iu + option_d + option_c + option_script
 				+ option_user;
 
@@ -284,13 +284,13 @@ public class JobServiceImpl implements JobService {
 		int page = Integer.parseInt(objPage + "") - 1;
 
 		String pageOpt = "-page" + " " + page;
-		pageOpt += " " + "-pgscale" + " " + previewPageUnit;
-
+		pageOpt = pageOpt.concat(" " + "-pgscale" + " " + previewPageUnit);
+		
 		String strWhole = odenCommonDao.getResultString("deploy", "test",
 				doubleQuotation + job + doubleQuotation + " " + opt + " "
 						+ pageOpt);
 
-		if (!(strWhole == null) && !strWhole.equals("")) {
+		if (!(strWhole == null) && !"".equals(strWhole)) {
 			JSONArray array = new JSONArray(strWhole);
 			if (!(array.length() == 0)) {
 				for (int i = 0; i < array.length(); i++) {
@@ -319,8 +319,9 @@ public class JobServiceImpl implements JobService {
 	 * @param cmd
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public Page findList(String cmd) throws Exception {
-		ArrayList<String> roles = CommonUtil.getRoleList(cmd);
+		List<String> roles = CommonUtil.getRoleList(cmd);
 
 		runningMap = new HashMap();
 		waitMap = new HashMap();
@@ -346,10 +347,10 @@ public class JobServiceImpl implements JobService {
 				gName = gName.replaceAll("\\\\", "/");
 			}
 
-			if (roles.contains(gName) || roles.get(0).equals("ROLE_ADMIN")) {
-				g.setJobname(ahref_pre
+			if (roles.contains(gName) || "ROLE_ADMIN".equals(roles.get(0))) {
+				g.setJobname(ahrefPre
 						+ "javascript:fn_addTab('03job', 'JobDeatil', 'jobdetail', '"
-						+ gName + "');" + ahref_mid + gName + ahref_post);
+						+ gName + "');" + ahrefMid + gName + ahrefPost);
 
 				if (runningJob.contains(gName)) {
 					Iterator itr = runningMap.keySet().iterator();
@@ -392,7 +393,7 @@ public class JobServiceImpl implements JobService {
 					String result = odenCommonDao.getResultString("log",
 							"search", para);
 
-					if (!(result == null) && !result.equals("")) {
+					if (!(result == null) && !"".equals(result)) {
 						JSONArray array = notUndoLog(new JSONArray(result));
 
 						if (!(array.length() == 0)) {
@@ -404,18 +405,16 @@ public class JobServiceImpl implements JobService {
 							String date = object.getString("date");
 
 							if (status.equalsIgnoreCase("S")) {
-								gStatus = ahref_pre
+								gStatus = ahrefPre
 										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahref_mid
+										+ gTxid + "');" + ahrefMid
 										+ imgSuccess + "(" + date + ")"
-										+ ahref_post;
-								;
+										+ ahrefPost;
 							} else if (status.equalsIgnoreCase("F")) {
-								gStatus = ahref_pre
+								gStatus = ahrefPre
 										+ "javascript:fn_addTab('04History', 'History', 'historydetail', '"
-										+ gTxid + "');" + ahref_mid + imgFail
-										+ "(" + date + ")" + ahref_post;
-								;
+										+ gTxid + "');" + ahrefMid + imgFail
+										+ "(" + date + ")" + ahrefPost;
 							} else {
 								gStatus = "";
 							}
@@ -461,7 +460,7 @@ public class JobServiceImpl implements JobService {
 			}
 		}
 
-		if (list.size() == 0) {
+		if (list.isEmpty()) {
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
 			return new Page(list, 1, list.size(), list.size(), list.size());
@@ -514,7 +513,7 @@ public class JobServiceImpl implements JobService {
 		String result = odenCommonDao.getResultString("status", "info");
 		String pre = "deploy undo:";
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				for (int i = 0; i < array.length(); i++) {
@@ -530,8 +529,7 @@ public class JobServiceImpl implements JobService {
 						runningMap.put(txid, jobName);
 					} else if (status == 2) {
 						waitMap.put(txid, jobName);
-					} else {
-					}
+					} 
 				}
 			}
 		}
@@ -544,14 +542,15 @@ public class JobServiceImpl implements JobService {
 	 */
 	private String getJobById(String txid) throws Exception {
 		String result = odenCommonDao.getResultString("log", "show", txid);
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					String jobName = object.getString("job");
-					if (!jobName.equals(""))
+					if (!"".equals(jobName)) {
 						return jobName;
+					}
 				}
 			}
 		}
@@ -569,8 +568,8 @@ public class JobServiceImpl implements JobService {
 		String imgStop = "<img src='images/stop.png' style='vertical-align:middle;'/>";
 
 		String result = "";
-		result += ahref_pre + "javascript:stopDeployJob('" + txId + "');"
-				+ ahref_mid + imgStop + ahref_post;
+		result = result.concat(ahrefPre + "javascript:stopDeployJob('" + txId
+				+ "');" + ahrefMid + imgStop + ahrefPost);
 		return result;
 	}
 
@@ -654,7 +653,7 @@ public class JobServiceImpl implements JobService {
 				break;
 			case 5:
 				link = "javascript:rollbackJob('" + txId + "');";
-				if (!gStatus.equals("")) {
+				if (!"".equals(gStatus)) {
 					action = imgRollback;
 				} else {
 					action = imgRollbackUnable;
@@ -666,10 +665,10 @@ public class JobServiceImpl implements JobService {
 			}
 
 			if (b) {
-				result += ahref_pre + link + ahref_mid + action + ahref_post
-						+ "&nbsp;&nbsp;&nbsp;";
+				result = result.concat(ahrefPre + link + ahrefMid + action
+						+ ahrefPost + "&nbsp;&nbsp;&nbsp;");
 			} else {
-				result += action + "&nbsp;&nbsp;&nbsp;";
+				result = result.concat(action + "&nbsp;&nbsp;&nbsp;");
 			}
 			// result += ahref_pre + link + ahref_mid + action
 			// + ahref_post + "   ";
@@ -689,14 +688,14 @@ public class JobServiceImpl implements JobService {
 	 */
 	public Job findByName(String param) throws Exception {
 
-		if (param.equals("")) {
+		if ("".equals(param)) {
 			return new Job();
 		} else {
 			String result = odenCommonDao.getResultString("job", "info",
 					doubleQuotation + param + doubleQuotation);
 			Job g = new Job();
 
-			if (!(result == null) && !result.equals("")) {
+			if (!(result == null) && !"".equals(result)) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
 					int recordSize = array.length();
@@ -714,9 +713,10 @@ public class JobServiceImpl implements JobService {
 								.get("excludes");
 						String strExcludes = "";
 						for (int num = 0; num < excludes.length(); num++) {
-							strExcludes += excludes.get(num) + ", ";
+							strExcludes = strExcludes.concat(excludes.get(num)
+									+ ", ");
 						}
-						if (!strExcludes.equals("")) {
+						if (!"".equals(strExcludes)) {
 							strExcludes = strExcludes.substring(0,
 									strExcludes.length() - 2);
 						}
@@ -775,6 +775,7 @@ public class JobServiceImpl implements JobService {
 		insertToOdenServer(param, cmds, mappings, jobname, repository, excludes);
 	}
 
+	@SuppressWarnings("PMD")
 	private void insertToOdenServer(String[] param, String[] cmds,
 			String[] mappings, String jobname, String repository,
 			String excludes) throws Exception {
@@ -787,10 +788,9 @@ public class JobServiceImpl implements JobService {
 		String exclu = "";
 		StringTokenizer token2 = new StringTokenizer(excludes, ",");
 		while (token2.hasMoreTokens()) {
-			exclu += token2.nextToken().trim() + ",";
+			exclu = exclu.concat(token2.nextToken().trim() + ",");
 		}
-		if (exclu.length() == 0) {
-		} else {
+		if (exclu.length() != 0) {
 			exclu = exclu.substring(0, exclu.length() - 1);
 		}
 		joSource.put("excludes", exclu);
@@ -896,8 +896,9 @@ public class JobServiceImpl implements JobService {
 	 * @param param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public Page loadMappings(String param) throws Exception {
-		if (param.equals("")) {
+		if ("".equals(param)) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
@@ -908,7 +909,7 @@ public class JobServiceImpl implements JobService {
 
 			String imgDel = "<img src='images/ico_del.gif'/>";
 
-			if (!(result == null) && !result.equals("")) {
+			if (!(result == null) && !"".equals(result)) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
 					int recordSize = array.length();
@@ -918,7 +919,7 @@ public class JobServiceImpl implements JobService {
 
 						JSONArray mappings = (JSONArray) sources
 								.get("mappings");
-						if (!(mappings == null) && !mappings.equals("")) {
+						if (!(mappings == null) && !"".equals(mappings)) {
 							for (int n = 0; n < mappings.length(); n++) {
 								JSONObject mapping = (JSONObject) mappings
 										.get(n);
@@ -928,10 +929,10 @@ public class JobServiceImpl implements JobService {
 
 								String key = dir + "@oden@" + checkout;
 
-								String event = ahref_pre
+								String event = ahrefPre
 										+ "javascript:delSource('" + key
-										+ "');" + ahref_mid + imgDel
-										+ ahref_post;
+										+ "');" + ahrefMid + imgDel
+										+ ahrefPost;
 
 								Mapping m = new Mapping();
 								m.setDir(dir);
@@ -947,16 +948,17 @@ public class JobServiceImpl implements JobService {
 				}
 			}
 
-			if (list.size() == 0) {
+			if (list.isEmpty()) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
 				return new Page(list, 1, list.size(), list.size(), list.size());
 			}
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public Page findMappings(String param) throws Exception {
-		if (param.equals("")) {
+		if ("".equals(param)) {
 			List list = new ArrayList();
 			return new Page(list, 1, list.size(), 1, 1);
 		} else {
@@ -969,7 +971,7 @@ public class JobServiceImpl implements JobService {
 
 			String imgDel = "<img src='images/ico_del.gif'/>";
 
-			if (!(result == null) && !result.equals("")) {
+			if (!(result == null) && !"".equals(result)) {
 				JSONArray array = new JSONArray(result);
 				if (!(array.length() == 0)) {
 					int recordSize = array.length();
@@ -981,8 +983,8 @@ public class JobServiceImpl implements JobService {
 
 						String key = dir + "@oden@" + checkout;
 
-						String event = ahref_pre + "javascript:delSource('"
-								+ key + "');" + ahref_mid + imgDel + ahref_post;
+						String event = ahrefPre + "javascript:delSource('"
+								+ key + "');" + ahrefMid + imgDel + ahrefPost;
 
 						Mapping m = new Mapping();
 						m.setDir(dir);
@@ -995,7 +997,7 @@ public class JobServiceImpl implements JobService {
 				}
 			}
 
-			if (list.size() == 0) {
+			if (list.isEmpty()) {
 				return new Page(list, 1, list.size(), 1, 1);
 			} else {
 				return new Page(list, 1, list.size(), list.size(), list.size());
@@ -1010,6 +1012,7 @@ public class JobServiceImpl implements JobService {
 	 * @param param
 	 * @param opt
 	 */
+	@SuppressWarnings("PMD")
 	public Page compare(Object objPage, String param, String opt)
 			throws Exception {
 
@@ -1022,9 +1025,9 @@ public class JobServiceImpl implements JobService {
 		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
 
 		if (page == 0) {
-			option += "-page" + " " + page;
+			option = option.concat("-page" + " " + page);
 		} else {
-			option += "-page" + " " + (page - 1);
+			option = option.concat("-page" + " " + (page - 1));
 		}
 
 		String result = odenCommonDao.getResultString("job", "compare",
@@ -1032,7 +1035,7 @@ public class JobServiceImpl implements JobService {
 
 		List list = new ArrayList();
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				int recordSize = array.length();
@@ -1051,7 +1054,7 @@ public class JobServiceImpl implements JobService {
 							String equal = dataObj.getString("equal");
 
 							String eqaulResult = "";
-							if (equal.equals("T")) {
+							if ("T".equals(equal)) {
 								eqaulResult = imgSuccess;
 							} else {
 								eqaulResult = imgFail;
@@ -1066,7 +1069,7 @@ public class JobServiceImpl implements JobService {
 									JSONObject t = (JSONObject) targets.get(n);
 									String name = t.getString("name");
 									String date = chgDateFormat(Long
-											.parseLong((t.getString("date"))));
+											.parseLong(t.getString("date")));
 									String size = t.getString("size");
 									map.put(name, date + "<br/>" + size
 											+ "byte");
@@ -1087,7 +1090,8 @@ public class JobServiceImpl implements JobService {
 	 * 
 	 * @param param
 	 */
-	public HashMap compareHeader(String param) throws Exception {
+	@SuppressWarnings("PMD")
+	public Map compareHeader(String param) throws Exception {
 
 		int numHeader = 0;
 
@@ -1098,7 +1102,7 @@ public class JobServiceImpl implements JobService {
 		String result = odenCommonDao.getResultString("job", "info",
 				doubleQuotation + param + doubleQuotation);
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				int tarLeng = array.length();
@@ -1149,7 +1153,7 @@ public class JobServiceImpl implements JobService {
 			map_model.put("sortable", false);
 			model.add(map_model);
 		}
-		HashMap map_result = new HashMap();
+		Map map_result = new HashMap();
 		map_result.put("header", header);
 		map_result.put("model", model);
 
@@ -1176,7 +1180,8 @@ public class JobServiceImpl implements JobService {
 	}
 
 	private String chgDateFormat(Long input) {
-		return new SimpleDateFormat("yyyy.MM.dd aa hh:mm:ss").format(input);
+		return new SimpleDateFormat("yyyy.MM.dd aa hh:mm:ss", Locale
+				.getDefault()).format(input);
 	}
 
 	/**
@@ -1185,13 +1190,14 @@ public class JobServiceImpl implements JobService {
 	 * @param param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public List<HashMap> excel(String param) throws Exception {
 
 		String result = odenCommonDao.getResultString("job", "compare", param);
 
 		List list = new ArrayList();
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !"".equals(result)) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
 				int recordSize = array.length();
@@ -1217,7 +1223,7 @@ public class JobServiceImpl implements JobService {
 									JSONObject t = (JSONObject) targets.get(n);
 									String name = t.getString("name");
 									String date = chgDateFormat(Long
-											.parseLong((t.getString("date"))));
+											.parseLong(t.getString("date")));
 									String size = t.getString("size");
 									map.put(name, date + " " + size + "byte");
 								}

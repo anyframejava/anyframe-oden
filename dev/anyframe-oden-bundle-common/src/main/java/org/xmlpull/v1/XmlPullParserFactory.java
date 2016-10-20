@@ -33,6 +33,7 @@ import java.util.Vector;
  * @see XmlPullParser
  */
 
+@SuppressWarnings("PMD")
 public class XmlPullParserFactory {
 	/** used as default class to server as context class in newInstance() */
 	final static Class referenceContextClass;
@@ -69,6 +70,7 @@ public class XmlPullParserFactory {
 	 */
 
 	protected XmlPullParserFactory() {
+		super();
 	}
 
 	/**
@@ -171,14 +173,16 @@ public class XmlPullParserFactory {
 
 	public XmlPullParser newPullParser() throws XmlPullParserException {
 
-		if (parserClasses == null)
+		if (parserClasses == null) {
 			throw new XmlPullParserException(
 					"Factory initialization was incomplete - has not tried "
 							+ classNamesLocation);
+		}
 
-		if (parserClasses.size() == 0)
+		if (parserClasses.isEmpty()) {
 			throw new XmlPullParserException(
 					"No valid parser classes found in " + classNamesLocation);
+		}
 
 		final StringBuffer issues = new StringBuffer();
 
@@ -226,7 +230,7 @@ public class XmlPullParserFactory {
 					"Factory initialization incomplete - has not tried "
 							+ classNamesLocation);
 		}
-		if (serializerClasses.size() == 0) {
+		if (serializerClasses.isEmpty()) {
 			throw new XmlPullParserException(
 					"No valid serializer classes found in "
 							+ classNamesLocation);
@@ -289,19 +293,21 @@ public class XmlPullParserFactory {
 			try {
 				InputStream is = context.getResourceAsStream(RESOURCE_NAME);
 
-				if (is == null)
+				if (is == null) {
 					throw new XmlPullParserException(
 							"resource not found: "
 									+ RESOURCE_NAME
 									+ " make sure that parser implementing XmlPull API is available");
+				}
 				final StringBuffer sb = new StringBuffer();
 
 				while (true) {
 					final int ch = is.read();
-					if (ch < 0)
+					if (ch < 0) {
 						break;
-					else if (ch > ' ')
+					} else if (ch > ' ') { 
 						sb.append((char) ch);
+					}
 				}
 				is.close();
 
@@ -324,8 +330,9 @@ public class XmlPullParserFactory {
 		while (pos < classNames.length()) {
 			int cut = classNames.indexOf(',', pos);
 
-			if (cut == -1)
+			if (cut == -1) {
 				cut = classNames.length();
+			}
 			final String name = classNames.substring(pos, cut);
 
 			Class candidate = null;

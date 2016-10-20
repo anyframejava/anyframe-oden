@@ -52,6 +52,7 @@ public class StartCommandImpl extends InstallCommandImpl implements Command {
 		return "start bundle(s).";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		StringTokenizer st = new StringTokenizer(s, " ");
 

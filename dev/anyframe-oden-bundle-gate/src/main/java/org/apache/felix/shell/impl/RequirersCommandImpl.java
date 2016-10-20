@@ -49,6 +49,7 @@ public class RequirersCommandImpl implements Command {
 		return "list requiring bundles.";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		// Get package admin service.
 		ServiceReference ref = m_context

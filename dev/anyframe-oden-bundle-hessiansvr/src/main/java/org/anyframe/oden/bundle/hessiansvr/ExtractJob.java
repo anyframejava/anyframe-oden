@@ -57,13 +57,16 @@ public class ExtractJob extends StoppableJob {
 	protected Object execute() throws IOException {
 		File s = new File(srcdir);
 		File d = new File(destdir);
-		if (!s.isAbsolute())
+		if (!s.isAbsolute()) {
 			throw new IOException("Absolute path is allowed only: " + s);
-		if (!d.isAbsolute())
+		}
+		if (!d.isAbsolute()) {
 			throw new IOException("Absolute path is allowed only: " + d);
+		}
 		return extractSnapshot(new File(s, zipname), d);
 	}
 
+	@SuppressWarnings("PMD")
 	private List<DoneFileInfo> extractSnapshot(File src, File dest)
 			throws IOException {
 		List<DoneFileInfo> result = new ArrayList<DoneFileInfo>();
@@ -75,6 +78,7 @@ public class ExtractJob extends StoppableJob {
 		return result;
 	}
 
+	@SuppressWarnings("PMD")
 	private Map<FileInfo, Boolean> _extract(File src, File dest)
 			throws IOException {
 		if (!src.exists() || src.isDirectory())

@@ -23,6 +23,7 @@ import org.json.JSONException;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class JSONArrayFilter {
 	public JSONArrayFilter() {
 	}

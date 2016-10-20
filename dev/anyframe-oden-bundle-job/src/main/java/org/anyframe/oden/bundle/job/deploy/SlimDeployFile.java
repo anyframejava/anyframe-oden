@@ -98,8 +98,9 @@ public class SlimDeployFile implements JSONizable, Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof SlimDeployFile))
+		if (!(o instanceof SlimDeployFile)) {
 			return false;
+		}
 		SlimDeployFile d = (SlimDeployFile) o;
 		return path.equals(d.path) && target.equals(target);
 	}

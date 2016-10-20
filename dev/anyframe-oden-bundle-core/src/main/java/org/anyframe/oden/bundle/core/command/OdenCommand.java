@@ -15,7 +15,6 @@
  */
 package org.anyframe.oden.bundle.core.command;
 
-import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -59,8 +58,9 @@ public abstract class OdenCommand implements CustomCommand {
 	 */
 	protected Cmd toInfoCmd(String prefs, String name) throws OdenException {
 		String info = getPrefs(prefs).get(name);
-		if (info.length() == 0)
+		if (info.length() == 0) {
 			return null;
+		}
 		return new Cmd("foo fooAction \"" + name + "\" " + info);
 	}
 
@@ -84,8 +84,9 @@ public abstract class OdenCommand implements CustomCommand {
 	protected String extractUserName(Cmd cmd) {
 		String user = cmd.getOptionArg(new String[] { Cmd.USER_OPT });
 		try {
-			if (user.length() == 0)
+			if (user.length() == 0) {
 				user = InetAddress.getLocalHost().getHostAddress();
+			}
 		} catch (UnknownHostException e) {
 			user = "";
 		}

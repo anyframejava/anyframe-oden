@@ -98,10 +98,12 @@ public class UndoJob extends DeployJob {
 		}
 	}
 
+	@SuppressWarnings("PMD")
 	protected void undo() throws OdenException {
 		currentWork = "ready to undo...";
-		if (deployFiles.size() == 0)
+		if (deployFiles.size() == 0) {
 			throw new OdenException("<txid> is not available.undo size is 0.");
+		}
 		Iterator<DeployFile> it = deployFiles.iterator();
 		Map<String, DeployerService> dsMap = new HashMap<String, DeployerService>();
 		DeployerService ds;
@@ -121,9 +123,10 @@ public class UndoJob extends DeployJob {
 				}
 				// DeployerService ds = txmitterService.getDeployer(parent
 				// .agentAddr());
-				if (ds == null)
+				if (ds == null) {
 					throw new OdenException("Couldn't connect to the agent: "
 							+ parent.agentAddr());
+				}
 
 				// backup directory setting....
 				String oldbak = FileUtil.resolveDotNatationPath(FileUtil
@@ -164,22 +167,25 @@ public class UndoJob extends DeployJob {
 											.getProperty("deploy.undo.loc"), id),
 									backupcnt);
 
-							if (d != null)
+							if (d != null) {
 								f.setMode(d.isUpdate() ? Mode.UPDATE : Mode.ADD);
-							else
+							} else {
 								f.setMode(Mode.NA);
+							}
 						}
 					} else {
 						// initial deploy file
-						if (f.mode() == Mode.ADD)
+						if (f.mode() == Mode.ADD) {
 							d = ds.backupNRemove(
 									parentLoc,
 									file,
 									FileUtil.combinePath(context
 											.getProperty("deploy.undo.loc"), id),
 									backupcnt);
-						if (d != null)
+						}
+						if (d != null) {
 							f.setMode(Mode.DELETE);
+						}
 					}
 					if (d != null) {
 						f.setSuccess(d.success());
@@ -203,6 +209,7 @@ public class UndoJob extends DeployJob {
 		return totalWorks - additionalWorks;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void done() {
 		try {
 			RecordElement2 r = new RecordElement2(id, deployFiles, user,
@@ -224,7 +231,8 @@ public class UndoJob extends DeployJob {
 	}
 
 	protected void setError(String msg) {
-		if (errorMessage == null)
+		if (errorMessage == null) {
 			errorMessage = msg;
+		}
 	}
 }

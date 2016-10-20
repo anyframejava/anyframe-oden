@@ -18,12 +18,12 @@
 			url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=historyService.show(page,cmd,opt)&viewName=jsonView&cmd='/>" + '<%=param%>' + "&opt=" + encodeURI('<%=opt%>'),
 			mtype : 'GET',
 			datatype : "json",
-			colNames : [ '<anyframe:message code="historydetail.grid.no"/>',
-						 '<anyframe:message code="historydetail.grid.status"/>',
-			             '<anyframe:message code="historydetail.grid.target"/>',
-			 			 '<anyframe:message code="historydetail.grid.path"/>', 
-			 			 '<anyframe:message code="historydetail.grid.mode"/>', 
-			 			 '<anyframe:message code="historydetail.grid.log"/>' ],
+			colNames : [ '<spring:message code="historydetail.grid.no"/>',
+						 '<spring:message code="historydetail.grid.status"/>',
+			             '<spring:message code="historydetail.grid.target"/>',
+			 			 '<spring:message code="historydetail.grid.path"/>', 
+			 			 '<spring:message code="historydetail.grid.mode"/>', 
+			 			 '<spring:message code="historydetail.grid.log"/>' ],
 			jsonReader : {
 				repeatitems : false
 			},
@@ -69,11 +69,11 @@
 			viewrecords : true,
 			shrinkToFit:true,
 			pager : jQuery('#pager_historydetail'),
-			rowNum : '<anyframe:message code="common.page.size"/>',
+			rowNum : '<spring:message code="common.page.size"/>',
 			sortable : true,
 
 			loadError : function(xhr, st, err) {
-				alert('<anyframe:message code="historydetail.load.error"/>');
+				alert('<spring:message code="historydetail.load.error"/>');
 			}
 		});
 
@@ -99,7 +99,7 @@
 		var x;
 
 		if(isValidString(trim($("#filename").val())) && trim($("#filename").val()) !== ""){
-			alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+			alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 		}else{
 			if(trim($("#filename").val()) !== "") {
 				searchs.push("-path" +" " + $("#filename").val() + " ");
@@ -139,7 +139,7 @@
 	
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="historydetail.page.subtitle"/></h3>
+	<h3 class="subtitle_h3"><spring:message code="historydetail.page.subtitle"/></h3>
 </div><!-- end pageSubtitle -->
 <div id="body_history">
 <form method="post" id="detailForm" name="detailForm">
@@ -151,19 +151,19 @@
 				<caption>history detail search</caption>
 				<tbody>
 					<tr>
-						<th scope="row"><label for="filename"><anyframe:message code="history.label.itemname"/></label></th>
+						<th scope="row"><label for="filename"><spring:message code="history.label.itemname"/></label></th>
 						<td><input type="text" id="filename" name="filename" value="" style="width:120px; height:17px;" onKeyPress="if(event.keyCode==13) search();"/></td>
-						<th scope="row"><label for="mode"><anyframe:message code="historydetail.label.mode"/></label></th>
+						<th scope="row"><label for="mode"><spring:message code="historydetail.label.mode"/></label></th>
 						<td>
 							<select name="mode" id="mode" class="selectbox" style='width:100'>
-								<option value="all"><anyframe:message code="historydetail.select.all"/></option>
-								<option value="A"><anyframe:message code="historydetail.select.add"/></option>
-								<option value="U"><anyframe:message code="historydetail.select.upd"/></option>
-								<option value="D"><anyframe:message code="historydetail.select.del"/></option>
+								<option value="all"><spring:message code="historydetail.select.all"/></option>
+								<option value="A"><spring:message code="historydetail.select.add"/></option>
+								<option value="U"><spring:message code="historydetail.select.upd"/></option>
+								<option value="D"><spring:message code="historydetail.select.del"/></option>
 							</select>	
 						</td>
 						<td width="230"></td>
-						<th scope="row" style="align:right;"><label for="fail"><anyframe:message code="historydetail.search.fail"/></label></th>
+						<th scope="row" style="align:right;"><label for="fail"><spring:message code="historydetail.search.fail"/></label></th>
 						<td><input type="checkbox"  id="failed" value="true" class="checkbox"/></td>
 						<td width="80" align="right"><a href="javascript:search();"><img src="<c:url value='/images/btn_search.gif'/>" width="73" height="20" alt="search" /></a></td>
 					</tr>

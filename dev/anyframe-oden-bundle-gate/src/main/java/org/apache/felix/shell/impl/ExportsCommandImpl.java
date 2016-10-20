@@ -49,6 +49,7 @@ public class ExportsCommandImpl implements Command {
 		return "list exported packages.";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		// Get package admin service.
 		ServiceReference ref = m_context

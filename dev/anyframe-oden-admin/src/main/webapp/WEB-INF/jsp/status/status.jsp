@@ -13,10 +13,10 @@ jQuery(document).ready(function() {
 				url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=statusService.findList(cmd)&viewName=jsonView'/>",
 				mtype : 'GET',
 				datatype : "json",
-				colNames : [ '<anyframe:message code="status.grid.job"/>',
-							 '<anyframe:message code="status.grid.date"/>', 
-							 '<anyframe:message code="status.grid.counts"/>', 
-							 '<anyframe:message code="status.grid.action"/>',
+				colNames : [ '<spring:message code="status.grid.job"/>',
+							 '<spring:message code="status.grid.date"/>', 
+							 '<spring:message code="status.grid.counts"/>', 
+							 '<spring:message code="status.grid.action"/>',
 							 'txId'
 							 ],
 				jsonReader : {
@@ -66,7 +66,7 @@ jQuery(document).ready(function() {
 				loadError : function(xhr, st, err) {
 					//jQuery("#grid_job").clearGridData(true);
 					jQuery("#grid_status").trigger("reloadGrid");
-					alert('<anyframe:message code="status.load.error"/>');
+					alert('<spring:message code="status.load.error"/>');
 				},
 				gridComplete: function() {
 					$.ajax( {
@@ -100,7 +100,7 @@ jQuery(document).ready(function() {
 	}
 	
 	function stopDeploy(txid){
-		if(confirm('<anyframe:message code="status.confirm.stopjob"/>')){
+		if(confirm('<spring:message code="status.confirm.stopjob"/>')){
 			$.ajax( {
 				url : "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.stop(id)&viewName=jsonView&id='/>"+txid ,
 				dataType : "json",
@@ -109,14 +109,14 @@ jQuery(document).ready(function() {
 					jQuery("#grid_status").trigger("reloadGrid");
 				},
 				error : function() {
-					alert('<anyframe:message code="status.load.error"/>');
+					alert('<spring:message code="status.load.error"/>');
 				}
 			});
 		}
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="status.page.subtitle"/></h3>
+	<h3 class="subtitle_h3"><spring:message code="status.page.subtitle"/></h3>
 </div><!-- end pageSubtitle -->
 
 <div id="body_policy">

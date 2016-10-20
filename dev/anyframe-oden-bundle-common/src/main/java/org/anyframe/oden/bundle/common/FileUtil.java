@@ -53,8 +53,9 @@ public class FileUtil {
 	public static void mkdirs(File f) throws IOException {
 		File parent = f.getParentFile();
 		if (parent != null && !parent.exists()) {
-			if (parent.mkdirs() == false)
+			if (!parent.mkdirs()) {
 				throw new IOException("Fail to create dir: " + parent.getPath());
+			}
 		}
 		// return f.createNewFile();
 	}
@@ -67,12 +68,14 @@ public class FileUtil {
 	 * @throws IOException
 	 */
 	public static long compress(File dir, File jar) throws IOException {
-		if (!dir.exists() || !dir.isDirectory())
+		if (!dir.exists() || !dir.isDirectory()) {
 			throw new IOException("Couldn't find: " + dir);
+		}
 		if (jar.exists()) {
-			if (jar.isDirectory())
+			if (jar.isDirectory()) {
 				throw new IOException("same directory is existed."
 						+ jar.getPath());
+			}
 			jar.delete();
 		}
 
@@ -83,8 +86,9 @@ public class FileUtil {
 			compressDir(dir, dir, jout);
 			return jar.length();
 		} finally {
-			if (jout != null)
+			if (jout != null) {
 				jout.close();
+			}
 		}
 	}
 
@@ -95,6 +99,7 @@ public class FileUtil {
 	 * @return size of the orginal dir
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	private static long compressDir(final File root, File dir,
 			ZipOutputStream out) throws IOException {
 		long total = 0;
@@ -122,8 +127,9 @@ public class FileUtil {
 					} catch (IOException e) {
 					}
 					try {
-						if (in != null)
+						if (in != null) {
 							in.close();
+						}
 					} catch (IOException e) {
 					}
 
@@ -140,10 +146,12 @@ public class FileUtil {
 	 */
 	public static List<String> updateJar(File ref, File target)
 			throws IOException {
-		if (!ref.exists() || ref.isDirectory())
+		if (!ref.exists() || ref.isDirectory()) {
 			throw new IOException("Couldn't find: " + ref);
-		if (target.exists() && target.isDirectory())
+		}
+		if (target.exists() && target.isDirectory()) {
 			throw new IOException("Directory is existed: " + target);
+		}
 
 		List<String> updatedfiles = null;
 
@@ -170,6 +178,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	public static File temporaryDir() throws IOException {
 		Random random = new Random();
 		for (int maxAttempts = 100; maxAttempts > 0; --maxAttempts) {
@@ -187,15 +196,16 @@ public class FileUtil {
 	 * @param file
 	 * @return
 	 */
-	private static String pathName(File file) {
-		String sfile = file.getName();
-		int idot = sfile.lastIndexOf('.');
-		if (idot == -1)
-			return sfile;
-
-		String ext = sfile.length() > idot + 1 ? sfile.substring(idot + 1) : "";
-		return sfile.substring(0, idot) + "_" + ext;
-	}
+//	private static String pathName(File file) {
+//		String sfile = file.getName();
+//		int idot = sfile.lastIndexOf('.');
+//		if (idot == -1) {
+//			return sfile;
+//		}
+//
+//		String ext = sfile.length() > idot + 1 ? sfile.substring(idot + 1) : "";
+//		return sfile.substring(0, idot) + "_" + ext;
+//	}
 
 	/**
 	 * @param jar
@@ -203,6 +213,7 @@ public class FileUtil {
 	 * @throws IOException
 	 * @throws ZipException
 	 */
+	@SuppressWarnings("PMD")
 	private static List<String> extractLatest(File jar, File dir)
 			throws ZipException, IOException {
 		List<String> updatedfiles = new ArrayList<String>();
@@ -222,10 +233,11 @@ public class FileUtil {
 					// time = entry.getTime();
 				} else {
 					old = new File(dir, entry.getName());
-					if (old.exists())
+					if (old.exists()) {
 						if (old.lastModified() >= entry.getTime()) {
 							continue;
 						}
+					}
 
 					in = new BufferedInputStream(zip.getInputStream(entry));
 					out = new BufferedOutputStream(new FileOutputStream(old));
@@ -236,22 +248,26 @@ public class FileUtil {
 				}
 			} finally {
 				try {
-					if (out != null)
+					if (out != null) {
 						out.close();
+					}
 				} catch (IOException x) {
 				}
 				try {
-					if (in != null)
+					if (in != null) {
 						in.close();
+					}
 				} catch (IOException x) {
 				}
 				try {
-					if (zip != null)
+					if (zip != null) {
 						zip.close();
+					}
 				} catch (IOException x) {
 				}
-				if (old != null && time > -1)
+				if (old != null && time > -1) {
 					old.setLastModified(time);
+				}
 			}
 		}
 		return updatedfiles;
@@ -266,10 +282,12 @@ public class FileUtil {
 	 * @throws ZipException
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	public static Map<FileInfo, Boolean> extractZip(File src, File dest)
 			throws IOException {
-		if (!src.exists() || src.isDirectory())
+		if (!src.exists() || src.isDirectory()) {
 			throw new IOException("Couldn't find: " + src);
+		}
 
 		Map<FileInfo, Boolean> extractedfiles = new HashMap<FileInfo, Boolean>();
 
@@ -301,22 +319,26 @@ public class FileUtil {
 				} finally {
 					// do u wanna read this?
 					try {
-						if (out != null)
+						if (out != null) {
 							out.close();
+						}
 					} catch (IOException x) {
 					}
 					try {
-						if (in != null)
+						if (in != null) {
 							in.close();
+						}
 					} catch (IOException x) {
 					}
 					try {
-						if (zip != null)
+						if (zip != null) {
 							zip.close();
+						}
 					} catch (IOException x) {
 					}
-					if (f != null)
+					if (f != null) {
 						f.setLastModified(time);
+					}
 				}
 				extractedfiles.put(
 						new FileInfo(entry.getName(), false, f.lastModified(),
@@ -333,6 +355,7 @@ public class FileUtil {
 	 * @param file
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String getRelativePath(final String root, String file) {
 		String root_ = normalize(root);
 		root_ = root_.startsWith("/") ? root_.substring(1) : root_;
@@ -341,8 +364,9 @@ public class FileUtil {
 
 		if (file_.startsWith(root_)) {
 			String relative = file_.substring(root_.length());
-			if (relative.startsWith("/"))
+			if (relative.startsWith("/")) {
 				relative = relative.substring("/".length());
+			}
 			return relative;
 		}
 		return null;
@@ -354,13 +378,16 @@ public class FileUtil {
 	 * @param path
 	 * @return path with separated '/'. it is not end with '/'.
 	 */
+	@SuppressWarnings("PMD")
 	public static String normalize(String path) {
-		if (path == null)
+		if (path == null) {
 			return null;
+		}
 
 		path = path.replaceAll("\\\\", "/");
-		if (!path.equals("/") && path.endsWith("/"))
+		if (!"/".equals(path) && path.endsWith("/")) {
 			path = path.substring(0, path.length() - 1);
+		}
 		return path;
 	}
 
@@ -372,13 +399,15 @@ public class FileUtil {
 	 * @param sep
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String combinePath(String parent, String child) {
-		if (parent == null && child == null)
+		if (parent == null && child == null) {
 			return null;
-		else if (parent == null || parent.length() == 0)
+	 	} else if (parent == null || parent.length() == 0) {
 			return normalize(child);
-		else if (child == null || child.length() == 0)
+		} else if (child == null || child.length() == 0) {
 			return normalize(parent);
+		}
 		child = normalize(child);
 		return normalize(parent) + (child.startsWith("/") ? "" : "/") + child;
 	}
@@ -389,6 +418,7 @@ public class FileUtil {
 	 * @param path
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String parentPath(String path) {
 		path = normalize(path);
 		int i = path.lastIndexOf('/');
@@ -401,6 +431,7 @@ public class FileUtil {
 	 * @param path
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String fileName(String path) {
 		path = normalize(path);
 		// after normalized, can not be end with '/'.
@@ -415,8 +446,9 @@ public class FileUtil {
 	 */
 	public static String nameOnly(String file) {
 		int dot = file.indexOf(".");
-		if (dot == -1)
+		if (dot == -1) {
 			return file;
+		}
 		return file.substring(0, dot);
 	}
 
@@ -461,14 +493,17 @@ public class FileUtil {
 			out = new BufferedOutputStream(new FileOutputStream(dest));
 			size = copy(in, out);
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
-			if (in != null)
+			}
+			if (in != null) {
 				in.close();
+			}
 		}
 
-		if (!dest.setLastModified(src.lastModified()))
+		if (!dest.setLastModified(src.lastModified())) {
 			throw new IOException("Fail to set date: " + dest);
+		}
 		return size;
 	}
 
@@ -480,6 +515,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	public static long copy(InputStream in, OutputStream out)
 			throws IOException {
 		byte[] buf = new byte[1024 * 64];
@@ -489,6 +525,7 @@ public class FileUtil {
 			out.write(buf, 0, size);
 			total += size;
 		}
+		
 		return total;
 	}
 
@@ -500,10 +537,12 @@ public class FileUtil {
 			out = new FileOutputStream(dest).getChannel();
 			return in.transferTo(0, in.size(), out);
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
-			if (in != null)
+			}
+			if (in != null) {
 				in.close();
+			}
 		}
 	}
 
@@ -516,10 +555,12 @@ public class FileUtil {
 			out = new FileOutputStream(dest).getChannel();
 			return in.transferTo(0, in.size(), out);
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
-			if (in != null)
+			}
+			if (in != null) {
 				in.close();
+			}
 			dest.setLastModified(date);
 		}
 	}
@@ -566,8 +607,9 @@ public class FileUtil {
 	public static boolean matched(String path, List<String> wildcards) {
 		String _file = path.replaceAll("\\\\", "/");
 		for (String wildcard : wildcards) {
-			if (_file.matches(toRegex(wildcard)))
+			if (_file.matches(toRegex(wildcard))) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -576,15 +618,17 @@ public class FileUtil {
 	 * @return common parent. null if there's no common parent
 	 */
 	public static String commonParent(List<String> wcs) {
-		if (wcs.size() == 0)
+		if (wcs.isEmpty()) {
 			return null;
+		}
 
 		String common = null;
 		for (String wc : wcs) {
-			if (common == null)
+			if (common == null) {
 				common = normalParent(wc);
-			else
+			} else {
 				common = commonParent(common, wc);
+			}
 		}
 		return common;
 	}
@@ -592,6 +636,7 @@ public class FileUtil {
 	/**
 	 * @return wc's parent not having wildcard character.
 	 */
+	@SuppressWarnings("PMD")
 	private static String normalParent(String wc) {
 		wc = normalize(wc);
 
@@ -616,6 +661,7 @@ public class FileUtil {
 	/**
 	 * method to extract a same parent directory
 	 */
+	@SuppressWarnings("PMD")
 	private static String commonParent(String wc0, String wc1) {
 		wc0 = normalize(wc0);
 		wc1 = normalize(wc1);
@@ -623,8 +669,9 @@ public class FileUtil {
 		StringBuffer buf = new StringBuffer();
 		StringBuffer tok = new StringBuffer();
 		for (int i = 0; i < wc0.length(); i++) {
-			if (wc1.length() <= i)
+			if (wc1.length() <= i) {
 				break;
+			}
 
 			char c = wc0.charAt(i);
 			if (c != wc1.charAt(i) || c == '?' || c == '*') { // not same or wc
@@ -654,8 +701,9 @@ public class FileUtil {
 						.replaceAll("\\?", ".");
 
 		// add to last ((^|/).*)? to consider files in folder
-		if (converted.contains("@@"))
+		if (converted.contains("@@")) {
 			converted = converted.replaceAll("@@", "(.*/)?") + "((^|/).*)?$";
+		}
 		return converted;
 	}
 
@@ -668,22 +716,25 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("PMD")
 	public static File uniqueFile(File path, String prefix, String postfix)
 			throws IOException {
 		final int maxAttempts = 300;
 		for (int i = 0; i < maxAttempts; i++) {
 			File uniquef = new File(path, prefix + "_" + Integer.valueOf(i)
 					+ postfix);
-			if (!uniquef.exists())
+			if (!uniquef.exists()) {
 				return uniquef;
+			}
 		}
 		throw new IOException("Couldn't get a unique file name with prefix: "
 				+ prefix + " & postfix: " + postfix);
 	}
 
 	public static boolean isAbsolutePath(String path) {
-		if (path == null)
+		if (path == null) {
 			return false;
+		}
 		return path.startsWith("/") || /* UNIX */
 		path.matches("^[a-zA-Z]:[/\\\\].*"); /* Windows */
 	}
@@ -695,46 +746,54 @@ public class FileUtil {
 	 *            absolute path like /aaa/bbb/../../ccc/ddd
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String resolveDotNatationPath(String path) {
 		path = path.replaceAll("\\\\", "/");
 
-		if (!isAbsolutePath(path))
+		if (!isAbsolutePath(path)) {
 			return null;
+		}
 
 		// remove /.
 		int prevlen = 0;
-		if (path.contains("."))
+		if (path.contains(".")) {
 			while (prevlen != path.length()) {
 				prevlen = path.length();
 				path = path.replaceFirst("/\\./?$", "");
 				path = path.replaceFirst("/\\./", "/");
 			}
+		}
 
 		// replace /..
 		prevlen = 0;
-		if (path.contains(".."))
+		if (path.contains("..")) {
 			while (prevlen != path.length()) {
 				prevlen = path.length();
 				path = path.replaceFirst("/[^/]+/\\.\\.", "");
 			}
+		}
 
-		if (path.contains("/."))
+		if (path.contains("/.")) {
 			return null;
+		}
 		return path;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public static void listAllFiles(Collection<FileInfo> ret, String root,
 			File dir) {
-		if (!dir.exists())
+		if (!dir.exists()) {
 			return;
+		}
 		File[] fs = dir.listFiles();
 		for (File f : fs) {
-			if (f.isDirectory())
+			if (f.isDirectory()) {
 				listAllFiles(ret, root, f);
-			else
+			} else {
 				ret.add(new FileInfo(FileUtil.getRelativePath(root,
 						f.getAbsolutePath()), false, f.lastModified(), f
 						.length()));
+			}
 		}
 	}
 
@@ -752,7 +811,16 @@ public class FileUtil {
 		String sourceTemp = null;
 		StringBuffer result = new StringBuffer();
 		sourceTemp = source.toUpperCase();
-		while ((eIndex = sourceTemp.indexOf(pattern.toUpperCase(), sIndex)) >= 0) {
+//		while ((eIndex = sourceTemp.indexOf(pattern.toUpperCase(), sIndex)) >= 0) {
+//			result.append(source.substring(sIndex, eIndex));
+//			result.append(replace);
+//			sIndex = eIndex + pattern.length();
+//		}
+		while (true) {
+			eIndex = sourceTemp.indexOf(pattern.toUpperCase(), sIndex);
+			if (eIndex < 0) {
+				break;
+			}
 			result.append(source.substring(sIndex, eIndex));
 			result.append(replace);
 			sIndex = eIndex + pattern.length();

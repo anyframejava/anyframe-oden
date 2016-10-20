@@ -61,8 +61,9 @@ public class RepositoryCommandImpl implements CustomCommand {
 				ja = getRepositoryProtocols();
 			} else if (Cmd.SHOW_ACTION.equals(action)) {
 				String[] repoArgs = cmd.getOptionArgArray(REPO_OPT);
-				if (repoArgs == null)
+				if (repoArgs == null) {
 					throw new OdenException("Couldn't execute command.");
+				}
 				ja = getRepositoryStructure(repoArgs);
 			} else if (action.length() == 0 || "help".equals(action)) {
 				out.println(getFullUsage());
@@ -85,6 +86,7 @@ public class RepositoryCommandImpl implements CustomCommand {
 		return jsonizedFileList(files);
 	}
 
+	@SuppressWarnings("PMD")
 	private JSONArray jsonizedFileList(List<FileInfo> files)
 			throws OdenException {
 		final String NAME = "name";
@@ -131,11 +133,13 @@ public class RepositoryCommandImpl implements CustomCommand {
 		for (Iterator<String> it = repositoryProvider.getRepositoryUsages()
 				.iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");
-			if (it.hasNext())
+			if (it.hasNext()) {
 				usages.append(" | ");
+			}
 		}
-		if (usages.length() == 0)
+		if (usages.length() == 0) {
 			throw new OdenException("Couldn't find any repository services.");
+		}
 		return usages.toString();
 	}
 

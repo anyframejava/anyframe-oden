@@ -51,6 +51,7 @@ public class StopCommandImpl implements Command {
 		return "stop bundle(s).";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		StringTokenizer st = new StringTokenizer(s, " ");
 

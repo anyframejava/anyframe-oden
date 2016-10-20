@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,12 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoggingAspect {
 
-	// @Pointcut("execution(* test1..*Impl.*(..)) || execution(* anyframe.core.ria.mip..*MiPServiceImpl.*(..))")
-	@Pointcut("execution(* anyframe.oden.admin..*Impl.*(..))")
-	public void serviceMethod() {
-	}
-
-	@Before("serviceMethod()")
+	@Before("execution(* org.anyframe.oden..*Impl.*(..))")
 	public void beforeLogging(JoinPoint thisJoinPoint) {
 		Class<? extends Object> clazz = thisJoinPoint.getTarget().getClass();
 		String methodName = thisJoinPoint.getSignature().getName();
@@ -51,7 +45,8 @@ public class LoggingAspect {
 			if (i > 0) {
 				argBuf.append(", ");
 			}
-			argBuf.append(argClassName + " arg" + ++i);
+			String arg = argClassName + " arg" + ++i;
+			argBuf.append(arg);
 			argValueBuf.append(".arg" + i + " : " + argument.toString() + "\n");
 		}
 

@@ -21,6 +21,7 @@ package org.anyframe.oden.bundle.http;
  * @author Junghwan Hong
  */
 public class ShellException extends Exception {
+	@SuppressWarnings("PMD")
 	public ShellException() {
 
 	}

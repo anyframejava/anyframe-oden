@@ -29,7 +29,7 @@ public class Status implements Serializable {
 	private String jobname;
 	private String id;
 	private String date;
-	private String status;
+	private String jobStatus;
 	private String desc;
 	private String progress;
 	private String totalWorks;
@@ -71,15 +71,15 @@ public class Status implements Serializable {
 	}
 
 	public String getStatus() {
-		return status;
+		return jobStatus;
 	}
 
 	/**
 	 * 
 	 * @param status
 	 */
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(String jobStatus) {
+		this.jobStatus = jobStatus;
 	}
 
 	public String getDesc() {

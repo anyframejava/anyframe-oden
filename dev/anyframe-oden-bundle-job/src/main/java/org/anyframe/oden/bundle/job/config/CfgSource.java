@@ -71,8 +71,9 @@ public class CfgSource {
 		JSONObject o = new JSONObject();
 		o.put("dir", path);
 		JSONArray arr = new JSONArray();
-		for (CfgMapping mapping : mappings)
+		for (CfgMapping mapping : mappings) {
 			arr.put(mapping.toJSON());
+		}
 		o.put("mappings", arr);
 		o.put("excludes", new JSONArray(excludes));
 		return o;
@@ -84,8 +85,9 @@ public class CfgSource {
 			CfgSource ct = (CfgSource) obj;
 			if (StringUtil.equals(path, ct.getPath())
 					&& mappings.equals(ct.getMappings())
-					&& excludes.equals(ct.getExcludes()))
+					&& excludes.equals(ct.getExcludes())) {
 				return true;
+			}
 		}
 		return false;
 	}

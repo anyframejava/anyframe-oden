@@ -60,8 +60,9 @@ public class CfgTarget {
 		if (obj instanceof CfgTarget) {
 			CfgTarget ct = (CfgTarget) obj;
 			if (equals(name, ct.getName()) && equals(address, ct.getAddress())
-					&& equals(path, ct.getPath()))
+					&& equals(path, ct.getPath())) {
 				return true;
+			}
 		}
 		return false;
 	}

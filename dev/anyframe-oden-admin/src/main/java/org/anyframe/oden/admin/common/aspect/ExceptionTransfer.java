@@ -19,18 +19,16 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import org.anyframe.exception.BaseException;
 import org.anyframe.oden.admin.exception.BrokerException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.aop.framework.Advised;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-
-import anyframe.common.exception.BaseException;
 
 /**
  * This is ExceptionTransfer Class
@@ -41,14 +39,10 @@ import anyframe.common.exception.BaseException;
 @Service
 public class ExceptionTransfer {
 
-	@Pointcut("execution(* anyframe.oden.admin..*ServiceImpl.*(..))")
-	public void serviceMethod() {
-	}
-
 	@Inject
 	private MessageSource messageSource;
 
-	@AfterThrowing(pointcut = "serviceMethod()", throwing = "exception")
+	@AfterThrowing(pointcut = "execution(* org.anyframe.oden..*Impl.*(..))", throwing = "exception")
 	public void transfer(JoinPoint thisJoinPoint, Exception exception)
 			throws BrokerException {
 		Object target = thisJoinPoint.getTarget();
@@ -63,7 +57,7 @@ public class ExceptionTransfer {
 		}
 
 		String className = target.getClass().getSimpleName().toLowerCase();
-		String opName = (thisJoinPoint.getSignature().getName()).toLowerCase();
+		String opName = thisJoinPoint.getSignature().getName().toLowerCase();
 		Log logger = LogFactory.getLog(target.getClass());
 
 		// Oden Server Interface Exception
@@ -71,8 +65,9 @@ public class ExceptionTransfer {
 			BrokerException odenEx = (BrokerException) exception;
 			String msg = messageSource.getMessage(odenEx.getMessage(),
 					new String[] {}, Locale.getDefault());
-			if (!odenEx.getMessage().contains("broker.info"))
+			if (!odenEx.getMessage().contains("broker.info")) {
 				logger.error(msg, odenEx);
+			}
 			throw new BrokerException(msg, odenEx);
 		}
 

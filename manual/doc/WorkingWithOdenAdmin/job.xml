@@ -21,8 +21,8 @@
 		</para>
 	
 		<para>
-			<table>
-				<title>Job Actions</title>
+			<informaltable>
+				<caption>Job Actions</caption>
 				<tgroup cols="3">
 					<thead>
 						<row>
@@ -39,6 +39,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_deploy.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>배포버튼</phrase>
+									</textobject> 
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -57,6 +60,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_cleandeploy.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>클린배포버튼</phrase>
+									</textobject>
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -73,6 +79,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_compare.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>타겟서버 비교 버튼</phrase>
+									</textobject>
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -91,6 +100,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_runscript.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>스크립트 구동 버튼</phrase>
+									</textobject>
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -109,6 +121,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_del.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>배포 Job 삭제 버튼</phrase>
+									</textobject>
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -125,6 +140,9 @@
 										<imagedata fileref="../image/WorkingWithOdenAdmin/job_rollback.gif"
 											align="center" />
 									</imageobject>
+									<textobject>
+										<phrase>배포 원복 버튼</phrase>
+									</textobject>
 								</mediaobject>
 							</entry>
 							<entry align="left">
@@ -136,7 +154,7 @@
 						</row>
 					</tbody>
 				</tgroup>
-			</table>
+			</informaltable>
 		</para>
 	</section>
 

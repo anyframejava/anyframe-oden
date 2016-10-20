@@ -37,7 +37,7 @@ import org.osgi.service.component.ComponentContext;
  * @author Junghwan Hong
  */
 public class PageMemoryHandlerImpl implements PageHandler {
-	private int CACHE_SZ = 20;
+	private int cacheSz = 20;
 
 	private JSONArrayFilter filter = null;
 	int pgscale = 20;
@@ -50,7 +50,7 @@ public class PageMemoryHandlerImpl implements PageHandler {
 	protected void activate(ComponentContext context) {
 		String cacheSz = context.getBundleContext().getProperty(
 				"page.cache.size");
-		this.CACHE_SZ = StringUtil.empty(cacheSz) ? 20 : Integer
+		this.cacheSz = StringUtil.empty(cacheSz) ? 20 : Integer
 				.valueOf(cacheSz);
 
 		String _scale = context.getBundleContext().getProperty("page.scale");
@@ -67,10 +67,12 @@ public class PageMemoryHandlerImpl implements PageHandler {
 	 * @param cmd
 	 * @return null if no appropriate data
 	 */
+	@SuppressWarnings("PMD")
 	public JSONObject getCachedData(Cmd cmd, int pgscale, PageHandlerOr or)
 			throws Exception {
-		if (pgscale < 1)
+		if (pgscale < 1) {
 			pgscale = this.pgscale;
+		}
 
 		String _cmd = cmd.toString();
 		String _page = cmd.getOptionArg(new String[] { "page" });
@@ -80,12 +82,14 @@ public class PageMemoryHandlerImpl implements PageHandler {
 		}
 
 		int page = Integer.valueOf(_page);
-		if (page == 0)
+		if (page == 0) {
 			return runCachedOr(_cmd, page, pgscale, or);
+		}
 
 		JSONObject ret = get(_cmd, page, pgscale);
-		if (ret == null) // cache hit fail
+		if (ret == null) {// cache hit fail
 			return runCachedOr(_cmd, page, pgscale, or);
+		}
 		return ret;
 	}
 
@@ -97,15 +101,18 @@ public class PageMemoryHandlerImpl implements PageHandler {
 				new JSONArray());
 	}
 
+	@SuppressWarnings("PMD")
 	public JSONObject get(String cmd, int page, int pgscale) throws Exception {
-		if (pgscale < 1)
+		if (pgscale < 1) {
 			pgscale = this.pgscale;
+		}
 		synchronized (latch) {
 			String cmdkey = removeRedundancy(cmd);
 
 			JSONArray found = pgcache.get(cmdkey);
-			if (found == null)
+			if (found == null) {
 				return null;
+			}
 
 			return makeJSONObject(filter.run(found, page, pgscale),
 					found.length());
@@ -138,8 +145,9 @@ public class PageMemoryHandlerImpl implements PageHandler {
 		while (i < opts.size()) {
 			Opt opt = opts.get(i);
 			if (!opt.getName().equals("json") && !opt.getName().equals("_user")
-					&& !opt.getName().equals("page"))
+					&& !opt.getName().equals("page")) {
 				i++;
+			}
 			opts.remove(i);
 		}
 		return cmd.toString();

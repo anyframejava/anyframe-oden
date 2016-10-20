@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * rule) <name> [<action> [<action-arg>]] -<option> [<option-arg[=value]> ...]
  * [-<option> ...] ex) policy add mypolicy $local -i **\*.js **\*.jar -x
@@ -39,8 +42,10 @@ public class Cmd {
 	private String name = "";
 	private String action = "";
 	private String actionArg = "";
-	private List<Opt> options = new ArrayList<Opt>();
-
+	private final List<Opt> options = new ArrayList<Opt>();
+	
+	private final Log logger = LogFactory.getLog(this.getClass());
+	
 	public Cmd(String line) {
 		parse(line);
 	}
@@ -51,9 +56,10 @@ public class Cmd {
 
 	private void parse(String line) {
 		String[] args = CommonUtil.split(line);
-		if (args.length == 0 || isOption(args[0]))
-			System.out.println("Syntax Error command");
-
+		if (args.length == 0 || isOption(args[0])) {
+			logger.error("Syntax Error command");
+		}
+		
 		int idx = 0;
 		name = args[idx++];
 		if (idx < args.length && !isOption(args[idx])) {
@@ -64,23 +70,28 @@ public class Cmd {
 		}
 
 		if (idx < args.length) {
-			if (!isOption(args[idx]))
-				System.out.println("Syntax Error command");
-
+			if (!isOption(args[idx])) {
+				logger.error("Syntax Error command");
+			}
+			Opt opt = new Opt();
 			// collect the others
 			StringBuffer ops = new StringBuffer();
 			for (int i = idx; i < args.length; i++) {
 				if (args[i].startsWith("-")) {
 					if (ops.length() != 0) {
-						options.add(new Opt(ops.toString()));
+						opt.clear();
+						opt.makeOpt(ops.toString());
+						options.add(opt);
 						ops.delete(0, ops.length());
 					}
 					ops.append(args[i].substring(1) + " ");
-				} else
+				} else {
 					ops.append("\"" + args[i] + "\" ");
+				}
 			}
-			if (ops.length() != 0)
+			if (ops.length() != 0) {
 				options.add(new Opt(ops.toString()));
+			}
 		}
 	}
 
@@ -106,17 +117,20 @@ public class Cmd {
 
 	public Opt getOption(String name) {
 		for (Opt op : options) {
-			if (name.equals(op.getName()))
+			if (name.equals(op.getName())) {
 				return op;
+			}
 		}
 		return null;
 	}
 
 	public Opt getOption(String[] names) {
 		for (Opt op : options) {
-			for (String name : names)
-				if (name.equals(op.getName()))
+			for (String name : names) {
+				if (name.equals(op.getName())) {
 					return op;
+				}
+			}
 		}
 		return null;
 	}
@@ -130,8 +144,9 @@ public class Cmd {
 	 */
 	public String getOptionArg(String[] names) {
 		String[] args = getOptionArgArray(names);
-		if (args.length > 0)
+		if (args.length > 0) {
 			return args[0];
+		}
 		return "";
 	}
 
@@ -168,8 +183,10 @@ public class Cmd {
 		buf.append(action.length() > 0 ? " " + action : "");
 		buf.append(actionArg.length() > 0 ? " \"" + actionArg + "\"" : " \""
 				+ "\"");
-		for (Opt option : options)
-			buf.append(" " + option.toString());
+		for (Opt option : options) {
+			buf.append(" ");
+			buf.append(option.toString());
+		}
 		return buf.toString();
 	}
 
@@ -180,8 +197,10 @@ public class Cmd {
 	 */
 	public String getOptionString() {
 		StringBuffer buf = new StringBuffer();
-		for (Opt option : options)
-			buf.append(" " + option.toString());
+		for (Opt option : options) {
+			buf.append(" ");
+			buf.append(option.toString());
+		}
 		return buf.toString().trim();
 	}
 

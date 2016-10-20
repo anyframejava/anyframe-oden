@@ -4,33 +4,36 @@ Anyframe 프로젝트 내에 사용된 외부 오픈 소스의 경우 원 오픈 소스의 라이센스 정책
 1) Apache Ant 1.6.5 : http://ant.apache.org/, Apache License Version 2.0
 2) Apache Felix 4.0.2 : http://felix.apache.org/site/index.html, Apache License Version 2.0
 3) Apache Felix 1.4.1 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-4) Apache License Version 2.0  : http://www.apache.org/, Apache License Version 2.0
-5) Apache-Jakarta Codec 1.4 : http://commons.apache.org/codec/, Apache License Version 2.0
-6) Apache-XML Xerces Java 1 2.9.1 : http://xerces.apache.org/xerces2-j/index.html, Apache License Version 2.0
-7) Berkeley DB Java Edition 4.0.103 : http://www.oracle.com/us/products/database/overview/index.html, Oracle Berkeley DB Java Edition License
-8) core 3.1.1 : https://cfengine.com/community/, Eclipse Public License - v 1.0
-9) GlassFish 2.1 : http://glassfish.java.net/, COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-10) Hessian Binary Web Service Protocol 3.1.6 : http://hessian.caucho.com/, Apache 1.1
-11) International Components for Unicode - ICU4J 4.6.1 : http://site.icu-project.org/, ICU License
-12) Jakarta Commons-Logging 1.1.1 : http://commons.apache.org/logging/, Apache License Version 2.0
-13) JDOM  : http://www.jdom.org/, Jdom License
-14) jquery.autocomplete.bassistance 1.1 : http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/, MIT License V2
-15) jqueryjs 1.3.2 : http://code.google.com/p/jqueryjs/, MIT License V2
-16) json-framework 1.0.0 : https://github.com/bpo/json-framework/, JSon License
-17) kXML - A Lean Common XML API 2.2.2 : http://kxml.sourceforge.net/, BSD 2.0
-18) org.apache.felix.configadmin 1.2.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-19) org.apache.felix.eventadmin 1.0.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-20) org.apache.felix.http.jetty 2.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-21) org.apache.felix.log 1.0.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-22) org.apache.felix.prefs 1.0.2 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-23) org.apache.felix.prefs 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-24) org.apache.felix.scr 1.4.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-25) org.apache.felix.shell.remote 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-26) org.apache.felix.shell.tui 1.4.1 : http://felix.apache.org/site/index.html, Apache License Version 2.0
-27) org.apche.servicemix.bundles.jasypt 1.7_1 : http://servicemix.apache.org, Apache License Version 2.0
-28) R-OSGi - r-osgi remote-1.0.0.RC4 : http://r-osgi.sourceforge.net/, BSD 2.0
-29) servlet-api-2.5  : https://github.com/saces/servlet-api-2.5/, Sun Servlet Binary Code License
-30) winstone-lite 0.9.10 : http://winstone.sourceforge.net, LGPL 2.1
-31) XMLPULL Parser based on Xerces 2 XNI v1 : http://xni2xmlpull.sourceforge.net/, Apache License Version 2.0
-
+4) Apache Felix EventAdmin 1.2.4 : http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.eventadmin/, Apache License Version 2.0
+5) Apache Felix Http Jetty 2.2.0 : http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.http.jetty/, Apache License Version 2.0
+6) Apache Felix Shell Service  : http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.shell/, Apache License Version 2.0
+7) Apache License Version 2.0  : http://www.apache.org/, Apache License Version 2.0
+8) Apache-Jakarta Codec 1.4 : http://commons.apache.org/codec/, Apache License Version 2.0
+9) Apache-XML Xerces Java 1 2.9.1 : http://xerces.apache.org/xerces2-j/index.html, Apache License Version 2.0
+10) Berkeley DB Java Edition 4.0.103 : http://www.oracle.com/us/products/database/overview/index.html, Oracle Berkeley DB Java Edition License
+11) core 3.1.1 : https://cfengine.com/community/, Eclipse Public License - v 1.0
+12) devframe  : https://code.google.com/p/devframe/, Apache License Version 2.0
+13) devstore  : https://code.google.com/p/devstore/, Apache License Version 2.0
+14) GlassFish 2.1 : http://glassfish.java.net/, COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+15) Hessian Binary Web Service Protocol 3.1.6 : http://hessian.caucho.com/, Apache 1.1
+16) International Components for Unicode - ICU4J 4.6.1 : http://site.icu-project.org/, ICU License
+17) Jakarta Commons-Logging 1.1.1 : http://commons.apache.org/logging/, Apache License Version 2.0
+18) JDOM  : http://www.jdom.org/, Jdom License
+19) jquery.autocomplete.bassistance 1.1 : http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/, MIT License V2
+20) jqueryjs 1.3.2 : http://code.google.com/p/jqueryjs/, MIT License V2
+21) json-framework 1.0.0 : https://github.com/bpo/json-framework/, JSon License
+22) kXML - A Lean Common XML API 2.2.2 : http://kxml.sourceforge.net/, BSD 2.0
+23) kXML - A Lean Common XML API2.3.0:http://kxml.sourceforge.net/, BSD 2.0
+24) org.apache.felix.configadmin 1.2.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+25) org.apache.felix.log 1.0.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+26) org.apache.felix.prefs 1.0.2 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+27) org.apache.felix.prefs 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+28) org.apache.felix.scr 1.4.0 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+29) org.apache.felix.shell.remote 1.0.4 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+30) org.apache.felix.shell.tui 1.4.1 : http://felix.apache.org/site/index.html, Apache License Version 2.0
+31) org.apche.servicemix.bundles.jasypt 1.7_1 : http://servicemix.apache.org, Apache License Version 2.0
+32) R-OSGi - r-osgi remote-1.0.0.RC4 : http://r-osgi.sourceforge.net/, BSD 2.0
+33) servlet-api-2.5  : https://github.com/saces/servlet-api-2.5/, Sun Servlet Binary Code License
+34) winstone-lite 0.9.10 : http://winstone.sourceforge.net, LGPL 2.1
+35) XMLPULL Parser based on Xerces 2 XNI v1 : http://xni2xmlpull.sourceforge.net/, Apache License Version 2.0
 

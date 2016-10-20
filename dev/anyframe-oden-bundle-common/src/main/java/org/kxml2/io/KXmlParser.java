@@ -33,6 +33,7 @@ import org.xmlpull.v1.*;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class KXmlParser implements XmlPullParser {
 
     private Object location;

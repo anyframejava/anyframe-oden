@@ -43,6 +43,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ExtUndoJob extends DeployJob {
 	protected TransmitterService txmitterService;
 

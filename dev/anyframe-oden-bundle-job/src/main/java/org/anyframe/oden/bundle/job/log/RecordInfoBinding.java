@@ -32,6 +32,7 @@ public class RecordInfoBinding extends TupleBinding {
 	String user;
 	boolean isFailOnly = false;
 
+	@SuppressWarnings("PMD")
 	public RecordInfoBinding() {
 	}
 
@@ -43,24 +44,28 @@ public class RecordInfoBinding extends TupleBinding {
 
 	@Override
 	public Object entryToObject(TupleInput in) {
-		if (in.available() == 0)
+		if (in.available() == 0) {
 			return null;
+		}
 
 		ShortenRecord ret = new ShortenRecord();
 		ret.setId(in.readString());
 		ret.setJob(in.readString());
-		if (!StringUtil.empty(job) && !job.equals(ret.getJob()))
+		if (!StringUtil.empty(job) && !job.equals(ret.getJob())) {
 			return null;
+		}
 		ret.setSuccess(in.readBoolean());
-		if (isFailOnly && ret.isSuccess())
+		if (isFailOnly && ret.isSuccess()) {
 			return null;
+		}
 		ret.setTotal(in.readInt());
 		ret.setnSuccess(in.readInt());
 		ret.setDate(in.readLong());
 		ret.setLog(in.readString());
 		ret.setUser(in.readString());
-		if (!StringUtil.empty(user) && !user.equals(ret.getUser()))
+		if (!StringUtil.empty(user) && !user.equals(ret.getUser())) {
 			return null;
+		}
 
 		// TODO path search
 		return ret;

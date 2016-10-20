@@ -34,6 +34,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class DeployFileListBinding extends TupleBinding {
 	Mode mode = Mode.NA;
 	boolean isFailOnly = false;
@@ -75,8 +76,9 @@ public class DeployFileListBinding extends TupleBinding {
 
 			DeployFile df = new DeployFile(repo, _path, agent, 0L, 0L, mode,
 					isSuccess);
-			if (!isSuccess && log != null)
+			if (!isSuccess && log != null) {
 				df.setErrorLog(log);
+			}
 			ret.add(df);
 		}
 		return ret;

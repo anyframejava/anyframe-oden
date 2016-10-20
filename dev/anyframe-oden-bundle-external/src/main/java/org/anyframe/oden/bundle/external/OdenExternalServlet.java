@@ -33,6 +33,7 @@ import com.caucho.hessian.server.HessianServlet;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class OdenExternalServlet extends HessianServlet {
 	/**
 	 * 

@@ -38,10 +38,11 @@ public class Logger {
 	 * @param msg
 	 */
 	public static void log(int level, String msg){
-		if(log == null)
+		if(log == null) {
 			System.out.println(msg);
-		else
+		} else {
 			log.log(level, msg);
+		}
 	}
 	
 	/**
@@ -52,10 +53,11 @@ public class Logger {
 	 * @param e
 	 */
 	public static void log(int level, String msg, Exception e){
-		if(log == null)
+		if(log == null) {
 			System.out.println(msg + "\n\t" + stackTrace(e));
-		else
+		} else {
 			log.log(level, msg + "\n\t" + stackTrace(e));
+		}
 	}
 	
 	/**
@@ -76,19 +78,23 @@ public class Logger {
 	}
 	
 	private static String stackTrace(Throwable t) {
-		if(t == null) return "";
+		if(t == null) { 
+			return "";
+		}
 		
 		String s = t.getClass().getName();
 		String msg = t.getLocalizedMessage();
 		
-		StringBuffer buf = new StringBuffer(msg != null ? s + ": " + msg : s);
+		String bufString = msg != null ? s + ": " + msg : s;
+		StringBuffer buf = new StringBuffer(bufString);
 		buf.append('\n');
 		for(StackTraceElement trace : t.getStackTrace()){
 			buf.append("\tat " + trace + "\n");
 		}
 		
-		if(t.getCause() != null)
+		if(t.getCause() != null) {
 			buf.append(stackTrace(t.getCause()));
+		}
 		
 		return buf.toString();
 	}

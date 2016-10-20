@@ -25,21 +25,25 @@
 
 			<para>
 				배포될 파일이 존재하는 시스템에 
-				ODEN Server를 설치해야 하고 원할한 작동을 위해 설치 경로는 영문으로 구성 되어야 한다. 
+				ODEN Server를 설치해야 하고 원활한 작동을 위해 설치 경로는 영문으로 구성 되어야 한다. 
 			</para>
 
 			<para>
-				ODEN의 압축을 풀면 아래와 같은 구조로 되어 있다. 
+				ODEN의 압축을 풀면 아래와 같은 구조로 되어 있다.
 				<mediaobject>
 					<imageobject>
 						<title>ODEN Folder Structure</title>
-						<imagedata fileref="../image/Install/file_struct.png" align="center"/>
+						<imagedata fileref="../image/Install/file_struct.png"
+							align="center" />
 					</imageobject>
+					<textobject>
+						<phrase>압축을 풀면 크게 core, admin, manual로 구성되어지며 core 하단에는 bin, bundle, conf로 구성된다.</phrase>
+					</textobject> 
 				</mediaobject>
 			</para>
 		    <para>
 		    	압축파일에는 ODEN 및 ODEN Admin이 모두 포함되어 있다. ODEN은 Server모드(bin/startup.sh or bin/startup.cmd)로도 
-		    	Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. Agent만 설치하고 싶다면, core 디렉토리만 복사하여
+		    	Agent모드(bin/startup-agent.sh or bin/startup-agent.cmd)로도 구동시킬 수 있다. 구동된 Server/Agent 중지를 원할 경우는 bin/ *-shutdown.sh or bin/ *-shutdown.cmd 를 실행한다. Agent만 설치하고 싶다면, core 디렉토리만 복사하여
 		    	Agent모드로 부팅시키면 된다.
 		    </para>
 		    
@@ -110,6 +114,11 @@
 					</listitem>
 					<listitem>
 						<para>
+							deploy.threadcnt: 일괄 배포 시 구동되는 thread 개수. 설정하지 않을 경우, JVM 상에서 유효한 processors를 기준으로 ODEN 에서 자동 설정  
+						</para>
+					</listitem>
+					<listitem>
+						<para>
 							deploy.exception.option: 배포 오류 발생 시 원복 여부. true로 설정되면 배포 오류 발생 시 배포 작업이 취소. false로 설정되면 오류 파일은 제외하고 나머지 파일 배포작업 수행.
 						</para>
 					</listitem>
@@ -147,6 +156,12 @@
 					<listitem>
 						<para>
 							security.key: 파일 전송 시 암호화 및 복호화를 하기 위한 키 값. 기능을 사용 할 경우 키 값을 정의하며, oden.ini 와 agent.ini 에 동일한 값이 정의 되어야 한다.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							boot.only: 배포 대상 서버에 물리적으로 동일한 공간에서 다수의 Application이 동작 할 경우 하나의 Agent 기동을 원할 경우의 설정값. 
+							agent.ini 에 정의하며, Window Server의 경우 Subinacl 윈도우 유틸리티가 설치 되어야 한다. 또한 모든 경로의 접근을 위해 Admin 권한으로 Agent를 구동하여야 한다.
 						</para>
 					</listitem>
 				</itemizedlist>

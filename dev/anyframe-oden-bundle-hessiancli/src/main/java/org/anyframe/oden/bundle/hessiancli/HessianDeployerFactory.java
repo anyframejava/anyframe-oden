@@ -32,6 +32,7 @@ import com.caucho.hessian.client.HessianProxyFactory;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class HessianDeployerFactory implements DeployerFactory {
 	private int TIMEOUT = 5000;
 	private long READ_TIMEOUT = 120000;

@@ -28,8 +28,9 @@ import java.io.IOException;
 public abstract class AbstractRepositoryimpl implements RepositoryService {
 
 	public boolean matchedURI(String[] args) {
-		if (args.length == 0)
+		if (args.length == 0) {
 			return false;
+		}
 		if (args[0].startsWith(getProtocol())) {
 			return true;
 		}
@@ -37,8 +38,9 @@ public abstract class AbstractRepositoryimpl implements RepositoryService {
 	}
 
 	protected String stripProtocol(String uri) {
-		if (!uri.startsWith(getProtocol()))
+		if (!uri.startsWith(getProtocol())) {
 			return uri;
+		}
 		return uri.substring(getProtocol().length());
 	}
 

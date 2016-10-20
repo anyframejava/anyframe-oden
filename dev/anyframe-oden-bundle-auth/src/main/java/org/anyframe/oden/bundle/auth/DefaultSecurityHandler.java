@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.anyframe.oden.bundle.common.BundleUtil;
 import org.anyframe.oden.bundle.http.SecurityHandler;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
 
 /**
@@ -42,26 +41,46 @@ public class DefaultSecurityHandler implements SecurityHandler {
 
 	private static final String REALM = "Anyframe OSGi Shell";
 
-	protected void activate(ComponentContext context) {
-	}
+//	protected void activate(ComponentContext context) {
+//	}
 
 	public boolean handle(HttpServletRequest req, HttpServletResponse res)
 			throws IOException {
 		String authHeader = req.getHeader(HEADER_AUTHORIZATION);
+
 		if (authHeader != null && authHeader.length() > 0) {
+
 			String[] auth = authHeader.split(" ");
-			if (auth.length == 2 && auth[0].equalsIgnoreCase("Basic")) {
-				Properties accs = loadAccounts();
-				for (Object user : accs.keySet()) {
-					if (accs.get(user).equals(auth[1])) {
-						// this is spec
-						req.setAttribute(HttpContext.AUTHENTICATION_TYPE, "");
-						req.setAttribute(HttpContext.REMOTE_USER, user);
-						return true;
-					}
+
+			if (auth.length != 2 && !auth[0].equalsIgnoreCase("Basic")) {
+				return false;
+			}
+
+			Properties accs = loadAccounts();
+			for (Object user : accs.keySet()) {
+				if (accs.get(user).equals(auth[1])) {
+					// this is spec
+					req.setAttribute(HttpContext.AUTHENTICATION_TYPE, "");
+					req.setAttribute(HttpContext.REMOTE_USER, user);
+					return true;
 				}
 			}
 		}
+		
+//		if (authHeader != null && authHeader.length() > 0) {
+//			String[] auth = authHeader.split(" ");
+//			if (auth.length == 2 && auth[0].equalsIgnoreCase("Basic")) {
+//				Properties accs = loadAccounts();
+//				for (Object user : accs.keySet()) {
+//					if (accs.get(user).equals(auth[1])) {
+//						// this is spec
+//						req.setAttribute(HttpContext.AUTHENTICATION_TYPE, "");
+//						req.setAttribute(HttpContext.REMOTE_USER, user);
+//						return true;
+//					}
+//				}
+//			}
+//		}
 
 		// if no auth header..
 		res.setHeader(HEADER_WWW_AUTHENTICATE, "Basic realm=\"" + REALM + "\"");
@@ -82,8 +101,9 @@ public class DefaultSecurityHandler implements SecurityHandler {
 			prop.load(in);
 			return prop;
 		} finally {
-			if (in != null)
+			if (in != null) {
 				in.close();
+			}
 		}
 	}
 

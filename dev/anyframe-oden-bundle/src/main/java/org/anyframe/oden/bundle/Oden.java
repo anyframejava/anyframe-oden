@@ -19,13 +19,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,22 +38,22 @@ import org.osgi.framework.BundleException;
  * @author Junghwan Hong
  */
 public class Oden {
-	private static String CONFIG_FILE = "conf/oden.ini";
+	private static String configFile = "conf/oden.ini";
 
-	private static String CACHE = "meta";
+	private static String cache = "meta";
 
-	private final static String BUNDLE_LOC = "bundle";
+	private final static String bundleLoc = "bundle";
 
-	private final static int AGENT_PORT = 9872;
+	private final static int agentPort = 9872;
 
-	private static Bundle framework = null;
+	private static Bundle odenFramework = null;
 
-	private static String SHELL_PORT;
+	private static String shellPort;
 
 	public static void main(String[] args) throws Exception {
 		if (args.length > 0) {
-			CONFIG_FILE = args[0];
-			CACHE = "meta-agent";
+			configFile = args[0];
+			cache = "meta-agent";
 		}
 
 		try {
@@ -66,10 +62,10 @@ public class Oden {
 			File home = new File(Felix.class.getProtectionDomain()
 					.getCodeSource().getLocation().toURI()).getParentFile()
 					.getParentFile();
-			startFramework(setFelixProperties(new File(home, CONFIG_FILE),
-					new File(home, CACHE)));
+			startFramework(setFelixProperties(new File(home, configFile),
+					new File(home, cache)));
 
-			installBundles(new File(home, BUNDLE_LOC));
+			installBundles(new File(home, bundleLoc));
 		} catch (BundleException e) {
 			System.err.println("Could not create framework: " + e);
 			e.printStackTrace();
@@ -79,46 +75,6 @@ public class Oden {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-	}
-
-	/**
-	 * method to log running threads' stacks when the process is died.
-	 * 
-	 * @param cache
-	 */
-	private static void addShutdownHook(final File cache) {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				StringBuffer buf = new StringBuffer();
-				buf.append("#"
-						+ new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
-								.format(System.currentTimeMillis()) + "\n");
-				buf.append("Memory usage: "
-						+ ((Runtime.getRuntime().totalMemory() - Runtime
-								.getRuntime().freeMemory()) / 1000) + "kb\n");
-				buf.append("Thread: " + Thread.activeCount()
-						+ " threads are running.\n");
-				Map<Thread, StackTraceElement[]> ttraces = Thread.getAllStackTraces();
-				for (Thread t : ttraces.keySet()) {
-					buf.append("#" + t.getId() + "\n");
-					for (StackTraceElement ele : ttraces.get(t)) {
-						buf.append(ele + "\n");
-					}
-				}
-
-				PrintStream out = null;
-				try {
-					out = new PrintStream(new FileOutputStream(new File(cache,
-							"lastlog.log")));
-					out.println(buf.toString());
-				} catch (Exception e) {
-					// ignore
-				}
-				if (out != null)
-					out.close();
-			}
-		});
 	}
 
 	private static void printWelcome() {
@@ -134,9 +90,9 @@ public class Oden {
 	 * @throws BundleException
 	 */
 	public static Bundle startFramework(Map props) throws BundleException {
-		framework = new Felix(props);
-		framework.start();
-		return framework;
+		odenFramework = new Felix(props);
+		odenFramework.start();
+		return odenFramework;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -162,8 +118,9 @@ public class Oden {
 		Properties thirdProp = loadINI(config);
 		if (thirdProp != null) {
 			configMap.putAll(thirdProp);
-			if (thirdProp.getProperty("http.port") == null) // if there's no http.port
-				configMap.put("http.port", String.valueOf(AGENT_PORT));
+			if (thirdProp.getProperty("http.port") == null) { // if there's no http.port
+				configMap.put("http.port", String.valueOf(agentPort));
+			}
 		}
 
 		// override properties from program's arguments
@@ -173,32 +130,10 @@ public class Oden {
 		replaceKey(configMap, "http.port", "org.osgi.service.http.port");
 		replaceKey(configMap, "shell.ip", "osgi.shell.telnet.ip");
 		Object o = configMap.get("shell.port");
-		SHELL_PORT = o == null ? null : o.toString();
+		shellPort = o == null ? null : o.toString();
 		replaceKey(configMap, "shell.port", "osgi.shell.telnet.port");
 		replaceKey(configMap, "shell.maxconn", "osgi.shell.telnet.maxconn");
 		return configMap;
-	}
-
-	private static int getPort(String[] args) {
-		try {
-			int idx = Arrays.binarySearch(args, "-port");
-			if (idx != -1 && args.length > idx + 1)
-				return Integer.parseInt(args[idx + 1]);
-		} catch (Exception e) {
-			// ignore
-		}
-		return AGENT_PORT;
-	}
-
-	private static void args2map(Map m, String[] args) {
-		for (int i = 0; i < args.length - 1; i++) { // args form: -name value
-			if (args[i].startsWith("-") && !args[i + 1].startsWith("-")) {
-				String k = args[i].substring(1); // remove -
-				m.put(k.equals("port") ? "http.port" : k, args[i + 1]);
-				i++; // skip next because it is arg's value.
-			}
-		}
-
 	}
 
 	/**
@@ -230,48 +165,51 @@ public class Oden {
 		for (File file : files) {
 			String name = file.getName();
 			if (file.isFile() && !"felix.jar".equals(name)) {
-				framework.getBundleContext().installBundle(
+				odenFramework.getBundleContext().installBundle(
 						"file:" + loc.getPath() + "/" + name);
 			}
 		}
 
 		String[] libraries = libBundles();
 		// start bundles which are not belonging to lib
-		for (Bundle bnd : framework.getBundleContext().getBundles()) {
-			if (contains(libraries, bnd))
+		for (Bundle bnd : odenFramework.getBundleContext().getBundles()) {
+			if (contains(libraries, bnd)) {
 				continue;
+			}
 			bnd.start();
 		}
 
 		// if remote shell is loaded, show some guides.
-		for (Bundle bnd : framework.getBundleContext().getBundles()) {
-			if (SHELL_PORT != null
+		for (Bundle bnd : odenFramework.getBundleContext().getBundles()) {
+			if (shellPort != null
 					&& bnd.getSymbolicName().equals(
 							"org.apache.felix.org.apache.felix.shell.remote")
 					&& bnd.getState() == Bundle.ACTIVE) {
-				String ip = framework.getBundleContext().getProperty(
+				String ip = odenFramework.getBundleContext().getProperty(
 						"osgi.shell.telnet.ip");
 				System.out
 						.println("::: You can access Oden by Telnet. (e.g. telnet "
 								+ (ip == null ? "localhost" : ip)
 								+ " "
-								+ SHELL_PORT + ") :::\n");
+								+ shellPort + ") :::\n");
 			}
 		}
 	}
 
 	private static boolean contains(String[] list, Bundle b) {
 		for (String s : list) {
-			if (b.getLocation().endsWith(s))
+			if (b.getLocation().endsWith(s)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
 	private static String[] libBundles() {
-		String bnds = framework.getBundleContext().getProperty("bundle.libs");
-		if (bnds == null)
+		String bnds = odenFramework.getBundleContext().getProperty("bundle.libs");
+		if (bnds == null) {
 			return new String[0];
+		}
 		return bnds.split("\\s");
 	}
 
@@ -298,11 +236,11 @@ public class Oden {
 	}
 
 	public static void stopFramework() throws BundleException {
-		framework.stop();
+		odenFramework.stop();
 	}
 
 	public static Bundle framework() {
-		return framework;
+		return odenFramework;
 	}
 
 }

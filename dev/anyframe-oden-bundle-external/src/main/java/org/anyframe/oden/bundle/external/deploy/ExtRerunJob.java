@@ -56,6 +56,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class ExtRerunJob extends DeployJob {
 	protected TransmitterService txmitterService;
 

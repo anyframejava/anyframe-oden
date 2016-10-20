@@ -69,10 +69,11 @@ public class UninstallCommandImpl implements Command {
 				} catch (NumberFormatException ex) {
 					err.println("Unable to parse id '" + id + "'.");
 				} catch (BundleException ex) {
-					if (ex.getNestedException() != null)
+					if (ex.getNestedException() != null) {
 						err.println(ex.getNestedException().toString());
-					else
+					} else {
 						err.println(ex.toString());
+					}
 				} catch (Exception ex) {
 					err.println(ex.toString());
 				}

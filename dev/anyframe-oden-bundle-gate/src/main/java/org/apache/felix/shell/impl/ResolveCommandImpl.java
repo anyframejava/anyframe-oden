@@ -50,6 +50,7 @@ public class ResolveCommandImpl implements Command {
 		return "attempt to resolve the specified bundles.";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		// Get package admin service.
 		ServiceReference ref = m_context

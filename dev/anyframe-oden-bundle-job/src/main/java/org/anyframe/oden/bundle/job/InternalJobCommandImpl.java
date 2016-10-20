@@ -52,25 +52,29 @@ public class InternalJobCommandImpl implements Command {
 			String action = null;
 			StringTokenizer tok = new StringTokenizer(line, " ");
 			tok.nextToken(); // name
-			if (tok.hasMoreTokens())
+			if (tok.hasMoreTokens()) {
 				action = tok.nextToken(); // action
+			}
 
 			if (action == null || action.equals("help")) {
 				out.println(getFullUsage());
 				return;
 			} else if (action.equals("add")) {
-				if (!tok.hasMoreTokens())
+				if (!tok.hasMoreTokens()) {
 					throw new OdenException("Invalid Arguments");
+				}
 				int start = line.indexOf(tok.nextToken());
 				int end = line.lastIndexOf('}');
-				if (end <= start)
+				if (end <= start) {
 					throw new OdenException("Invalid Arguments");
+				}
 
 				addJob(new JSONObject(line.substring(start, end + 1)));
 				out.println("[]");
 			} else if (action.equals("del")) {
-				if (!tok.hasMoreTokens())
+				if (!tok.hasMoreTokens()) {
 					throw new OdenException("Invalid Arguments");
+				}
 				jobConfig.removeJob(tok.nextToken());
 				out.println("[]");
 			} else {
@@ -90,6 +94,7 @@ public class InternalJobCommandImpl implements Command {
 		jobConfig.addJob(job);
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgCommand> makeCommands(JSONArray jcommands)
 			throws JSONException {
 		List<CfgCommand> commands = new ArrayList<CfgCommand>();
@@ -101,6 +106,7 @@ public class InternalJobCommandImpl implements Command {
 		return commands;
 	}
 
+	@SuppressWarnings("PMD")
 	private List<CfgTarget> makeTargets(JSONArray jtargets)
 			throws JSONException {
 		List<CfgTarget> targets = new ArrayList<CfgTarget>();
@@ -112,6 +118,7 @@ public class InternalJobCommandImpl implements Command {
 		return targets;
 	}
 
+	@SuppressWarnings("PMD")
 	private CfgSource makeSource(JSONObject jsource) throws JSONException {
 		List<CfgMapping> mappings = new ArrayList<CfgMapping>();
 		JSONArray arr = jsource.getJSONArray("mappings");

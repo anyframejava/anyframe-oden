@@ -17,12 +17,14 @@ package org.anyframe.oden.bundle.hessiansvr;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +44,7 @@ import org.anyframe.oden.bundle.common.CipherUtil;
 import org.anyframe.oden.bundle.common.FileInfo;
 import org.anyframe.oden.bundle.common.FileUtil;
 import org.anyframe.oden.bundle.common.Logger;
+import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.common.Utils;
 import org.anyframe.oden.bundle.deploy.ByteArray;
 import org.anyframe.oden.bundle.deploy.CfgReturnScript;
@@ -59,6 +62,7 @@ import org.osgi.framework.FrameworkUtil;
  * @see DeployerService
  * @ThreadSafe
  */
+@SuppressWarnings("PMD")
 public class DeployerImpl implements DeployerService {
 	private final String HOME = BundleUtil.odenHome().getPath();
 
@@ -69,6 +73,8 @@ public class DeployerImpl implements DeployerService {
 	private String securitykey = "";
 	
 	private boolean isCompress;
+	
+	private boolean bootOnly = false;
 	//
 	// private String backDir;
 	//
@@ -186,8 +192,9 @@ public class DeployerImpl implements DeployerService {
 			int backupcnt, boolean isCompress) throws Exception {
 		parent = toAbsPath(parent);
 		this.backupcnt = backupcnt;
+		Map<String, String> ownerShip = new HashMap<String, String>();
 		
-		// get securitykey start
+		// get security key start
 		BundleContext context = FrameworkUtil.getBundle(this.getClass())
 				.getBundleContext();
 		this.isCompress = isCompress;
@@ -196,8 +203,18 @@ public class DeployerImpl implements DeployerService {
 			securitykey = context.getProperty("security.key");
 		else
 			securitykey = "";
-		// get securitykey end
-
+		// get security key end
+		
+		// boot only one agent
+		if (context.getProperty("boot.only") != null) {
+			bootOnly = Boolean.valueOf(context.getProperty("boot.only"));
+			if(bootOnly) {
+				File file = new File(parent + File.separator + path);
+					
+				if(!file.exists() || file.length() == 0L)
+					ownerShip = getOnwerShip(parent);
+			}
+		}
 		
 		synchronized (lock) {
 			// if (mode != MODE.INIT) {
@@ -214,12 +231,70 @@ public class DeployerImpl implements DeployerService {
 			final String key = parent + path;
 			if (fileStreams.containsKey(key))
 				fileStreams.remove(key);
-				
-			fileStreams.put(key, new DeployOutputStream(parent, path, date,
-					useTmp));
+			if (bootOnly) {
+				fileStreams.put(key, new DeployOutputStream(parent, path, date,
+						useTmp, ownerShip));
+			} else {
+				fileStreams.put(key, new DeployOutputStream(parent, path, date,
+						useTmp));
+			}
 		}
 	}
-
+	
+	private Map<String, String> getOnwerShip(String parent) throws Exception {
+		boolean isWin = System.getProperty("os.name").startsWith("Windows");
+		StringBuffer buf = new StringBuffer();
+		Process p;
+		String s = null;
+		Map<String, String> rtnMap = new HashMap<String, String>();
+		
+		if (isWin) {
+			p = Runtime.getRuntime().exec(
+					new String[] { "cmd", "/c",
+							"dir /a:d /q " + '"' + parent + '"' });
+		} else {
+			p = Runtime.getRuntime().exec("ls -d -l " + parent);
+				
+		}
+		
+		int exitValue = p.waitFor();
+		if(exitValue != 0) {
+			throw new OdenException("Fail to get diretory's imformation:" + parent);
+		}
+		BufferedReader r = new BufferedReader(new InputStreamReader(
+				p.getInputStream()));
+		
+		while (true) {
+			if ((s = r.readLine()) == null)
+				break;
+			buf.append(s);
+		}
+		String[] resultArr = buf.toString().split(" ");
+		if (isWin) {
+			int i = 0;
+			for (String result : resultArr) {
+				if (result.equals("<DIR>")) {
+					for (int start = i; start < resultArr.length; start++) {
+						String owner = resultArr[start];
+						if (owner.contains("\\")) {
+							rtnMap.put("owner", owner);
+							break;
+						}
+					}
+				}
+				if(!rtnMap.isEmpty())
+					break;
+				i++;
+				
+			}
+		} else if (!isWin && resultArr.length != 0) {
+			rtnMap.put("owner", resultArr[2]);
+			rtnMap.put("group", resultArr[3]);
+		}
+		
+		return rtnMap;
+	}
+	
 	// public void zinit(int backupcnt, String backDir, String undo)
 	// 		throws Exception {
 	// 			this.backupcnt = backupcnt;

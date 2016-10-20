@@ -60,8 +60,9 @@ public class CfgCommand {
 		if (obj instanceof CfgCommand) {
 			CfgCommand ct = (CfgCommand) obj;
 			if (equals(name, ct.getName()) && equals(command, ct.getCommand())
-					&& equals(path, ct.getPath()))
+					&& equals(path, ct.getPath())) {
 				return true;
+			}
 		}
 		return false;
 	}

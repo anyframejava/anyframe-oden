@@ -72,8 +72,9 @@ public class TaskCommandImpl extends OdenCommand {
 	protected PolicyCommandImpl policyCommand;
 
 	protected void setPolicyCommand(CustomCommand cmd) {
-		if (cmd instanceof PolicyCommandImpl)
+		if (cmd instanceof PolicyCommandImpl) {
 			this.policyCommand = (PolicyCommandImpl) cmd;
+		}
 	}
 
 	protected RepositoryProviderService repositoryProvider;
@@ -105,13 +106,15 @@ public class TaskCommandImpl extends OdenCommand {
 					ja = doListActionJ();
 				} else {
 					ja = doInfoActionJ(task);
-					if (ja.length() == 0)
+					if (ja.length() == 0) {
 						throw new OdenException("Couldn't find a task: " + task);
+					}
 				}
 			} else if (Cmd.ADD_ACTION.equals(action)) {
 				if (cmd.getActionArg().length() < 1
-						|| cmd.getOptions().size() < 1)
+						|| cmd.getOptions().size() < 1) {
 					throw new OdenException("Couldn't execute command.");
+				}
 
 				// valid policy?
 				String[] policynames = cmd.getOptionArgArray(POLICY_OPT);
@@ -126,34 +129,39 @@ public class TaskCommandImpl extends OdenCommand {
 					}
 				} else {
 					for (String policyname : policynames) {
-						if (!existPolicy(policyname))
+						if (!existPolicy(policyname)) {
 							throw new OdenException("Couldn't find a policy: "
 									+ policyname);
+						}
 					}
 					addTask(cmd.getActionArg(), cmd.getOptionString());
 				}
 				consoleResult = "Task " + cmd.getActionArg() + " is added.";
 			} else if (Cmd.REMOVE_ACTION.equals(action)) {
-				if (cmd.getActionArg().length() < 1)
+				if (cmd.getActionArg().length() < 1) {
 					throw new OdenException("Couldn't execute command.");
+				}
 
 				String task = cmd.getActionArg();
 
-				if (doInfoAction(task).length() == 0)
+				if (doInfoAction(task).length() == 0) {
 					throw new OdenException("Couldn't find a task: "
 							+ cmd.getActionArg());
+				}
 
 				removeTask(task);
 				consoleResult = task + " is removed.";
 			} else if (Cmd.RUN_ACTION.equals(action)) {
-				if (cmd.getActionArg().length() < 1)
+				if (cmd.getActionArg().length() < 1) {
 					throw new OdenException("Couldn't execute command.");
+				}
 
 				String task = cmd.getActionArg();
 
-				if (doInfoAction(task).length() == 0)
+				if (doInfoAction(task).length() == 0) {
 					throw new OdenException("Couldn't find a task: "
 							+ cmd.getActionArg());
+				}
 
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = deploy(task, isSync, extractUserName(cmd));
@@ -161,30 +169,34 @@ public class TaskCommandImpl extends OdenCommand {
 					RecordElement2 r = deploylog.search(txid, null, null, null,
 							false);
 					Assert.check(r != null, "Couldn't find a log: " + txid);
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid)
 								.put("status", r.isSuccess() ? "S" : "F")
 								.put("count", r.getDeployFiles().size()));
-					else
+					} else {
 						consoleResult = "Task is finished. Transaction id: "
 								+ txid + (r.isSuccess() ? " Success" : " Fail")
 								+ "(" + r.getDeployFiles().size() + ")";
+					}
 				} else {
-					if (isJSON)
+					if (isJSON) {
 						ja.put(new JSONObject().put("txid", txid));
-					else
+					} else {
 						consoleResult = "Task is scheduled. Transaction id is: "
 								+ txid;
+					}
 				}
 			} else if (TEST_ACTION.equals(action)) {
-				if (cmd.getActionArg().length() < 1)
+				if (cmd.getActionArg().length() < 1) {
 					throw new OdenException("Couldn't execute command.");
-
+				}
+				
 				String task = cmd.getActionArg();
 
-				if (doInfoAction(task).length() == 0)
+				if (doInfoAction(task).length() == 0) {
 					throw new OdenException("Couldn't find a task: "
 							+ cmd.getActionArg());
+				}
 
 				Set<DeployFile> dfiles = preview(task);
 				if (isJSON) {
@@ -211,12 +223,13 @@ public class TaskCommandImpl extends OdenCommand {
 						+ action);
 			}
 
-			if (isJSON)
+			if (isJSON) {
 				out.println(ja.toString());
-			else if (consoleResult.length() > 0)
+			} else if (consoleResult.length() > 0) {
 				out.println(consoleResult);
-			else
+			} else {
 				out.println(JSONUtil.toString(ja));
+			}
 
 		} catch (OdenException e) {
 			if (isJSON) {
@@ -248,8 +261,9 @@ public class TaskCommandImpl extends OdenCommand {
 		JSONArray arr = new JSONArray();
 		try {
 			String info = getTaskPrefs().get(taskName);
-			if (info.length() > 0)
+			if (info.length() > 0) {
 				arr.put(new JSONObject().put(taskName, info));
+			}
 		} catch (JSONException e) {
 			return null;
 		}
@@ -278,25 +292,28 @@ public class TaskCommandImpl extends OdenCommand {
 					}
 				});
 
-		if (isSync)
+		if (isSync) {
 			jobManager.syncRun(j);
-		else
+		} else {
 			jobManager.schedule(j);
+		}
 		return j.id();
 	}
 
 	private Set<DeployFile> preview(String taskName) throws OdenException {
 		Cmd cmd = infoCmd(taskName);
 		Opt op = cmd.getOption(POLICY_OPT);
-		if (op == null)
+		if (op == null) {
 			throw new OdenParseException(cmd.toString());
+		}
 
 		Set<DeployFile> dfiles = new HashSet<DeployFile>();
 
 		String[] policies = op.getArgArray();
 		for (String policy : policies) {
-			if (!existPolicy(policy))
+			if (!existPolicy(policy)) {
 				throw new OdenException("Couldn't find a policy: " + policy);
+			}
 
 			Cmd policyInfo = policyCommand.infoCmd(policy);
 			policyCommand.preview(dfiles, policyInfo);
@@ -305,8 +322,9 @@ public class TaskCommandImpl extends OdenCommand {
 	}
 
 	private boolean existPolicy(String policyname) {
-		if (policyCommand == null)
+		if (policyCommand == null) {
 			return false;
+		}
 		return policyCommand.getPrefs().get(policyname).length() > 0;
 	}
 

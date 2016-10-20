@@ -47,8 +47,9 @@ public class StringUtil {
 		int i = 0;
 		for (Object o : c) {
 			buf.append(o.toString());
-			if (i < c.size() - 1)
+			if (i < c.size() - 1) {
 				buf.append(", ");
+			}
 			i++;
 		}
 		return buf.toString();

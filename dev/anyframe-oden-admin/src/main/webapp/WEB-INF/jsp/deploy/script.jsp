@@ -10,7 +10,7 @@ jQuery(document).ready(function() {
 		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 		mtype : 'POST',
 		datatype : "json",
-		colNames : [ '<anyframe:message code="script.grid.target"/>'],
+		colNames : [ '<spring:message code="script.grid.target"/>'],
 		jsonReader : {
 			repeatitems : false
 		},
@@ -34,7 +34,7 @@ jQuery(document).ready(function() {
 		pager : jQuery('#pager_script1'),
 
 		loadError : function(xhr, st, err) {
-			alert('<anyframe:message code="script.load.server.error"/>');
+			alert('<spring:message code="script.load.server.error"/>');
 		},
 
 		gridComplete: function() { 
@@ -48,10 +48,10 @@ jQuery(document).ready(function() {
 		url : "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=run",
 		mtype : 'POST',
 		datatype : "json",
-		colNames : [ '<anyframe:message code="script.grid.name"/>',
-		     		 '<anyframe:message code="script.grid.path"/>',
-		     		 '<anyframe:message code="script.grid.script"/>',
-		     		 '<anyframe:message code="script.grid.task"/>'],
+		colNames : [ '<spring:message code="script.grid.name"/>',
+		     		 '<spring:message code="script.grid.path"/>',
+		     		 '<spring:message code="script.grid.script"/>',
+		     		 '<spring:message code="script.grid.task"/>'],
 		jsonReader : {
 			repeatitems : false
 		},
@@ -92,11 +92,11 @@ jQuery(document).ready(function() {
 		pager : jQuery('#pager_script2'),
 
 		loadError : function(xhr, st, err) {
-			alert('<anyframe:message code="script.load.error"/>');
+			alert('<spring:message code="script.load.error"/>');
 		},
 		onSelectRow: function(name) {
 			if(name == null) {
-				alert('<anyframe:message code="script.alert.selectserver"/>');
+				alert('<spring:message code="script.alert.selectserver"/>');
 			}else{
 				rowData = jQuery("#grid_script2").getRowData(name);
 				$("#script_name").val(rowData.name);
@@ -131,10 +131,10 @@ function runScript(script){
 	rowNum = new String(jQuery("#grid_script1").getGridParam('selarrrow'));
 	
 	if(rowNum == null || rowNum ==""){
-		alert('<anyframe:message code="script.alert.selectserver"/>');
+		alert('<spring:message code="script.alert.selectserver"/>');
 	} else {
 		rowNumList = rowNum.split(",");
-		if(confirm('<anyframe:message code="script.confirm.run"/>')){
+		if(confirm('<spring:message code="script.confirm.run"/>')){
 			for(var i = 0 ; i < rowNumList.length ; i++){
 				var rowData = jQuery("#grid_script1").getRowData(rowNumList[i]);
 				rowArray[i] = rowData.name;
@@ -179,7 +179,7 @@ function cancelScript(){
 
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="script.page.subtitle"/><%=jobName %></h3>
+	<h3 class="subtitle_h3"><spring:message code="script.page.subtitle"/><%=jobName %></h3>
 </div><!-- end pageSubtitle -->
 
 <div id="body_script">

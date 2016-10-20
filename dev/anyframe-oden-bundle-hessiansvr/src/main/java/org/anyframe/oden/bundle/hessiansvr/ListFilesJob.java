@@ -41,28 +41,34 @@ public class ListFilesJob extends StoppableJob {
 	@Override
 	protected Object execute() throws IOException {
 		File dir = new File(root);
-		if (!dir.isAbsolute())
+		if (!dir.isAbsolute()) {
 			throw new IOException("Absolute path is allowed only: " + root);
+		}
 		return listAllFiles(dir);
 	}
 
+	@SuppressWarnings("PMD")
 	private List<FileInfo> listAllFiles(final File dir) {
-		if (stop)
+		if (stop) {
 			return Collections.EMPTY_LIST;
+		}
 
 		List<FileInfo> result = new ArrayList<FileInfo>();
-		if (!dir.exists())
+		if (!dir.exists()) {
 			return result;
+		}
 		File[] fs = dir.listFiles();
 		for (File f : fs) {
-			if (stop)
+			if (stop) {
 				break;
-			if (f.isDirectory())
+			}
+			if (f.isDirectory()) {
 				result.addAll(listAllFiles(f));
-			else
-				result.add(new FileInfo(FileUtil.getRelativePath(root,
-						f.getAbsolutePath()), false, f.lastModified(), f
+			} else {
+				result.add(new FileInfo(FileUtil.getRelativePath(root, f
+						.getAbsolutePath()), false, f.lastModified(), f
 						.length()));
+			}
 		}
 		return result;
 	}

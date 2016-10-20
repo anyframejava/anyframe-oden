@@ -17,10 +17,10 @@ package org.anyframe.oden.admin.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.anyframe.oden.admin.domain.Job;
-
-import anyframe.common.Page;
+import org.anyframe.pagination.Page;
 
 /**
  * This is JobService Interface
@@ -54,7 +54,7 @@ public interface JobService {
 
 	public void stop(String param) throws Exception;
 
-	public HashMap compareHeader(String param) throws Exception;
+	public Map compareHeader(String param) throws Exception;
 
 	public Page findList(String param) throws Exception;
 

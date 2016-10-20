@@ -1,14 +1,14 @@
 
 <project name="Oden Admin" default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
-	
+
 	<property environment="env"/>
-	
+
 	<property name="pack.name" value="anyframe-oden-admin" />
-	<property name="version" value="2.4.0"/>
+	<property name="version" value="2.5.0"/>
 	<!--property name="env.ANT_HOME" value="C:\ats-2.0.2\anyframe-5.0.1\ide\ant"/-->
 	<property name="dist" location="dist"/>
 	<property name="pack" location="pack"/>
-	
+
 	<!-- MAVEN_ANT Settings -->
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
 		<classpath>
@@ -32,35 +32,34 @@
 		</artifact:dependencies>
 		<copy todir="${dist}/WEB-INF/lib">
 			<fileset refid="deps.fileset" />
-  			<mapper type="flatten" />
+			<mapper type="flatten" />
 		</copy>
 		<javac srcdir="src/main/java" destdir="${dist}/WEB-INF/classes"
-				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
+				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8" extdirs="src/main/java/launcher">
 			<classpath>
 				<fileset dir="${dist}/WEB-INF/lib"/>
-				<fileset dir="pkrscs" includes="winstone-*.jar"/>
+				<!--fileset dir="pkrscs" includes="winstone-*.jar"/-->
 				<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar,servlet-api-2.5.jar"/-->
 			</classpath>
 		</javac>
-		<javac srcdir="src/main/launcher" destdir="${dist}"
-				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
+		<javac srcdir="src/main/java/org/anyframe/oden/admin/launcher" destdir="${dist}" debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
 			<classpath>
-				<fileset dir="pkrscs" includes="winstone-*.jar"/>
+				<fileset dir="pkrscs" includes="winstone-*.jar" />
 				<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar"/-->
 			</classpath>
 		</javac>
 	</target>
-	
+
 	<target name="pmd">
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
-	    <pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
-	        <formatter type="xml" toFile="target/pmd.xml"/>
-	        <fileset dir="src">
-	            <include name="**/*.java"/>
-	        </fileset>
-	    </pmd>
+		<pmd rulesetfiles="http://dev.anyframejava.org/docs/anyframe/plugin/ruleset.xml">
+			<formatter type="xml" toFile="target/pmd.xml"/>
+			<fileset dir="src">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
 	</target>
-	
+
 	<target name="cp-rscs">
 		<copy todir="${dist}">
 			<fileset dir="src/main/webapp" includes="**/*" excludes="**/*.svn"/>
@@ -81,9 +80,9 @@
 	<target name="war">
 		<war destfile="${pack}/${pack.name}.war" 
 			basedir="${dist}" webxml="${dist}/WEB-INF/web.xml">
-		    <manifest>
-		    	<attribute name="Main-Class" value="Main"/>
-		    </manifest>
+			<manifest>
+				<attribute name="Main-Class" value="org.anyframe.oden.admin.launcher.Main"/>
+			</manifest>
 		</war>
 		<copy todir="${pack}">
 			<fileset dir="pkrscs" includes="startup.sh,startup.cmd,license.txt"/>
@@ -91,12 +90,12 @@
 			<fileset dir="." includes="logs/**"/>
 		</copy>
 	</target>
-		
+
 	<target name="package">
 		<property name="pack" location="pack"/>
 		<antcall target="war"/>
 	</target>
-	
+
 	<target name="all" depends="init, cp-rscs, compile, pmd, war, package"/>
-		
+
 </project>

@@ -18,21 +18,20 @@ package org.anyframe.oden.admin.web;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.util.Properties;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.anyframe.iam.core.userdetails.jdbc.CustomUserDetailsHelper;
 import org.anyframe.oden.admin.exception.BrokerException;
-import org.anyframe.oden.admin.service.Credential;
 import org.anyframe.oden.admin.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import anyframe.iam.core.userdetails.jdbc.CustomUserDetailsHelper;
 
 /**
  * controller class for create user.
@@ -43,7 +42,7 @@ import anyframe.iam.core.userdetails.jdbc.CustomUserDetailsHelper;
 public class LogInController {
 
 	@Resource
-	private UserService userService = null;
+	private UserService userService;
 
 	protected static ApplicationContext context;
 
@@ -59,8 +58,9 @@ public class LogInController {
 		ModelAndView mav = null;
 		HttpSession session = request.getSession();
 		userid = CustomUserDetailsHelper.getAuthenticatedUser().getUsername();
-
-		Credential c = new Credential();
+		
+//		Credential c = new Credential();
+		Properties c = new Properties();
 		c.setProperty("userid", "oden");
 		c.setProperty("password", "oden0");
 
@@ -70,7 +70,6 @@ public class LogInController {
 				mav = new ModelAndView("jsonLayout");
 				session.setAttribute("userid", userid);
 				session.setAttribute("userrole", getRole());
-
 			}
 		} catch (BrokerException e) {
 			mav = new ModelAndView("login");
@@ -82,16 +81,26 @@ public class LogInController {
 		return mav;
 	}
 
-	private String getRole() throws Exception {
+	private String getRole() throws Exception{
 		String roles = "";
-		if (!userid.equals("") || userid != null) {
-			Class.forName("org.hsqldb.jdbcDriver");
-			connection = DriverManager.getConnection(url, "sa", "");
-			ResultSet rs = connection.prepareStatement(
-					"SELECT ROLE_ID FROM AUTHORITIES WHERE SUBJECT_ID ='"
-							+ userid + "'").executeQuery();
-			while (rs.next()) {
-				roles = roles + rs.getString(1) + ",";
+		ResultSet rs = null;
+		if (!"".equals(userid) || userid != null) {
+			try {
+				Class.forName("org.hsqldb.jdbcDriver");
+				connection = DriverManager.getConnection(url, "sa", "");
+				if (connection != null) {
+					rs = connection.prepareStatement(
+							"SELECT ROLE_ID FROM AUTHORITIES WHERE SUBJECT_ID ='"
+									+ userid + "'").executeQuery();
+					while (rs.next()) {
+						roles = roles.concat(rs.getString(1) + ",");
+					}
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				rs.close();
+				connection.close();
 			}
 		}
 		return roles;

@@ -30,6 +30,7 @@ import org.osgi.service.startlevel.StartLevel;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class PsCommandImpl implements Command {
 	private BundleContext m_context = null;
 

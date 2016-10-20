@@ -50,14 +50,16 @@ class AgentLocation {
 	}
 
 	public String getAgentName() {
-		if (agent != null)
+		if (agent != null) {
 			return agent.getName();
+		}
 		return null;
 	}
 
 	public String getAgentAddr() {
-		if (agent != null)
+		if (agent != null) {
 			return agent.getAddr();
+		}
 		return null;
 	}
 }

@@ -49,6 +49,7 @@ public class CfgHistory implements Serializable {
 			List<CfgHistoryDetail> data, String date, String success) {
 		this.txid = txid;
 		this.user = user;
+		this.job = job;
 		this.total = total;
 		this.data = data;
 		this.date = date;

@@ -28,7 +28,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class BrokerHandler implements InitializingBean {
 
-	private static OdenBrokerService OdenBroker = new OdenBrokerImpl();
+	private static OdenBrokerService odenBroker = new OdenBrokerImpl();
 
 	private static String server;
 	private static String port;
@@ -52,7 +52,7 @@ public class BrokerHandler implements InitializingBean {
 
 		String result = "";
 
-		result = OdenBroker.sendRequest("http://" + server + ":" + port
+		result = odenBroker.sendRequest("http://" + server + ":" + port
 				+ "/shell", cmd);
 
 		return result;

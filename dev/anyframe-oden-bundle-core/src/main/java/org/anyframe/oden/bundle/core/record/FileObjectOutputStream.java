@@ -54,13 +54,15 @@ public class FileObjectOutputStream extends FileOutputStream {
 			write(contents);
 		} finally {
 			try {
-				if (oos != null)
+				if (oos != null) {
 					oos.close();
+				}
 			} catch (IOException e) {
 			}
 		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private byte[] size(int length) {
 		byte[] size = new byte[4];
 		for (int i = 0; i < 4; i++) {

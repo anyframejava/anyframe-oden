@@ -119,8 +119,9 @@ public class DeployFile implements Serializable {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
-		if (success)
+		if (success) {
 			this.errorLog = "";
+		}
 	}
 
 	public Repository getRepo() {
@@ -144,8 +145,9 @@ public class DeployFile implements Serializable {
 	}
 
 	public void setErrorLog(String s) {
-		if (s == null)
+		if (s == null) {
 			return;
+		}
 
 		this.errorLog = s.trim();
 		this.success = false;
@@ -153,8 +155,9 @@ public class DeployFile implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof DeployFile))
+		if (!(o instanceof DeployFile)) {
 			return false;
+		}
 		DeployFile d = (DeployFile) o;
 		return repo.equals(d.repo) && path.equals(d.path)
 				&& agent.agentName().equals(d.agent.agentName());

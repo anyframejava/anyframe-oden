@@ -15,8 +15,15 @@
  */
 package org.anyframe.oden.bundle.core.job;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.anyframe.oden.bundle.common.Logger;
 import org.osgi.service.component.ComponentContext;
@@ -27,13 +34,20 @@ import org.osgi.service.component.ComponentContext;
  * @author Junghwan Hong
  * @see anyframe.oden.bundle.core.job.JobManager
  */
+@SuppressWarnings("PMD")
 public class JobManagerImpl implements JobManager {
 
 	private List<Job> jobQueue = new Vector<Job>();
 
 	private Thread worker = null;
+	
+	private int threadNum = 0; 
 
 	protected void activate(ComponentContext context) {
+		threadNum = Integer.valueOf(context.getBundleContext().getProperty(
+				"deploy.threadcnt")==null ? "0" : context.getBundleContext().getProperty(
+						"deploy.threadcnt"));
+		
 		if (worker != null)
 			return;
 		worker = new Thread() {
@@ -75,9 +89,11 @@ public class JobManagerImpl implements JobManager {
 
 	public Job job(String id) {
 		synchronized (jobQueue) {
-			for (Job j : jobQueue)
-				if (j.id().equals(id))
+			for (Job j : jobQueue) {
+				if (j.id().equals(id)) {
 					return j;
+				}
+			}
 			return null;
 		}
 	}
@@ -116,6 +132,83 @@ public class JobManagerImpl implements JobManager {
 			}
 		} catch (InterruptedException e) {
 		}
+	}
+
+	public LinkedList<String> batchRun(LinkedList<Job> deployJobs) {
+		if(threadNum ==0)
+			threadNum = Runtime.getRuntime().availableProcessors() / 2;
+		
+
+		// m-thread Job processing implements
+		LinkedList<String> rtnList = new LinkedList<String>();
+		ExecutorService pool = Executors.newFixedThreadPool(threadNum);
+
+		List<Future<Job>> futures = null;
+		
+		
+		int iNum = deployJobs.size() <= threadNum ? 1 : (int) Math
+				.ceil((double) deployJobs.size() / threadNum);
+		int jNum = deployJobs.size() <= threadNum ? deployJobs.size() : threadNum;
+
+		for (int i = 0; i < iNum; i++) {
+			Collection<Callable<Job>> list = new LinkedList<Callable<Job>>();
+			if( (i == iNum -1 && i != 0) && (deployJobs.size() % threadNum != 0))
+				jNum = deployJobs.size() % threadNum;
+			
+			for (int j = 0; j < jNum; j++) {
+				Job job = deployJobs.get(i * threadNum + j);
+				jobQueue.add(job);
+				list.add(new batchThread(job));
+			}
+			try {
+				futures = pool.invokeAll(list);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			for (Future<Job> f : futures) {
+				try {
+					jobQueue.remove(f.get());
+					rtnList.add(((Job) f.get()).id());
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return rtnList;
+	}
+
+}
+
+class batchThread implements Callable<Job> {
+	Job j;
+
+	public batchThread() {
+	}
+
+	public batchThread(Job j) {
+		this.j = j;
+	}
+
+	public Job call() throws Exception {
+		// TODO Auto-generated method stub
+		if (j != null) {
+			try {
+				j.start();
+			} catch (RuntimeException re) {
+			}
+			try {
+				j.dispose();
+			} catch (RuntimeException re) {
+			}
+		}
+		return j;
 	}
 
 }

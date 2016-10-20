@@ -61,8 +61,9 @@ public class CipherUtil {
 	 * @throws Exception
 	 */
 	public static byte[] decrypt(byte[] message) throws Exception {
-		if (message == null)
+		if (message == null) {
 			return null;
+		}
 
 		byte[] rtnByte = null;
 		try {

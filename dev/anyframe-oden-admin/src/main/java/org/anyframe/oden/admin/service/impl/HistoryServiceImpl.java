@@ -24,28 +24,27 @@ import org.anyframe.oden.admin.domain.History;
 import org.anyframe.oden.admin.domain.Job;
 import org.anyframe.oden.admin.domain.Log;
 import org.anyframe.oden.admin.service.HistoryService;
+import org.anyframe.pagination.Page;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import anyframe.common.Page;
-
 /**
  * This is HistoryServiceImpl Class
- *  
+ * 
  * @author Junghwan Hong
  */
 @Service("historyService")
 public class HistoryServiceImpl implements HistoryService {
-	private OdenCommonDao<History> odenCommonDao = new OdenCommonDao<History>();
+	private final OdenCommonDao<History> odenCommonDao = new OdenCommonDao<History>();
 
 	@Value("#{contextProperties['pageUnit'] ?: 30}")
 	int pageUnit;
 
-	private String ahref_pre = "<a href=\"";
-	private String ahref_mid = "\">";
-	private String ahref_post = "</a>";
+	String ahrefPre = "<a href=\"";
+	String ahrefMid = "\">";
+	String ahrefPost = "</a>";
 
 	/**
 	 * Method for showing history detail information.
@@ -53,6 +52,7 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public Page show(Object objPage, String param, String opt) throws Exception {
 		// return odenCommonDao.getList("log", "show", param);
 		ArrayList list = new ArrayList();
@@ -69,19 +69,21 @@ public class HistoryServiceImpl implements HistoryService {
 		} else {
 			txid = param;
 		}
-		if (param.indexOf("-path") != -1)
-			option += param.substring(param.indexOf("-path"), param.length());
+		if (param.indexOf("-path") != -1) {
+			option = option.concat(param.substring(param.indexOf("-path"),
+					param.length()));
+		}
 
 		if (opt == null || opt.equals("")) {
-			option += " ";
+			option = option.concat(" ");
 		} else {
-			option += opt + " ";
+			option = option.concat(opt + " ");
 		}
 
 		if (page == 0) {
-			option += "-page" + " " + page;
+			option = option.concat("-page" + " " + page);
 		} else {
-			option += "-page" + " " + (page - 1);
+			option = option.concat("-page" + " " + (page - 1));
 		}
 
 		String result = odenCommonDao.getResultString("log", "show", txid + " "
@@ -90,9 +92,10 @@ public class HistoryServiceImpl implements HistoryService {
 		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
 		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
+
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					totalNum = Integer.parseInt(object.getString("total"));
@@ -120,7 +123,8 @@ public class HistoryServiceImpl implements HistoryService {
 							String target = "";
 							if (!(targets.length() == 0)) {
 								for (int n = 0; n < targets.length(); n++) {
-									target += "[" + targets.get(n) + "] ";
+									target = target.concat("[" + targets.get(n)
+											+ "] ");
 								}
 								target = target.substring(0,
 										target.length() - 1);
@@ -131,12 +135,13 @@ public class HistoryServiceImpl implements HistoryService {
 							// .getString("name");
 							String path = dataObj.getString("path");
 							String mode = dataObj.getString("mode");
-							if (mode.equals("A"))
+							if ("A".equals(mode)) {
 								mode = "Add";
-							else if (mode.equals("U"))
+							} else if ("U".equals(mode)) {
 								mode = "Update";
-							else
+							} else {
 								mode = "Delete";
+							}
 
 							String errorlog = dataObj.getString("errorlog");
 
@@ -162,6 +167,7 @@ public class HistoryServiceImpl implements HistoryService {
 	 * 
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public Page findByPk(Object objPage, String param) throws Exception {
 		ArrayList list = new ArrayList();
 
@@ -170,9 +176,9 @@ public class HistoryServiceImpl implements HistoryService {
 		String option = "";
 
 		if (page == 0) {
-			option += "-page" + " " + page;
+			option = option.concat("-page" + " " + page);
 		} else {
-			option += "-page" + " " + (page - 1);
+			option = option.concat("-page" + " " + (page - 1));
 		}
 
 		String result = odenCommonDao.getResultString("log", "search", param
@@ -181,9 +187,10 @@ public class HistoryServiceImpl implements HistoryService {
 		String imgSuccess = "<img src='images/accept.png' style='vertical-align:middle;'/>";
 		String imgFail = "<img src='images/exclamation.png' style='vertical-align:middle;'/>";
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
+
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					totalNum = Integer.parseInt(object.getString("total"));
@@ -204,17 +211,17 @@ public class HistoryServiceImpl implements HistoryService {
 							if (status.equalsIgnoreCase("S")) {
 								txidAndStatus = imgSuccess
 										+ "("
-										+ ahref_pre
+										+ ahrefPre
 										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
 										+ txid + ", $('#itemname').val());"
-										+ ahref_mid + txid + ahref_post + ")";
+										+ ahrefMid + txid + ahrefPost + ")";
 							} else if (status.equalsIgnoreCase("F")) {
 								txidAndStatus = imgFail
 										+ "("
-										+ ahref_pre
+										+ ahrefPre
 										+ "javascript:fn_addTab('04History', 'Historydetail', 'historydetail', "
 										+ txid + ", $('#itemname').val());"
-										+ ahref_mid + txid + ahref_post + ")";
+										+ ahrefMid + txid + ahrefPost + ")";
 							}
 
 							Log l = new Log();
@@ -242,8 +249,8 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @throws Exception
 	 */
 	public List<Job> findJob(String role) throws Exception {
-		return odenCommonDao.findJob("job", "info",
-				CommonUtil.getRoleList(role));
+		return odenCommonDao.findJob("job", "info", CommonUtil
+				.getRoleList(role));
 	}
 
 	/**
@@ -270,14 +277,16 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public List<Log> findByPkExcel(String param) throws Exception {
 		String result = odenCommonDao.getResultString("log", "search", param);
 
 		List<Log> list = new ArrayList<Log>();
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
+
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					JSONArray data = (JSONArray) object.get("data");
@@ -318,6 +327,7 @@ public class HistoryServiceImpl implements HistoryService {
 	 * @param param
 	 * @throws Exception
 	 */
+	@SuppressWarnings("PMD")
 	public List<Log> showExcel(String param, String opt) throws Exception {
 		String txid = "";
 
@@ -334,9 +344,10 @@ public class HistoryServiceImpl implements HistoryService {
 
 		List<Log> list = new ArrayList<Log>();
 
-		if (!(result == null) && !result.equals("")) {
+		if (!(result == null) && !("".equals(result))) {
 			JSONArray array = new JSONArray(result);
 			if (!(array.length() == 0)) {
+
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = (JSONObject) array.get(i);
 					JSONArray data = (JSONArray) object.get("data");
@@ -351,7 +362,8 @@ public class HistoryServiceImpl implements HistoryService {
 							String target = "";
 							if (!(targets.length() == 0)) {
 								for (int n = 0; n < targets.length(); n++) {
-									target += "[" + targets.get(n) + "] ";
+									target = target.concat("[" + targets.get(n)
+											+ "] ");
 								}
 								target = target.substring(0,
 										target.length() - 1);
@@ -359,12 +371,13 @@ public class HistoryServiceImpl implements HistoryService {
 
 							String path = dataObj.getString("path");
 							String mode = dataObj.getString("mode");
-							if (mode.equals("A"))
+							if ("A".equals(mode)) {
 								mode = "Add";
-							else if (mode.equals("U"))
+							} else if ("U".equals(mode)) {
 								mode = "Update";
-							else
+							} else {
 								mode = "Delete";
+							}
 
 							String errorlog = dataObj.getString("errorlog");
 

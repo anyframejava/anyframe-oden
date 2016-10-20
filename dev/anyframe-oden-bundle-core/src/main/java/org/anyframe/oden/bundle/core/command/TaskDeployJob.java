@@ -50,6 +50,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class TaskDeployJob extends DeployJob {
 
 	protected RepositoryProviderService repositoryProvider;

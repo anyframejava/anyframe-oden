@@ -15,6 +15,8 @@
  */
 package org.anyframe.oden.bundle.core.job;
 
+import java.util.LinkedList;
+
 /**
  * This class managing jobs in queue.
  * 
@@ -58,4 +60,6 @@ public interface JobManager {
 	 * @param j
 	 */
 	public void syncRun(Job j);
+	
+	public LinkedList<String> batchRun(LinkedList<Job> deployJobs);
 }

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Service("logService")
 public class LogServiceImpl implements LogService {
 
-	private OdenCommonDao<Log> odenCommonDao = new OdenCommonDao<Log>();
+	private final OdenCommonDao<Log> odenCommonDao = new OdenCommonDao<Log>();
 
 	/**
 	 * Method for getting log with date.

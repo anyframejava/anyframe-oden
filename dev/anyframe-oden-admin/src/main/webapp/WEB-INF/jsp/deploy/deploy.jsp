@@ -79,9 +79,9 @@ function drawGrid() {
 						url : "<c:url value= '/simplejson.do?layout=jsonLayout&service=jobService.test(page,cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt="+option,
 						mtype : 'GET',
 						datatype : "json",
-						colNames : ['<anyframe:message code="deploy.grid.mode"/>', 
-									'<anyframe:message code="deploy.grid.file"/>', 
-									'<anyframe:message code="deploy.grid.dest"/>',
+						colNames : ['<spring:message code="deploy.grid.mode"/>', 
+									'<spring:message code="deploy.grid.file"/>', 
+									'<spring:message code="deploy.grid.dest"/>',
 									'',
 									'hidden'],
 						jsonReader : {
@@ -123,11 +123,11 @@ function drawGrid() {
 						viewrecords : true,
 						sortable : false,
 						forceFit : true,
-						rowNum : '<anyframe:message code="deploy.page.size"/>',
+						rowNum : '<spring:message code="deploy.page.size"/>',
 						pager : jQuery('#pager_deploy'),
 
 						loadError : function(xhr, st, err) {
-							alert('<anyframe:message code="deploy.load.error"/>');
+							alert('<spring:message code="deploy.load.error"/>');
 						},
 
 						onSelectRow: function(id) {
@@ -207,7 +207,7 @@ function drawGrid() {
 
 			var page = $("#grid_deploy").getGridParam("page");
 			
-			if(confirm('<anyframe:message code="deploy.confirm.deployitem"/>')){
+			if(confirm('<spring:message code="deploy.confirm.deployitem"/>')){
 				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.run(items,opt,job,page,cmd,userid)&viewName=jsonView'/>",
 					       {
 				       		items : rowArray,
@@ -222,7 +222,7 @@ function drawGrid() {
 					//setTimeout('fn_addTab("03job", "Job", "job")', 500);
 			}
 		}else{
-			alert('<anyframe:message code="deploy.alert.empty"/>');
+			alert('<spring:message code="deploy.alert.empty"/>');
 		}
 
 	}
@@ -284,7 +284,7 @@ function drawGrid() {
 	
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h4"><anyframe:message code="deploy.page.subtitle"/><%=jobName %></h3>
+	<h3 class="subtitle_h4"><spring:message code="deploy.page.subtitle"/><%=jobName %></h3>
 </div><!-- end pageSubtitle --> 
 <div id="body_deploy">
 <form method="get" id="detailDeployForm" name="detailDeployForm">
@@ -297,17 +297,17 @@ function drawGrid() {
 				<caption>deploy select</caption>
 				<tbody>
 					<tr>
-						<th><label for="deploy"><anyframe:message code="deploy.text.select"/></label></th>
+						<th><label for="deploy"><spring:message code="deploy.text.select"/></label></th>
 						<td>
 							<select name="deploy_mode" id="deploy_mode" class="selectbox" style="width:120">
-								<option value="include" selected="selected"><anyframe:message code="deploy.text.include"/></option>
-								<option value="update"><anyframe:message code="deploy.text.update"/></option>
+								<option value="include" selected="selected"><spring:message code="deploy.text.include"/></option>
+								<option value="update"><spring:message code="deploy.text.update"/></option>
 							</select>
 						</td>
 						<td width="500"></td>
-						<th scope="row"><label for="fail"><anyframe:message code="deploy.text.delete"/></label></th>
+						<th scope="row"><label for="fail"><spring:message code="deploy.text.delete"/></label></th>
 						<td><input type="checkbox" id="checkbox_d" name="checkbox_opt" value="Delete" class="checkbox" unchecked></td>
-						<th scope="row"><label for="fail"><anyframe:message code="deploy.text.compress"/></label></th>
+						<th scope="row"><label for="fail"><spring:message code="deploy.text.compress"/></label></th>
 						<td><input type="checkbox" id="checkbox_c" name="checkbox_copt" value="Compress" class="checkbox" unchecked></td>
 						<td width="80" align="right"><a href="javascript:drawGrid();"><img src="<c:url value='/images/btn_preview.gif'/>" alt="preview" /></a></td>
 					</tr>
@@ -336,13 +336,13 @@ function drawGrid() {
 	</div>
 	
 	<!-- dialog form start -->
-	<div id="dialog-form" title='<anyframe:message code="deploy.confirm.deployalltitle"/>'>
+	<div id="dialog-form" title='<spring:message code="deploy.confirm.deployalltitle"/>'>
 		<fieldset>
 			<table summary="deploy">
 				<caption>running script select</caption>
 				<tbody>
 					<tr>
-						<td><label for="deploy"><anyframe:message code="deploy.confirm.label"/></label></td>
+						<td><label for="deploy"><spring:message code="deploy.confirm.label"/></label></td>
 						<td>
 							<select name="command" id="command" class="selectbox" style='width:100'>
 								<option value="none" selected="selected">None</option>
@@ -355,7 +355,7 @@ function drawGrid() {
 				</tbody>
 			</table>
 		</fieldset>
-		<p><anyframe:message code="deploy.confirm.deployallitem"/></p>
+		<p><spring:message code="deploy.confirm.deployallitem"/></p>
 	</div>
 	<!-- dialog form end -->
 </form></div>

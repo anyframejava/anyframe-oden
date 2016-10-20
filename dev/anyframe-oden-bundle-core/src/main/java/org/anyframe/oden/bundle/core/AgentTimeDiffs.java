@@ -37,12 +37,14 @@ public class AgentTimeDiffs {
 	private final String TMPDIR = FileUtil.temporaryDir().getPath();
 
 	public AgentTimeDiffs() throws IOException {
+		super();
 	}
 
 	private Long getDiff(DeployerService deplyr, String loc) throws IOException {
 		File f = uniqueFile(TMPDIR, deplyr, loc);
-		if (f == null)
+		if (f == null) {
 			throw new IOException("Fail to find unique file name.");
+		}
 
 		try {
 			long ds_t = getDeployerTime(deplyr, loc, f.getName());
@@ -69,7 +71,8 @@ public class AgentTimeDiffs {
 		}
 		return donef.lastModified();
 	}
-
+	
+	@SuppressWarnings("PMD")
 	private File uniqueFile(String tmpdir, DeployerService deplyr, String loc) {
 		Exception excepn = null;
 
@@ -78,8 +81,9 @@ public class AgentTimeDiffs {
 			try {
 				File tmp = new File(tmpdir, "oden0" + String.valueOf(i)
 						+ ".tmp");
-				if (tmp.exists())
+				if (tmp.exists()) {
 					continue;
+				}
 
 				if (!deplyr.exist(loc, tmp.getName())) {
 					return tmp;
@@ -89,8 +93,9 @@ public class AgentTimeDiffs {
 			}
 		}
 
-		if (excepn != null) // write one exception only
+		if (excepn != null) { // write one exception only
 			Logger.error(excepn);
+		}
 		return null;
 	}
 

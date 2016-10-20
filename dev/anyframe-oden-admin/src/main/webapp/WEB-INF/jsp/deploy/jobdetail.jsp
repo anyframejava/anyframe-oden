@@ -53,9 +53,9 @@
 
 			mtype : 'GET',
 			datatype : "json",
-			colNames : [ '<anyframe:message code="jobdetail.grid.dir"/>',
-			 			 '<anyframe:message code="jobdetail.grid.mapping"/>', 
-			 			 '<anyframe:message code="jobdetail.grid.action"/>',
+			colNames : [ '<spring:message code="jobdetail.grid.dir"/>',
+			 			 '<spring:message code="jobdetail.grid.mapping"/>', 
+			 			 '<spring:message code="jobdetail.grid.action"/>',
 			 			 'hiddenname'],
 			jsonReader : {
 				repeatitems : false
@@ -98,7 +98,7 @@
 			sortable : false,
 			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.loadMappings(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 			loadError : function(xhr, st, err) {
-				alert('<anyframe:message code="jobdetail.mappingload.error"/>');
+				alert('<spring:message code="jobdetail.mappingload.error"/>');
 			},
 
 			onSelectRow: function(id) {
@@ -121,7 +121,7 @@
 			},
 			loadComplete: function(data) { 
 				if(boolSourceReload){
-					alert('<anyframe:message code="jobdetail.alert.mappingcomplete"/>');
+					alert('<spring:message code="jobdetail.alert.mappingcomplete"/>');
 					boolSourceReload = false;	
 				}else{
 					boolSourceReload = false;	
@@ -139,11 +139,11 @@
 
 			mtype : 'GET',
 			datatype : "json",
-			colNames : [ '<anyframe:message code="jobdetail.grid.status"/>',
-						 '<anyframe:message code="jobdetail.grid.name"/>',
-			 			 '<anyframe:message code="jobdetail.grid.url"/>', 
-			 			 '<anyframe:message code="jobdetail.grid.path"/>', 
-			 			 '<anyframe:message code="jobdetail.grid.action"/>',
+			colNames : [ '<spring:message code="jobdetail.grid.status"/>',
+						 '<spring:message code="jobdetail.grid.name"/>',
+			 			 '<spring:message code="jobdetail.grid.url"/>', 
+			 			 '<spring:message code="jobdetail.grid.path"/>', 
+			 			 '<spring:message code="jobdetail.grid.action"/>',
 			 			 'hiddenname'
 			 			 ],
 			jsonReader : {
@@ -201,7 +201,7 @@
 			sortable : true,
 			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=serverService.findListByPk(cmd)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>'),
 			loadError : function(xhr, st, err) {
-				alert('<anyframe:message code="jobdetail.load.error"/>');
+				alert('<spring:message code="jobdetail.load.error"/>');
 			},
 
 			onSelectRow: function(id) {
@@ -235,10 +235,10 @@
 
 			mtype : 'GET',
 			datatype : "json",
-			colNames : [ '<anyframe:message code="jobdetail.grid.name"/>',
-			 			 '<anyframe:message code="jobdetail.grid.path"/>', 
-			 			 '<anyframe:message code="jobdetail.grid.script"/>', 
-			 			 '<anyframe:message code="jobdetail.grid.action"/>',
+			colNames : [ '<spring:message code="jobdetail.grid.name"/>',
+			 			 '<spring:message code="jobdetail.grid.path"/>', 
+			 			 '<spring:message code="jobdetail.grid.script"/>', 
+			 			 '<spring:message code="jobdetail.grid.action"/>',
 			 			 'hiddenname'],
 			jsonReader : {
 				repeatitems : false
@@ -289,7 +289,7 @@
 			sortable : false,
 			editurl: "<c:url value='/simplejson.do?layout=jsonLayout&service=scriptService.findListByPk(cmd,opt)&viewName=jsonView&cmd='/>"+encodeURI('<%=jobName%>')+"&opt=del",
 			loadError : function(xhr, st, err) {
-				alert('<anyframe:message code="jobdetail.scriptload.error"/>');
+				alert('<spring:message code="jobdetail.scriptload.error"/>');
 			},
 
 			onSelectRow: function(id) {
@@ -326,10 +326,10 @@
 		var paraHidden = "<a href=\"javascript:delSource('"+key+"');\">"+"<img src=\"<c:url value='/images/ico_del.gif'/>\"/>"+"</a>";
 		var datarow = {dir:paraDir,checkout:paraCheckout,hidden:paraHidden,hiddenname:key};
 		if(paraDir == null || paraDir.length == 0 || paraCheckout == null || paraCheckout.length == 0){
-			alert('<anyframe:message code="jobdetail.alert.insertmapping"/>');
+			alert('<spring:message code="jobdetail.alert.insertmapping"/>');
 		}else{
 			if(isValidString(paraDir) || isValidString(paraCheckout)){
-				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+				alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 			}else{
 				if(idOfSource(key) == ""){
 					var su=$("#grid_sourcedetail").jqGrid('addRowData',num+1,datarow);
@@ -337,7 +337,7 @@
 						$("#source_dir").val('');
 						$("#source_checkout").val('');
 					} else 
-						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+						alert('<spring:message code="jobdetail.alert.insertfail"/>');	
 				}else{
 					$("#source_dir").val('');
 					$("#source_checkout").val('');
@@ -348,10 +348,10 @@
 	}
 	
 	function delSource(source){
-		if(confirm('<anyframe:message code="jobdetail.confirm.deletesource"/>')){
+		if(confirm('<spring:message code="jobdetail.confirm.deletesource"/>')){
 			var id = idOfSource(source);
 			var su=jQuery("#grid_sourcedetail").jqGrid('delRowData',id);
-			if(su) {} else alert('<anyframe:message code="jobdetail.alert.inlist"/>');
+			if(su) {} else alert('<spring:message code="jobdetail.alert.inlist"/>');
 		}
 	}
 	
@@ -368,10 +368,10 @@
 		var paraHidden = "<a href=\"javascript:delServer('"+paraName+"');\">"+"<img src=\"<c:url value='/images/ico_del.gif'/>\"/>"+"</a>";
 		var datarow = {name:paraName,url:paraUrl,path:paraPath,hidden:paraHidden,hiddenname:paraName};
 		if(paraName == null || paraName.length == 0 || paraUrl == null || paraUrl.length == 0 || paraPath == null || paraPath.length == 0){
-			alert('<anyframe:message code="jobdetail.alert.inserttarget"/>');
+			alert('<spring:message code="jobdetail.alert.inserttarget"/>');
 		}else{
 			if(isValidStringNames(paraName) || isValidString(paraUrl) || isValidString(paraPath)){
-				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+				alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 			}else{
 				if(idOfServer(paraName) == ""){
 					var su=$("#grid_jobdetail").jqGrid('addRowData',num+1,datarow);
@@ -380,22 +380,22 @@
 						$("#server_url").val('');
 						$("#server_path").val('');
 					} else 
-						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+						alert('<spring:message code="jobdetail.alert.insertfail"/>');	
 				}else{
 					$("#server_name").val('');
 					$("#server_url").val('');
 					$("#server_path").val('');
-					alert('<anyframe:message code="jobdetail.alert.duplicate"/>');
+					alert('<spring:message code="jobdetail.alert.duplicate"/>');
 				}
 			}
 		}
 	}
 	
 	function delServer(server){
-		if(confirm('<anyframe:message code="jobdetail.confirm.deletetarget"/>')){
+		if(confirm('<spring:message code="jobdetail.confirm.deletetarget"/>')){
 			var id = idOfServer(server);
 			var su=jQuery("#grid_jobdetail").jqGrid('delRowData',id);
-			if(su) {} else alert('<anyframe:message code="jobdetail.alert.inlist"/>');
+			if(su) {} else alert('<spring:message code="jobdetail.alert.inlist"/>');
 		}
 	}
 
@@ -412,10 +412,10 @@
 		var paraHidden = "<a href=\"javascript:delScript('"+paraName+"');\">"+"<img src=\"<c:url value='/images/ico_del.gif'/>\"/>"+"</a>";
 		var datarow = {name:paraName,path:paraPath,cmd:paraCmd,hidden:paraHidden,hiddenname:paraName};
 		if(paraName == null || paraName.length == 0 || paraCmd == null || paraCmd.length == 0 || paraPath == null || paraPath.length == 0){
-			alert('<anyframe:message code="jobdetail.alert.insertscript"/>');
+			alert('<spring:message code="jobdetail.alert.insertscript"/>');
 		}else{
 			if(isValidStringNames(paraName) || isValidString(paraPath) || isValidString(paraCmd)){
-				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+				alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 			}else{
 				if(idOfScript(paraName) == ""){
 					var su=$("#grid_cmddetail").jqGrid('addRowData',num+1,datarow);
@@ -424,22 +424,22 @@
 						$("#script_path").val('');
 						$("#script_script").val('');
 					} else 
-						alert('<anyframe:message code="jobdetail.alert.insertfail"/>');	
+						alert('<spring:message code="jobdetail.alert.insertfail"/>');	
 				}else{
 					$("#script_name").val('');
 					$("#script_path").val('');
 					$("#script_script").val('');
-					alert('<anyframe:message code="jobdetail.alert.scriptduplicate"/>');
+					alert('<spring:message code="jobdetail.alert.scriptduplicate"/>');
 				}
 			}
 		}
 	}
 	
 	function delScript(script){
-		if(confirm('<anyframe:message code="jobdetail.confirm.deletecmd"/>')){
+		if(confirm('<spring:message code="jobdetail.confirm.deletecmd"/>')){
 			var id = idOfScript(script);
 			var su=jQuery("#grid_cmddetail").jqGrid('delRowData',id);
-			if(su) {} else alert('<anyframe:message code="jobdetail.alert.inlist"/>');
+			if(su) {} else alert('<spring:message code="jobdetail.alert.inlist"/>');
 		}
 	}
 
@@ -512,7 +512,7 @@
 	}
 
 	function saveJobAction(){
-		if(confirm('<anyframe:message code="jobdetail.confirm.save"/>')){
+		if(confirm('<spring:message code="jobdetail.confirm.save"/>')){
 			jQuery('#grid_sourcedetail').jqGrid('saveRow',lastselSources);
 			jQuery('#grid_jobdetail').jqGrid('saveRow',lastselTarget);
 			jQuery('#grid_cmddetail').jqGrid('saveRow',lastselCmd);
@@ -535,16 +535,16 @@
 		var rowCmdArray = new Array();
 
 		if($("#job_name").val()==""){
-			alert('<anyframe:message code="jobdetail.alert.nameempty"/>');
+			alert('<spring:message code="jobdetail.alert.nameempty"/>');
 		}else if($("#repository").val()==""){
-			alert('<anyframe:message code="jobdetail.alert.directoryempty"/>');
+			alert('<spring:message code="jobdetail.alert.directoryempty"/>');
 		}else if(rowTargetNumList==""){
-			alert('<anyframe:message code="jobdetail.alert.targetempty"/>');
+			alert('<spring:message code="jobdetail.alert.targetempty"/>');
 		}else{
 			for(var i = 0 ; i < rowTargetNumList.length ; i++){
 				var rowTargetData = jQuery("#grid_jobdetail").getRowData(rowTargetNumList[i]);
 				if(isValidStringNames(rowTargetData.name)) {
-					alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>' + rowTargetData.name);
+					alert('<spring:message code="jobdetail.alert.invalidcharacter"/>' + rowTargetData.name);
 					return;
 				} else {
 					rowTargetArray[i] = rowTargetData.name+"@oden@"+rowTargetData.url+"@oden@"+rowTargetData.path;
@@ -574,7 +574,7 @@
 			var job_e = replacePath($("#excludes").val());
 
 			if(isValidStringJobName(job_n) || isValidString(job_r) || isValidString(job_e)){
-				alert('<anyframe:message code="jobdetail.alert.invalidcharacter"/>');	
+				alert('<spring:message code="jobdetail.alert.invalidcharacter"/>');	
 			}else{
 				<%if(isNew){ %>
 				$.get("<c:url value='/simplejson.do?layout=jsonLayout&service=jobService.insert(list,cmd,mapping,jobname,repo,excludes)&viewName=jsonView'/>",
@@ -624,7 +624,7 @@
 	}
 	
 	function getAutoMappings(){
-		if(confirm('<anyframe:message code="jobdetail.confirm.loadmapping"/>')){
+		if(confirm('<spring:message code="jobdetail.confirm.loadmapping"/>')){
 			boolSourceReload = true;	
 			jQuery("#grid_sourcedetail")
 			.jqGrid(
@@ -662,7 +662,7 @@
 	}
 </script>
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h3 class="subtitle_h3"><anyframe:message code="jobdetail.page.subtitle"/></h3>
+	<h3 class="subtitle_h3"><spring:message code="jobdetail.page.subtitle"/></h3>
 </div><!-- end pageSubtitle --> 
 <div id="body_jobdetail">
 <form method="post" id="searchForm" name="searchForm">
@@ -674,11 +674,11 @@
 			<caption>job register</caption>
 			<tbody>
 				<tr>
-					<th scope="row"><label for="JobName"><anyframe:message code="jobdetail.label.jobname"/></label></th>
+					<th scope="row"><label for="JobName"><spring:message code="jobdetail.label.jobname"/></label></th>
 					
 					<%if(isNew){ %>
 					<td><input type="text" id="job_name" name="job_name" size="40" value="" style="height:18px;width:300px;" /></td>
-					<anyframe:validate id="job_name" required="true" promptMessage="Enter Job Name" /> 
+					<simpleweb:validate id="job_name" required="true" promptMessage="Enter Job Name" /> 
 					<%}else{%>
 					<td><input type="text" id="job_name" name="job_name" disabled="disabled" size="40" value="" style="height:18px;width:300px;" /></td>
 					<%}%>
@@ -692,7 +692,7 @@
 
 <!--START: input table_source info-->
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h4 class="subtitle_h4"><anyframe:message code="jobdetail.source.subtitle"/></h4>
+	<h4 class="subtitle_h4"><spring:message code="jobdetail.source.subtitle"/></h4>
 </div><!-- end pageSubtitle --> 
 <!--START: input table-->
 <fieldset>
@@ -702,14 +702,14 @@
 		<caption>source</caption>
 		<tbody>
 			<tr>
-				<th scope="row"><label for="Repository"><anyframe:message code="jobdetail.label.directory"/></label></th>
+				<th scope="row"><label for="Repository"><spring:message code="jobdetail.label.directory"/></label></th>
 				<td><input type="text" id="repository" name="repository" size="40" value="" style="height:18px;width:300px;" /></td>
-				<anyframe:validate id="repository" required="true" promptMessage="Enter Directory. ex> C:/anyframe/target" />
-				<th scope="row"><label for="Excludes"><anyframe:message code="jobdetail.label.exclude"/></label></th>
+				<simpleweb:validate id="repository" required="true" promptMessage="Enter Directory. ex> C:/anyframe/target" />
+				<th scope="row"><label for="Excludes"><spring:message code="jobdetail.label.exclude"/></label></th>
 				<td><input type="text" id="excludes" name="excludes" size="40" value="" style="height:18px;width:300px;" /></td>
 			</tr>
 			<tr>
-				<th scope="row"><label for="Mappings"><a href="javascript:hiddenMappings();">Mappings <img src="<c:url value='/images/ico_down.gif'/>" style='vertical-align:middle;'/></a></label></th>
+				<th scope="row"><label for="Mappings"><a href="javascript:hiddenMappings();"><spring:message code="jobdetail.mappings.subtitle"/> <img src="<c:url value='/images/ico_down.gif'/>" style='vertical-align:middle;'/></a></label></th>
 				<td colspan="3"></td>
 			</tr>
 			<tr>
@@ -719,7 +719,7 @@
 							<table style="width:875px;">
 									<tr>
 										<td width="750"></td>
-										<td><a href="javascript:getAutoMappings();"><img src="<c:url value='/images/ico_mapping.png'/>" width="18" height="18" alt="auto mapping" style='vertical-align:middle;'/>Auto Mapping</a></td>
+										<td><a href="javascript:getAutoMappings();"><img src="<c:url value='/images/ico_mapping.png'/>" width="18" height="18" alt="<spring:message code="jobdetail.label.automapping"/>" style='vertical-align:middle;'/><spring:message code="jobdetail.label.automapping"/> </a></td>
 									</tr>
 							</table>
 						</div>
@@ -734,12 +734,12 @@
 								<caption>add</caption>
 								<tbody>
 									<tr>
-										<th scope="row"><label for="dir"><anyframe:message code="jobdetail.label.dir"/></label></th>
+										<th scope="row"><label for="dir"><spring:message code="jobdetail.label.dir"/></label></th>
 										<td><input type="text" id="source_dir" name="source_dir" value="" style="height:18px; width:200px;" /></td>
-										<anyframe:validate id="source_dir" promptMessage="ex> WEB-INF/classes" />
-										<th scope="row"><label for="mapping"><anyframe:message code="jobdetail.label.mapping"/></label></th>
+										<simpleweb:validate id="source_dir" promptMessage="ex> WEB-INF/classes" />
+										<th scope="row"><label for="mapping"><spring:message code="jobdetail.label.mapping"/></label></th>
 										<td><input type="text" id="source_checkout" name="source_checkout" value="" style="height:18px; width:250px;" /></td>
-										<anyframe:validate id="source_checkout" promptMessage="ex> C:/anyframe/src/main/java" />
+										<simpleweb:validate id="source_checkout" promptMessage="ex> C:/anyframe/src/main/java" />
 										<td><a class="btn3"><span onclick="javascript:addSource();" style="align:right; vertical-align:middle; height:18px;">Add</span></a></td>
 									</tr>
 								</tbody>
@@ -758,7 +758,7 @@
 
 <!--START: input table_target info-->
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h4 class="subtitle_h4"><anyframe:message code="jobdetail.target.subtitle"/></h4>
+	<h4 class="subtitle_h4"><spring:message code="jobdetail.target.subtitle"/></h4>
 </div><!-- end pageSubtitle --> 
 <div class="listbox" style="padding-top:5px;">
 	<table id="grid_jobdetail" class="scroll" cellpadding="0" cellspacing="0"><tr><td /></tr></table>
@@ -771,15 +771,15 @@
 		<caption>add</caption>
 		<tbody>
 			<tr>
-				<th scope="row"><label for="Name"><anyframe:message code="jobdetail.label.name"/></label></th>
+				<th scope="row"><label for="Name"><spring:message code="jobdetail.label.name"/></label></th>
 				<td><input type="text" id="server_name" name="server_name" value="" style="height:18px; width:130px;" /></td>
-				<anyframe:validate id="server_name" required="true" promptMessage="Enter target name."/>
-				<th scope="row"><label for="Url"><anyframe:message code="jobdetail.label.url"/></label></th>
+				<simpleweb:validate id="server_name" required="true" promptMessage="Enter target name."/>
+				<th scope="row"><label for="Url"><spring:message code="jobdetail.label.url"/></label></th>
 				<td><input type="text" id="server_url" name="server_url" value="" style="height:18px; width:160px;" /></td>
-				<anyframe:validate id="server_url" required="true" promptMessage="ex> 127.0.0.1:9872" />
-				<th scope="row"><label for="Path"><anyframe:message code="jobdetail.label.path"/></label></th>
+				<simpleweb:validate id="server_url" required="true" promptMessage="ex> 127.0.0.1:9872" />
+				<th scope="row"><label for="Path"><spring:message code="jobdetail.label.path"/></label></th>
 				<td><input type="text" id="server_path" name="server_path" value="" style="height:18px; width:280px; vertical-align:middle;"/></td>
-				<anyframe:validate id="server_path" required="true" promptMessage="ex> D:/anyframe/oden/deploy/target<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deploy/target" />
+				<simpleweb:validate id="server_path" required="true" promptMessage="ex> D:/anyframe/oden/deploy/target<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deploy/target" />
 				<td><a class="btn3"><span onclick="javascript:addServer();">Add</span></a></td>
 			</tr>
 		</tbody>
@@ -790,7 +790,7 @@
 
 <!--START: input table_command info-->
 <div class="pageSubtitle" style="padding-top:10px;">
-	<h4 class="subtitle_h4"><a href="javascript:hiddenCommands();"><anyframe:message code="jobdetail.command.subtitle"/> <img src='<c:url value='/images/ico_down.gif'/>' style='vertical-align:middle;'/></a></h4>
+	<h4 class="subtitle_h4"><a href="javascript:hiddenCommands();"><spring:message code="jobdetail.command.subtitle"/> <img src='<c:url value='/images/ico_down.gif'/>' style='vertical-align:middle;'/></a></h4>
 </div><!-- end pageSubtitle --> 
 <div id="commands_table" style="display:none;">
 <div class="listbox" style="padding-top:5px;">
@@ -804,15 +804,15 @@
 		<caption>add</caption>
 		<tbody>
 			<tr>
-				<th scope="row"><label for="Name"><anyframe:message code="jobdetail.label.name"/></label></th>
+				<th scope="row"><label for="Name"><spring:message code="jobdetail.label.name"/></label></th>
 				<td><input type="text" id="script_name" name="script_name" value="" style="height:18px; width:130px;" /></td>
-				<anyframe:validate id="script_name" promptMessage="Enter command name." />
-				<th scope="row"><label for="Path"><anyframe:message code="jobdetail.label.path"/></label></th>
+				<simpleweb:validate id="script_name" promptMessage="Enter command name." />
+				<th scope="row"><label for="Path"><spring:message code="jobdetail.label.path"/></label></th>
 				<td><input type="text" id="script_path" name="script_path" value="" style="height:18px; width:280px;" /></td>
-				<anyframe:validate id="script_path" promptMessage="ex> C:/util/tomcat/bin" />
-				<th scope="row"><label for="Script"><anyframe:message code="jobdetail.label.script"/></label></th>
+				<simpleweb:validate id="script_path" promptMessage="ex> C:/util/tomcat/bin" />
+				<th scope="row"><label for="Script"><spring:message code="jobdetail.label.script"/></label></th>
 				<td><input type="text" id="script_script" name="script_script" value="" style="height:18px; width:130px;"/></td>
-				<anyframe:validate id="script_script" promptMessage="ex> startup.bat" />
+				<simpleweb:validate id="script_script" promptMessage="ex> startup.bat" />
 				<td><a class="btn3"><span onclick="javascript:addScript();" style="align:right; vertical-align:middle; height:18px;">Add</span></a></td>
 			</tr>
 		</tbody>

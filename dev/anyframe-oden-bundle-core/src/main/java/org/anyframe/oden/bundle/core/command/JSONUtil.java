@@ -60,8 +60,9 @@ public class JSONUtil {
 	 * @throws JSONException
 	 */
 	public static Object jsonize(Object o) throws JSONException {
-		if (o == null)
+		if (o == null) {
 			throw new JSONException("Couldn't jsonize the object: " + o);
+		}
 		if (o instanceof Collection) {
 			return toJsonArray((Collection) o);
 		} else if (o instanceof Map) {
@@ -150,8 +151,9 @@ public class JSONUtil {
 				} else {
 					buf.append(o.toString());
 				}
-				if (i < jArr.length())
+				if (i < jArr.length()) {
 					buf.append("\n");
+				}
 			}
 		} catch (JSONException e) {
 			jArr.toString();
@@ -171,8 +173,9 @@ public class JSONUtil {
 				} else {
 					buf.append(o.toString());
 				}
-				if (i < jArr.length())
+				if (i < jArr.length()) {
 					buf.append(", ");
+				}
 			}
 		} catch (JSONException e) {
 			return jArr.toString();
@@ -192,8 +195,9 @@ public class JSONUtil {
 			for (Iterator<String> i = jObj.keys(); i.hasNext();) {
 				String key = i.next();
 				buf.append(key).append(" = ").append(jObj.get(key));
-				if (i.hasNext())
+				if (i.hasNext()) {
 					buf.append(", ");
+				}
 			}
 		} catch (JSONException e) {
 			return jObj.toString();

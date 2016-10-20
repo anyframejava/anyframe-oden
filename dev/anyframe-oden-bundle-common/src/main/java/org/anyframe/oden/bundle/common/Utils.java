@@ -30,8 +30,9 @@ public class Utils {
 	 * @return
 	 */
 	public static String rootCause(Throwable t) {
-		if (t.getCause() != null)
+		if (t.getCause() != null) {
 			return rootCause(t.getCause());
+		}
 		return t.getMessage() == null ? t.toString() : t.getMessage();
 	}
 
@@ -40,6 +41,7 @@ public class Utils {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String jvmStat() {
 		StringBuffer buf = new StringBuffer();
 		// JavaSysMon monitor = new JavaSysMon();
@@ -57,7 +59,8 @@ public class Utils {
 		for (Thread t : ttraces.keySet()) {
 			buf.append("#" + t.getId() + "\n");
 			for (StackTraceElement ele : ttraces.get(t)) {
-				buf.append(ele + "\n");
+				buf.append(ele);
+				buf.append("\n");
 			}
 		}
 		return buf.toString();

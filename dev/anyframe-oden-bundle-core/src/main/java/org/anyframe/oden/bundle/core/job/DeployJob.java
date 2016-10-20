@@ -90,6 +90,7 @@ public abstract class DeployJob extends Job {
 		return totalWorks - additionalWorks;
 	}
 
+	@SuppressWarnings("PMD")
 	protected void done() {
 		try {
 			RecordElement2 r = new RecordElement2(id, deployFiles, user,
@@ -97,7 +98,7 @@ public abstract class DeployJob extends Job {
 			if (errorMessage != null) {
 				r.setLog(errorMessage);
 				r.setSucccess(false);
-			} else if (deployFiles.size() == 0) {
+			} else if (deployFiles.isEmpty()) {
 				r.setSucccess(true);
 			}
 			deploylog.record(r);

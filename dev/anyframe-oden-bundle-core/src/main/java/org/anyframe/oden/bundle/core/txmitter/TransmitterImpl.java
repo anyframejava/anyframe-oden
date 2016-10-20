@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.anyframe.oden.bundle.common.Logger;
-import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.deploy.DeployerFactory;
 import org.anyframe.oden.bundle.deploy.DeployerService;
 import org.osgi.framework.BundleContext;
@@ -68,14 +67,16 @@ public class TransmitterImpl implements TransmitterService {
 		DeployerService ds = null;
 		try {
 			ds = _getDeployer(addr);
-			if (ds == null || !ds.alive())
+			if (ds == null || !ds.alive()) {
 				throw new IOException("Fail to access: " + addr);
+			}
 		} catch (Exception e) {
 			// try one more
 			try {
 				ds = _getDeployer(addr);
-				if (ds == null || !ds.alive())
+				if (ds == null || !ds.alive()) {
 					throw new IOException("Fail to access: " + addr);
+				}
 			} catch (Exception e2) {
 				Logger.debug("Fail to access: " + addr);
 				return null;
@@ -88,12 +89,14 @@ public class TransmitterImpl implements TransmitterService {
 		final int idx = addr.indexOf("://");
 		final String protocol = addr.substring(0, idx < 0 ? 0 : idx + 3);
 		for (DeployerFactory factory : deployfactories) {
-			if (factory.getProtocol().equals(protocol))
+			if (factory.getProtocol().equals(protocol)) {
 				return factory.newInstance(addr);
+			}
 		}
 		return null;
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public void disconnect(String addr) throws Exception {
 	}
 }

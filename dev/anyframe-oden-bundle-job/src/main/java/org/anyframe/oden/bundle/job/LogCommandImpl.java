@@ -16,7 +16,6 @@
 package org.anyframe.oden.bundle.job;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,9 +24,9 @@ import org.anyframe.oden.bundle.common.Logger;
 import org.anyframe.oden.bundle.common.OdenException;
 import org.anyframe.oden.bundle.common.StringUtil;
 import org.anyframe.oden.bundle.core.DeployFile;
-import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.DeployFileUtil;
 import org.anyframe.oden.bundle.core.SortedDeployFileSet;
+import org.anyframe.oden.bundle.core.DeployFile.Mode;
 import org.anyframe.oden.bundle.core.command.Cmd;
 import org.anyframe.oden.bundle.core.command.JSONUtil;
 import org.anyframe.oden.bundle.gate.CustomCommand;
@@ -142,8 +141,9 @@ public class LogCommandImpl implements CustomCommand {
 					.valueOf(pgscale0);
 
 			ShortenRecord r = jobLogger.search(txid);
-			if (r == null)
+			if (r == null) {
 				throw new OdenException("No proper log: " + txid);
+			}
 
 			JSONObject obj = pageHandler.getCachedData(cmd, pgscale,
 					new PageHandlerOr() {
@@ -187,8 +187,9 @@ public class LogCommandImpl implements CustomCommand {
 		} else if (action.equals("error")) {
 			String date = cmd.getOptionArg(new String[] { "date" });
 			LogError r = jobLogger.getErrorLog(date);
-			if (r == null)
+			if (r == null) {
 				throw new OdenException("No proper error log: " + date);
+			}
 
 			if (isJSON) {
 				return new JSONArray().put(
@@ -202,39 +203,42 @@ public class LogCommandImpl implements CustomCommand {
 		}
 	}
 
-	private JSONArray toJSONArray(SortedDeployFileSet fs) throws JSONException {
-		JSONArray list = new JSONArray();
+//	private JSONArray toJSONArray(SortedDeployFileSet fs) throws JSONException {
+//		JSONArray list = new JSONArray();
+//
+//		DeployFile prev = null;
+//		List<String> targets = null;
+//		for (Iterator<DeployFile> it = fs.iterator(); it.hasNext();) {
+//			DeployFile current = it.next();
+//			if (prev != null && current.getPath().equals(prev.getPath())) {
+//				targets.add(current.getAgent().agentName());
+//				continue;
+//			}
+//
+//			// if not equal to previous element, print previous one.
+//			if (prev != null) {
+//				list.put(new JSONObject().put("path", prev.getPath())
+//						.put("targets", new JSONArray(targets))
+//						.put("mode", DeployFileUtil.modeToString(prev.mode()))
+//						.put("success", String.valueOf(prev.isSuccess()))
+//						.put("errorlog", StringUtil.makeEmpty(prev.errorLog())));
+//			}
+//
+//			prev = current;
+//			targets = new ArrayList<String>();
+//			targets.add(current.getAgent().agentName());
+//		}
+//		if (prev != null) {
+//			list.put(new JSONObject().put("path", prev.getPath())
+//					.put("targets", targets)
+//					.put("mode", DeployFileUtil.modeToString(prev.mode()))
+//					.put("success", String.valueOf(prev.isSuccess()))
+//					.put("errorlog", StringUtil.makeEmpty(prev.errorLog())));
+//		}
+//		return list;
+//	}
 
-		DeployFile prev = null;
-		List<String> targets = null;
-		for (Iterator<DeployFile> it = fs.iterator(); it.hasNext();) {
-			DeployFile current = it.next();
-			if (prev != null && current.getPath().equals(prev.getPath())) {
-				targets.add(current.getAgent().agentName());
-				continue;
-			}
-
-			// if not equal to previous element, print previous one.
-			if (prev != null)
-				list.put(new JSONObject().put("path", prev.getPath())
-						.put("targets", new JSONArray(targets))
-						.put("mode", DeployFileUtil.modeToString(prev.mode()))
-						.put("success", String.valueOf(prev.isSuccess()))
-						.put("errorlog", StringUtil.makeEmpty(prev.errorLog())));
-
-			prev = current;
-			targets = new ArrayList<String>();
-			targets.add(current.getAgent().agentName());
-		}
-		if (prev != null)
-			list.put(new JSONObject().put("path", prev.getPath())
-					.put("targets", targets)
-					.put("mode", DeployFileUtil.modeToString(prev.mode()))
-					.put("success", String.valueOf(prev.isSuccess()))
-					.put("errorlog", StringUtil.makeEmpty(prev.errorLog())));
-		return list;
-	}
-
+	@SuppressWarnings("PMD")
 	private JSONArray toJSONArray2(SortedDeployFileSet fs) throws JSONException {
 		JSONArray list = new JSONArray();
 

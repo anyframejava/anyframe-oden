@@ -18,6 +18,7 @@ package org.anyframe.oden.bundle.core.keygen;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -31,6 +32,7 @@ public class DateKeyGenerator implements KeyGenerator {
 	private String lastDate;
 	private Map<String, Integer> lastValues = new HashMap<String, Integer>();
 
+	@SuppressWarnings("PMD")
 	public synchronized String next(String prefix) {
 		String today = today();
 		if (!today.equals(lastDate)) {
@@ -39,8 +41,9 @@ public class DateKeyGenerator implements KeyGenerator {
 		}
 
 		int seq = 0;
-		if (lastValues.containsKey(prefix))
+		if (lastValues.containsKey(prefix)) {
 			seq = lastValues.get(prefix);
+		}
 		lastValues.put(prefix, seq + 1);
 		return prefix + today + new DecimalFormat("00000").format(seq);
 	}
@@ -50,7 +53,7 @@ public class DateKeyGenerator implements KeyGenerator {
 	}
 
 	private String today() {
-		return new SimpleDateFormat("yyMMdd")
+		return new SimpleDateFormat("yyMMdd", Locale.getDefault())
 				.format(System.currentTimeMillis());
 	}
 

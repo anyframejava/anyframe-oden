@@ -38,6 +38,7 @@ public class MiniRecordElement implements Serializable {
 		this.user = user;
 		this.date = date;
 		this.success = success;
+		this.log = errorLog;
 		this.desc = desc;
 	}
 

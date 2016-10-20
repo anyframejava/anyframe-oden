@@ -27,6 +27,7 @@ import org.anyframe.oden.bundle.deploy.CfgReturnScript;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class Proc implements WatchdogListener, Runnable {
 	String command;
 	File dir;

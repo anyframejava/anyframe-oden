@@ -17,6 +17,7 @@ package org.anyframe.oden.bundle.core.command;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.anyframe.oden.bundle.common.OdenException;
@@ -44,6 +45,8 @@ public class Cmd {
 	private String name = "";
 	private String action = "";
 	private String actionArg = "";
+	private LinkedList<String> actionArgs = new LinkedList<String>();
+	
 	private List<Opt> options = new ArrayList<Opt>();
 
 	public Cmd(String line) throws OdenException {
@@ -89,24 +92,37 @@ public class Cmd {
 //			}
 //		}
 //	}
-
+	@SuppressWarnings("PMD")
 	private void parse(String line) throws OdenException {
 		String[] args = CommandUtil.split(line);
-		if (args.length == 0 || isOption(args[0]))
+		if (args.length == 0 || isOption(args[0])) {
 			throw new OdenParseException(line);
+		}
 
 		int idx = 0;
 		name = args[idx++];
 		if (idx < args.length && !isOption(args[idx])) {
 			action = args[idx++];
-			if (idx < args.length && !isOption(args[idx])) {
-				actionArg = args[idx++];
+			if ("runs".equals(action)) {
+				for (int i = idx; i < args.length; i++) {
+					if (!isOption(args[i])) {
+						actionArgs.add(args[i]);
+						idx++;
+					} else {
+						break;
+					}
+				}
+			} else {
+				if (idx < args.length && !isOption(args[idx])) {
+					actionArg = args[idx++];
+				}
 			}
 		}
 
 		if (idx < args.length) {
-			if (!isOption(args[idx]))
+			if (!isOption(args[idx])) {
 				throw new OdenParseException(line);
+			}
 
 			// collect the others
 			StringBuffer ops = new StringBuffer();
@@ -117,11 +133,13 @@ public class Cmd {
 						ops.delete(0, ops.length());
 					}
 					ops.append(args[i].substring(1) + " ");
-				} else
+				} else {
 					ops.append("\"" + args[i] + "\" ");
+				}
 			}
-			if (ops.length() != 0)
+			if (ops.length() != 0) {
 				options.add(new Opt(ops.toString()));
+			}
 		}
 	}
 
@@ -156,7 +174,16 @@ public class Cmd {
 	public String getActionArg() {
 		return actionArg;
 	}
-
+	
+	/**
+	 * get command's action's arguments
+	 * 
+	 * @return
+	 */
+	public LinkedList<String> getActionArgs() {
+		return actionArgs;
+	}
+	
 	/**
 	 * get all option objects
 	 * 
@@ -174,8 +201,9 @@ public class Cmd {
 	 */
 	public Opt getOption(String name) {
 		for (Opt op : options) {
-			if (name.equals(op.getName()))
+			if (name.equals(op.getName())) {
 				return op;
+			}
 		}
 		return null;
 	}
@@ -188,9 +216,11 @@ public class Cmd {
 	 */
 	public Opt getOption(String[] names) {
 		for (Opt op : options) {
-			for (String name : names)
-				if (name.equals(op.getName()))
+			for (String name : names) {
+				if (name.equals(op.getName())) {
 					return op;
+				}
+			}
 		}
 		return null;
 	}
@@ -204,8 +234,9 @@ public class Cmd {
 	 */
 	public String getOptionArg(String[] names) {
 		String[] args = getOptionArgArray(names);
-		if (args.length > 0)
+		if (args.length > 0) {
 			return args[0];
+		}
 		return "";
 	}
 
@@ -259,8 +290,10 @@ public class Cmd {
 		buf.append(action.length() > 0 ? " " + action : "");
 		buf.append(actionArg.length() > 0 ? " \"" + actionArg + "\"" : " \""
 				+ "\"");
-		for (Opt option : options)
-			buf.append(" " + option.toString());
+		for (Opt option : options) {
+			buf.append(" ");
+			buf.append(option.toString());
+		}
 		return buf.toString();
 	}
 
@@ -271,8 +304,10 @@ public class Cmd {
 	 */
 	public String getOptionString() {
 		StringBuffer buf = new StringBuffer();
-		for (Opt option : options)
-			buf.append(" " + option.toString());
+		for (Opt option : options) {
+			buf.append(" ");
+			buf.append(option.toString());
+		}
 		return buf.toString().trim();
 	}
 }

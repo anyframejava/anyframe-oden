@@ -1,3 +1,5 @@
+package org.anyframe.oden.admin.launcher;
+
 /*
  * Copyright 2002-2012 the original author or authors.
  *
@@ -15,7 +17,7 @@
  */
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,8 +36,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
+//import java.util.Random;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -47,6 +50,7 @@ import java.util.zip.ZipOutputStream;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class Main {
 
 	private static Map<String, String> ports;
@@ -81,6 +85,7 @@ public class Main {
 
 		File tmp = new File(war.getParent(), ".oden");
 		removeDir(tmp);
+
 		for (String s : jars) {
 			File jar = new File(tmp, s);
 			if (url == null) {
@@ -108,8 +113,9 @@ public class Main {
 		ports = new HashMap<String, String>();
 
 		for (String arg : args) {
-			if (!arg.contains("--"))
+			if (!arg.contains("--")) {
 				ports.put(arg.split("=")[0], arg.split("=")[1]);
+			}
 		}
 	}
 
@@ -124,8 +130,9 @@ public class Main {
 		String PROPERTY_FILE = "context.properties";
 		
 		File property = new File(home, PROPERTY_FILE_PATH);
-		if (!property.exists())
+		if (!property.exists()) {
 			property.mkdirs();
+		}
 		
 		File dest = new File(home, file);
 		extractZip(src, PROPERTY_FILE_PATH + "/" + PROPERTY_FILE, dest);
@@ -138,13 +145,16 @@ public class Main {
 		while (input.hasNext()) {
 			String s1 = input.nextLine();
 
-			if (s1.contains("oden.port"))
+			if (s1.contains("oden.port")) {
 				s1 = "oden.port" + "=" + ports.get("oden.port");
-			if (s1.contains("oden.db.port"))
+			}
+			if (s1.contains("oden.db.port")) {
 				s1 = "oden.db.port" + "=" + ports.get("oden.db.port");
-			if (s1.contains("url") && !ports.get("oden.db.port").equals("9001"))
+			}
+			if (s1.contains("url") && !ports.get("oden.db.port").equals("9001")) {
 				s1 = "url" + "=" + "jdbc:hsqldb:hsql://localhost:"
 						+ ports.get("oden.db.port") + "/odendb";
+			}
 			output.println(s1);
 		}
 		input.close();
@@ -195,7 +205,7 @@ public class Main {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		} finally {
 			inZip.close();
 			outZip.close();
@@ -212,7 +222,7 @@ public class Main {
 		removeDir(f);
 	}
 
-	private static void removeDir(File dir) {
+	private static void removeDir(File dir) throws Exception {
 		try {
 			if (dir != null && dir.isFile()) {
 					dir.delete();
@@ -232,7 +242,7 @@ public class Main {
 				dir.delete();
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			throw e;
 		}
 	}
 
@@ -252,7 +262,8 @@ public class Main {
 	private static void getMessagePre() throws Exception {
 		String oden = "[Oden Web Admin" + " ";
 		String webapp = "[webapp" + " ";
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss",
+				Locale.getDefault());
 
 		System.out.println(oden + dateFormat.format(new Date())
 				+ "] - Beginning extraction from war file");
@@ -270,7 +281,8 @@ public class Main {
 		List<String> argss = new ArrayList<String>(Arrays.asList(args));
 		String portNo = "";
 		String oden = "[Oden Web Admin" + " ";
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss",
+				Locale.getDefault());
 
 		System.out
 				.println(oden
@@ -290,8 +302,9 @@ public class Main {
 						+ dateFormat.format(new Date())
 						+ "] - Winstone Servlet Engine v0.9.10 running: controlPort=disabled");
 
-		if (args.length == 0)
+		if (args.length == 0) {
 			portNo = "9880";
+		}
 		System.out.println(oden + dateFormat.format(new Date())
 				+ "] - HTTP Listener started: port=" + portNo);
 	}
@@ -304,14 +317,16 @@ public class Main {
 
 	private static void extractZip(File src, String entryName, File dest)
 			throws IOException {
-		if (!src.exists() || src.isDirectory())
+		if (!src.exists() || src.isDirectory()) {
 			throw new IOException("Invalid src: " + src);
+		}
 
 		ZipFile zip = new ZipFile(src);
 		ZipEntry entry = zip.getEntry(entryName);
 
-		if (entry == null)
+		if (entry == null) {
 			throw new IOException("No such entry: " + entryName);
+		}
 
 		InputStream in = null;
 		OutputStream out = null;
@@ -320,34 +335,42 @@ public class Main {
 			out = new BufferedOutputStream(new FileOutputStream(dest));
 			byte[] buf = new byte[1024 * 64];
 			int size = 0;
-			while ((size = in.read(buf)) != -1)
+			while ((size = in.read(buf)) != -1) {
 				out.write(buf, 0, size);
+			}
 		} finally {
 			try {
-				if (in != null)
+				if (in != null) {
 					in.close();
+				}
 			} catch (IOException e) {
 			}
 			try {
-				if (out != null)
+				if (out != null) {
 					out.close();
+				}
 			} catch (IOException e) {
+				throw e;
 			}
 			try {
-				if (zip != null)
+				if (zip != null) {
 					zip.close();
+				}
 			} catch (IOException e) {
+				throw e;
 			}
 		}
 	}
 
 	private static long compress(File dir, File jar) throws IOException {
-		if (!dir.exists() || !dir.isDirectory())
+		if (!dir.exists() || !dir.isDirectory()) {
 			throw new IOException("Couldn't find: " + dir);
+		}
 		if (jar.exists()) {
-			if (jar.isDirectory())
+			if (jar.isDirectory()) {
 				throw new IOException("same directory is existed."
 						+ jar.getPath());
+			}
 			jar.delete();
 		}
 
@@ -358,8 +381,9 @@ public class Main {
 			compressDir(dir, dir, jout);
 			return jar.length();
 		} finally {
-			if (jout != null)
+			if (jout != null) {
 				jout.close();
+			}
 		}
 	}
 
@@ -390,11 +414,14 @@ public class Main {
 					try {
 						out.closeEntry();
 					} catch (IOException e) {
+						throw e;
 					}
 					try {
-						if (in != null)
+						if (in != null) {
 							in.close();
+						}
 					} catch (IOException e) {
+						throw e;
 					}
 
 				}
@@ -412,20 +439,23 @@ public class Main {
 		
 		if(file_.startsWith(root_)){
 			String relative = file_.substring(root_.length());
-			if(relative.startsWith("/"))
+			if(relative.startsWith("/")) {
 					relative = relative.substring("/".length());
+			}
 			return relative;
 		}
 		return null;
 	}
 	
 	public static String normalize(String path){
-		if(path == null)
+		if(path == null) {
 			return null;
+		}
 		
 		path = path.replaceAll("\\\\", "/");
-		if(!path.equals("/") && path.endsWith("/"))
+		if(!"/".equals(path) && path.endsWith("/")) {
 			path = path.substring(0, path.length()-1);
+		}
 		return path;
 	}
 }

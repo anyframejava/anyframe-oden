@@ -59,8 +59,9 @@ public class ShellServlet extends HttpServlet {
 
 	protected void setSecurityHandler(SecurityHandler handler) {
 		this.securityHandler = handler;
-		if (httpContext != null) // handler is already binded.
+		if (httpContext != null) { // handler is already binded.
 			((ShellHttpContext) httpContext).setSecurityHandler(handler);
+		}
 	}
 
 	protected void unsetSecurityHandler(SecurityHandler handler) {
@@ -109,13 +110,15 @@ public class ShellServlet extends HttpServlet {
 
 				reader = req.getReader();
 				String cmd = readCmdLine(reader);
-				if (cmd == null)
+				if (cmd == null) {
 					throw new Exception();
+				}
 				if (cmd.trim().endsWith(";")) { // for osgi original commands
 					cmd = cmd.substring(0, cmd.lastIndexOf(";"));
 				} else if (!cmd.trim().contains("_user")) { // for oden commands
 															// in user attribute
-					cmd += " -_user " + userName(req);
+					cmd = cmd.concat(" -_user " + userName(req));
+//					cmd += " -_user " + userName(req);
 				}
 
 				long t = System.currentTimeMillis();
@@ -128,13 +131,15 @@ public class ShellServlet extends HttpServlet {
 			} catch (Exception e) {
 				throw new ServletException("Couldn't execute a command", e);
 			} finally {
-				if (reader != null)
+				if (reader != null) {
 					reader.close();
+				}
 			}
 
 		} finally {
-			if (out != null)
+			if (out != null) {
 				out.close();
+			}
 		}
 	}
 

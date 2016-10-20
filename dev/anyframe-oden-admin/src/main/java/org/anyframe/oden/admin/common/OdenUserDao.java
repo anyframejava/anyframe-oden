@@ -23,10 +23,9 @@ import java.util.Iterator;
 import javax.inject.Inject;
 
 import org.anyframe.oden.admin.domain.User;
+import org.anyframe.pagination.Page;
+import org.anyframe.query.QueryService;
 import org.springframework.stereotype.Repository;
-
-import anyframe.common.Page;
-import anyframe.core.query.IQueryService;
 
 /**
  * This is OdenUserDao Class
@@ -37,7 +36,7 @@ import anyframe.core.query.IQueryService;
 public class OdenUserDao {
 
 	@Inject
-	IQueryService queryService;
+	QueryService queryService;
 
 	// public void setQueryService(IQueryService queryService) {
 	// super.setQueryService(queryService);
@@ -51,17 +50,17 @@ public class OdenUserDao {
 		Iterator itr = collection.iterator();
 		while (itr.hasNext()) {
 			User vo = (User) itr.next();
-			Object[] iVal = new Object[] { "vo", vo };
+			Object[] iVal = getVoArray(vo);
 
 			// add role name
 			ArrayList role_list = (ArrayList) queryService.find("findUserRole",
-					new Object[] { iVal });
+					getObjectArray(iVal));
 			String role = ((HashMap) role_list.get(0)).get("groupName") + "";
 			vo.setRole(role);
 
 			// add assign job
 			ArrayList<HashMap> job_list = (ArrayList) queryService.find(
-					"findUserJobList", new Object[] { iVal });
+					"findUserJobList", getObjectArray(iVal));
 			String assign_job = "";
 
 			for (HashMap map : job_list) {
@@ -69,16 +68,15 @@ public class OdenUserDao {
 					assign_job = "All Jobs";
 					continue;
 				}
-				assign_job += map.get("roleId") + ", ";
+				assign_job = assign_job.concat(map.get("roleId") + ", ");
 			}
-			if (assign_job.length() > 0 && !assign_job.equals("All Jobs")) {
+			if (assign_job.length() > 0 && !"All Jobs".equals(assign_job)) {
 				vo.setJob(assign_job.substring(0, assign_job.length() - 2));
 			} else {
 				vo.setJob(assign_job);
 			}
 
-			if (vo.getUserId().equalsIgnoreCase("oden")) {
-			} else {
+			if (!(vo.getUserId().equalsIgnoreCase("oden"))) {
 				String imgDel = "<img src='images/ico_del.gif' alt='Delete' title='Delete' style='vertical-align:middle;'/>";
 
 				String deleteAction = "<a href=\"javascript:deleteUser('"
@@ -91,7 +89,15 @@ public class OdenUserDao {
 		return new Page(result_col, 1, result_col.size(), result_col.size(),
 				result_col.size());
 	}
-
+	
+	private Object[] getObjectArray(Object[] iVal) {
+		return new Object[] { iVal };
+	}
+	
+	private Object[] getVoArray(User vo) {
+		return new Object[] { "vo", vo };
+	}
+	
 	public User getUser(String id) throws Exception {
 		User vo = new User();
 		vo.setUserId(id);
@@ -110,7 +116,7 @@ public class OdenUserDao {
 		String assign_job = "";
 
 		for (HashMap map : job_list) {
-			assign_job += map.get("roleId") + ", ";
+			assign_job = assign_job.concat(map.get("roleId") + ", ");
 		}
 		if (assign_job.length() > 0) {
 			user.setJob(assign_job.substring(0, assign_job.length() - 2));

@@ -50,6 +50,7 @@ public class RefreshCommandImpl implements Command {
 		return "refresh packages.";
 	}
 
+	@SuppressWarnings("PMD")
 	public void execute(String s, PrintStream out, PrintStream err) {
 		StringTokenizer st = new StringTokenizer(s, " ");
 

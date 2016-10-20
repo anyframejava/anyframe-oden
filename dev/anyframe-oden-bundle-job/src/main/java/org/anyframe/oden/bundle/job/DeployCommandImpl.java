@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -125,8 +126,9 @@ public class DeployCommandImpl implements CustomCommand {
 	ExecCommandImpl execCommand;
 
 	protected void setExecCommand(CustomCommand cmd) {
-		if (cmd instanceof ExecCommandImpl)
+		if (cmd instanceof ExecCommandImpl) {
 			this.execCommand = (ExecCommandImpl) cmd;
+		}
 	}
 
 	String compPath = null;
@@ -148,7 +150,9 @@ public class DeployCommandImpl implements CustomCommand {
 				executeExec(cmd, out, err);
 			}
 		} catch (Exception e) {
-			err.println(isJSON ? JSONUtil.jsonizedException(e) : e.getMessage());
+			err
+					.println(isJSON ? JSONUtil.jsonizedException(e) : e
+							.getMessage());
 			Logger.error(e);
 		}
 	}
@@ -158,20 +162,25 @@ public class DeployCommandImpl implements CustomCommand {
 		CfgJob job = jobConfig.getJob(cmd.getActionArg());
 
 		String c_script = "exec run";
-		c_script += " " + "\"" + job.getName() + "\"";
+		c_script = c_script.concat(" " + "\"" + job.getName() + "\"");
+		// c_script += " " + "\"" + job.getName() + "\"";
 
-		c_script += " " + "-t";
+		c_script = c_script.concat(" " + "-t");
+		// c_script += " " + "-t";
 		List<String> targets = cmd.getOptionArgList(new String[] { "t" });
 		List<CfgTarget> activeTargets = getActiveTargets(job
 				.getAllTargets(targets));
 		for (CfgTarget t : activeTargets) {
-			c_script += " " + "\"" + t.getName() + "\"";
+			c_script = c_script.concat(" " + "\"" + t.getName() + "\"");
+			// c_script += " " + "\"" + t.getName() + "\"";
 		}
 
-		c_script += " " + "-c";
+		c_script = c_script.concat(" " + "-c");
+		// c_script += " " + "-c";
 		List<String> commands = cmd.getOptionArgList(new String[] { "after" });
 		for (String c : commands) {
-			c_script += " " + "\"" + c + "\"";
+			c_script = c_script.concat(" " + "\"" + c + "\"");
+			// c_script += " " + "\"" + c + "\"";
 		}
 
 		execCommand.execute(c_script, out, err);
@@ -202,20 +211,23 @@ public class DeployCommandImpl implements CustomCommand {
 					"deploy.exception.option").equals("true") ? true : false;
 
 			final CfgJob job = jobConfig.getJob(cmd.getActionArg());
-			if (job == null)
+			if (job == null) {
 				throw new OdenException("Invalid Job Name: "
 						+ cmd.getActionArg());
+			}
 			boolean _u = cmd.getOption("u") != null;
 			boolean _i = cmd.getOption("i") != null;
 			boolean _del = cmd.getOption("del") != null;
 			// 압축 전송 시 옵션
 			boolean _c = cmd.getOption("c") != null;
 
-			if (_u && _i)
+			if (_u && _i) {
 				throw new OdenException("Allowed only: -u or -i");
-			if (!_i && !_u && !_del)
+			}
+			if (!_i && !_u && !_del) {
 				// default option -i
 				_i = true;
+			}
 			final boolean isUpdate = _u;
 			final boolean hasInclude = _i;
 			final boolean isDelete = _del;
@@ -233,8 +245,8 @@ public class DeployCommandImpl implements CustomCommand {
 
 			if (!isCompress) {
 				j = new JobDeployJob(context, job.getSource(), getUser(cmd),
-						cmd.getActionArg(),
-						getActiveTargets(job.getAllTargets(targets)),
+						cmd.getActionArg(), getActiveTargets(job
+								.getAllTargets(targets)),
 						new DeployFileResolver() {
 							public Collection<DeployFile> resolveDeployFiles()
 									throws OdenException {
@@ -246,8 +258,8 @@ public class DeployCommandImpl implements CustomCommand {
 			} else {
 				// 압축 전송
 				j = new CompressDeployJob(context, job.getSource(),
-						getUser(cmd), cmd.getActionArg(),
-						getActiveTargets(job.getAllTargets(targets)),
+						getUser(cmd), cmd.getActionArg(), getActiveTargets(job
+								.getAllTargets(targets)),
 						new CompressFileResolver() {
 							public Collection<DeployFile> compressDeployFiles()
 									throws OdenException {
@@ -270,22 +282,22 @@ public class DeployCommandImpl implements CustomCommand {
 
 			Logger.debug(j.id() + " " + (System.currentTimeMillis() - tm)
 					+ "ms");
-
+			
 			// deploy exception option check. When exception option is true ,
 			// transaction is all
 			// or nothing
-			if (!r.isSuccess() && deployExcOpt)
+			if (!r.isSuccess() && deployExcOpt) {
 				rollback(getUser(cmd), j.id());
+			}
 
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject()
-								.put("txid", j.id())
-								.put("status", r.isSuccess() ? "S" : "F")
-								.put("count",
-										!r.isSuccess() && deployExcOpt ? "0"
-												: r.getTotal())
-								.put("nsuccess", r.getnSuccess())).toString();
+						new JSONObject().put("txid", j.id()).put("status",
+								r.isSuccess() ? "S" : "F").put(
+								"count",
+								!r.isSuccess() && deployExcOpt ? "0" : r
+										.getTotal()).put("nsuccess",
+								r.getnSuccess())).toString();
 			}
 			String total = !r.isSuccess() && deployExcOpt ? "0" : String
 					.valueOf(r.getTotal());
@@ -296,8 +308,9 @@ public class DeployCommandImpl implements CustomCommand {
 			// 오류 난 배포 물만 재배포
 			final String id = cmd.getActionArg();
 
-			if (id.length() == 0)
+			if (id.length() == 0) {
 				throw new OdenException("<txid> is required.");
+			}
 
 			try {
 				jobLogger.show(id, "", Mode.NA, true);
@@ -324,10 +337,10 @@ public class DeployCommandImpl implements CustomCommand {
 					+ "ms");
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject().put("txid", j.id())
-								.put("status", r.isSuccess() ? "S" : "F")
-								.put("count", r.getTotal())
-								.put("nsuccess", r.getnSuccess())).toString();
+						new JSONObject().put("txid", j.id()).put("status",
+								r.isSuccess() ? "S" : "F").put("count",
+								r.getTotal()).put("nsuccess", r.getnSuccess()))
+						.toString();
 			}
 
 			return (r.isSuccess() ? "[S]" : "[F]") + " " + j.id() + "("
@@ -336,13 +349,15 @@ public class DeployCommandImpl implements CustomCommand {
 			final String id = cmd.getActionArg();
 			String undo = context.getProperty("deploy.undo");
 
-			if (id.length() == 0)
+			if (id.length() == 0) {
 				throw new OdenException("<txid> is required.");
+			}
 
-			if (undo == null || !undo.startsWith("true"))
+			if (undo == null || !undo.startsWith("true")) {
 				throw new OdenException(
 						"Undo function is not activated. Check 'deploy.undo' property in oden.ini."
 								+ undo);
+			}
 
 			long tm = System.currentTimeMillis();
 
@@ -363,14 +378,138 @@ public class DeployCommandImpl implements CustomCommand {
 					+ "ms");
 			if (isJSON) {
 				return new JSONArray().put(
-						new JSONObject().put("txid", j.id())
-								.put("status", r.isSuccess() ? "S" : "F")
-								.put("count", r.getTotal())
-								.put("nsuccess", r.getnSuccess())).toString();
+						new JSONObject().put("txid", j.id()).put("status",
+								r.isSuccess() ? "S" : "F").put("count",
+								r.getTotal()).put("nsuccess", r.getnSuccess()))
+						.toString();
 			}
 
 			return (r.isSuccess() ? "[S]" : "[F]") + " " + j.id() + "("
 					+ r.getTotal() + ")";
+
+		} else if (action.equals("runs")) {
+			// batch deploy , m-jobs , m-thread processing
+
+			boolean deployExcOpt = context.getProperty(
+					"deploy.exception.option").equals("true") ? true : false;
+
+			final LinkedList<String> jobs = cmd.getActionArgs();
+			
+			if (jobs.isEmpty()) {
+				throw new OdenException("Invalid Job Name: "
+						+ cmd.getActionArg());
+			}
+			
+			final LinkedList<CfgJob> cfgJobs = new LinkedList<CfgJob>();
+			LinkedList<Job> deployJobs = new LinkedList<Job>();
+
+			for (String job : jobs) {
+				CfgJob defJob = jobConfig.getJob(job);
+				if (defJob == null) {
+					throw new OdenException("Invalid Job Name: " + job);
+				} else {
+					cfgJobs.add(jobConfig.getJob(job));
+				}
+			}
+			boolean _u = cmd.getOption("u") != null;
+			boolean _i = cmd.getOption("i") != null;
+			boolean _del = cmd.getOption("del") != null;
+			// 압축 전송 시 옵션
+			boolean _c = cmd.getOption("c") != null;
+
+			if (_u && _i) {
+				throw new OdenException("Allowed only: -u or -i");
+			}
+			if (!_i && !_u && !_del) {
+				// default option -i
+				_i = true;
+			}
+			final boolean isUpdate = _u;
+			final boolean hasInclude = _i;
+			final boolean isDelete = _del;
+			final boolean isCompress = _c;
+
+			
+			final List<String> deployCandidates = cmd
+					.getOptionArgList(new String[] { "i" });
+			final List<String> deleteCandidates = cmd
+					.getOptionArgList(new String[] { "del" });
+			final List<String> targets = cmd
+					.getOptionArgList(new String[] { "t" });
+
+			long tm = System.currentTimeMillis();
+
+			for (final CfgJob cfgJob : cfgJobs) {
+				
+				Job j;
+				if (!isCompress) {
+					j = new JobDeployJob(context, cfgJob.getSource(),
+							getUser(cmd), cfgJob.getName(),
+							getActiveTargets(cfgJob.getAllTargets(targets)),
+							new DeployFileResolver() {
+								public Collection<DeployFile> resolveDeployFiles()
+										throws OdenException {
+									return new SortedDeployFileSet(preview(
+											cfgJob, isUpdate, hasInclude,
+											deployCandidates, isDelete,
+											deleteCandidates, targets));
+								}
+							});
+				} else {
+					// 압축 전송
+					j = new CompressDeployJob(context, cfgJob.getSource(),
+							getUser(cmd), cfgJob.getName(),
+							getActiveTargets(cfgJob.getAllTargets(targets)),
+							new CompressFileResolver() {
+								public Collection<DeployFile> compressDeployFiles()
+										throws OdenException {
+									return new SortedDeployFileSet(compPreview(
+											cfgJob, isUpdate, hasInclude,
+											deployCandidates, isDelete,
+											deleteCandidates, targets));
+								}
+							}, new DeployFileResolver() {
+								public Collection<DeployFile> resolveDeployFiles()
+										throws OdenException {
+									return new SortedDeployFileSet(preview(
+											cfgJob, isUpdate, hasInclude,
+											deployCandidates, isDelete,
+											deleteCandidates, targets));
+								}
+							});
+				}
+				deployJobs.add(j);
+			}
+			jobManager.batchRun(deployJobs);
+
+			Logger.debug((System.currentTimeMillis() - tm) + "ms");
+			
+			String rtnString = "";
+			
+			JSONArray jsonArr = new JSONArray();
+			
+			for (Job j : deployJobs) {
+				ShortenRecord r = jobLogger.search(j.id());
+				Assert.check(r != null, "Fail to get log: " + j.id());
+				
+				if (!r.isSuccess() && deployExcOpt) {
+					rollback(getUser(cmd), j.id());
+				}
+				jsonArr.put(new JSONObject().put("txid", j.id()).put("status",
+						r.isSuccess() ? "S" : "F").put("count", r.getTotal())
+						.put("nsuccess", r.getnSuccess()));
+				
+				rtnString = rtnString.concat((r.isSuccess() ? "[S]" : "[F]")
+						+ " " + j.id() + "(" + r.getTotal() + ")");
+				rtnString = rtnString.concat("\n");
+			}
+			
+			if (isJSON) {
+				return jsonArr.toString();
+			}
+			
+			return rtnString;
+
 		} else {
 			throw new OdenException("Invalid Action: " + action);
 		}
@@ -382,6 +521,7 @@ public class DeployCommandImpl implements CustomCommand {
 	 * @return
 	 * @throws JSONException
 	 */
+	@SuppressWarnings("PMD")
 	private JSONArray toJSONArray(SortedDeployFileSet fs) throws JSONException {
 		JSONArray list = new JSONArray();
 
@@ -397,21 +537,24 @@ public class DeployCommandImpl implements CustomCommand {
 			}
 
 			// if not equal to previous element, print previous one.
-			if (prevPath != null)
-				list.put(new JSONObject().put("path", prevPath)
-						.put("mode", prevMode).put("targets", targets));
+			if (prevPath != null) {
+				list.put(new JSONObject().put("path", prevPath).put("mode",
+						prevMode).put("targets", targets));
+			}
 
 			prevPath = current.getPath();
 			prevMode = current.mode();
 			targets = new ArrayList<String>();
 			targets.add(current.getAgent().agentName());
 		}
-		if (prevPath != null)
-			list.put(new JSONObject().put("path", prevPath)
-					.put("mode", prevMode).put("targets", targets));
+		if (prevPath != null) {
+			list.put(new JSONObject().put("path", prevPath).put("mode",
+					prevMode).put("targets", targets));
+		}
 		return list;
 	}
 
+	@SuppressWarnings("PMD")
 	private String toPreviewString(Collection<DeployFile> fs) {
 		StringBuffer buf = new StringBuffer("total: " + fs.size() + "\n\n");
 
@@ -427,32 +570,37 @@ public class DeployCommandImpl implements CustomCommand {
 			}
 
 			// if not equal to previous element, print previous one.
-			if (prevPath != null)
+			if (prevPath != null) {
 				buf.append(DeployFileUtil.modeToString(prevMode) + " "
 						+ prevPath + " " + targets + "\n");
+			}
 
 			prevPath = current.getPath();
 			prevMode = current.mode();
 			targets = new ArrayList<String>();
 			targets.add(current.getAgent().agentName());
 		}
-		if (prevPath != null)
+		if (prevPath != null) {
 			buf.append(DeployFileUtil.modeToString(prevMode) + " " + prevPath
 					+ " " + targets + "\n");
+		}
 		return buf.toString();
 	}
 
 	private Collection<DeployFile> doTestAction(Cmd cmd) throws Exception {
 		final CfgJob job = jobConfig.getJob(cmd.getActionArg());
-		if (job == null)
+		if (job == null) {
 			throw new OdenException("Invalid Job Name: " + cmd.getActionArg());
+		}
 		boolean _u = cmd.getOption("u") != null;
 		boolean _i = cmd.getOption("i") != null;
 		boolean _del = cmd.getOption("del") != null;
-		if (_u && _i)
+		if (_u && _i) {
 			throw new OdenException("Allowed only: -u or -i");
-		if (!_i && !_u && !_del)
+		}
+		if (!_i && !_u && !_del) {
 			_u = _del = true;
+		}
 		final boolean isUpdate = _u;
 		final boolean hasInclude = _i;
 		final boolean isDelete = _del;
@@ -469,11 +617,13 @@ public class DeployCommandImpl implements CustomCommand {
 	private SourceManager getSourceManager(CfgSource src) throws OdenException {
 		RepositoryService repoSvc = repositoryProvider
 				.getRepoServiceByURI(CfgUtil.toRepoArg(src));
-		if (repoSvc == null)
+		if (repoSvc == null) {
 			throw new OdenException("Invalid Repository: " + src.getPath());
+		}
 		return new SourceManager(repoSvc, src);
 	}
 
+	@SuppressWarnings("PMD")
 	class RepoCollector extends Thread {
 		Collection<FileInfo> ret = null;
 		SourceManager srcmgr = null;
@@ -497,12 +647,14 @@ public class DeployCommandImpl implements CustomCommand {
 		List<CfgTarget> activeTargets = new ArrayList<CfgTarget>();
 		for (CfgTarget t : targets) {
 			DeployerService ds = txmitter.getDeployer(t.getAddress());
-			if (ds != null)
+			if (ds != null) {
 				activeTargets.add(t);
+			}
 		}
 		return activeTargets;
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<DeployFile> compPreview(final CfgJob job,
 			final boolean isUpdate, final boolean hasInclude,
 			final List<String> deployCandidates, final boolean isDelete,
@@ -530,10 +682,13 @@ public class DeployCommandImpl implements CustomCommand {
 				for (final CfgTarget t : CfgTargets) {
 
 					final String targetTmp = getTargetTmp(t);
-					ret.add(new DeployFile(new Repository(new String[] {
-							srcmgr.getRepository().args()[0], srcTmp }),
-							"temp.zip", new AgentLoc(t.getName(), t
-									.getAddress(), targetTmp), 0L, 0L, Mode.ADD));
+					ret
+							.add(new DeployFile(
+									new Repository(new String[] {
+											srcmgr.getRepository().args()[0],
+											srcTmp }), "temp.zip",
+									new AgentLoc(t.getName(), t.getAddress(),
+											targetTmp), 0L, 0L, Mode.ADD));
 				}
 			}
 		});
@@ -551,16 +706,18 @@ public class DeployCommandImpl implements CustomCommand {
 
 	private String getTargetTmp(CfgTarget t) {
 		DeployerService ds = txmitter.getDeployer(t.getAddress());
-		if (ds != null)
+		if (ds != null) {
 			try {
 				return ds.getTempDirectory();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		return "";
 	}
 
+	@SuppressWarnings("PMD")
 	private Collection<DeployFile> preview(final CfgJob job,
 			final boolean isUpdate, final boolean hasInclude,
 			final List<String> deployCandidates, final boolean isDelete,
@@ -726,8 +883,9 @@ public class DeployCommandImpl implements CustomCommand {
 	private String getUser(Cmd cmd) {
 		String user = cmd.getOptionArg(new String[] { Cmd.USER_OPT });
 		try {
-			if (StringUtil.empty(user))
+			if (StringUtil.empty(user)) {
 				user = InetAddress.getLocalHost().getHostAddress();
+			}
 		} catch (UnknownHostException e) {
 			user = "";
 		}
@@ -737,15 +895,17 @@ public class DeployCommandImpl implements CustomCommand {
 	private void rollback(String user, final String txid) throws OdenException {
 		String undo = context.getProperty("deploy.undo");
 
-		if (txid.length() == 0)
+		if (txid.length() == 0) {
 			throw new OdenException("<txid> is required.");
+		}
 
-		if (undo == null || !undo.startsWith("true"))
+		if (undo == null || !undo.startsWith("true")) {
 			throw new OdenException(
 					"Undo function is not activated. Check 'deploy.undo' property in oden.ini."
 							+ undo);
+		}
 
-		long tm = System.currentTimeMillis();
+		// long tm = System.currentTimeMillis();
 
 		Job j = new UndoJob(context, user, "deploy undo:" + txid, txid,
 				new DeployFileResolver() {
@@ -776,7 +936,8 @@ public class DeployCommandImpl implements CustomCommand {
 				+ "\n\t[-u | -i ] [ -del ]"
 				+ "\ndeploy run <job> [ -t <target> ... ] "
 				+ "\n\t[-u | -i ] [ -del ] [ -c ]"
-				+ "\n\t[-after <command-name> ...]" + "\ndeploy rerun <txid> "
-				+ "\ndeploy undo <txid> ";
+				+ "\n\t[-after <command-name> ...]"
+				+ "\ndeploy runs <job> ... " + "\n\t[-u | -i ] [ -del ] [ -c ]"
+				+ "\ndeploy rerun <txid> " + "\ndeploy undo <txid> ";
 	}
 }

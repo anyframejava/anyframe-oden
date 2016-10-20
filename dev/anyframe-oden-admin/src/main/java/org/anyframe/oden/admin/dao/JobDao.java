@@ -18,9 +18,8 @@ package org.anyframe.oden.admin.dao;
 import javax.inject.Inject;
 
 import org.anyframe.oden.admin.common.CommonUtil;
+import org.anyframe.query.QueryService;
 import org.springframework.stereotype.Repository;
-
-import anyframe.core.query.IQueryService;
 
 /**
  * This is JobDao Class
@@ -30,7 +29,7 @@ import anyframe.core.query.IQueryService;
 @Repository("jobDao")
 public class JobDao {
 	@Inject
-	private IQueryService queryService;
+	private QueryService queryService;
 
 	/**
 	 * @param jobname

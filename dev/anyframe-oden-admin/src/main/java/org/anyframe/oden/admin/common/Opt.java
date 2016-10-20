@@ -26,7 +26,15 @@ import java.util.List;
 public class Opt {
 
 	protected String name = "";
+
 	protected List<String> args = new ArrayList<String>();
+
+	/**
+	 * Opt Default Constructor
+	 */
+	public Opt() {
+		super();
+	}
 
 	/**
 	 * 
@@ -36,18 +44,28 @@ public class Opt {
 	public Opt(String sOpt) {
 		String[] sArgs = CommonUtil.split(sOpt);
 		name = sArgs[0];
-		for (int i = 1; i < sArgs.length; i++)
+		for (int i = 1; i < sArgs.length; i++) {
 			args.add(sArgs[i]);
+		}
 	}
-
+	
+	public void makeOpt(String sOpt) {
+		String[] sArgs = CommonUtil.split(sOpt);
+		name = sArgs[0];
+		for (int i = 1; i < sArgs.length; i++) {
+			args.add(sArgs[i]);
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}
 
 	public List<String> getArgList() {
 		List<String> list = new ArrayList<String>();
-		for (String s : args)
+		for (String s : args) {
 			list.add(s);
+		}
 		return list;
 	}
 
@@ -55,11 +73,28 @@ public class Opt {
 		return args.toArray(new String[args.size()]);
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setArgs(List<String> args) {
+		this.args = args;
+	}
+
+	public void clear() {
+		name = "";
+		args.clear();
+	}
+
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer("-" + name);
+		StringBuffer buf = new StringBuffer();
+		buf.append("-");
+		buf.append(name);
 		for (String val0 : args) {
-			buf.append(" \"" + val0 + "\"");
+			buf.append(" \"");
+			buf.append(val0);
+			buf.append("\"");
 		}
 		return buf.toString();
 	}

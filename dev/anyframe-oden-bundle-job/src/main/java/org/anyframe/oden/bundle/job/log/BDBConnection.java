@@ -66,8 +66,9 @@ public class BDBConnection {
 
 	public void close() {
 		try {
-			if (env != null)
+			if (env != null) {
 				env.close();
+			}
 		} catch (Exception e) {
 		}
 	}

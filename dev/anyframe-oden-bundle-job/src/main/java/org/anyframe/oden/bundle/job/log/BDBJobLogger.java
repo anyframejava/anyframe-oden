@@ -52,6 +52,7 @@ import com.sleepycat.je.Transaction;
  * 
  * @author Junghwan Hong
  */
+@SuppressWarnings("PMD")
 public class BDBJobLogger implements JobLogService {
 	private static final String LOG_FILE_PREFIX = "log_";
 	private static final String LOG_FILE_EXT = ".log";

@@ -15,9 +15,8 @@
  */
 package org.anyframe.oden.admin.exception;
 
+import org.anyframe.exception.BaseException;
 import org.springframework.context.MessageSource;
-
-import anyframe.common.exception.BaseException;
 
 /**
  * This SalesException class contains various constructor for different

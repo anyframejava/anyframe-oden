@@ -39,8 +39,10 @@ public class RecordElement2 implements Serializable {
 	private int nSuccess = 0;
 
 	public RecordElement2() {
+		super();
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public RecordElement2(String id, Collection<DeployFile> files, String user,
 			long date, String desc) {
 		this.id = id;
@@ -48,13 +50,16 @@ public class RecordElement2 implements Serializable {
 		this.user = user;
 		this.date = date;
 		this.desc = desc;
-		if (files.size() > 0)
-			for (DeployFile f : files)
+		if (files.size() > 0) {
+			for (DeployFile f : files) {
 				this.success = this.success & f.isSuccess();
-		else
+			}
+		} else {
 			this.success = false;
+		}
 	}
-
+	
+	@SuppressWarnings("PMD")
 	public RecordElement2(String id, Collection<DeployFile> files, String user,
 			long date, boolean success, String errorLog, String desc) {
 		this.id = id;
@@ -65,6 +70,7 @@ public class RecordElement2 implements Serializable {
 		this.desc = desc;
 	}
 
+	@SuppressWarnings("PMD")
 	public RecordElement2(String id, Collection<DeployFile> files,
 			int nSuccess, String user, long date, String errorLog, String desc) {
 		this.id = id;

@@ -66,8 +66,9 @@ public class AuthTest {
 			result = handleResult(conn);
 
 		} finally {
-			if (writer != null)
+			if (writer != null) {
 				writer.close();
+			}
 		}
 		return result;
 
@@ -78,24 +79,25 @@ public class AuthTest {
 		String result = null;
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(
-					conn.getInputStream()));
+			reader = new BufferedReader(new InputStreamReader(conn
+					.getInputStream()));
 
 			result = readAll(reader);
 
 			// // check if shell exception or unknown exception
 			// JSONObject json = new JSONObject(result);
 			// if(json.has(KNOWN_EXCEPTION)) {
-			// 		throw new ShellException(json.getString(KNOWN_EXCEPTION));
+			// throw new ShellException(json.getString(KNOWN_EXCEPTION));
 			// }else if(json.has(UNKNOWN_EXCEPTION)) {
-			// 		throw new Exception(json.getString(UNKNOWN_EXCEPTION));
+			// throw new Exception(json.getString(UNKNOWN_EXCEPTION));
 			// }
 
 		} catch (IOException e) {
 			throw new ShellException(e);
 		} finally {
-			if (reader != null)
+			if (reader != null) {
 				reader.close();
+			}
 		}
 		return result;
 	}
@@ -107,8 +109,8 @@ public class AuthTest {
 		con.setDoOutput(true);
 		con.setDoInput(true);
 		con.setConnectTimeout(TIMEOUT);
-		con.setRequestProperty("Authorization",
-				"Basic " + encode("oden", "oden0"));
+		con.setRequestProperty("Authorization", "Basic "
+				+ encode("oden", "oden0"));
 		return con;
 	}
 
@@ -120,9 +122,10 @@ public class AuthTest {
 
 	private static String readAll(BufferedReader reader) throws IOException {
 		StringBuffer buf = new StringBuffer();
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			buf.append(line + "\n");
+		
+		for ( String line; (line = reader.readLine()) != null; ) {
+			buf.append(line);
+			buf.append("\n");
 		}
 		return buf.toString();
 	}

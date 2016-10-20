@@ -31,6 +31,7 @@ public class CommandUtil {
 	 * @param line
 	 * @return
 	 */
+	@SuppressWarnings("PMD")
 	public static String[] split(String line) {
 		List<String> args = new ArrayList<String>();
 
@@ -52,8 +53,9 @@ public class CommandUtil {
 			}
 			arg.append(c);
 		}
-		if (arg.length() > 0)
+		if (arg.length() > 0) {
 			args.add(arg.toString());
+		}
 
 		return args.toArray(new String[args.size()]);
 	}
