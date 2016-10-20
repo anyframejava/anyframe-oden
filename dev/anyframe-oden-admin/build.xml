@@ -4,7 +4,7 @@
 	<property environment="env"/>
 
 	<property name="pack.name" value="anyframe-oden-admin" />
-	<property name="version" value="2.6.0.RC4"/>
+	<property name="version" value="2.6.1"/>
 	<!--property name="env.ANT_HOME" value="C:\ats-2.0.2\anyframe-5.0.1\ide\ant"/-->
 	<property name="dist" location="dist"/>
 	<property name="pack" location="pack"/>
@@ -27,7 +27,7 @@
 	</target>
 
 	<target name="compile">
-		<artifact:dependencies filesetId="deps.fileset" usescope="compile">
+		<artifact:dependencies filesetId="deps.fileset" settingsFile="/APP/apache-maven-2.2.1/conf/settings.xml" usescope="compile">
 			<pom file="pom.xml"/>
 		</artifact:dependencies>
 		<copy todir="${dist}/WEB-INF/lib">
@@ -96,6 +96,6 @@
 		<antcall target="war"/>
 	</target>
 
-	<target name="all" depends="init, cp-rscs, compile, pmd, war, package"/>
+	<target name="all" depends="init, cp-rscs, compile, war, package"/>
 
 </project>

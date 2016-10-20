@@ -1,0 +1,124 @@
+<section id="workingwithodenexternalapi_externalinterface">
+	<title>ODEN External Interface</title>
+
+	<para>
+		Hessian 원격 기술을 통해 ODEN 서버가 제공하는 ODEN API Interface는 다음과 같다.
+	</para>
+
+	<para>
+		<table>
+			<title>ODEN External Interface Method</title>
+			<tgroup cols="3">
+				
+				<thead>
+					<row>
+						<entry>Interface Name</entry>
+						<entry>역할</entry>
+						<entry>Return type</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry align="center">
+							execute(CfgJob job)
+						</entry>
+						<entry align="left">
+							배포 작업을 실행하는 메쏘드
+						</entry>
+						<entry align="left">
+							CfgReturnVO
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							reexecute(String txid, String user)
+						</entry>
+						<entry align="left">
+							배포 작업 후 예외가 발생한 작업만 재배포 하는 명령어
+						</entry>
+						<entry align="left">
+							CfgReturnVO
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							rollback(String id)
+						</entry>
+						<entry align="left">
+							배포 작업 완료 후 작업을 취소하고 이전 상태로 rollback 하는 메쏘드
+						</entry>
+						<entry align="left">
+							CfgReturnVO
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							log(String id, int pageIdx, int pagesize)
+						</entry>
+						<entry align="left">
+							배포한 결과를 조회하는 메쏘드
+						</entry>
+						<entry align="left">
+							CfgHistory
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							stop(String id)
+						</entry>
+						<entry align="left">
+							현 진행 중인 배포 작업을 중지하는 메쏘드
+						</entry>
+						<entry align="left">
+							String
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							run(CfgScript script)
+						</entry>
+						<entry align="left">
+							특정 위치에 존재하는 script 파일을 실행하는 메쏘드
+						</entry>
+						<entry align="left">
+							<![CDATA[Map<String,String>]]>
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							<![CDATA[checkAgent(List<CfgTarget> agents)]]>
+						</entry>
+						<entry align="left">
+							배포 대상의 ODEN Agent 들의 활성화 여부를 조회하는 메쏘드
+						</entry>
+						<entry align="left">
+							<![CDATA[Map<String,boolean]]>
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							status(String id)
+						</entry>
+						<entry align="left">
+							배포 작업 상태를 파악하는 메쏘드
+						</entry>
+						<entry align="left">
+							<![CDATA[List<CfgReturnStatus>]]>
+						</entry>
+					</row>
+					<row>
+						<entry align="center">
+							test(CfgJob job)
+						</entry>
+						<entry align="left">
+							배포 작업 미리보기를 실행하는 메쏘드
+						</entry>
+						<entry align="left">
+							<![CDATA[Map<String, List<CfgReturnPreview>>]]>
+						</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</para>
+</section>

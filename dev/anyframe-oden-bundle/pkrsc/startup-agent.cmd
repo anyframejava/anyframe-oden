@@ -1,2 +1,2 @@
 set ARGS=-Xmx32m -XX:NewRatio=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=25
-java %ARGS% -jar oden-2.6.0.RC4.jar conf/agent.ini
+java %ARGS% -jar oden-2.6.1.jar conf/agent.ini

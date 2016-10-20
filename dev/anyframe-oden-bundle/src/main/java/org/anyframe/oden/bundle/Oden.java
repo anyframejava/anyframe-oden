@@ -171,12 +171,29 @@ public class Oden {
 		}
 
 		String[] libraries = libBundles();
+		Bundle core_bnd = null;
+		Bundle job_bnd = null;
 		// start bundles which are not belonging to lib
 		for (Bundle bnd : odenFramework.getBundleContext().getBundles()) {
 			if (contains(libraries, bnd)) {
 				continue;
 			}
+			if(bnd.getLocation().contains("anyframe-oden-bundle-core")){
+				core_bnd = bnd;
+				continue;
+			}
+			if(bnd.getLocation().contains("anyframe-oden-bundle-job")){
+				job_bnd = bnd;
+				continue;
+			}
 			bnd.start();
+		}
+		
+		if(job_bnd != null) {
+			job_bnd.start();
+		}
+		if(core_bnd != null) {
+			core_bnd.start();
 		}
 
 		// if remote shell is loaded, show some guides.

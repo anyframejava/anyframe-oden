@@ -1,0 +1,27 @@
+<section id="workingwithexternalapi_introductionodenexternal">
+	<title>Introduction to ODEN External API</title>
+
+	<para>
+		ODEN External API는 ODEN Server와 연계하여 배포관리를 지원하는 API이며, 타 이관 웹 시스템에서  ODEN을 이용하여 배포관리 시 용이하다. 
+		다음과 같은 특징을 제공한다. 
+	</para>
+
+	<itemizedlist>
+		<listitem>
+			<para>
+				HTTP를 통해 경략의 원격 서비스를 제공하는 Hessian/Burlap 원격 기술을 사용
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				배포 관리를 위해  이관, 원복, 이력 관리 , 스크립트 수행등의 다양한 메쏘드 도출
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				객체를 통한 정보 전달로 배포 대상 전달 및 배포 후 이력 정보 관리에 용이
+			</para>
+		</listitem>
+	</itemizedlist>
+
+</section>

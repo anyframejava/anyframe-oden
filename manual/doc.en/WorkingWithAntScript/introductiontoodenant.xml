@@ -1,0 +1,15 @@
+<section id="workingwithantscript_introductiontoodenant">
+	<title>Introduction to Oden Ant Script</title>
+
+	<para>
+		Anyframe Open Deployment ENvironment(이하 Oden)를 통해 배포 환경을 구성하게 되면
+		CI 환경을 통해 빌드된 어플리케이션 컴포넌트 및 각종 설정파일, 웹파일 등을 원하는 Target Server에 편리하게 배포할 수
+		있다. 하지만 CI 환경은 지속적으로 새로운 상태를 유지하지만, Target Server에는 수동으로 배포해줘야 하는 어려움이 있다.
+		이러한 불편함을 해소하기 위해 CI 환경 내에서 Oden을 자동 실행할 수 있도록 Oden Ant를 제공한다. 
+		</para>
+
+	<para>
+		Oden Ant는 Ant Task로 제공되며, CI 환경을 유지시키는 빌드파일(ant script)에 Task를
+		추가하여 사용할 수 있다. 
+		</para>
+</section>

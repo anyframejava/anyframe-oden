@@ -20,7 +20,6 @@
     
 	<!-- for jquery -->
 	<script type="text/javascript" src="<c:url value='/jquery/jquery-1.4.2.min.js'/>"></script>
-	<link rel="stylesheet" href="<c:url value='/css/jquery.css'/>" type="text/css" />
 	
 	<!-- jquery ui, jqGrid -->
 	<script type="text/javascript" src="<c:url value='/jquery/jqgrid/i18n/grid.locale-en.js'/>"></script>

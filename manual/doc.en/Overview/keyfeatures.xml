@@ -1,0 +1,88 @@
+<section id="overview_keyfeatures">
+	<title>Key Features</title>
+
+	<para>
+		Oden has the following features.
+		</para>
+
+	<para>
+		First, it pursues an open and flexible structure to respond to various situations in the site project.
+		<itemizedlist>
+			<listitem>
+				<para>
+					Uses a platform that adds functions in a plugin format (OSGi Bundle) 
+					to enable flexible response to additional function requests at site. 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Can be integrated with Oden in command format through Http protocol, 
+					so it can be conveniently integrated with the previous transfer system.
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+
+	<para>
+		Second, it supports various forms of deployment methods.
+		<itemizedlist>
+			<listitem>
+				<para>
+					Entire deployment
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Changed item deployment
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+
+	<para>
+		Third, provides various additional functions or guidelines related to deployment.
+		<itemizedlist>
+			<listitem>
+				<para>
+					History search
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Server match validation 
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+	<para>
+		Fourth, guarantees stable performance to apply to various deployment environments.
+		<itemizedlist>
+			<listitem>
+				<para>
+					Provides stable deployment for a large amount of items 
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Reduces physical disk I/O to secure speed
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+	<para>
+		Fifth, provides various interface.
+		<itemizedlist>
+			<listitem>
+				<para>
+					Deployment execution or monitoring through CLI environment
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					Deployment execution or monitoring through Web UI
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
+
+</section>

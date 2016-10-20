@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
 <project name="ODEN Packaging" default="default" basedir=".">
-	<property name="version" value="2.6.0.RC4"/>
+	<property name="version" value="2.6.1"/>
 	<!--property name="manual.dir" location="../../../manual/manual/target/oden"/-->
-	<!--property name="manual.dir" location="../../../manual/manual/target"/-->
-	<property name="manual.dir" location="../../../manual/Release/target"/>
+	<property name="manual.dir" location="../../../RELEASE-anyframe-oden-manual/workspace/target"/>
+	<!--property name="manual.dir" location="../../../manual/Release/target"/-->
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
 	<!--property name="distDir" location="../dist"/-->
 	<property name="distDir" location="../dist"/>
@@ -22,25 +22,25 @@
 	<target name="make.admin">
 		<echo>construct oden admin folder</echo>
 		<!-- pack admin -->
-		<!--ant antfile="../../anyframe-oden-admin/build.xml" target="all" inheritall="false" /-->
-		<ant antfile="../../../Admin/Release/build.xml" target="all" inheritall="false" />
+		<ant antfile="../../../RELEASE-anyframe-oden-admin/workspace/build.xml" target="all" inheritall="false" />
+		<!--ant antfile="../../../Admin/Release/build.xml" target="all" inheritall="false" /-->
 		
 		<copy todir="${distDir}/${pksubname}/admin" >
-			<!--fileset dir="../../anyframe-oden-admin/pack"/-->
-			<fileset dir="../../../Admin/Release/pack"/>
+			<fileset dir="../../../RELEASE-anyframe-oden-admin/workspace/pack"/>
+			<!--fileset dir="../../../Admin/Release/pack"/-->
 		</copy>
 	</target>
 	<target name="make.core">
 		<echo>construct oden core folder</echo>
 		<!-- pack admin -->
-		<!--ant antfile="../../anyframe-oden-bundle/build-all.xml" target="build.all" inheritall="false" /-->
-		<!--ant antfile="../../anyframe-oden-bundle/build-all.xml" target="_pack.server" inheritall="false" /-->
-		<ant antfile="../../../Bundle/Release/anyframe-oden-bundle/build-all.xml" target="build.all" inheritall="false" />
-		<ant antfile="../../../Bundle/Release/anyframe-oden-bundle/build-all.xml" target="_pack.server" inheritall="false" />
+		<ant antfile="../../../RELEASE-anyframe-oden-bundle/workspace/anyframe-oden-bundle/build-all.xml" target="build.all" inheritall="false" />
+		<ant antfile="../../../RELEASE-anyframe-oden-bundle/workspace/anyframe-oden-bundle/build-all.xml" target="_pack.server" inheritall="false" />
+		<!--ant antfile="../../../Bundle/Release/anyframe-oden-bundle/build-all.xml" target="build.all" inheritall="false" /-->
+		<!--ant antfile="../../../Bundle/Release/anyframe-oden-bundle/build-all.xml" target="_pack.server" inheritall="false" /-->
 		
 		<copy todir="${distDir}/${pksubname}/core" >
-			<!--fileset dir="../../anyframe-oden-bundle/pack"/-->
-			<fileset dir="../../../Bundle/Release/anyframe-oden-bundle/pack"/>
+			<fileset dir="../../../RELEASE-anyframe-oden-bundle/workspace/anyframe-oden-bundle/pack"/>
+			<!--fileset dir="../../../Bundle/Release/anyframe-oden-bundle/pack"/-->
 		</copy>
 	</target>
 	<target name="make.manual">

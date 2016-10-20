@@ -51,9 +51,9 @@ public class ExcelDownloadController {
 		List<Log> logs = historyService.findByPkExcel(cmd);
 
 		res.reset();
-		res.setHeader("Content-type", "application/xls");
-		res.setHeader("Content-disposition", "inline; filename=history.xls");
-
+		res.setHeader("Content-Type", "application/vnd.ms-excel");
+		res.setHeader("Content-Disposition", "inline; filename=history.xls");
+		  
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();
 
@@ -85,8 +85,8 @@ public class ExcelDownloadController {
 		List<Log> logs = historyService.showExcel(txid, cmd);
 
 		res.reset();
-		res.setHeader("Content-type", "application/xls");
-		res.setHeader("Content-disposition", "inline; filename=historydetail.xls");
+		res.setHeader("Content-Type", "application/vnd.ms-excel");
+		res.setHeader("Content-Disposition", "inline; filename=historydetail.xls");
 
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();
@@ -122,8 +122,8 @@ public class ExcelDownloadController {
 		int icol = 2;
 
 		res.reset();
-		res.setHeader("Content-type", "application/xls");
-		res.setHeader("Content-disposition", "inline; filename=comparetarget.xls");
+		res.setHeader("Content-Type", "application/vnd.ms-excel");
+		res.setHeader("Content-Disposition", "inline; filename=comparetarget.xls");
 
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet();

@@ -1,6 +1,6 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="2.6.0.RC4"/>
-	<property name="manual.dir" location="../../../manual/manual/target/oden"/>
+	<property name="version" value="2.6.1"/>
+	<property name="manual.dir" location="../../../RELEASE-anyframe-oden-manual/workspace/target/oden"/>
 	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	<property name="pksubname" value="Anyframe-Oden-${version}"/>
 	<property name="artifactsDir" value="pack"/>

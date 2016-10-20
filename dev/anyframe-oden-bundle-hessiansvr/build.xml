@@ -1,7 +1,7 @@
 <project name="Oden Hessian Server" default="all-local" basedir=".">
 	
 	<property name="bundle.name" value="anyframe-oden-bundle-hessiansvr" />
-	<property name="version" value="1.6.0.RC4"/>
+	<property name="version" value="1.6.0"/>
 			
 	<property name="src" location="${basedir}/src/main/java"/>
 	<property name="build" location="${basedir}/build"/>

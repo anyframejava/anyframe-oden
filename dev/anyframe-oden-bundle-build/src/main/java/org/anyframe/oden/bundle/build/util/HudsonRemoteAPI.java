@@ -98,7 +98,7 @@ public class HudsonRemoteAPI {
 
 	@SuppressWarnings("unchecked")
 	public static List<Element> getJobDetail(String jobName)
-			throws JDOMException, IOException {
+			throws Exception {
 		List<Element> elements = new ArrayList<Element>();
 		if (!jobName.endsWith("/")) {
 			jobName += "/";
@@ -238,8 +238,7 @@ public class HudsonRemoteAPI {
 		return job;
 	}
 
-	public Element getJobConfigXml(String jobName) throws JDOMException,
-			IOException {
+	public Element getJobConfigXml(String jobName) throws Exception {
 
 		return getDocument(hudsonURL
 				+ "anyframe/api?service=getJobConfig&jobName=" + jobName).getRootElement();
@@ -307,10 +306,11 @@ public class HudsonRemoteAPI {
 		HttpClient httpClient = getClient();
 		
 		buildName = URLEncoder.encode(buildName).replace("+", "%20");
-		PostMethod method = new PostMethod(address + "/job/" + buildName
-				+ "/buildWithParameters");
+		PostMethod method = new PostMethod(address + "/job/" + buildName + "/buildWithParameters");
 		method.setRequestHeader("Content-Type",
 				"application/x-www-form-urlencoded; charset=UTF-8");
+		method.setDoAuthentication(true);
+		
 		method.addParameter("USER.ID", userId);
 		method.addParameter("PWD", pwd);
 		method.addParameter("DM.DB.NAME", dbName);
@@ -327,7 +327,7 @@ public class HudsonRemoteAPI {
 			method.addParameter("TARGET", "pmd.run");
 		}
 		hudsonURL = address + "/";
-		method.setDoAuthentication(true);
+		
 
 		String buildNo = getLastBuildNo(buildName);
 
@@ -602,8 +602,7 @@ public class HudsonRemoteAPI {
 		return "";
 	}
 
-	public static Document getDocument(String url) throws IOException,
-			JDOMException {
+	public static Document getDocument(String url) throws Exception {
 		HttpClient client = new HttpClient();
 		SAXBuilder builder = new SAXBuilder(false);
 		Document dom = null;

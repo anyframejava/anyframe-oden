@@ -2,6 +2,58 @@ Anyframe ODEN Admin CHANGELOG
 ==========================
 http://www.anyframejava.org
 
+Changes in version 2.6.1 (2016-01-26)
+-------------------------------------
+* Apache 취약점 관련 commons-collections 버전업
+* Anyframe Admin 화면 버그 수정(jquery.css, excel download 버그)
+
+
+* 소스 코드 변경
+  - anyframe-oden-bundle-admin 변경 
+
+* 참조 라이브러리 변경
+  - 기존의 commons-collections-3.2.jar 파일을 commons-collections-3.2.2.jar로 버전 변경.
+
+* 해결된 이슈 목록
+
+ODEN-66 Apache commons Collections 이슈관련
+ODEN-67	Oden Admin jquery.css, excel download관련 버그
+
+
+
+Changes in version 2.6.0 (2015-12-02)
+-------------------------------------
+* Anyframe ODEN과 Jenkins 연동 기능 추가
+* Anyframe Admin 화면 개선 (Job Grouping, Jenkins 연동)
+* ODEN 서버 구동 시 bundle 로딩 순서에 따른 이슈 조치
+* Command로 스크립트 실행을 정상수행하였을 때 결과값처리 로직 추가
+
+
+* 소스 코드 변경
+  - anyframe-oden-bundle-build 추가, anyframe-oden-bundle, anyframe-oden-bundle-http, anyframe-oden-bundle-external, anyframe.oden.admin 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 추가된 기능 
+  - 새 명령어 추가
+    . build info, build run, build log, build status, build check  	
+
+* 해결된 이슈 목록
+ODEN-30	Job grouping ODEN Command 추가
+ODEN-31 Jenkins job ODEN Command 추가
+ODEN-36	ODEN Job 그룹핑, 빌드자동화 서비스레이어 구현
+ODEN-37	ODEN job 그룹핑(목록) 화면 구현
+ODEN-38	배포 Job 등록/조회(빌드Job 매핑,group 매핑) 화면 구현
+ODEN-48	빌드 관련 명령어 중 빌드 서버 기동여부를 확인하는 명령어 추가
+ODEN-49	Admin IE에서 실행 시 스크립트 오류
+ODEN-50	Admin Tab 이동간 sync 오류
+ODEN-51	Admin Agent Check 최소화
+ODEN-65	Jenkins 접속관련 security로직 추가
+SP-168 [BDA Lab] paas 환경 ODEN 문의 대응
+
+
+
 Changes in version 2.5.0 (2013-04-05)
 -------------------------------------
 * PMD RuleSet 검증 결과 조치.
