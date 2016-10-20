@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE queryservice PUBLIC "-//ANYFRAME//DTD QUERYSERVICE//EN" "http://www.anyframejava.org/dtd/anyframe-core-query-mapping-3.2.dtd">
+<queryservice>
+
+	<queries>
+		<query id="insertSecuredResRoles" isDynamic="true" mappingStyle="camel">
+			<statement>
+			<![CDATA[
+				INSERT INTO SECURED_RESOURCES_ROLES ( 			
+					RESOURCE_ID, 
+					ROLE_ID, 
+					CREATE_DATE, 
+					MODIFY_DATE) 
+				VALUES (:resourceid, 
+						:roleid, 
+						:createdate, 
+						:modifydate)
+			]]>
+			</statement>
+			<param name="resourceid" type="VARCHAR" />
+			<param name="roleid" type="VARCHAR" />
+			<param name="createdate" type="VARCHAR" />
+			<param name="modifydate" type="VARCHAR" />
+		</query>
+
+		<query id="removeSecuredResRoles" mappingStyle="camel">
+			<statement>
+			<![CDATA[
+				DELETE FROM SECURED_RESOURCES_ROLES
+				WHERE ROLE_ID = :jobname
+			]]>
+			</statement>
+			<param name="jobname" type="VARCHAR" />
+		</query>
+
+	</queries>
+</queryservice>

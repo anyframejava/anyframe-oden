@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<project name="perforce" basedir="." default="all">
+  
+	<property name="dist" location="${basedir}/dist"/>
+	<property name="build" location="${basedir}/build"/>
+	<!-- src root path(src,src/main/java) -->
+	<property name="srcRoot" value="src/main/java"/>
+	<!-- web root path(webapp) -->
+	<property name="webRoot" value="src/main/webapp"/>
+	<!-- src append path -->
+	<property name="srcAppd" value="."/>
+	<!-- web append path -->
+	<property name="webAppd" value="."/>
+	
+	<property name="reference" value="${basedir}/reference/classes"/>	
+	
+	
+	<path id="classpath">
+		<fileset dir="../../lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="pf.init">
+		<delete dir="${dist}"/>
+		<delete dir="${build}"/>
+	</target>	
+	
+	<target name="pmd.init">
+		<delete dir="${basedir}/pmd"/>
+		<mkdir dir="${basedir}/pmd"/>
+	</target>
+
+	
+	<!--
+	<target name="pf.checkout" depends="pf.clean">
+		<taskdef name="checkout" classname="org.anyframe.oden.perforce.PerforceAdaptor" classpathref="classpath" />
+		<checkout serverUrl="p4java://localhost:1666" password="qqqq1111" userName="junsung3" client="junsung3_SDS-PC_273" dRecode="another10" finalPath = "C:/TESTPERFORCE" jobId="bye" />
+	</target>
+	-->
+	
+	<target name="pf.checkout">
+		<taskdef name="checkout" classname="org.anyframe.oden.perforce.PerforceAdaptor" classpathref="classpath" />
+		<checkout serverUrl="${DM.SERVER}" password="${PWD}" userName="${USER.ID}" client="${PRODUCT.NAME}" finalPath = "${dist}" jobId = "${REQUEST}"/>			
+	</target>
+	
+	<target name="pf.compile">
+		<taskdef name="compile" classname="org.anyframe.oden.perforce.compile.CompileBroker" classpathref="classpath" />
+		<compile requestId = "${REQUEST}" srcRoot="${srcRoot}" webRoot="${webRoot}"  srcAppd="${srcAppd}" webAppd="${webAppd}"/>
+	</target>
+
+	<target name="pf.clean">
+		<delete dir="${dist}"/>
+		<delete dir="${build}"/>
+	</target>
+	
+	<!--
+	<target name="pf.clean">
+		<delete dir="${finalPath}"/>
+	</target>
+	-->
+	<target name="pmd">
+		<mkdir dir="build"/>
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="classpath"/>
+		<pmd rulesetfiles="pmd-ruleset.xml">
+			<formatter type="xml" toFile="pmd/pmd.xml"/>
+			<fileset dir="dist">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+	
+	<target name="all" depends="pf.checkout, pf.compile"/>	
+	<target name="pmd.run" depends="pmd.init, pf.checkout, pmd, pf.clean"/>
+
+	<target name="build.rollback">
+		<taskdef name="rollback" classname="org.anyframe.oden.perforce.rollback.RollbackBroker" classpathref="classpath" />
+		<rollback requestId="${REQUEST}"/>
+	</target>
+	
+	
+</project>

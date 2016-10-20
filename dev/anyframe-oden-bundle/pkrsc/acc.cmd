@@ -1,0 +1,1 @@
+java -jar ../bundle/anyframe-oden-bundle-auth-1.0.2.RC4.jar %*

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="euc-kr"?>
+<project name="bookrental" default="all" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+	<property name="dist" location="${basedir}/dist"/>
+	<property name="build" location="${basedir}/build"/>
+	<!-- src root path(src,src/main/java) -->
+	<property name="srcRoot" value="anyframe-query-pi/src/main/java"/>
+	<!-- web root path(webapp) -->
+	<property name="webRoot" value="anyframe-query-pi/src/main/webapp"/>
+	<!-- src append path -->
+	<property name="srcAppd" value="."/>
+	<!-- web append path -->
+	<property name="webAppd" value="."/>
+	<!-- jar pacakage webRoot delete(ex.webapp/WEB-INF) -->
+	<property name="jarWebRoot" value="WEB-INF"/>
+	<!-- reference classes Root -->
+	<property name="classesRoot" value="${basedir}/reference/WEB-INF/classes"/>
+	<!-- reference lib Root -->
+	<property name="libsRoot" value="${basedir}/reference/WEB-INF/libs"/>
+	<!-- reference path for Making War File-->
+	<property name="reference" value="${basedir}/reference"/>
+
+	<path id="classpath">
+		<fileset dir="../../lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="dm.init">
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${build}"/>
+	</target>
+
+	<target name="pmd.init">
+		<delete dir="${basedir}/pmd"/>
+		<mkdir dir="${basedir}/pmd"/>
+	</target>
+
+	<target name="dm.checkout">
+		<taskdef name="checkout" classname="org.anyframe.oden.dimmension.DimensionAdapter" classpathref="classpath" />
+		<checkout userId="${USER.ID}" password="${PWD}" dbName="${DM.DB.NAME}" dbConnection="${DB.CONNECTION}" server="${DM.SERVER}" productName="${PRODUCT.NAME}" projectName="${DM.PROJECT.NAME}" requestId="${REQUEST}" targetPath="${dist}" />
+	</target>
+
+	<target name="dm.compile">
+		<taskdef name="compile" classname="org.anyframe.oden.dimmension.compile.CompileBroker" classpathref="classpath" />
+		<compile projectName="${DM.PROJECT.NAME}" srcRoot="${srcRoot}" webRoot="${webRoot}" srcAppd="${srcAppd}" webAppd="${webAppd}" requestId="${REQUEST}" jarWebRoot="${jarWebRoot}" packageName="${PACKAGENAME}" classesRoot="${classesRoot}" libsRoot="${libsRoot}" reference="${reference}" />
+	
+		<delete includeemptydirs="true">
+	      <fileset dir="${build}"  >
+	        <and>
+	          <size value="0"/>
+	          <type type="dir"/>
+	         </and>
+	      </fileset>
+	    </delete>	
+	</target>
+
+	<target name="dm.copyrepo">
+		<ac:if>
+			<equals arg1="${PACKAGETYPE}" arg2="jar"/> <!-- if(directory=="Test 1") -->
+				 <then> <!--if directory name is Test 1-->
+			 		<echo message="PACKAGETYPE Jar"/>
+				 	<jar destfile="${reference}/${PACKAGENAME}.jar" basedir="${classesRoot}"/>
+				 	<taskdef name="compile" classname="org.anyframe.oden.dimmension.compile.CompileBroker" classpathref="classpath" />
+				 	<compile projectName="${DM.PROJECT.NAME}" srcRoot="${srcRoot}" webRoot="${webRoot}" srcAppd="${srcAppd}" webAppd="${webAppd}" requestId="${REQUEST}" packageType="${PACKAGETYPE}" jarWebRoot="${jarWebRoot}" packageName="${PACKAGENAME}" classesRoot="${classesRoot}" libsRoot="${libsRoot}" reference="${reference}" />
+				 	<move todir="${REPOSITORY.PATH}">
+ 			  	   		<fileset dir="${basedir}/build">
+ 			  	        	<include name="**/${PACKAGENAME}.jar" />
+ 			  			</fileset>
+ 			  	   </move>		  	   
+			 	</then>						
+	   <elseif>
+		  <equals arg1="${PACKAGETYPE}" arg2="war" />
+		  <then>
+			   <echo message="PACKAGETYPE War" />
+		  	   <war destfile="${reference}/${PACKAGENAME}.war" basedir="${reference}" webxml="${reference}/WEB-INF/web.xml" />
+		  	   <taskdef name="compile" classname="org.anyframe.oden.dimmension.compile.CompileBroker" classpathref="classpath" />
+		  	   <compile projectName="${DM.PROJECT.NAME}" srcRoot="${srcRoot}" webRoot="${webRoot}" srcAppd="${srcAppd}" webAppd="${webAppd}" requestId="${REQUEST}" packageType="${PACKAGETYPE}" jarWebRoot="${jarWebRoot}" packageName="${PACKAGENAME}" classesRoot="${classesRoot}" libsRoot="${libsRoot}" reference="${reference}" />
+		  	   <move todir="${REPOSITORY.PATH}">
+		  	   		<fileset dir="${basedir}/build">
+		  	        	<include name="**/${PACKAGENAME}.war" />
+		  			</fileset>
+		  	   </move>
+		  </then>
+		</elseif>
+			
+		<else>
+			<echo message="PACKAGETYPE class"/>
+			<echo message="${PACKAGETYPE}"/>
+			<echo message="${PACKAGENAME}"/>
+			<copy todir="${REPOSITORY.PATH}">
+				<fileset dir="${basedir}/build"/>
+			</copy>
+		</else>
+		</ac:if>
+	</target>
+
+	<target name="dm.clean">
+		<delete dir="${dist}"/>
+		<delete dir="${build}"/>
+	</target>
+
+	<target name="dm.deletemeta">
+	  	<delete includeemptydirs="true">
+	      <fileset dir="${build}" includes="**/.metadata/**"/>
+	    </delete>
+	</target>
+	
+	<target name="pmd">
+		<mkdir dir="build"/>
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="classpath"/>
+		<pmd rulesetfiles="pmd-ruleset.xml">
+			<formatter type="xml" toFile="pmd/pmd.xml"/>
+			<fileset dir="dist">
+				<include name="**/*.java"/>
+			</fileset>
+		</pmd>
+	</target>
+
+	<!--target name="all" depends="dm.init, dm.checkout, dm.compile, dm.copyrepo, dm.clean"/-->
+
+	<target name="all" depends="dm.init, dm.checkout, dm.compile, dm.deletemeta, dm.copyrepo, dm.clean"/>
+
+	<target name="pmd.run" depends="pmd.init, dm.checkout, pmd, dm.clean"/>
+
+	<target name="build.rollback">
+		<taskdef name="rollback" classname="org.anyframe.oden.dimmension.rollback.RollbackBroker" classpathref="classpath" />
+		<rollback requestId="${REQUEST}"/>
+	</target>
+
+</project>

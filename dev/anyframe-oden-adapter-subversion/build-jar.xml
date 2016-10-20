@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- Sample build file used to retrieve svnant's sources -->
+<project name="svn-test" basedir="." default="checkoutThis">
+  
+  <!--  all properties are in build.properties --> 
+  <property file="build.properties" /> 
+
+  <!-- path to the svnant libraries. Usually they will be located in ANT_HOME/lib -->
+  <path id="classpath">
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>  
+  
+  <!-- load the svn task --> 
+  <typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="classpath" />
+ 
+  <target name="checkoutThis">
+    <svn username="junsung84.park" password="sds000">
+      <checkout url="http://dev.anyframejava.org/subv/anyframe-opensource/deployer/trunk/dev/anyframe-oden-adapter-dimension/" revision="HEAD" destPath="D:/svnTarget/" />
+    </svn>
+  </target>
+
+</project>

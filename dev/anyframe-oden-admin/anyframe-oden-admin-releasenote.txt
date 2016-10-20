@@ -1,0 +1,155 @@
+Anyframe ODEN Admin CHANGELOG
+==========================
+http://www.anyframejava.org
+
+Changes in version 2.5.0 (2013-04-05)
+-------------------------------------
+* PMD RuleSet 검증 결과 조치.
+* 일괄 배포 기능을 통한 멀티 스레드 배포 처리 구현.
+* 다국어 처리 기능 구현.
+* ODEN Server/Agent 중지를 위한 Shutdown 스크립트 구현.
+* 동일 물리적 서버 내 다수 Agent 구동에 관한 이슈 사항 해결.
+
+
+* 소스 코드 변경
+    - anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - 기존의 org.apache.felix.eventadmin-1.0.0.jar 파일을 org.apache.felix.eventadmin-1.2.4.jar로 버전 변경.
+  - 기존의 org.apache.felix.http.jetty-2.0.4.jar 파일을 org.apache.felix.http.jetty-2.2.0.jar로 버전 변경.
+
+* 해결된 이슈 목록
+ODEN-19	PMD RuleSet 검증 결과 조치
+ODEN-20	멀티 스레드 배포 처리기능 추가
+ODEN-23	국제화 지원
+ODEN-26	ODEN Server/Agent Shutdown 스크립트 작성
+ODEN-27	다 수개 Agent 기동에 관한 이슈 사항 해결
+
+
+
+Changes in version 2.4.0 (2012-12-28)
+-------------------------------------
+* 파일 전송 시 암호화 하여 전송하는 기능 구현.
+* ODEN Agent 에서 허용 되는 Server 인증 기능 구현.
+
+
+* 소스 코드 변경
+    - anyframe-oden-bundle-common 변경,  anyframe-oden-bundle-core 변경,  anyframe-oden-bundle-external 변경,  anyframe-oden-bundle-hessiansvr 변경,  anyframe-oden-bundle-http 변경,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - icu4j-4.6.1.jar 추가.
+  - commons-logging-1.1.1.jar 추가.
+  - org.apache.servicemix.bundles.jasypt-1.7_1.jar 추가.
+
+* 해결된 이슈 목록
+ODEN-15	배포 파일 정보 암호화 기능 구현
+ODEN-16	ODEN Agent 에서 허용되는 Server 인증 기능 구현
+
+
+Changes in version 2.3.1 (2012-06-15)
+-------------------------------------
+* JDK 7 환경 구동을 위한 개선.
+* message code 문제 개선.
+
+* 소스 코드 변경
+    - anyframe-oden-admin 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+  - N/A.
+
+
+
+Changes in version 2.3.0 (2012-04-10)
+-------------------------------------
+* 압축 배포 전송 기능 구현.
+* 재 배포 기능 구현.
+* ODEN Admin DB Port 설정 옵션 추가.
+
+* 소스 코드 변경
+    - anyframe-oden-admin,  anyframe-oden-bundle-job 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+  - N/A.
+ 
+
+
+Changes in version 2.2.0 (2011-06-30)
+-------------------------------------
+* 배포 원복 기능 구현.
+* 배포 오류 옵션 추가.
+* 패키지 구조 변경(anyframe- --> org.anyframe.-).
+
+* 소스 코드 변경
+    - anyframe-oden-admin,  anyframe-oden-bundle-job 변경,  anyframe-oden-bundle-hessiansvr 변경 
+
+* 참조 라이브러리 변경
+  - N/A.
+
+* 해결된 이슈 목록
+  - N/A.
+ 
+
+
+Changes in version 2.1.0 (2010-12-21)
+-------------------------------------
+* 사용자 관리 및 권한관리 구현.
+* 배포 후 특정 스크립트를 구동할 수 있음.
+* Anyframe IAM 기반 으로 Secutiry 관련 설정.
+* 사용 계정에 따른 배포 이력 추적 기능 구현.
+
+* 소스 코드 변경
+    - anyframe.oden.bundle.ent.http,  anyframe.oden.admin 변경 
+
+* 참조 라이브러리 변경
+  - spring-3.0.4. 관련 jar 추가.
+  - Anyframe IAM 관련 jar 추가.
+  - Anyframe.query-4.5.2.jar 추가.
+
+* 해결된 이슈 목록
+ODEN-412	Bug fix 한글 encoding 문제
+ODEN-413	IAM을 적용하여 계정관리와 권한 관리가 가능하도록 조치
+ODEN-414	배포 후 스크립트 동작
+ODEN-415	Histoy 및 Job 관리 화면 권한 관리 조치
+ODEN-416	User 권한 제어 화면 구현
+ 
+
+
+Changes in version 2.0.0 (2010-09-29)
+-------------------------------------
+* Oden GUI를 Eclipse Plugin에서 Web화면으로 변경.
+* Job, History, Status, Log 관리 화면 제공.
+* Excel export 기능 제공.
+* 배포 진행과정 progress bar 제공.
+* 별도 WAS없이 자체 부팅 가능.
+
+* 소스 코드 변경
+  - anyframe.oden.admin 추가
+  
+* 참조 라이브러리 변경
+  - anyframe 4.5.1 추가
+  - spring 3.0.3 추가
+  - json, jquery 추가 
+  - winstone 0.9.10 추가
+
+* 추가된 기능
+  - Job화면에서는 Job을 설정하거나 배포를 실행시킬 수 있다. 명령어를 수행할 수도 있고, Job에 속한 Target들간 비교도 할 수 있다.
+  - History는 전체 배포 목록을 간략하게 보여주는 화면과 각 배포건의 상세를 보여주는 화면으로 구성되어 있다.
+  - Status에서는 진행 %뿐만 아니라 현재 배포중인 파일도 확인할 수 있고, 대기중인 Job목록도 확인할 수 있다.
+  - Log에서는 System Error의 상세 내역을 Stacktrace와 함께 보여준다.
+
+* 해결된 이슈 목록
+ODEN-362	배포 작업 상태 모니터링 화면 구현
+ODEN-365	배포 작업 현황 조회 화면 구현
+ODEN-351	배포 관련 화면 구현
+ODEN-368	로그 조회 화면 구현
+ODEN-356	배포 Target 서버 간 정합성 비교 화면 구현
+ODEN-354	배포 그룹 화면 구현
+ODEN-356	배포 미리보기 화면 구현
+ODEN-393	화면 Excel Download 기능 개선
+ODEN-404	Deploy All 방식 변경

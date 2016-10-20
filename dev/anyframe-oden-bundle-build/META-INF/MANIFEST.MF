@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Build
+Bundle-SymbolicName: anyframe-oden-bundle-build
+Bundle-Version: 1.0.1.qualifier
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.sleepycat.bind,
+ com.sleepycat.bind.serial,
+ com.sleepycat.bind.tuple,
+ com.sleepycat.je,
+ com.sleepycat.je.dbi,
+ com.sleepycat.je.util,
+ com.sleepycat.util,
+ org.anyframe.oden.bundle.common,
+ org.anyframe.oden.bundle.core.command,
+ org.anyframe.oden.bundle.gate,
+ org.apache.commons.httpclient,
+ org.apache.commons.httpclient.auth,
+ org.apache.commons.httpclient.methods,
+ org.apache.commons.httpclient.params,
+ org.jdom,
+ org.jdom.input,
+ org.json,
+ org.osgi.framework,
+ org.osgi.service.component,
+ org.ungoverned.osgi.service.shell
+Service-Component: OSGI-INF/build_command.xml,
+ OSGI-INF/bdb_build_logger.xml,
+ OSGI-INF/internal_build_command.xml
+Bundle-ClassPath: .
+Export-Package: org.anyframe.oden.bundle.build.config,
+ org.anyframe.oden.bundle.build.util

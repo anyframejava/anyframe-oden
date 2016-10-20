@@ -1,0 +1,109 @@
+
+/* New */
+
+.leftline	{
+	background: #dadada url(../images/leftline.png) left top repeat-y;
+}
+
+.depth01	{
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu01.png) left top no-repeat;
+ 	}
+.depth01 a:link,
+.depth01 a:visited {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu01.png) left top no-repeat;
+ 	}
+.depth01 a:hover {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: transparent  url(../images/menu_hover.png) left top no-repeat;
+ 	}
+
+
+.depth02	{
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu02.png) left top no-repeat;
+ 	}
+.depth02 a:link,
+.depth02 a:visited {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu02.png) left top no-repeat;
+ 	}
+.depth02 a:hover {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: transparent  url(../images/menu_hover.png) left top no-repeat;
+ 	}
+
+
+.depth03	{
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu03.png) left top no-repeat;
+ 	}
+.depth03 a:link,
+.depth03 a:visited {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu03.png) left top no-repeat;
+ 	}
+.depth03 a:hover {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: transparent  url(../images/menu_hover.png) left top no-repeat;
+ 	}
+
+
+.depth04	{
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu04.png) left top no-repeat;
+ 	}
+.depth04 a:link,
+.depth04 a:visited {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu04.png) left top no-repeat;
+ 	}
+.depth04 a:hover {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: transparent  url(../images/menu_hover.png) left top no-repeat;
+ 	}
+ 	
+.depth05	{
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu05.png) left top no-repeat;
+ 	}
+.depth05 a:link,
+.depth05 a:visited {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: #dadada url(../images/leftmenu05.png) left top no-repeat;
+ 	}
+.depth05 a:hover {
+	display:block;
+	width:65px;
+	height: 75px;
+	background: transparent  url(../images/menu_hover.png) left top no-repeat;
+ 	} 	

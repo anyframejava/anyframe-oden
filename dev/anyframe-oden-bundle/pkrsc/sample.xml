@@ -1,0 +1,16 @@
+<project name="Oden Ant Sample" default="deploy" basedir=".">
+	<taskdef resource="oden-task.properties" classpath="anyframe.oden.ant.jar" />
+
+	<target name="clean">
+		<delete dir="target"/>
+	</target>
+	
+	<target name="deploy" depends="clean">
+		<oden-task server="localhost" port="9860" 
+			id="oden" pw="oden0">
+			<deploy repository="file://doc" includes="**">
+				<agent name="sampleapp"/>
+			</deploy>
+		</oden-task>
+	</target>
+</project>

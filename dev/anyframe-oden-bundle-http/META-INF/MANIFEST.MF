@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Oden Enterprise Http
+Bundle-SymbolicName: anyframe-oden-bundle-http
+Bundle-Version: 2.0.3
+Bundle-Vendor: SAMSUNG SDS
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: javax.servlet,
+ javax.servlet.http,
+ org.json,
+ org.osgi.service.http,
+ org.ungoverned.osgi.service.shell,
+ org.anyframe.oden.bundle.common,
+ org.osgi.service.component
+Export-Package: org.anyframe.oden.bundle.http
+Service-Component: OSGI-INF/resource_register.xml,
+ OSGI-INF/shell_servlet.xml
+Main-Class: org.anyframe.oden.bundle.http.Cmd
