@@ -17,6 +17,7 @@
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -27,7 +28,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
 import anyframe.common.bundle.gate.CustomCommand;
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
@@ -118,15 +118,22 @@ public class TaskCommandImpl extends OdenCommand {
 					
 				// valid policy?
 				String[] policynames = cmd.getOptionArgArray(POLICY_OPT);
-				if(policynames == null || policynames.length == 0)
-					throw new OdenException("Couldn't find any -p option.");
-				
-				for(String policyname : policynames){
-					if(!existPolicy(policyname))
-						throw new OdenException("Couldn't find a policy: " + policyname);
+				if(policynames == null || policynames.length == 0){
+					// try to add policy
+					try{
+						String id = cmd.getActionArg();
+						policyCommand.addPolicy(id, cmd.getOptionString());
+						addTask(id, "-p \"" + id + "\"");
+					}catch(OdenException e){
+						throw new OdenException("Illegal Arguments.");
+					}
+				}else {
+					for(String policyname : policynames){
+						if(!existPolicy(policyname))
+							throw new OdenException("Couldn't find a policy: " + policyname);
+					}
+					addTask(cmd.getActionArg(), cmd.getOptionString());
 				}
-
-				addTask(cmd.getActionArg(), cmd.getOptionString());
 				consoleResult = "Task " + cmd.getActionArg() + " is added.";
 			}else if(Cmd.REMOVE_ACTION.equals(action)){
 				if(cmd.getActionArg().length() < 1)
@@ -274,7 +281,7 @@ public class TaskCommandImpl extends OdenCommand {
 		if(op == null) 
 			throw new OdenParseException(cmd.toString());
 		
-		Set<DeployFile> dfiles = new ArraySet<DeployFile>();
+		Set<DeployFile> dfiles = new HashSet<DeployFile>();
 		
 		String[] policies = op.getArgArray();
 		for(String policy : policies){
@@ -305,11 +312,17 @@ public class TaskCommandImpl extends OdenCommand {
 		return getName() + " " + Cmd.HELP_ACTION;
 	}
 	
-	public String getFullUsage() {
+	public String getFullUsage() throws OdenException {
 		return getName() + " " + Cmd.INFO_ACTION + " [<task-name>]" + "\n" +
 				getName() + " " + Cmd.ADD_ACTION + " <task-name> "+
 				"\n\t-p[olicy]" +" <policy-name> ... " + 
 				"\n\t[-desc" + " <description>]" + "\n" +
+				getName() + " " + Cmd.ADD_ACTION + " <task-name> " + 
+				"\n\t[-r[epo] " + policyCommand.getRepositoryUsages() + "] " + 
+				"\n\t-i[nclude]" + " <wildcard-location> ... " +
+				"[" + "-e[xclude]" + " <wildcard-location> ...] " + 
+				"\n\t[" + "-u[pdate] | -del" + "] " + 
+				"\n\t-d[est]" + " <agent-name:[<absolute-path> | ~[/<path>] | $<location-var>[/<path>] ]> ... \n" + 
 				getName() + " " + Cmd.REMOVE_ACTION + " <task-name>" + "\n" +
 				getName() + " " + Cmd.RUN_ACTION + " <task-name> [-sync]" + "\n" +
 				getName() + " " + TEST_ACTION + " <task-name>";

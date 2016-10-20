@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Oden Common
 Bundle-SymbolicName: anyframe.oden.bundle.common
-Bundle-Version: 1.1.1
+Bundle-Version: 1.1.2
 Bundle-Vendor: SAMSUNG SDS
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: anyframe.oden.bundle.common,

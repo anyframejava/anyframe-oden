@@ -49,7 +49,7 @@ public class Utils {
 //		Thread.sleep(500);
 //		buf.append("CPU usage: " + Math.round(monitor.cpuTimes().getCpuUsage(initTimes)*100) + "%\n");
 
-		buf.append("Memory usage: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1000) +"kb\n");
+		buf.append("Memory usage: " + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())/1024) +"kb\n");
 		buf.append("Thread: " + Thread.activeCount() + " threads are running.\n");
 		Map<Thread, StackTraceElement[]> ttraces = Thread.getAllStackTraces();
 		for(Thread t : ttraces.keySet()){

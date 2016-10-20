@@ -17,10 +17,9 @@
 package anyframe.oden.bundle.core.command;
 
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.DateUtil;
 import anyframe.oden.bundle.common.FileUtil;
@@ -111,11 +109,13 @@ public class HistoryCommandImpl extends OdenCommand {
 			
 			if(Cmd.SHOW_ACTION.equals(action)) {
 				List<RecordElement2> list = new ArrayList<RecordElement2>();
-				list.add(deploylog.search(cmd.getActionArg(), 
+				RecordElement2 r = deploylog.search(cmd.getActionArg(), 
 						cmd.getOptionArg(USER_OP),
 						cmd.getOptionArg(AGENT_OP),
 						cmd.getOptionArg(PATH_OP),
-						cmd.getOption(FAILONLY_OP) != null));
+						cmd.getOption(FAILONLY_OP) != null);
+				if(r != null)
+					list.add(r);
 				if(isJSON){
 					ja = jsonize(list);
 				} else {
@@ -123,14 +123,10 @@ public class HistoryCommandImpl extends OdenCommand {
 				}
 			}else if(Cmd.INFO_ACTION.equals(action)){
 				String[] date = cmd.getOptionArgArray(DATE_OP);
-				if(date.length == 0){		// show today's transaction list
-					date = new String[]{
-							new SimpleDateFormat("yyyyMMdd").format(new Date(System.currentTimeMillis() )) };
-				}
 				
 				// show all histories of that date
 				List<MiniRecordElement> list = deploylog.search(  
-						date.length > 0 ? date[0] : "", date.length > 1 ? date[1] : (date.length > 0 ? date[0] : ""),
+						date.length > 0 ? date[0] : null, date.length > 1 ? date[1] : (date.length > 0 ? date[0] : null),
 								null, false);
 				if(isJSON){
 					for(MiniRecordElement r : list){
@@ -156,8 +152,8 @@ public class HistoryCommandImpl extends OdenCommand {
 				String user = extractUserName(cmd); 
 				
 				String undo = context.getProperty("deploy.undo");
-				if(undo == null || !undo.equals("true"))
-					throw new OdenException("Undo function is not activated. Check 'deploy.undo' property in oden.ini.");
+				if(undo == null || !undo.startsWith("true"))
+					throw new OdenException("Undo function is not activated. Check 'deploy.undo' property in oden.ini." + undo);
 				
 				boolean isSync = cmd.getOption(SYNC_OPT) != null;
 				String txid = undo(id, paths, isSync, user);
@@ -230,21 +226,6 @@ public class HistoryCommandImpl extends OdenCommand {
 		}
 		System.gc();
 	}
-	
-	private void appendDetails(JSONObject jo, Set<DeployFile> deployFiles) {
-		int nsuccess = 0;
-		Set<String> items = new ArraySet<String>();
-		for(DeployFile f : deployFiles){
-			items.add(f.getPath());
-			if(f.isSuccess())
-				nsuccess++;
-		}
-		try {
-			jo.put("nitems", items.size()).put("nsuccess", nsuccess).put("total", deployFiles.size());
-		} catch (JSONException e) {
-			// ignore
-		}
-	}
 
 	private String redeploy(final String id, boolean isSync, String user) throws OdenException {
 		// composite deploy job & schedule it
@@ -257,7 +238,10 @@ public class HistoryCommandImpl extends OdenCommand {
 						Assert.check(r != null, "Fail to find a history for " + id);
 						
 						// filter deployfiles to get the failed files & their related files.
-						return DeployFileUtil.filterToRedeploy(r.getDeployFiles());
+						Set<DeployFile> ret = new HashSet<DeployFile>();
+						DeployFileUtil.filterToRedeploy(
+								r.getDeployFiles(), ret);
+						return ret;
 					}
 				});
 		
@@ -335,7 +319,7 @@ public class HistoryCommandImpl extends OdenCommand {
 	}
 
 	private Set<DeployFile> undoFiles(String id, Map<AgentLoc, String> paths) throws OdenException {
-		Set<DeployFile> undos = new ArraySet<DeployFile>();
+		Set<DeployFile> undos = new HashSet<DeployFile>();
 		
 		RecordElement2 record = deploylog.search(id, null, null, null, false);
 		if(record == null)

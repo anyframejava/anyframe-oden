@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<agents>
+<!-- 
+	<group id="mac55">
+		<agent name="app0" path=""/>
+		<agent name="app1" path=""/>
+		<agent name="app2" path=""/>
+	</group>
+	<group id="mac55_abs">
+		<agent name="app0" path="ant_absolute"/>
+		<agent name="app1" path="ant_absolute"/>
+		<agent name="app2" path="ant_absolute"/>
+	</group>
+	 -->
+	 <group id="mac55_abs">
+		<agent name="agent1" path=""/>
+		<agent name="agent2" path=""/>
+	</group>
+</agents>

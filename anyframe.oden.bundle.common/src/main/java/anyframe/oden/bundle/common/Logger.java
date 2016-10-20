@@ -69,6 +69,10 @@ public class Logger {
 		log(LogService.LOG_ERROR, e.getMessage(), e);
 	}
 	
+	public static void debug(String msg){
+		log(LogService.LOG_DEBUG, msg);
+	}
+	
 	private static String stackTrace(Throwable t) {
 		if(t == null) return "";
 		

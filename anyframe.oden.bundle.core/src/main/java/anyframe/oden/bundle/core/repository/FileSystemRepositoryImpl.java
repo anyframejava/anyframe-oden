@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import anyframe.oden.bundle.common.BundleUtil;
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
@@ -207,5 +208,18 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	
 	public long getDate(String[] args) throws IOException{
 		return System.currentTimeMillis();
+	}
+	
+	protected void normalizeArgs(String[] args) {
+		args[0] = normalizeURI(args[0]);
+	}
+
+	private String normalizeURI(String s) {
+		String protocol = getProtocol();
+		String path = s.substring(protocol.length());
+		if(FileUtil.isAbsolutePath(path))
+			return s;
+		return protocol + FileUtil.resolveDotNatationPath(
+				BundleUtil.odenHome().getPath() + "/" + path);
 	}
 }

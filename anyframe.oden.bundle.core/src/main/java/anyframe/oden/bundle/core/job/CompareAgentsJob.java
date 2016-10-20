@@ -33,9 +33,9 @@ import anyframe.oden.bundle.common.FileUtil;
 import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentFile;
+import anyframe.oden.bundle.core.AgentLoc;
 import anyframe.oden.bundle.core.FileMap;
 import anyframe.oden.bundle.core.config.AgentElement;
-import anyframe.oden.bundle.core.config.AgentLocation;
 import anyframe.oden.bundle.core.config.OdenConfigService;
 import anyframe.oden.bundle.core.txmitter.TransmitterService;
 import anyframe.oden.bundle.deploy.ByteArray;
@@ -52,8 +52,8 @@ import anyframe.oden.bundle.deploy.DoneFileInfo;
 public class CompareAgentsJob extends Job {
 	private List<String> agentNames = new ArrayList<String>();
 	
-	private Map<DeployerService, AgentLocation> agents = 
-			new HashMap<DeployerService, AgentLocation>();
+	private Map<AgentLoc, DeployerService> agents = 
+			new HashMap<AgentLoc, DeployerService>();
 	
 	private FileMap result = new FileMap();
 	
@@ -94,13 +94,16 @@ public class CompareAgentsJob extends Job {
 				error = new OdenException("Couldn't connect to the agent: " + ds);
 				return;
 			}
-			agents.put(ds, agentInfo.getDefaultLoc());
+			AgentLoc al = new AgentLoc(agentInfo.getName(), 
+					agentInfo.getAddr(), agentInfo.getDefaultLocValue());
+			agents.put(al, ds);
 		}
 		
-		Set<DeployerService> dss = agents.keySet();
+		Set<AgentLoc> alocs = agents.keySet();
 		
 		// touch check
-		for(DeployerService ds : dss){		
+		for(AgentLoc aloc : alocs){
+			DeployerService ds = agents.get(aloc);
 			try {
 				if(!ds.touchAvailable()){
 					timediff = new TimeDiffManager();
@@ -115,16 +118,16 @@ public class CompareAgentsJob extends Job {
 		}
 		
 		List<Thread> threads = new ArrayList<Thread>();
-		for(final DeployerService ds : dss){
-			final AgentLocation loc = agents.get(ds);
+		for(final AgentLoc loc : alocs){
+			final DeployerService ds = agents.get(loc);
 			
 			final long diffmilli = timediff == null ? 0 : timediff.getDiff(ds);
 			
 			Thread t = new Thread(){			
 				public void run() {
-					String agentName = loc.getAgentName();
+					String agentName = loc.agentName();
 					try{
-						List<FileInfo> fs = ds.listAllFiles(id, loc.getValue());
+						List<FileInfo> fs = ds.listAllFiles(id, loc.location());
 						for(FileInfo f : fs){
 							result.append(f.getPath(), 
 									newAgentFile(agentName, f.getPath(), f.size(), 
@@ -164,8 +167,10 @@ public class CompareAgentsJob extends Job {
 		super.cancel();
 		if(this.status == Job.RUNNING){
 			try {
-				for(DeployerService ds : agents.keySet())
+				for(AgentLoc aloc : agents.keySet()){
+					DeployerService ds = agents.get(aloc);
 					ds.stop(id);
+				}
 			} catch (Exception e) {
 			}
 		}
@@ -185,25 +190,26 @@ public class CompareAgentsJob extends Job {
 		private Map<DeployerService, Long> diffs = new HashMap<DeployerService, Long>();
 		
 		public TimeDiffManager() throws IOException{
-			final Set<DeployerService> deploys = agents.keySet();
+			final Set<AgentLoc> alocs = agents.keySet();
 			
 			// get tmp dir
 			File tmpdir = FileUtil.temporaryDir();
 			
 			// get unique file name
-			String uniqName = uniqueFile(tmpdir.getPath(), deploys);
+			String uniqName = uniqueFile(tmpdir.getPath(), alocs);
 			if(uniqName == null)
 				throw new IOException("Fail to find unique file name.");
 			
-			Map<DeployerService, Long> dstimes = Collections.EMPTY_MAP; 
+			Map<AgentLoc, Long> dstimes = Collections.EMPTY_MAP; 
 			// get ds times
-			dstimes = getDSTimes(deploys, uniqName);
-			if(dstimes.size() != deploys.size())
+			dstimes = getDSTimes(alocs, uniqName);
+			if(dstimes.size() != alocs.size())
 				throw new IOException("Fail to transfer file: " + uniqName);
 
 			// adjust diffs
 			long standard = 0;
-			for(DeployerService ds : deploys){
+			for(AgentLoc aloc : alocs){
+				DeployerService ds = agents.get(aloc);
 				final Long time = dstimes.get(ds);
 				if(time == null)
 					throw new IOException("Cannot be occured.");
@@ -216,15 +222,16 @@ public class CompareAgentsJob extends Job {
 			}
 		}
 
-		private Map<DeployerService, Long> getDSTimes(Set<DeployerService> deploys, 
+		private Map<AgentLoc, Long> getDSTimes(Set<AgentLoc> alocs, 
 				final String uniqName){
 			final Map dstimes = new HashMap<DeployerService, Long>();
 			try{
 				// write to
-				for(DeployerService ds : deploys){
-					ds.init(agents.get(ds).getValue(), uniqName, 0);
+				for(AgentLoc aloc : alocs){
+					DeployerService ds = agents.get(alocs);
+					ds.init(aloc.location(), uniqName, 0);
 					// some ftp can't transfer 0 byte file
-					ds.write(agents.get(ds).getValue(), uniqName, 
+					ds.write(aloc.location(), uniqName, 
 							new ByteArray(new byte[4]));	
 				}
 			}catch(Exception e){
@@ -232,12 +239,13 @@ public class CompareAgentsJob extends Job {
 			}finally{
 				// close concurrently
 				List<Thread> ths = new ArrayList<Thread>();
-				for(final DeployerService ds : deploys){
+				for(final AgentLoc aloc : alocs){
+					final DeployerService ds = agents.get(alocs);
 					ths.add(new Thread(){
 						public void run() {
 							try { 
 								DoneFileInfo info = ds.close(
-										agents.get(ds).getValue(), uniqName, null, null); 
+										aloc.location(), uniqName, null, null); 
 								dstimes.put(ds, info.lastModified());
 							} catch (Exception e) {
 								error = e;
@@ -250,12 +258,14 @@ public class CompareAgentsJob extends Job {
 				for(Thread th : ths)
 					try { th.join(); } catch (InterruptedException e) { }
 				
-				for(DeployerService ds : deploys)
+				for(AgentLoc aloc : alocs){
+					DeployerService ds = agents.get(alocs);
 					try {
-						ds.removeFile(agents.get(ds).getValue(), uniqName);
+						ds.removeFile(aloc.location(), uniqName);
 					} catch (Exception e) {
 						if(error != null) error = e;
 					}
+				}
 			}
 			return dstimes;
 		}
@@ -265,19 +275,21 @@ public class CompareAgentsJob extends Job {
 			return diff == null ? 0 : diff;
 		}
 		
-		private String uniqueFile(String tmpdir, Set<DeployerService> dss) {
-			for(DeployerService ds : dss){
-				final String uniq = uniqueFile(tmpdir, ds);
-				if(isUnique(uniq, dss))
+		private String uniqueFile(String tmpdir, Set<AgentLoc> alocs) {
+			for(AgentLoc aloc : alocs){
+				DeployerService ds = agents.get(aloc);
+				final String uniq = uniqueFile(tmpdir, alocs);
+				if(isUnique(uniq, alocs))
 					return uniq;
 			}
 			return null;
 		}
 		
-		private boolean isUnique(String name, Set<DeployerService> dss){
-			for(DeployerService ds : dss){
+		private boolean isUnique(String name, Set<AgentLoc> alocs){
+			for(AgentLoc aloc : alocs){
+				DeployerService ds = agents.get(aloc);
 				try {
-					if(ds.exist(agents.get(ds).getValue(), name))
+					if(ds.exist(aloc.location(), name))
 						return false;
 				} catch (Exception e) {
 					return false;
@@ -286,7 +298,8 @@ public class CompareAgentsJob extends Job {
 			return true;
 		}
 		
-		private String uniqueFile(String tmpdir, DeployerService ds){
+		private String uniqueFile(String tmpdir, AgentLoc aloc){
+			DeployerService ds = agents.get(aloc);
 			Exception excepn= null;
 			
 			final int maxiter = 100;
@@ -296,7 +309,7 @@ public class CompareAgentsJob extends Job {
 					if(tmp.exists())
 						continue;
 					
-					if(!ds.exist(agents.get(ds).getValue(), tmp.getName()))
+					if(!ds.exist(aloc.location(), tmp.getName()))
 						return tmp.getName();
 				}catch(Exception e){
 					excepn = e;

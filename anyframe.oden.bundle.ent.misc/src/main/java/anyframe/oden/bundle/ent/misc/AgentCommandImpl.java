@@ -217,8 +217,8 @@ public class AgentCommandImpl implements CustomCommand {
 			jagent.put("name", agent.getName());
 			jagent.put("host", agent.getHost());
 			jagent.put("port", agent.getPort());
-			jagent.put("loc", agent.getDefaultLoc().getValue());
-			jagent.put("backup", agent.getBackupLoc().getValue());
+			jagent.put("loc", agent.getDefaultLocValue());
+			jagent.put("backup", agent.getBackupLocValue());
 			jagent.put("locs", getLocs(agent));
 			DeployerService ds = txmitterService.getDeployer(agent.getAddr());
 			boolean alive = false;
@@ -250,8 +250,17 @@ public class AgentCommandImpl implements CustomCommand {
 					if(prev == null){
 						prev = f;
 					} else {
-						final long diff = Math.abs(prev.date() - f.date());
-						success = prev.size() == f.size() && diff <= spanmilli;
+						if(prev.size() != f.size()){
+							success = false;
+							Logger.debug(path + ": " + prev.size() + ", " + f.size());
+						}
+						if(success){
+							final long diff = Math.abs(prev.date() - f.date());
+							if(diff > spanmilli){
+								success = false;
+								Logger.debug(path + ": " + prev.date() + ", " + f.date());
+							}
+						}
 					}
 				}
 			}
@@ -302,7 +311,7 @@ public class AgentCommandImpl implements CustomCommand {
 		
 		JSONObject jlocs = new JSONObject();
 		for(String name : agent.getLocNames()){
-			jlocs.put(name, agent.getLoc(name).getValue());
+			jlocs.put(name, agent.getLocValue(name));
 		}
 		return jlocs;
 	}

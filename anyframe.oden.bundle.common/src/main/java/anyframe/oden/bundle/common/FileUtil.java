@@ -621,4 +621,39 @@ public class FileUtil {
 				prefix + " & postfix: " + postfix);
 	}
 	
+	public static boolean isAbsolutePath(String path){
+		return path.startsWith("/") ||		/* UNIX */
+				path.matches("^[a-zA-Z]:[/\\\\].*");		/* Windows */
+	}
+	
+	/**
+	 * start with . or .. is not allowed. 
+	 * @param path absolute path like /aaa/bbb/../../ccc/ddd
+	 * @return
+	 */
+	public static String resolveDotNatationPath(String path){
+		path = path.replaceAll("\\\\", "/");
+		
+		if(!isAbsolutePath(path))
+			return null;
+		
+		// remove /.
+		int prevlen = 0;
+		while(prevlen != path.length()){
+			prevlen = path.length();
+			path = path.replaceFirst("/\\.$", "");
+			path = path.replaceFirst("/\\./", "/");
+		}
+		
+		// replace /..
+		prevlen = 0;
+		while(prevlen != path.length()){
+			prevlen = path.length();
+			path = path.replaceFirst("/[^/]+/\\.\\.", "");
+		}
+		
+		if(path.contains("/."))
+			return null;
+		return path;
+	}
 }

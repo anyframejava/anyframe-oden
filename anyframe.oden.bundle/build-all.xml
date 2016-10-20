@@ -1,5 +1,7 @@
 <project name="_Oden Full" default="build.all.dbg" basedir=".">
-	<property name="version" value="1.2.1"/>
+	<property name="version" value="1.3.0"/>
+	<property name="manual.dir" location="../manual/target/oden"/>
+	<property name="oden.ant.dir" location="../anyframe.oden.ant/jar"/>
 	
 	<target name="build.all">
 		<condition property="todo" else="all-local">
@@ -19,14 +21,9 @@
 					
 		<ant antfile="../anyframe.oden.bundle.ent.misc/build.xml" target="${todo}" inheritall="false" />
 
-		<ant antfile="../anyframe.oden.bundle.ent.repository/build.xml" target="${todo}" inheritall="false" />
-
-		<ant antfile="../anyframe.oden.bundle.ent.snapshot/build.xml" target="${todo}" inheritall="false" />
-
 		<ant antfile="../anyframe.oden.bundle.ent.http/build.xml" target="${todo}" inheritall="false" />
 		
 		<ant antfile="../anyframe.oden.bundle.ent.auth/build.xml" target="${todo}" inheritall="false" />
-		
 	</target>
 	
 	<target name="build.all.dbg">
@@ -55,14 +52,9 @@
 						hessian-*.jar,
 						felix*.jar"/>
 			</copy>
-			<copy todir="${basedir}/pack">
-				<fileset dir="pkrsc" includes="readme"/>
-			</copy>
 			<copy todir="${basedir}/pack/bin">
 				<fileset dir="pkrsc" includes="startup-agent.sh,startup-agent.cmd"/>
 			</copy>
-			<rename dest="pack/bin/startup.sh" src="pack/bin/startup-agent.sh"/>
-			<rename dest="pack/bin/startup.cmd" src="pack/bin/startup-agent.cmd"/>
 		</target>
 	<!--
 	<target name="pack.agent" depends="_pack.agent">
@@ -77,11 +69,10 @@
 	</target>
 	-->
 	<target name="_pack.server">
-		<delete dir="${basedir}/pack" excludes="*.zip,*tar.gz"/>		<!-- exclude zip to prevent to remove previous versions and agent packages.-->
 		<mkdir dir="${basedir}/pack/bin"/>
 		<mkdir dir="${basedir}/pack/bundle"/>
 		<mkdir dir="${basedir}/pack/conf"/>
-		<mkdir dir="${basedir}/pack/docs"/>
+		<mkdir dir="${basedir}/pack/meta"/>
 		
 		<copy todir="${basedir}/pack/bin">
 			<fileset dir="dist" includes="oden-*.jar"/>
@@ -91,7 +82,11 @@
 				includes="anyframe.common.bundle.gate-*.jar,
 					anyframe.oden.bundle.common-*.jar,
 					anyframe.oden.bundle.core-*.jar,
-					anyframe.oden.bundle.hessiancli-*jar,
+					anyframe.oden.bundle.hessiancli-*.jar,
+					anyframe.oden.bundle.hessiansvr-*.jar,
+					anyframe.oden.bundle.ent.misc-*.jar,
+					anyframe.oden.bundle.ent.http-*.jar,
+					anyframe.oden.bundle.ent.auth-*.jar,
 					felix.jar,
 					org.apache.felix.configadmin-*.jar,
 					org.apache.felix.eventadmin-*.jar,
@@ -100,17 +95,17 @@
 					org.apache.felix.prefs-*.jar,
 					org.apache.felix.scr-*.jar,
 					org.apache.felix.shell.remote-*.jar,
-					hessian-*.jar,
-					org.json_*.jar"/>
+					org.json_*.jar,
+					hessian-*.jar"/>
 		</copy>
 		<copy todir="${basedir}/pack/conf">
-			<fileset dir="pkrsc" includes="config.xml,oden.ini"/>
+			<fileset dir="pkrsc" includes="config.xml,oden.ini,agent.ini,accounts.txt"/>
 		</copy>
 		<copy todir="${basedir}/pack/bin">
-			<fileset dir="pkrsc" includes="startup.cmd,startup.sh"/>
+			<fileset dir="pkrsc" includes="startup.cmd,acc.cmd,runc.cmd,startup.sh,acc.sh,runc.sh,startup-agent.sh,startup-agent.cmd"/>
 		</copy>
-		<copy todir="${basedir}/pack/docs">
-			<fileset dir="pkrsc" includes="*.pdf"/>
+		<copy todir="${basedir}/pack/meta">
+			<fileset dir="pkrsc" includes="anyframe.oden.bundle.core_*.ser"/>
 		</copy>
 	</target>
 	<!--
@@ -154,6 +149,7 @@
 					anyframe.oden.bundle.ent.snapshot-*.jar,
 					anyframe.oden.bundle.ent.http-*.jar,
 					anyframe.oden.bundle.ent.auth-*.jar,
+					anyframe.oden.bundle.sh-*.jar,
 					felix.jar,
 					org.apache.felix.configadmin-*.jar,
 					org.apache.felix.eventadmin-*.jar,
@@ -166,11 +162,7 @@
 					hessian-*.jar"/>
 		</copy>
 		<copy todir="${basedir}/pack/conf">
-			<fileset dir="pkrsc" includes="config.xml,oden-ent.ini"/>
-		</copy>
-		<rename src="pack/conf/oden-ent.ini" dest="pack/conf/oden.ini"/>
-		<copy todir="${basedir}/pack">
-			<fileset dir="pkrsc" includes="readme"/>
+			<fileset dir="pkrsc" includes="config.xml,oden.ini,accounts.txt"/>
 		</copy>
 		<copy todir="${basedir}/pack/bin">
 			<fileset dir="pkrsc" includes="startup.cmd,acc.cmd,runc.cmd,startup.sh,acc.sh,runc.sh"/>
@@ -201,26 +193,28 @@
 			<isset property="server.target"/>
 		</condition>
 		
-		<delete dir="pack" includes="agent.zip,server.zip,${pkname}"/>
+		<delete dir="pack"/>
+		<mkdir dir="pack"/>
 		
 		<antcall target="build.all"/>
-		
-		<antcall target="_pack.agent"/>
-		<zip destfile="pack/agent.zip">
-			<zipfileset dir="pack" includes="bin/*.sh" filemode="754"/>
-			<zipfileset dir="pack" includes="bin/**,bundle/**,readme" excludes="bin/*.sh"/>
-		</zip>
-		
+				
 		<antcall target="${server.target}"/>
-		<zip destfile="pack/server.zip">
+
+		<mkdir dir="pack/doc"/>
+		<copy todir="pack/doc">
+			<fileset dir="${manual.dir}" includes="html/**/*,image/**/*"/>
+		</copy>
+		
+		<mkdir dir="pack/lib-ant"/>
+		<copy todir="pack/lib-ant">
+			<fileset dir="${oden.ant.dir}" includes="anyframe.oden.ant*.jar"/>
+			<fileset dir="pkrsc" includes="sample.xml"/>
+		</copy>
+		
+		<zip destfile="pack/${pkname}">
 			<zipfileset dir="pack" includes="bin/*.sh" filemode="754"/>
-			<zipfileset dir="pack" includes="bin/**,bundle/**,conf/**,docs/**,readme" excludes="bin/*.sh"/>
+			<zipfileset dir="pack" excludes="bin/*.sh,*.zip"/>
 		</zip>
-		
-		<zip destfile="pack/${pkname}"
-				basedir="pack" includes="agent.zip,server.zip"/>
-		
-		<delete dir="pack" includes="agent.zip,server.zip" />
 	</target>
 		
 	<target name="pack.src.all">
@@ -239,7 +233,7 @@
 		<delete file="pack/test.zip"/>
 		<zip destfile="pack/test.zip">
 			<zipfileset dir="pack" includes="bin/*.sh" filemode="754"/>
-			<zipfileset dir="pack" includes="bin/**,bundle/**,readme" excludes="bin/*.sh"/>
+			<zipfileset dir="pack" includes="bin/**,bundle/**" excludes="bin/*.sh"/>
 		</zip>
 	</target>
 <!--	

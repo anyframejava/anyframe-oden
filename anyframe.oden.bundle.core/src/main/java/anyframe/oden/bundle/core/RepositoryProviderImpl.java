@@ -66,8 +66,9 @@ public class RepositoryProviderImpl implements RepositoryProviderService{
 	
 	public RepositoryService getRepoServiceByURI(String[] repoArgs){
 		for(RepositoryService repoService : repoServices){
-			if(repoService.matchedURI(repoArgs))
+			if(repoService.matchedURI(repoArgs)){
 				return repoService;
+			}
 		}
 		return null;
 	}

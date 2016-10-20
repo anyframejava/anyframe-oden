@@ -11,7 +11,7 @@
 		switch(e.which){
 		case 13:			// enter
 			$('#result').val('');
-			$.ajax({data: $('#cmd_text').val() + ';'});
+			$.ajax({data: $('#cmd_text').val()});
 			$('#cmd_text').select();
 		}
 	}

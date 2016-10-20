@@ -16,11 +16,12 @@
  */
 package anyframe.oden.bundle.core;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Utils;
 import anyframe.oden.bundle.core.DeployFile.Mode;
 
@@ -39,24 +40,8 @@ public class DeployFileUtil {
 	 * @param dfile
 	 */
 	public static void updateDeployFiles(Set<DeployFile> dfiles, DeployFile dfile){
-		for(DeployFile df : dfiles){
-			if(dfile.equals(df)){		// already existed
-				df.setMode(mergeMode(df.mode(), dfile.mode())); 
-				return;
-			}
-		}
-		dfiles.add(dfile);		// not existed
+		dfiles.add(dfile);
 	}
-	
-//	public static Map<Repository, Map<AgentLoc, Set<DeployFile>>> toRepositoryFiles(Set<DeployFile> files){
-//		Map<Repository, Map<AgentLoc, Set<DeployFile>>> result = 
-//				new HashMap<Repository, Map<AgentLoc, Set<DeployFile>>>();
-//		Map<Repository, Set<DeployFile>> rmap = groupByRepository(files);
-//		for(Repository r : rmap.keySet()){
-//			result.put(r, groupByAgent(rmap.get(r)));
-//		}
-//		return result;
-//	}
 	
 	/**
 	 * group DeployFile by its repository property
@@ -66,7 +51,7 @@ public class DeployFileUtil {
 		for(DeployFile df : dfiles){
 			Set<DeployFile> dfs = rfiles.get(df.getRepo());
 			if(dfs == null)
-				dfs = new ArraySet<DeployFile>();
+				dfs = new HashSet<DeployFile>();
 			dfs.add(df);
 			rfiles.put(df.getRepo(), dfs);
 		}
@@ -81,7 +66,7 @@ public class DeployFileUtil {
 		for(DeployFile f : files){
 			Set<DeployFile> fs = afiles.get(f.getAgent());
 			if(fs == null)
-				fs = new ArraySet<DeployFile>();
+				fs = new HashSet<DeployFile>();
 			fs.add(f);
 			afiles.put(f.getAgent(), fs);
 		}
@@ -113,7 +98,7 @@ public class DeployFileUtil {
 		for(DeployFile f : files){
 			Set<DeployFile> fs = filemap.get(f.getPath());
 			if(fs == null)
-				fs = new ArraySet<DeployFile>();
+				fs = new HashSet<DeployFile>();
 			fs.add(f);
 			filemap.put(f.getPath(), fs);
 		}
@@ -126,13 +111,13 @@ public class DeployFileUtil {
 	 * @param files
 	 * @return
 	 */
-	public static Set<AgentLoc> extractAgents(Set<DeployFile> files){
-		Set<AgentLoc> result = new ArraySet<AgentLoc>();
-		for(DeployFile f : files){
-			result.add(f.getAgent());
-		}
-		return result;
-	}
+//	public static Set<AgentLoc> extractAgents(Set<DeployFile> files){
+//		Set<AgentLoc> result = new ArraySet<AgentLoc>();
+//		for(DeployFile f : files){
+//			result.add(f.getAgent());
+//		}
+//		return result;
+//	}
 
 	/**
 	 * convert DeployFile's Mode to String value
@@ -183,9 +168,8 @@ public class DeployFileUtil {
 	 * @param dfs
 	 * @return
 	 */
-	public static Set<DeployFile> filterToRedeploy(Set<DeployFile> dfs) {
-		ArraySet<DeployFile> result = new ArraySet<DeployFile>();
-		
+	public static void filterToRedeploy(Set<DeployFile> dfs, 
+			Set<DeployFile> ret) {
 		Map<String, Set<DeployFile>> files = groupBySameSource(dfs);
 		for(String key : files.keySet()){
 			Set<DeployFile> fs = files.get(key);
@@ -193,11 +177,10 @@ public class DeployFileUtil {
 				for(DeployFile f : fs){
 					f.setSuccess(false);	// init file to deploy
 					f.setErrorLog("");
-					result.addForce(f);
+					ret.add(f);
 				}
 			}
 		}
-		return result;
 	}
 
 	private static boolean includeFail(Set<DeployFile> fs) {
@@ -219,7 +202,7 @@ public class DeployFileUtil {
 			String key = df.getRepo() + ":" + df.getPath();	// make unique key
 			Set<DeployFile> fs = result.get(key);
 			if(fs == null)
-				fs = new ArraySet<DeployFile>();
+				fs = new HashSet<DeployFile>();
 			fs.add(df);
 			result.put(key, fs);
 		}

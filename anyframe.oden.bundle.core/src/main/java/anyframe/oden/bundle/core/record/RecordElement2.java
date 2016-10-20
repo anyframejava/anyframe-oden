@@ -17,9 +17,9 @@
 package anyframe.oden.bundle.core.record;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.core.DeployFile;
 
 /**
@@ -33,7 +33,7 @@ public class RecordElement2 implements Serializable{
 	
 	private String id;
 	private String user = "";
-	private Set<DeployFile> files = new ArraySet<DeployFile>();
+	private Set<DeployFile> files = Collections.EMPTY_SET;
 	private long date;
 	private boolean success = true;
 	private String log = "";

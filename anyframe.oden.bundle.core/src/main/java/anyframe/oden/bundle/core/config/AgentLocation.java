@@ -22,7 +22,7 @@ package anyframe.oden.bundle.core.config;
  * @author joon1k
  *
  */
-public class AgentLocation {
+class AgentLocation {
 	private AgentElement agent;
 	
 	private String name;

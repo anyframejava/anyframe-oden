@@ -30,10 +30,22 @@ import java.io.IOException;
 public abstract class AbstractRepositoryimpl implements RepositoryService {
 
 	public boolean matchedURI(String[] args) {
-		if(args.length > 0)
-			return args[0].startsWith(getProtocol());
+		if(args.length == 0)
+			return false;
+		if(args[0].startsWith(getProtocol())){
+			normalizeArgs(args);
+			return true;
+		}
 		return false;
 	}
+	
+	/**
+	 * If args have a relative path, this will be converted to
+	 * absolute path. If not, do nothing.
+	 * 
+	 * @param args
+	 */
+	abstract protected void normalizeArgs(String[] args);
 	
 	protected String stripProtocol(String uri) {
 		StringBuffer buf = new StringBuffer(uri);

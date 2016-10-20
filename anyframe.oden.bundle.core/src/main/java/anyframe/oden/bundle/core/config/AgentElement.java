@@ -19,7 +19,11 @@ package anyframe.oden.bundle.core.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import anyframe.oden.bundle.common.FileUtil;
+import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.core.txmitter.TransmitterService;
+import anyframe.oden.bundle.deploy.DeployerService;
 
 /**
  * This represents agent element in the config.xml
@@ -41,8 +45,12 @@ public class AgentElement {
 	
 	private List<AgentLocation> locs = new ArrayList<AgentLocation>();
 	
+	private String agentHome = null;
 	
-	public AgentElement(){
+	private TransmitterService txmitter;
+	
+	public AgentElement(TransmitterService txmitter){
+		this.txmitter = txmitter;
 	}
 	
 	public String getName() {
@@ -69,18 +77,28 @@ public class AgentElement {
 		this.port = port;
 	}
 
-	public AgentLocation getDefaultLoc() {
+	private AgentLocation getDefaultLoc() {
 		return getLoc(DEFAULT_LOCATION);
+	}
+	
+	public String getDefaultLocValue() {
+		AgentLocation l = getDefaultLoc();
+		return l != null ? l.getValue() : null;
 	}
 
 	public void setDefaultLoc(String value) {
 		addLoc(DEFAULT_LOCATION, value);
 	}
 
-	public AgentLocation getBackupLoc() {
+	private AgentLocation getBackupLoc() {
 		return getLoc(BACKUP_LOCATION);
 	}
 
+	public String getBackupLocValue() {
+		AgentLocation l = getBackupLoc();
+		return l != null ? l.getValue() : null;
+	}
+	
 	public void setBackupLoc(String value) {
 		addLoc(BACKUP_LOCATION, value);
 	}
@@ -106,15 +124,52 @@ public class AgentElement {
 	 * @param name location variable name. null if it default-location
 	 * @return
 	 */
-	public AgentLocation getLoc(String name){
+	private AgentLocation _getLoc(String name){
 		for(AgentLocation loc : locs){
-			if(name == null){
-				if(loc.getName() == null) return loc;	// default
-			}else {
-				if(name.equals(loc.getName())) return loc;
+			if((name == null && loc.getName() == null)	/* default */ 
+					|| (name != null && name.equals(loc.getName()) )){
+				return loc;
 			}
 		}
 		return null;
+	}
+	
+	private AgentLocation getLoc(String name){
+		AgentLocation locsetting = _getLoc(name);
+		if(locsetting == null)
+			return null;
+		if(FileUtil.isAbsolutePath(locsetting.getValue()))
+			return locsetting;
+		
+		try{
+			if(agentHome == null)
+				agentHome = getAgentHome();
+			
+			String resolved = FileUtil.resolveDotNatationPath(
+					agentHome + "/" + locsetting.getValue());
+			if(resolved == null)
+				throw new Exception("Illegal format: " + agentHome + "/" + locsetting.getValue());
+			
+			locs.remove(locsetting);
+			AgentLocation result = new AgentLocation(this, name, resolved); 
+			locs.add(result);
+			return result;
+		}catch(Exception e){
+			Logger.error(e);
+		}
+		return null;
+	}
+	
+	private String getAgentHome() throws Exception{
+		DeployerService ds = txmitter.getDeployer(getAddr());
+		if(ds == null) throw new Exception("Access Fail: " + getAddr());
+		
+		return ds.odenHome();
+	}
+	
+	public String getLocValue(String name) {
+		AgentLocation l = getLoc(name);
+		return l != null ? l.getValue() : null;
 	}
 	
 	/**

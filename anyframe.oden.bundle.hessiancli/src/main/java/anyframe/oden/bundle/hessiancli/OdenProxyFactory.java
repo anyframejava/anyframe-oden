@@ -7,11 +7,19 @@ import java.net.URLConnection;
 import com.caucho.hessian.client.HessianProxyFactory;
 
 public class OdenProxyFactory extends HessianProxyFactory {
+	int timeout;
+	long readTimeout;
+	
+	public OdenProxyFactory(int timeout, long readTimeout) {
+		this.timeout = timeout;
+		this.readTimeout = readTimeout;
+	}
+
 	@Override
 	protected URLConnection openConnection(URL url) throws IOException {
-		setReadTimeout(5000);
+		setReadTimeout(readTimeout);
 		URLConnection conn = super.openConnection(url);
-		conn.setConnectTimeout(5000);
+		conn.setConnectTimeout(timeout);
 		return conn;
 	}
 }

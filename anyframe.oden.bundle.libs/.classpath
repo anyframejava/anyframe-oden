@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="lib" path="org.apache.felix.prefs-1.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="org.json_1.0.0.jar" sourcepath="org.json_1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="xerces-2.9.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="hessian-3.1.6.jar" sourcepath="hessian-3.1.6-src.jar"/>
+	<classpathentry exported="true" kind="lib" path="jdom.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

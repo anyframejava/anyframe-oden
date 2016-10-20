@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
@@ -48,11 +49,14 @@ public class Account {
 			System.exit(-1);
 		}
 		
-		File accFile = new File(SecurityHandler.ACCOUNT_FILE);
+		File accFile = null;
 		try {
+			accFile = new File(odenHome(), SecurityHandler.ACCOUNT_FILE);
+
 			String encoded = encode(args[0], args[1]);
 			writeToFile(accFile, args[0], encoded);
-		} catch (IOException e) {
+		} catch (Exception e) {
+			try{System.out.println(Account.class.getProtectionDomain().getCodeSource().getLocation().toURI()+"");}catch(Exception ee){}
 			System.out.println("Fail to register account. " + e.getMessage());
 			System.exit(-1);
 		}
@@ -86,5 +90,13 @@ public class Account {
 			if(out != null) out.close();
 		}	
 	}
-	
+
+	public static File odenHome() {
+		try{
+			URL url = new URL(Account.class.getProtectionDomain().getCodeSource().getLocation().toString());
+			return new File(url.getPath()).getParentFile().getParentFile();
+		}catch(Exception e){
+			return new File("..");
+		}
+	}
 }

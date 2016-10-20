@@ -47,9 +47,11 @@ public class Cmd {
 	
 	private String user;
 
+	private String home;
+	
 	public static void main(String... args) {
 		if (args.length < 1){
-			System.err.println("At least 1 argument is required.");
+			System.err.println("Usage: runc.sh <oden-cmd>");
 			System.exit(-1);
 		}
 		try {
@@ -59,6 +61,11 @@ public class Cmd {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Cmd() throws Exception{
+//		home = new File(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile() + "/../anyframe.oden.bundle";
+		home = odenHome().getPath();
 	}
 
 	private String toCommand(String[] ss) {
@@ -80,10 +87,10 @@ public class Cmd {
 				buf.append(ss[i] + " ");
 			i++;
 		}
-		return buf.substring(0, buf.length() - 1) + ";";
+		return buf.substring(0, buf.length() - 1);
 	}
 
-	private void loadINI() throws IOException {
+	private void loadINI() throws Exception {
 		Properties prop = loadINI(CONFIG_FILE);
 		if (prop == null)
 			throw new FileNotFoundException(CONFIG_FILE);
@@ -95,7 +102,7 @@ public class Cmd {
 
 		odenURL = "http://localhost:" + port + "/shell";
 		
-		String defaultUser = prop.getProperty("default.user");
+		String defaultUser = prop.getProperty("console.user");
 		if(defaultUser != null){
 			user = userInfo(defaultUser);
 		}
@@ -103,7 +110,7 @@ public class Cmd {
 
 	private String userInfo(String id){
 		String info = null;
-		File f = new File(SecurityHandler.ACCOUNT_FILE);
+		File f = new File(home, SecurityHandler.ACCOUNT_FILE);
 		if(f.exists()){
 			InputStream in = null;
 			try{
@@ -121,8 +128,8 @@ public class Cmd {
 		return info;
 	}
 	
-	private Properties loadINI(String ini) throws IOException {
-		File iniFile = new File(ini);
+	private Properties loadINI(String ini) throws Exception {
+		File iniFile = new File(home, ini);
 		InputStream in = null;
 		try {
 			in = new BufferedInputStream(new FileInputStream(iniFile));
@@ -198,5 +205,14 @@ public class Cmd {
 			buf.append(line + "\n");
 		}
 		return buf.toString();
+	}
+	
+	public static File odenHome() {
+		try{
+			URL url = new URL(Cmd.class.getProtectionDomain().getCodeSource().getLocation().toString());
+			return new File(url.getPath()).getParentFile().getParentFile();
+		}catch(Exception e){
+			return new File("..");
+		}
 	}
 }

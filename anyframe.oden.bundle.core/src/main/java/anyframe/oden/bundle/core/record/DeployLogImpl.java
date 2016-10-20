@@ -23,13 +23,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenStoreException;
 import anyframe.oden.bundle.core.DeployFile;
@@ -92,6 +92,9 @@ public class DeployLogImpl implements DeployLogService {
 		return new SimpleDateFormat(FILE_NAME_DATE_PATTERN).format(date);
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public List<RecordElement2> search(String txid, String user, String agent, String path,
 			String startdate, String enddate, boolean failonly) throws OdenException{
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
@@ -129,15 +132,21 @@ public class DeployLogImpl implements DeployLogService {
 		}
 	}
 
+	/**
+	 * for history info command
+	 */
 	public List<MiniRecordElement> search(String startdate, String enddate,
 			String user, boolean failonly) throws OdenException{
 		try{
-			if(empty(startdate))
-				return Collections.EMPTY_LIST;
+			List<MiniRecordElement> result = new ArrayList<MiniRecordElement>();
 			
-			long start = empty(startdate) ? Long.MIN_VALUE : longTime(startdate + START_TIME);
-			long end = empty(enddate) ? Long.MAX_VALUE : longTime(enddate + END_TIME);			
-			List<MiniRecordElement> result = getMiniRecords(start, end);
+			if(empty(startdate)){
+				collectMiniRecords(latestFile(logfiles()), result);
+			} else {
+				long start = empty(startdate) ? Long.MIN_VALUE : longTime(startdate + START_TIME);
+				long end = empty(enddate) ? Long.MAX_VALUE : longTime(enddate + END_TIME);			
+				result = getMiniRecords(start, end);	
+			}
 			
 			if(!empty(user))
 				result = searchMiniByUser(user, result);
@@ -150,6 +159,9 @@ public class DeployLogImpl implements DeployLogService {
 		}
 	}
 	
+	/**
+	 * for history show command
+	 */
 	public RecordElement2 search(String txid, String user, String agent, 
 			String path, boolean failonly) throws OdenException{
 		List<RecordElement2> result = new ArrayList<RecordElement2>();
@@ -387,7 +399,7 @@ public class DeployLogImpl implements DeployLogService {
 		}catch(ClassNotFoundException e){
 			throw new OdenException("Illegal format: " + logfile.getAbsolutePath());
 		}catch(IOException e) {
-			throw new OdenStoreException(logfile.getAbsolutePath());
+			throw new OdenException(e);
 		}finally{
 			try { if(fin != null) fin.close(); } catch (IOException e) { }
 		}
@@ -437,7 +449,7 @@ public class DeployLogImpl implements DeployLogService {
 	}
 	
 	private void refineMatchedAgentOnly(RecordElement2 r, String agentName){
-		Set<DeployFile> s = new ArraySet<DeployFile>();
+		Set<DeployFile> s = new HashSet<DeployFile>();
 		for(DeployFile f : r.getDeployFiles())
 			if(f.getAgent().agentName().contains(agentName))
 				s.add(f);
@@ -455,7 +467,7 @@ public class DeployLogImpl implements DeployLogService {
 	}
 	
 	private void refineMatchedPathOnly(RecordElement2 r, String fname){
-		Set<DeployFile> s = new ArraySet<DeployFile>();
+		Set<DeployFile> s = new HashSet<DeployFile>();
 		for(DeployFile f : r.getDeployFiles())
 			if(f.getPath().contains(fname))
 				s.add(f);
@@ -473,7 +485,7 @@ public class DeployLogImpl implements DeployLogService {
 	}
 	
 	private void refineFailonly(RecordElement2 r) {
-		Set<DeployFile> s = new ArraySet<DeployFile>();
+		Set<DeployFile> s = new HashSet<DeployFile>();
 		for(DeployFile f : r.getDeployFiles())
 			if(!f.isSuccess())
 				s.add(f);

@@ -4,5 +4,11 @@
    <service>
       <provide interface="anyframe.oden.bundle.core.config.OdenConfigService"/>
    </service>
+   <reference name="TRANSMITTER_SERVICE"
+         interface="anyframe.oden.bundle.core.txmitter.TransmitterService"
+         cardinality="1..1"
+         policy="dynamic"
+         bind="setTransmitterService"
+   />
 </component>   
 

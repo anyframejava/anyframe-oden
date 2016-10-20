@@ -202,4 +202,8 @@ public interface DeployerService {
 	public List<FileInfo> listAllFiles(String id, String path) throws Exception;
 	
 	public boolean touchAvailable() throws Exception;
+	
+	public String execShellCommand(String command, String dir, long timeout) throws Exception;
+	
+	public String odenHome() throws Exception;
 }

@@ -45,13 +45,13 @@ import org.osgi.framework.Constants;
  *
  */
 public class Oden {
-	private final static String CONFIG_FILE = "conf/oden.ini";
+	private static String CONFIG_FILE = "conf/oden.ini";
 	
-	private final static String CACHE = "meta";
+	private static String CACHE = "meta";
 	
 	private final static String BUNDLE_LOC = "bundle";
 	
-	private final static int AGENT_PORT = 9862;
+	private final static int AGENT_PORT = 9872;
 	
 	private static Bundle framework = null;
 	
@@ -59,12 +59,17 @@ public class Oden {
 	
     public static void main(String[] args) throws Exception
     {
+    	if(args.length > 0){
+    		CONFIG_FILE = args[0];
+    		CACHE = "meta-agent";
+    	}
+    	
         try
         {            
             printWelcome();
             
             File home = new File(Felix.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile().getParentFile();
-            startFramework(setFelixProperties(new File(home, CONFIG_FILE), new File(home, CACHE), args));
+            startFramework(setFelixProperties(new File(home, CONFIG_FILE), new File(home, CACHE)) );
             
             installBundles(new File(home, BUNDLE_LOC)); 
         } catch (BundleException e) {
@@ -130,7 +135,7 @@ public class Oden {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Map setFelixProperties(File config, File cache, String... args) throws Exception{
+	private static Map setFelixProperties(File config, File cache) throws Exception{
         Map configMap = new StringMap(false);
         
         // This information is from felix 1.8.0
@@ -155,7 +160,7 @@ public class Oden {
         }
         
         // override properties from program's arguments
-        args2map(configMap, args);
+//        args2map(configMap, args);
         
         replaceKey(configMap, "log.level", "felix.log.level");
         replaceKey(configMap, "http.port", "org.osgi.service.http.port");
@@ -224,7 +229,7 @@ public class Oden {
 				continue;
 			bnd.start();
 		}
-    	
+		
 		// if remote shell is loaded, show some guides.
     	for(Bundle bnd : framework.getBundleContext().getBundles()) {
     		if(SHELL_PORT != null &&

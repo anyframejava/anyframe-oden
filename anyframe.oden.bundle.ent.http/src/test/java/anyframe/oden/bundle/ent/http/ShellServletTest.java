@@ -9,13 +9,13 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class ShellServletTest {
-	private final static String SHELL_URL = "http://70.7.53.104:9860/shell";
+	private final static String SHELL_URL = "http://localhost:9860/shell";
 	public final static String KNOWN_EXCEPTION = "KnownException";	
 	public final static String UNKNOWN_EXCEPTION = "UnknownException";
 	private final static int TIMEOUT = 15000;	// millis
 		
 	public static void main(String... args) {
-		String msg = "task run t1";		// same with shell command line
+		String msg = "help";		// same with shell command line
 		try {
 			System.out.println(sendRequest(SHELL_URL, msg));
 		} catch (ShellException e) {

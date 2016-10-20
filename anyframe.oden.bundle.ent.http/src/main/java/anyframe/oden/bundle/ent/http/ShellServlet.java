@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.ungoverned.osgi.service.shell.ShellService;
@@ -75,6 +76,11 @@ public class ShellServlet extends HttpServlet {
 	public void setShellService(ShellService sh) {
 		this.shellService = sh;
 	}
+	
+	protected void activate(ComponentContext context){
+		String ext = System.getProperty("os.name").startsWith("Windows") ? "cmd" : "sh";
+		System.out.println("::: You can access Oden in the Command Line. (e.g. runc."+ ext +" help)");
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -113,11 +119,10 @@ public class ShellServlet extends HttpServlet {
 				reader = req.getReader();
 				String cmd = readCmdLine(reader);
 				if(cmd == null) throw new Exception();
-				if(cmd.trim().endsWith(";")) {
+				if(cmd.trim().endsWith(";")) {		// for osgi original commands
 					cmd = cmd.substring(0, cmd.lastIndexOf(";"));
-				} else {
-					Object o = req.getAttribute(HttpContext.REMOTE_USER);
-					cmd+= " -_user " + (o == null ? req.getRemoteAddr() : o.toString());
+				} else {	// for oden commands
+					cmd+= " -_user " + userName(req);
 				}
 				
 				shellService.executeCommand(cmd, out, err);
@@ -149,6 +154,11 @@ public class ShellServlet extends HttpServlet {
 				err.close();
 			
 		}
+	}
+	
+	private String userName(HttpServletRequest req){
+		Object o = req.getAttribute(HttpContext.REMOTE_USER);
+		return o == null ? req.getRemoteAddr() : o.toString();
 	}
 	
 	private String readCmdLine(BufferedReader reader) throws IOException{

@@ -26,11 +26,11 @@ import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.Utils;
 import anyframe.oden.bundle.core.command.JSONizable;
 import anyframe.oden.bundle.core.config.AgentElement;
-import anyframe.oden.bundle.core.config.AgentLocation;
 import anyframe.oden.bundle.core.config.OdenConfigService;
 
 /**
  * This represents agent's location.
+ * This indicates agent's specific location.
  * 
  * @author joon1k
  *
@@ -94,10 +94,15 @@ public class AgentLoc implements JSONizable, Serializable{
 		String parent = null;
 		String child = null;
 		if(path.startsWith("$")){
-			parent = resolveLocationVariable(firstToken(path.substring(1), PATH_SEP), info);
+			String var = firstToken(path.substring(1), PATH_SEP);
+			parent = info.getLocValue(var);
+			if(parent == null)
+				throw new OdenException("No such variable in the conf/config.xml: " + var);
 			child = secondToken(path, PATH_SEP);
 		}else if(path.startsWith("~")){
-			parent = resolveLocationVariable(null, info);
+			parent = info.getDefaultLocValue();
+			if(parent == null)
+				throw new OdenException("No default-location in the conf/config.xml");
 			child = secondToken(path, PATH_SEP);
 		}else {
 			parent = null;
@@ -171,13 +176,6 @@ public class AgentLoc implements JSONizable, Serializable{
 //		return FileUtil.combinePath(resolveLocationVariable(var.substring(0, idx+1), info),		// <agent-name>/$<var>/.. 
 //				var.substring(idx+1));		
 //	}
-
-	private String resolveLocationVariable(String var, AgentElement info) throws OdenException {
-		AgentLocation loc = info.getLoc(var);
-		if(loc == null)
-			throw new OdenException("Couldn't find a location variable: " + var);
-		return loc.getValue();
-	}
 	
 	public String agentName() {
 		return agentName;

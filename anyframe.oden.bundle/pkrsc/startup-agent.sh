@@ -14,4 +14,4 @@ PRGDIR=`dirname "$PRG"`
 ARGS="-Xmx32m -XX:NewRatio=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=25"
 
 ODENF=`ls $PRGDIR | grep jar`
-java $ARGS -jar ${PRGDIR}/${ODENF} -port 9872 &
+java $ARGS -jar ${PRGDIR}/${ODENF} conf/agent.ini &

@@ -40,7 +40,15 @@ public class FileMap extends HashMap<String, List<AgentFile>>{
 		List<AgentFile> agents = get(file);
 		if(agents == null)
 			put(file, agents = new ArrayList<AgentFile>());
-		if(!agents.contains(agent))
+		
+		boolean contains = false;
+		for(AgentFile a : agents){
+			if(agent.agent().equals(a.agent())){
+				contains = true;
+				break;
+			}
+		}
+		if(!contains)
 			agents.add(agent);
 	}
 	

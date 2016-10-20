@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentLoc;
 import anyframe.oden.bundle.core.DeployFile;
@@ -118,7 +117,7 @@ public class DeployerHelper {
 			}
 			
 			if(!contains)		// add mode
-				((ArraySet)fs).addForce(new DeployFile(
+				fs.add(new DeployFile(
 						snapshot.getRepo(), 
 						d.getPath(), 
 						snapshot.getAgent(), 

@@ -1,1 +1,1 @@
-java -jar ../bundle/anyframe.oden.bundle.ent.http-1.0.1.jar %*
+java -jar ../bundle/anyframe.oden.bundle.ent.auth-1.0.2.jar %*

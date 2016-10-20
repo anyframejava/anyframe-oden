@@ -18,6 +18,7 @@ package anyframe.oden.bundle.core.command;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
-import anyframe.oden.bundle.common.ArraySet;
 import anyframe.oden.bundle.common.Assert;
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
@@ -190,7 +190,7 @@ public class PolicyCommandImpl extends OdenCommand {
 		getPrefs().remove(policyName);
 	}
 
-	private void addPolicy(String policyName, String args) throws OdenException {
+	public void addPolicy(String policyName, String args) throws OdenException {
 		Cmd policyInfo = new Cmd("c a \"" + policyName + "\" " + args);
 		
 		// dests is defined in config.xml ?
@@ -265,7 +265,7 @@ public class PolicyCommandImpl extends OdenCommand {
 			throw new OdenParseException(policyInfo.toString());
 					
 		resolveDests(dests);
-		Set<AgentLoc> agents = new ArraySet<AgentLoc>();
+		Set<AgentLoc> agents = new HashSet<AgentLoc>();
 		for(String destargs : dests){
 			AgentLoc ra = new AgentLoc(destargs, configService);
 			if(!agents.contains(ra))
@@ -336,14 +336,6 @@ public class PolicyCommandImpl extends OdenCommand {
 			throw new OdenException(e1);
 		}
 		
-		long repo_t;
-		try {
-			repo_t = reposvc.getDate(repo.args());
-		} catch (IOException e1) {
-			throw new OdenException(e1);
-		}
-		long repo_t_diff = System.currentTimeMillis() - repo_t;
-		
 		List<String> files = reposvc.resolveFileRegex(repo.args(), includes, excludes);
 		for(String file : files){
 			FatInputStream in = null;
@@ -364,9 +356,8 @@ public class PolicyCommandImpl extends OdenCommand {
 								throw new OdenException("Not writable file.");
 							
 							if(update && !DeployerHelper.isNewFile(
-									ds.getDate(agent.location(), in.getPath()) - 
-									dffs.getDiffTime(ds, configService.getAgent(agent.agentName()).getDefaultLoc().getValue()),
-									in.getLastModified() - repo_t_diff))
+									ds.getDate(agent.location(), in.getPath()),
+									in.getLastModified()))
 								continue;
 							m = Mode.UPDATE;
 						}else {
@@ -393,7 +384,7 @@ public class PolicyCommandImpl extends OdenCommand {
 	}
 	
 	private Set<DeployFile> doTestAction(String policyName) throws OdenException{
-		Set<DeployFile> dfiles = new ArraySet<DeployFile>();
+		Set<DeployFile> dfiles = new HashSet<DeployFile>();
 		preview(dfiles, infoCmd(policyName));
 		return dfiles;
 	}
@@ -433,14 +424,14 @@ public class PolicyCommandImpl extends OdenCommand {
 				"\n\t-i[nclude]" + " <wildcard-location> ... " +
 				"[" + "-e[xclude]" + " <wildcard-location> ...] " + 
 				"\n\t[" + "-u[pdate] | -del" + "] " + 
-				"\n\t-d[est]" + " <agent-name>:<$<location-var>[/<path> | ~[/<path>] | <absolute-path>]> ... " + 
+				"\n\t-d[est]" + " <agent-name:[<absolute-path> | ~[/<path>] | $<location-var>[/<path>] ]> ... " + 
 				"\n\t[" + "-desc" + " <description>]" + "\n" +
 				getName() + " " + Cmd.INFO_ACTION + " [<policy-name>]" + "\n" +
 				getName() + " " + Cmd.REMOVE_ACTION + " <policy-name>" + "\n" + 
 				getName() + " " + TEST_ACTION + " <policy-name>";
 	}
 	
-	private String getRepositoryUsages() throws OdenException {
+	public String getRepositoryUsages() throws OdenException {
 		StringBuffer usages = new StringBuffer();
 		for(Iterator<String> it = repositoryProvider.getRepositoryUsages().iterator(); it.hasNext();) {
 			usages.append("[" + it.next() + "]");

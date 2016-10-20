@@ -31,9 +31,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import anyframe.oden.bundle.common.BundleUtil;
+import anyframe.oden.bundle.common.Logger;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenParseException;
 import anyframe.oden.bundle.common.StringUtil;
+import anyframe.oden.bundle.core.txmitter.TransmitterService;
 
 /**
  * @see anyframe.oden.bundle.core.config.OdenConfigService
@@ -50,6 +52,12 @@ public class OdenConfigImpl implements OdenConfigService {
 	protected List<AgentElement> agents = new ArrayList<AgentElement>();
 	
 	protected long lastload;
+	
+	private TransmitterService txmitter;
+	
+	protected void setTransmitterService(TransmitterService tx){
+		this.txmitter = tx;
+	}
 	
 	public OdenConfigImpl() {
 		CONFIG = new File(BundleUtil.odenHome(), "conf/config.xml");
@@ -70,6 +78,7 @@ public class OdenConfigImpl implements OdenConfigService {
 				}
 			}
 		}catch(Exception e){
+			Logger.error(e);
 		}
 		return null;
 	}
@@ -78,8 +87,8 @@ public class OdenConfigImpl implements OdenConfigService {
 		if(StringUtil.empty(agent.getName()) ||
 				StringUtil.empty(agent.getAddr()) ||
 				StringUtil.empty(agent.getPort()) ||
-				agent.getDefaultLoc() == null ||
-				agent.getBackupLoc() == null)
+				agent.getDefaultLocValue() == null ||
+				agent.getBackupLocValue() == null)
 			return false;
 		return true;
 	}
@@ -89,14 +98,14 @@ public class OdenConfigImpl implements OdenConfigService {
 		if(a == null)
 			throw new OdenException("Couldn't find any backup location from config.xml.");
 		
-		AgentLocation l = a.getBackupLoc();
-		if(l == null)
-			throw new OdenException("Couldn't find any backup location from config.xml.");
+		String bak = a.getBackupLocValue();
+		if(bak == null)
+			throw new OdenException("No backup-location in the config.xml.");
 			
-		AgentLocation def = a.getDefaultLoc();
-		if(def == null || def.getValue().contains(l.getValue()))
+		String def = a.getDefaultLocValue();
+		if(def == null || def.contains(bak))
 			throw new OdenException("Default location should not include the backup location.");
-		return l.getValue();
+		return bak;
 	}
 
 	public List<String> getAgentNames() throws OdenException {
@@ -151,7 +160,7 @@ public class OdenConfigImpl implements OdenConfigService {
 						while(eventType == XmlPullParser.START_TAG){	
 							parser.require(XmlPullParser.START_TAG, null, "agent");
 							
-							AgentElement agent = new AgentElement();
+							AgentElement agent = new AgentElement(txmitter);
 							agents.add(agent);
 							agent.setName(getAttributeValue(parser, "name"));
 							
@@ -214,10 +223,10 @@ public class OdenConfigImpl implements OdenConfigService {
 			for(AgentElement agent : agents){
 				writer.println("\t\t<agent name=\"" + agent.getName() + "\">");
 				writer.println("\t\t\t<address host=\"" + agent.getHost() + "\" port=\"" + agent.getPort() + "\"/>");
-				writer.println("\t\t\t<default-location value=\"" + agent.getDefaultLoc().getValue() + "\"/>");
-				writer.println("\t\t\t<default-location value=\"" + agent.getBackupLoc().getValue() + "\"/>");
+				writer.println("\t\t\t<default-location value=\"" + agent.getDefaultLocValue() + "\"/>");
+				writer.println("\t\t\t<default-location value=\"" + agent.getBackupLocValue() + "\"/>");
 				for(String locName : agent.getLocNames()){
-					writer.println("\t\t\t<location name=\"" + locName + "\" value=\"" + agent.getLoc(locName).getValue() + "\"/>");
+					writer.println("\t\t\t<location name=\"" + locName + "\" value=\"" + agent.getLocValue(locName) + "\"/>");
 				}
 				writer.println("\t\t</agent>");
 			}

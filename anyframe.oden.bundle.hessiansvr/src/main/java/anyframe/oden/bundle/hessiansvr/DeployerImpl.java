@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import anyframe.oden.bundle.common.BundleUtil;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
 import anyframe.oden.bundle.common.Utils;
@@ -218,8 +219,10 @@ public class DeployerImpl implements DeployerService {
 	}
 	
 	public List<FileInfo> listAllFiles(String id, String path) throws Exception{
-		job = new ListFilesJob(id, path);
-		return (List<FileInfo>) job.start();
+		synchronized (lock) {
+			job = new ListFilesJob(id, path);
+			return (List<FileInfo>) job.start();
+		}
 	}
 	
 	
@@ -324,5 +327,13 @@ public class DeployerImpl implements DeployerService {
 	
 	public boolean touchAvailable(){
 		return true;
+	}
+	
+	public String execShellCommand(String command, String dir, long timeout) throws Exception{
+		return new Launcher(new Proc(command, dir), timeout).start();
+	}
+
+	public String odenHome(){
+		return BundleUtil.odenHome().getPath();
 	}
 }
