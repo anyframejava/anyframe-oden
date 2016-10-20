@@ -79,7 +79,7 @@ public class TaskDeployJob extends DeployJob {
 			Repository repo = i.next();
 			try {
 				deploy(repo, rdfs.get(repo), user);
-			} catch (OdenException e) {
+			} catch (Exception e) {
 				if(errorMessage == null) // record first error log only
 					errorMessage = e.getMessage();
 				Logger.error(e);
@@ -107,38 +107,32 @@ public class TaskDeployJob extends DeployJob {
 			// init deployer
 			long t = System.currentTimeMillis();
 			for(DeployFile f : sameNameFiles){
-				if(f.mode() == Mode.NA){
-					// do nothing
-				}else if(f.mode() == Mode.DELETE){
-					try{
-						DeployerService ds = deployerManager.getDeployer(f);
-						if(ds == null)
-							throw new OdenException("Couldn't connect to the agent: " + f.getAgent());
-						
+				if(f.mode() == Mode.NA)
+					continue;
+				
+				try{
+					DeployerService ds = deployerManager.getDeployer(f);
+					if(ds == null)
+						throw new OdenException("Invalid agent: " + f.getAgent().agentName());
+			
+					if(f.mode() == Mode.DELETE){
 						ds.backupNRemove(f.getAgent().location(), f.getPath(), deployerManager.backupLocation(f));
 						f.setSuccess(true);
-					}catch(Exception e){
-						Logger.error(e);
-						f.setErrorLog(Utils.rootCause(e));
-						f.setSuccess(false);
+					}else{	// add or update
+						f.setDate(t);
+						DeployerHelper.readyToDeploy(ds, f, true);
+						inProgressFiles.put(f, ds);	
 					}
-				}else if(reposvc != null){
-					DeployerService ds = deployerManager.getDeployer(f);
-					f.setDate(t);
-					try{
-						if(ds != null){
-							DeployerHelper.readyToDeploy(ds, f);
-							inProgressFiles.put(f, ds);
-						}else{ 
-							f.setErrorLog("Couldn't access the agent: " + f.getAgent().agentName());
-						}
-					}catch(Exception e){
-						f.setErrorLog(e.getMessage());
-					}
+				}catch(Exception e){
+					Logger.error(e);
+					f.setErrorLog(Utils.rootCause(e));
+					f.setSuccess(false);
 				}
 			}
-			if(inProgressFiles.size() == 0)	// no add or update
+			if(inProgressFiles.size() == 0){	// no add or update
+				finishedWorks += sameNameFiles.size();
 				continue;
+			}
 			
 			try {
 				in = reposvc.resolve(repo.args(), path);
@@ -172,20 +166,20 @@ public class TaskDeployJob extends DeployJob {
 			byte[] buf = new byte[1024*8];
 			int size = 0;
 			while((size = in.read(buf)) != -1){
-				for(DeployFile f : sameNameFiles){	
-					DeployerService deployer = inProgressFiles.get(f);
+				for(final DeployFile f : sameNameFiles){
+					DeployerService ds = inProgressFiles.get(f);
+					if(ds == null) continue;
 					try{
-						if(deployer != null && 
-								!DeployerHelper.write(deployer, f, new ByteArray(buf, size)))
+						if(!DeployerHelper.write(ds, f, new ByteArray(buf, size)))
 							throw new OdenException("Fail to write: " + f.getPath());
 					}catch(Exception e){	// while writing..
 						inProgressFiles.remove(f);
 						f.setSuccess(false);
 						f.setErrorLog(Utils.rootCause(e));
-					}
-				}
+					}		
+				} 
 			}
-		} catch (Exception e) {	// while read..
+		} catch (Exception e) {	// while reading
 			for(DeployFile f : sameNameFiles){	
 				f.setSuccess(false);
 				f.setErrorLog("Fail to write: " + f.getPath());

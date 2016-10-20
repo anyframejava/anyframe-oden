@@ -226,6 +226,21 @@ public class HistoryCommandImpl extends OdenCommand {
 		}
 		System.gc();
 	}
+	
+	private void appendDetails(JSONObject jo, Set<DeployFile> deployFiles) {
+		int nsuccess = 0;
+		Set<String> items = new HashSet<String>();
+		for(DeployFile f : deployFiles){
+			items.add(f.getPath());
+			if(f.isSuccess())
+				nsuccess++;
+		}
+		try {
+			jo.put("nitems", items.size()).put("nsuccess", nsuccess).put("total", deployFiles.size());
+		} catch (JSONException e) {
+			// ignore
+		}
+	}
 
 	private String redeploy(final String id, boolean isSync, String user) throws OdenException {
 		// composite deploy job & schedule it
@@ -238,10 +253,7 @@ public class HistoryCommandImpl extends OdenCommand {
 						Assert.check(r != null, "Fail to find a history for " + id);
 						
 						// filter deployfiles to get the failed files & their related files.
-						Set<DeployFile> ret = new HashSet<DeployFile>();
-						DeployFileUtil.filterToRedeploy(
-								r.getDeployFiles(), ret);
-						return ret;
+						return DeployFileUtil.filterToRedeploy(r.getDeployFiles());
 					}
 				});
 		

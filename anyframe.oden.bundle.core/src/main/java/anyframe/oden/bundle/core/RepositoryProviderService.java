@@ -39,6 +39,8 @@ public interface RepositoryProviderService {
 	 */
 	public RepositoryService getRepoServiceByURI(String[] repoArgs);
 
+	public RepositoryAdaptor getRepositoryAdaptor(String[] args);
+	
 	/**
 	 * get all loaded RepositoryService's protocols
 	 * 

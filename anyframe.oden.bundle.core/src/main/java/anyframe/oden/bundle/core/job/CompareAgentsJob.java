@@ -127,7 +127,7 @@ public class CompareAgentsJob extends Job {
 				public void run() {
 					String agentName = loc.agentName();
 					try{
-						List<FileInfo> fs = ds.listAllFiles(id, loc.location());
+						List<FileInfo> fs = ds.listAllFilesAsJob(id, loc.location());
 						for(FileInfo f : fs){
 							result.append(f.getPath(), 
 									newAgentFile(agentName, f.getPath(), f.size(), 
@@ -213,7 +213,6 @@ public class CompareAgentsJob extends Job {
 				final Long time = dstimes.get(ds);
 				if(time == null)
 					throw new IOException("Cannot be occured.");
-				System.out.println("time: " + time);
 				if(standard == 0) {
 					standard = time;
 				} else {
@@ -229,7 +228,7 @@ public class CompareAgentsJob extends Job {
 				// write to
 				for(AgentLoc aloc : alocs){
 					DeployerService ds = agents.get(alocs);
-					ds.init(aloc.location(), uniqName, 0);
+					ds.init(aloc.location(), uniqName, 0, false);
 					// some ftp can't transfer 0 byte file
 					ds.write(aloc.location(), uniqName, 
 							new ByteArray(new byte[4]));	

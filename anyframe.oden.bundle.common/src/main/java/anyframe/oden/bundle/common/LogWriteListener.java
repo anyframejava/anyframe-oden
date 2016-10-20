@@ -39,6 +39,10 @@ import org.osgi.service.log.LogReaderService;
 public class LogWriteListener implements LogListener {
 	private final static String FILE_NAME_DATE_PATTERN = "yyyyMMdd";
 	private final static String LOG_DATE_PATTERN = "yyyy.MM.dd HH:mm:ss";
+	private final static int MAX_LOG_SIZE = 10*1024*1024;
+	
+	private String latestLogDate = null;
+	private File latestLogFile = null;
 	
 	private BundleContext context;
 	
@@ -101,14 +105,42 @@ public class LogWriteListener implements LogListener {
 	}
 	
 	private void writeToCacheLog(String s, long date) throws IOException{
-		final String cache = context.getProperty("felix.cache.rootdir");
-		final String fname = "log_" + onlyDate(date) + ".log";
-		File logf = new File(cache, fname);
-		File parent = logf.getParentFile();
-		if(!parent.exists())
-			parent.mkdirs();
+		setupLogFile(date);
+		File parent = latestLogFile.getParentFile();
+		if(!parent.exists()) parent.mkdirs();
 		
-		writeToFile(logf, s);	
+		writeToFile(s);
+	}
+	
+	private void setupLogFile(long date){
+		String cachedir = context.getProperty("felix.cache.rootdir");
+		
+		// if latest log file is not today's one, use today log file.
+		String today= onlyDate(date);
+		if(!today.equals(latestLogDate) || 
+				latestLogFile == null){
+			latestLogFile = new File(cachedir, "log_" + today+ ".log");
+			latestLogDate = today;
+		}
+		
+		// if latest log file is not oversized, use this. 
+		if(!latestLogFile.exists() ||
+				latestLogFile.length() < MAX_LOG_SIZE)
+			return;
+		
+		// if latest log file is oversized, backup this.
+		for(int i=0; i<100; i++){
+			File bak = new File(cachedir, "log_" + today + "-" + 
+					String.valueOf(i) + ".log");
+			if(!bak.exists()){
+				latestLogFile.renameTo(bak);
+				latestLogFile.delete();
+				return;
+			}
+		}
+		
+		// if no available file, delete current log file.
+		latestLogFile.delete();
 	}
 
 	private String onlyDate(long date) {
@@ -119,10 +151,10 @@ public class LogWriteListener implements LogListener {
 		return new SimpleDateFormat(LOG_DATE_PATTERN).format(new Date(date));
 	}
 
-	private void writeToFile(File file, String s) {
+	private void writeToFile(String s) {
 		PrintWriter pw = null;
 		try {
-			pw = new PrintWriter(new FileWriter(file, true));
+			pw = new PrintWriter(new FileWriter(latestLogFile, true));
 			pw.println(s);
 		} catch (IOException e) {
 		}finally{

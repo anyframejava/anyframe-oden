@@ -24,7 +24,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -73,8 +75,8 @@ public class FileUtil {
 		if(!dir.exists() || !dir.isDirectory())
 			throw new IOException("Couldn't find: " + dir);
 		if(jar.exists()){
-			if(jar.isDirectory() || !jar.canWrite())
-				throw new IOException("Fail to write: " + jar.getPath());
+			if(jar.isDirectory())
+				throw new IOException("same directory is existed." + jar.getPath());
 			jar.delete();
 		}
 			
@@ -145,8 +147,8 @@ public class FileUtil {
 			throws IOException {
 		if(!ref.exists() || ref.isDirectory())
 			throw new IOException("Couldn't find: " + ref);
-		if(target.exists() && (!target.canWrite() || target.isDirectory()))
-			throw new IOException("Fail to write: " + target);
+		if(target.exists() && target.isDirectory())
+			throw new IOException("Directory is existed: " + target);
 		
 		List<String> updatedfiles = null;
 		
@@ -358,7 +360,8 @@ public class FileUtil {
 			return normalize(child);
 		else if(child == null || child.length() == 0)
 			return normalize(parent);
-		return normalize(parent) + "/" + normalize(child);
+		child = normalize(child);
+		return normalize(parent) + (child.startsWith("/") ? "" : "/") + child;
 	}
 	
 	/**
@@ -430,11 +433,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static long copy(File src, File dest) throws IOException{
-		if(!src.exists() || 
-				(dest.exists() && (dest.isDirectory() || !dest.canWrite())) )
-			throw new IOException("Fail to copy: " + src.getPath() + " to " + dest.getPath());
-		
+	public static long copy0(File src, File dest) throws IOException{
 		long size = 0;
 		InputStream in = null;
 		OutputStream out = null;
@@ -447,7 +446,7 @@ public class FileUtil {
 			if(in != null) in.close();
 		}
 		
-		if(size > 0 && !dest.setLastModified(src.lastModified()))
+		if(!dest.setLastModified(src.lastModified()))
 			throw new IOException("Fail to set date: " + dest);
 		return size;
 	}
@@ -462,7 +461,7 @@ public class FileUtil {
 	 */
 	public static long copy(InputStream in, OutputStream out) 
 			throws IOException {
-		byte[] buf = new byte[1024*8];
+		byte[] buf = new byte[1024*64];
 		long total = 0;
 		int size = 0;
 		while((size = in.read(buf)) != -1){
@@ -472,6 +471,18 @@ public class FileUtil {
 		return total;
 	}
 	
+	public static long copy(File src, File dest) throws IOException{
+		FileChannel in = null;
+        FileChannel out = null;
+		try{
+			in = new FileInputStream(src).getChannel();
+			out = new FileOutputStream(dest).getChannel();
+			return in.transferTo(0, in.size(), out);
+		} finally {
+			if(out != null) out.close();
+			if(in != null) in.close();
+		}
+	}
 	
 	/**
 	 * split s with sep and trim it's result
@@ -622,6 +633,8 @@ public class FileUtil {
 	}
 	
 	public static boolean isAbsolutePath(String path){
+		if(path == null)
+			return false;
 		return path.startsWith("/") ||		/* UNIX */
 				path.matches("^[a-zA-Z]:[/\\\\].*");		/* Windows */
 	}
@@ -639,21 +652,38 @@ public class FileUtil {
 		
 		// remove /.
 		int prevlen = 0;
-		while(prevlen != path.length()){
-			prevlen = path.length();
-			path = path.replaceFirst("/\\.$", "");
-			path = path.replaceFirst("/\\./", "/");
-		}
+		if(path.contains("."))
+			while(prevlen != path.length()){
+				prevlen = path.length();
+				path = path.replaceFirst("/\\./?$", "");
+				path = path.replaceFirst("/\\./", "/");
+			}
 		
 		// replace /..
 		prevlen = 0;
-		while(prevlen != path.length()){
-			prevlen = path.length();
-			path = path.replaceFirst("/[^/]+/\\.\\.", "");
-		}
+		if(path.contains(".."))
+			while(prevlen != path.length()){
+				prevlen = path.length();
+				path = path.replaceFirst("/[^/]+/\\.\\.", "");
+			}
 		
 		if(path.contains("/."))
 			return null;
 		return path;
+	}
+	
+	public static void listAllFiles(Collection<FileInfo> ret, 
+			String root, File dir){
+		if(!dir.exists()) 
+			return;
+		File[] fs = dir.listFiles();
+		for(File f : fs){
+			if(f.isDirectory())
+				listAllFiles(ret, root, f);
+			else
+				ret.add(new FileInfo(
+						FileUtil.getRelativePath(root, f.getAbsolutePath()),
+						false, f.lastModified(), f.length()));
+		}
 	}
 }

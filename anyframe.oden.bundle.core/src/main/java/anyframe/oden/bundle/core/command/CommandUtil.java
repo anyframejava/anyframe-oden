@@ -48,7 +48,7 @@ public class CommandUtil {
 				if(!quote){ 
 					if(arg.length() >0){
 						args.add(arg.toString());
-						arg.delete(0, arg.length());
+						arg.delete(0, arg.length());	// clear arg
 					}
 					continue;
 				}

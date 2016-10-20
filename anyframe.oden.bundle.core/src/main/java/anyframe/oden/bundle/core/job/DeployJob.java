@@ -16,8 +16,8 @@
  */
 package anyframe.oden.bundle.core.job;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 import org.osgi.framework.BundleContext;
 
@@ -44,7 +44,7 @@ public abstract class DeployJob extends Job{
 	
 	protected DeployerManager deployerManager;
 
-	protected Set<DeployFile> deployFiles = Collections.EMPTY_SET;
+	protected Collection<DeployFile> deployFiles = Collections.EMPTY_SET;
 	
 	protected String user;
 	
@@ -70,6 +70,7 @@ public abstract class DeployJob extends Job{
 	@Override
 	void start() {
 		status = RUNNING;
+		currentWork = "resolving deploy files...";
 		try{
 			deployFiles = resolver.resolveDeployFiles();
 		}catch (OdenException e){

@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.core.AgentLoc;
 import anyframe.oden.bundle.core.DeployFile;
@@ -36,12 +37,12 @@ import anyframe.oden.bundle.deploy.DoneFileInfo;
  *
  */
 public class DeployerHelper {
-	public static void readyToDeploy(DeployerService ds, DeployFile f) throws Exception{
+	public static void readyToDeploy(DeployerService ds, 
+			DeployFile f, boolean useTmp) throws Exception{
 		final String parent = f.getAgent().location();
 		final String child = f.getPath();
 		try {		
-			f.setMode(ds.exist(parent, child) ? Mode.UPDATE : Mode.ADD);
-			ds.init(parent, child, f.getDate());
+			ds.init(parent, child, f.getDate(), useTmp);
 		}catch(Exception e){
 			try { ds.close(parent, child, null, null); } catch (Exception e1) {}
 			throw e;
@@ -66,6 +67,11 @@ public class DeployerHelper {
 	
 	public static boolean isNewFile(long agentf_t, long repof_t){
 		return agentf_t < repof_t;
+	}
+	
+	public static boolean isNewFile(FileInfo src, FileInfo dest){
+		return src.size() != dest.size() || 
+				src.lastModified() > dest.lastModified();
 	}
 	
 	public static boolean removeDir(DeployerService ds, String txid, Set<DeployFile> fs, 

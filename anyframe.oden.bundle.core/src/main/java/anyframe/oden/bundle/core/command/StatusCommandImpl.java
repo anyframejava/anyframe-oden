@@ -59,6 +59,7 @@ public class StatusCommandImpl implements CustomCommand {
 								.put("id", j.id())
 								.put("status", j.status())
 								.put("progress", j.progress())
+								.put("currentWork", j.getCurrentWork())
 								.put("totalWorks", j.todoWorks())			// this is for task deploy job
 								.put("date", j.date())
 								.put("desc", j.desc()));
@@ -72,7 +73,8 @@ public class StatusCommandImpl implements CustomCommand {
 								" " + j.progress()+"% [total: " + totalWorks + "]" : "";
 						buf.append("id: " + j.id() + ", desc: " + j.desc()
 								+ ", date: " + DateUtil.toStringDate(j.date())
-								+ " (" + status(j.status()) + progress + ")" + "\n");
+								+ " (" + status(j.status()) + progress + ")" 
+								+ ", " + j.getCurrentWork() + "\n");
 					}
 					
 					if(cmd.getOption(DETAIL_OPT) != null){

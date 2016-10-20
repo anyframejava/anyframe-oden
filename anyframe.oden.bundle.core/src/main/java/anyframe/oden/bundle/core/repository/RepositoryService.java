@@ -18,11 +18,14 @@ package anyframe.oden.bundle.core.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import anyframe.oden.bundle.common.FatInputStream;
 import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.OdenException;
+import anyframe.oden.bundle.common.OdenIncompleteArgumentException;
+import anyframe.oden.bundle.common.Pair;
 
 /**
  * Oden Service to access some file repositories like local filesystem or ftp.
@@ -60,6 +63,11 @@ public interface RepositoryService {
 	 */
 	public FatInputStream resolve(String[] args, String file) throws OdenException;
 
+	public FileInfo resolveAsFileInfo(String[] args, String file);
+	
+	public FileInfo resolveAsFileInfo(String[] args, List<String> refs, 
+			String file);
+	
 	/**
 	 * return required arguments to access repository service.
 	 * 커맨드라인에서 usage 로 사용 될 것임. 계정관련 인자는 사용법에서 제외
@@ -68,7 +76,29 @@ public interface RepositoryService {
 	 */
 	public String getUsage();
 
+	/**
+	 * get child list only
+	 * @param args
+	 * @return
+	 * @throws OdenException
+	 */
 	public List<FileInfo> getFileList(String[] args) throws OdenException;
+	
+	/**
+	 * get child list including it's nested.
+	 * @param args
+	 * @return
+	 * @throws OdenException
+	 */
+	public List<FileInfo> listAllFiles(String[] args) throws OdenException;
+	
+	public List<String> listAllFiles(String[] args, String subdir, 
+			List<String> excludes) throws OdenException;
+		
+	public void listAllFilesFileInfo(String[] args, String subdir,
+			List<Pair> dirSrcMap, 
+			List<String> excludes, Collection<FileInfo> ret) 
+			throws OdenIncompleteArgumentException;
 	
 	/**
 	 * This makes RepositoryService to close its connection. Some RepositoryService
@@ -92,4 +122,12 @@ public interface RepositoryService {
 	public File getFile(String[] repoargs, String fpath, String destpath) throws OdenException;
 	
 	public long getDate(String[] args) throws IOException;
+
+	public List<String> getSourceDirs(String[] repoArgs);
+
+	public String findDir(String[] repoArgs, String dirName, String exclude);
+	
+	public boolean isDirExisted(String[] args, String name);
+	
+	public String getAbsolutePathFromParent(String[] repoArgs, String name);
 }

@@ -30,7 +30,7 @@ public class Logger {
 	private static LogService log;
 	
 	protected void setlog(LogService log){
-		this.log = log;
+		Logger.log = log;
 	}	
 	
 	/**
@@ -71,6 +71,10 @@ public class Logger {
 	
 	public static void debug(String msg){
 		log(LogService.LOG_DEBUG, msg);
+	}
+	
+	public static void info(String msg){
+		log(LogService.LOG_INFO, msg);
 	}
 	
 	private static String stackTrace(Throwable t) {

@@ -65,13 +65,13 @@ public class TransmitterImpl implements TransmitterService {
 		DeployerService ds = null;
 		try{
 			ds = _getDeployer(addr);
-			if(ds == null)
+			if(ds == null || !ds.alive())
 				throw new IOException();
 		}catch(Exception e){
 			// try one more
 			try{
 				ds = _getDeployer(addr);
-				if(ds == null)
+				if(ds == null || !ds.alive())
 					throw new IOException("Fail to access: " + addr);
 			}catch(Exception e2){
 				Logger.error(e2);

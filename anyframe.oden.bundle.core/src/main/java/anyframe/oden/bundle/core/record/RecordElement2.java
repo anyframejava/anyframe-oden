@@ -17,8 +17,8 @@
 package anyframe.oden.bundle.core.record;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 import anyframe.oden.bundle.core.DeployFile;
 
@@ -33,13 +33,16 @@ public class RecordElement2 implements Serializable{
 	
 	private String id;
 	private String user = "";
-	private Set<DeployFile> files = Collections.EMPTY_SET;
+	private Collection<DeployFile> files = Collections.EMPTY_SET;
 	private long date;
 	private boolean success = true;
 	private String log = "";
 	private String desc = "";
+	private int nSuccess = 0;
 	
-	public RecordElement2(String id, Set<DeployFile> files, String user, long date, String desc) {
+	public RecordElement2(){}
+	
+	public RecordElement2(String id, Collection<DeployFile> files, String user, long date, String desc) {
 		this.id = id;
 		this.files = files;
 		this.user = user;
@@ -52,12 +55,22 @@ public class RecordElement2 implements Serializable{
 			this.success = false;
 	}
 	
-	public RecordElement2(String id, Set<DeployFile> files, String user, long date, boolean success, String errorLog, String desc) {
+	public RecordElement2(String id, Collection<DeployFile> files, String user, long date, boolean success, String errorLog, String desc) {
 		this.id = id;
 		this.files = files;
 		this.user = user;
 		this.date = date;
 		this.success = success;
+		this.desc = desc;
+	}
+	
+	public RecordElement2(String id, Collection<DeployFile> files, int nSuccess, String user, long date, String errorLog, String desc) {
+		this.id = id;
+		this.files = files;
+		this.nSuccess = nSuccess;
+		this.user = user;
+		this.date = date;
+		this.success = files.size() == nSuccess;
 		this.desc = desc;
 	}
 
@@ -73,11 +86,11 @@ public class RecordElement2 implements Serializable{
 		this.user = user;
 	}
 
-	public Set<DeployFile> getDeployFiles() {
+	public Collection<DeployFile> getDeployFiles() {
 		return files;
 	}
 	
-	public void setFiles(Set<DeployFile> s){
+	public void setFiles(Collection<DeployFile> s){
 		this.files = s;
 	}
 	
@@ -109,4 +122,11 @@ public class RecordElement2 implements Serializable{
 		this.log = s;
 	}
 
+	public void setNSuccess(int n){
+		this.nSuccess = n;
+	}
+	
+	public int getNSuccess(){
+		return nSuccess;
+	}
 }

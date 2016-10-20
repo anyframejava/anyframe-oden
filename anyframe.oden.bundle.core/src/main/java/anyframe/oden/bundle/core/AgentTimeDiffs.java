@@ -37,7 +37,7 @@ public class AgentTimeDiffs {
 	private long getDeployerTime(DeployerService deplyr, String loc, String name) throws Exception {
 		DoneFileInfo donef = null;	// this will be initialized in finally block
 		try{
-			deplyr.init(loc, name, -1);		// TODO: if date is 0, lastmodifed will be 0
+			deplyr.init(loc, name, -1, false);		// TODO: if date is 0, lastmodifed will be 0
 			deplyr.write(loc, name, new ByteArray(new byte[4]));
 		}finally{
 			try{

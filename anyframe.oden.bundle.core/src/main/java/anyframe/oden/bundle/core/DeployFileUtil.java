@@ -16,7 +16,7 @@
  */
 package anyframe.oden.bundle.core;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,13 +40,19 @@ public class DeployFileUtil {
 	 * @param dfile
 	 */
 	public static void updateDeployFiles(Set<DeployFile> dfiles, DeployFile dfile){
-		dfiles.add(dfile);
+		for(DeployFile df : dfiles){
+			if(dfile.equals(df)){		// already existed
+				df.setMode(mergeMode(df.mode(), dfile.mode()));	
+				return;
+			}
+		}
+		dfiles.add(dfile);		// not existed
 	}
 	
 	/**
 	 * group DeployFile by its repository property
 	 */
-	public static Map<Repository, Set<DeployFile>> groupByRepository(Set<DeployFile> dfiles){
+	public static Map<Repository, Set<DeployFile>> groupByRepository(Collection<DeployFile> dfiles){
 		Map<Repository, Set<DeployFile>> rfiles = new HashMap<Repository, Set<DeployFile>>();
 		for(DeployFile df : dfiles){
 			Set<DeployFile> dfs = rfiles.get(df.getRepo());
@@ -111,13 +117,13 @@ public class DeployFileUtil {
 	 * @param files
 	 * @return
 	 */
-//	public static Set<AgentLoc> extractAgents(Set<DeployFile> files){
-//		Set<AgentLoc> result = new ArraySet<AgentLoc>();
-//		for(DeployFile f : files){
-//			result.add(f.getAgent());
-//		}
-//		return result;
-//	}
+	public static Set<AgentLoc> extractAgents(Set<DeployFile> files){
+		Set<AgentLoc> result = new HashSet<AgentLoc>();
+		for(DeployFile f : files){
+			result.add(f.getAgent());
+		}
+		return result;
+	}
 
 	/**
 	 * convert DeployFile's Mode to String value
@@ -168,8 +174,9 @@ public class DeployFileUtil {
 	 * @param dfs
 	 * @return
 	 */
-	public static void filterToRedeploy(Set<DeployFile> dfs, 
-			Set<DeployFile> ret) {
+	public static Set<DeployFile> filterToRedeploy(Collection<DeployFile> dfs) {
+		Set<DeployFile> result = new HashSet<DeployFile>();
+		
 		Map<String, Set<DeployFile>> files = groupBySameSource(dfs);
 		for(String key : files.keySet()){
 			Set<DeployFile> fs = files.get(key);
@@ -177,10 +184,11 @@ public class DeployFileUtil {
 				for(DeployFile f : fs){
 					f.setSuccess(false);	// init file to deploy
 					f.setErrorLog("");
-					ret.add(f);
+					result.add(f);
 				}
 			}
 		}
+		return result;
 	}
 
 	private static boolean includeFail(Set<DeployFile> fs) {
@@ -196,7 +204,7 @@ public class DeployFileUtil {
 	 * @param dfs
 	 * @return
 	 */
-	public static Map<String, Set<DeployFile>> groupBySameSource(Set<DeployFile> dfs) {
+	public static Map<String, Set<DeployFile>> groupBySameSource(Collection<DeployFile> dfs) {
 		Map<String, Set<DeployFile>> result = new HashMap<String, Set<DeployFile>>();
 		for(DeployFile df : dfs){
 			String key = df.getRepo() + ":" + df.getPath();	// make unique key

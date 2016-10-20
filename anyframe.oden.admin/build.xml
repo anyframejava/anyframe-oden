@@ -1,0 +1,72 @@
+<project name="Oden Admin" default="package" basedir=".">
+	
+	<property name="pack.name" value="anyframe.oden.admin" />
+	<property name="version" value="1.0.0"/>
+			
+	<property name="dist" location="dist"/>
+	
+	<target name="init">
+		<delete dir="${dist}"/>
+		<mkdir dir="${dist}/WEB-INF/classes"/>
+		<mkdir dir="${pack}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="src/main/java" destdir="${dist}/WEB-INF/classes"
+				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
+			<classpath>
+				<fileset dir="src/main/webapp/WEB-INF/lib"/>
+				<fileset dir="pkrscs" includes="winstone-*.jar"/>
+				<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar,servlet-api-2.5.jar"/-->
+			</classpath>
+		</javac>
+		<javac srcdir="src/main/launcher" destdir="${dist}"
+				debug="${dbg}" debuglevel="lines,vars,source" encoding="utf-8">
+			<classpath>
+				<fileset dir="pkrscs" includes="winstone-*.jar"/>
+				<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar"/-->
+			</classpath>
+		</javac>
+	</target>
+					
+	<target name="cp-rscs" depends="compile">
+		<copy todir="${dist}">
+			<fileset dir="src/main/webapp" includes="**/*" excludes="**/*.svn"/>
+			<fileset dir="pkrscs" includes="winstone-*.jar,servlet-api-2.5.jar,ant-1.6.5.jar,core-3.1.1.jar,jsp-api-2.1-glassfish-2.1.v20091210.jar,jsp-2.1-glassfish-2.1.v20091210.jar"/>
+			<!--fileset dir="pkrscs" includes="winstone-*.jar,servlet-api.jar,jsp-api.jar,tomcat-juli.jar,jasper.jar,el-api.jar,jasper-el.jar"/-->
+			<!--fileset dir="pkrscs" includes="jetty-6.1.25.jar,jetty-util-6.1.25.jar,servlet-api-2.5.jar"/-->
+		</copy>
+		<copy todir="${dist}/WEB-INF/classes">
+			<fileset dir="src/main/resources" includes="**/*" excludes="**/*.svn,log4j.xml"/>
+			<fileset dir="pkrscs" includes="log4j.xml"/>
+		</copy>
+		<!--copy todir="${dist}/WEB-INF/lib">
+			<fileset dir="pkrscs" includes="el-api.jar"/>
+			<fileset dir="pkrscs" includes="servlet-api-2.5.jar"/>
+		</copy-->
+	</target>
+
+	<target name="war" depends="cp-rscs">
+		<war destfile="${pack}/${pack.name}.war" 
+			basedir="${dist}" webxml="${dist}/WEB-INF/web.xml">
+		    <manifest>
+		    	<attribute name="Main-Class" value="Main"/>
+		    </manifest>
+		</war>
+		<copy todir="${pack}">
+			<fileset dir="pkrscs" includes="startup.sh,startup.cmd,license.txt"/>
+			<fileset dir="." includes="licenses/**,*-releasenote.txt"/>
+		</copy>
+	</target>
+		
+	<target name="package">
+		<property name="pack" location="pack"/>
+		<antcall target="war"/>
+	</target>
+		
+	<target name="all">
+		<!--<property name="pack" location="${artifactsDir}"/>
+		<echo message="artifacts dir: ${artifactsDir}"></echo>-->
+		<antcall target="cp-rscs"/>
+	</target>
+</project>

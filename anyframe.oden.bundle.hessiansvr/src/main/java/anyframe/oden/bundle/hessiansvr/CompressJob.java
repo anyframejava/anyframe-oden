@@ -86,7 +86,7 @@ public class CompressJob extends StoppableJob {
 		if(!dir.exists() || !dir.isDirectory())
 			throw new IOException("Couldn't find: " + dir);
 		if(jar.exists()){
-			if(jar.isDirectory() || !jar.canWrite())
+			if(jar.isDirectory())
 				throw new IOException("Fail to write: " + jar.getPath());
 			jar.delete();
 		}

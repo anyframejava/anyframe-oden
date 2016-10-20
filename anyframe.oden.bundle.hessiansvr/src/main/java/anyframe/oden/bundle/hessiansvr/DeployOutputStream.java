@@ -43,22 +43,31 @@ public class DeployOutputStream{
 	private long date;
 
 	public DeployOutputStream(String parent, 
-			String path, long date) throws IOException{
-		String fullPath = FileUtil.combinePath(parent, path);
-		if(!new File(fullPath).isAbsolute())
-			throw new IOException("Absolute path is allowed only: " + fullPath);
-		
+			String path, long date) throws IOException{		
+		this(parent, path, date, true);
+	}
+	
+	boolean useTmp = true;
+	public DeployOutputStream(String parent, String path, 
+			long date, boolean useTmp) throws IOException{		
+		this.useTmp = useTmp;
 		this.parentPath = parent;
 		this.filePath = path;
 		
 		try{
-			tmpfile = File.createTempFile(TMP_PREFIX, String.valueOf(System.currentTimeMillis()) );
+			if(useTmp){
+				tmpfile = File.createTempFile(TMP_PREFIX, 
+						String.valueOf(System.currentTimeMillis()) );
+			}else {
+				tmpfile = new File(parentPath, filePath);
+				FileUtil.mkdirs(tmpfile);
+			}
 			this.date = date;
 			
 			this.out = new BufferedOutputStream(new FileOutputStream(tmpfile));
 		}catch(IOException e){
 			try{ if(out != null) out.close(); }catch(IOException e2){}
-			if(tmpfile != null) tmpfile.delete();
+			if(tmpfile != null && useTmp) tmpfile.delete();
 			throw e;
 		}
 	}
@@ -103,9 +112,16 @@ public class DeployOutputStream{
 				throw new IOException("Fail to transfer file: " + filePath);
 			if(date > -1) tmpfile.setLastModified(date);
 			
+			if(!useTmp)
+				return new DoneFileInfo(
+						filePath, 
+						false, 
+						tmpfile.lastModified(), 
+						tmpfile.length(), 
+						isUpdated, 
+						true);
+			
 			File destfile = new File(parentPath, filePath);
-			if(bakdir != null && !(new File(bakdir).isAbsolute()) )
-				throw new IOException("Backup location should be a absolute path: " + bakdir);
 			
 			// backup			
 			if(destfile.exists()){	
@@ -128,7 +144,7 @@ public class DeployOutputStream{
 					isUpdated, 
 					true);
 		}finally{
-			if(tmpfile != null) tmpfile.delete();	
+			if(tmpfile != null && useTmp) tmpfile.delete();	
 		}
 	}
 

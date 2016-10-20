@@ -54,6 +54,8 @@ public class ListFilesJob extends StoppableJob{
 			return Collections.EMPTY_LIST;
 		
 		List<FileInfo> result = new ArrayList<FileInfo>();
+		if(!dir.exists()) 
+			return result;
 		File[] fs = dir.listFiles();
 		for(File f : fs){
 			if(stop)

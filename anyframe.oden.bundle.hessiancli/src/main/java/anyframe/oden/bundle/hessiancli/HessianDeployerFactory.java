@@ -13,6 +13,11 @@ import anyframe.oden.bundle.deploy.DeployerService;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 
+/**
+ * @ThreadSafety
+ * @author joon1k
+ *
+ */
 public class HessianDeployerFactory implements DeployerFactory {
 	private int TIMEOUT = 5000;
 	private long READ_TIMEOUT = 120000;

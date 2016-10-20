@@ -1,0 +1,9 @@
+1. Anyframe Oden 3rd-party licenses
+
+1) Apache Felix 2.0.2 : http://felix.apache.org, Apache License 2.0
+2) JSON : http://www.json.org, JSON License
+3) Apache Commons Codec 1.3 : http://commons.apache.org/codec/, Apache License 2.0
+4) Berkely DB JAVA 4.0.103 : http://www.oracle.com/technetwork/database/berkeleydb/, BerkelyDB License
+5) Hessian 3.1.6 : http://hessian.caucho.com, Apache License 1.1
+6) KXML 2 : http://kxml.sourceforge.net, BSD License
+7) XML Pull Parser : http://www.xmlpull.org, LGPL License

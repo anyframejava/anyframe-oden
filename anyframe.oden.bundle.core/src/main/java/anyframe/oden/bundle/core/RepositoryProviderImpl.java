@@ -73,6 +73,12 @@ public class RepositoryProviderImpl implements RepositoryProviderService{
 		return null;
 	}
 	
+	public RepositoryAdaptor getRepositoryAdaptor(String[] args){
+		RepositoryService svc = getRepoServiceByURI(args);
+		if(svc == null) return null;
+		return new RepositoryAdaptor(svc, args);
+	}
+	
 	public boolean availableRepository(String[] repoArgs){
 		return getRepoServiceByURI(repoArgs) != null;
 	}

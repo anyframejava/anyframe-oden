@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import anyframe.oden.bundle.common.BundleUtil;
 import anyframe.oden.bundle.common.FatInputStream;
@@ -34,6 +38,8 @@ import anyframe.oden.bundle.common.FileInfo;
 import anyframe.oden.bundle.common.FileUtil;
 import anyframe.oden.bundle.common.OdenException;
 import anyframe.oden.bundle.common.OdenIncompleteArgumentException;
+import anyframe.oden.bundle.common.Pair;
+import anyframe.oden.bundle.common.StringUtil;
 
 /**
  * RepositoryService to access local file system.
@@ -72,11 +78,10 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	public FatInputStream resolve(String[] args, String file) throws OdenException {
 		if(args.length < 1)
 			throw new OdenIncompleteArgumentException(args);
-		String repoUri = args[0];
-
+		
 		FatInputStream in = null;
 		try {
-			File f = new File(stripProtocol(repoUri), file);			
+			File f = new File(stripProtocol(args[0]), file);			
 			in = new FatInputStream(new FileInputStream(f), 
 					file, f.isDirectory(), f.lastModified(), f.length());
 			return in;
@@ -84,11 +89,46 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 			throw new OdenException(e);
 		} 
 	}
+	
+	public FileInfo resolveAsFileInfo(String[] args, String file) {
+		if(args.length < 1)
+			return null;
+		args = normalizeArgs(args);
+		String repoUri = args[0];
+
+		File f = new File(stripProtocol(repoUri), file);			
+		return new FileInfo(file, f.isDirectory(), f.lastModified(), f.length());
+	}
+	
+	public FileInfo resolveAsFileInfo(String[] args, List<String> refs, 
+			String file) {
+		if(args.length < 1)
+			return null;
+		args = normalizeArgs(args);
+		
+		long date = -1L;
+		for(String ref : refs){
+			File f = new File(ref);
+			if(f.exists())
+				date = f.lastModified();
+		}
+		
+		final String bindir = args[0];
+		File bin = new File(stripProtocol(bindir), file);
+		if(!bin.exists())
+			return null;
+		
+		if(date == -1L)
+			date = bin.lastModified();
+		return new FileInfo(file, bin.isDirectory(), 
+				date, bin.length());
+	}
 
 	public List<String> resolveFileRegex(String[] args, List<String> includes, List<String> excludes) 
 			throws OdenException{
 		if(args.length < 1)
 			throw new OdenIncompleteArgumentException(args);
+		args = normalizeArgs(args);
 		String repoUri = args[0];
 
 		String root = stripProtocol(repoUri);
@@ -130,11 +170,9 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		if(files != null){
 			for(File file : files) {				
 				String path = new File(parent, file.getName()).getPath(); 
-				if(file == null || file.isHidden() || !file.canRead()) 
-					continue;
 
-				String rpath = FileUtil.getRelativePath(root, path);
 				if(file.isFile()){
+					String rpath = FileUtil.getRelativePath(root, path);
 					if(FileUtil.matched(rpath, includes, excludes))
 						matched.add(rpath);
 				} else if(recursive) {	// directory
@@ -149,19 +187,126 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		List<FileInfo> files = new ArrayList<FileInfo>();
 		if(args.length < 1)
 			throw new OdenIncompleteArgumentException(args);
+		args = normalizeArgs(args);
 		String path = stripProtocol(args[0]);
 		
 		File[] children = new File(path).listFiles();
 		if(children == null)
 			throw new OdenException("Invalid location: " + path);
 		for(File f : children){
-			if(f == null || f.isHidden() || !f.canRead()) 
-				continue;
 			FileInfo mf = new FileInfo(f.getPath(), 
 					f.isDirectory(), f.lastModified());
 			files.add(mf);
 		}
 		return files;
+	}
+	
+	public boolean isDirExisted(String[] args, String name) {
+		File path = new File(FileUtil.combinePath(normalizedPath(args), name));
+		return path.exists() && path.isDirectory();
+	}
+	
+	public List<FileInfo> listAllFiles(String[] args) throws OdenException {
+		if(args.length < 1)
+			throw new OdenIncompleteArgumentException(args);
+		args = normalizeArgs(args);
+		String path = stripProtocol(args[0]);
+		
+		List<FileInfo> ret = new ArrayList<FileInfo>();
+		FileUtil.listAllFiles(ret, path, new File(path));
+		return ret;
+	}
+	
+	public List<String> listAllFiles(String[] args, String subdir, 
+			List<String> excludes) throws OdenIncompleteArgumentException{
+		if(args.length < 1)
+			throw new OdenIncompleteArgumentException(args);
+		args = normalizeArgs(args);
+		final String root = stripProtocol(args[0]);
+		final String rootAndSub = FileUtil.combinePath(root, subdir);
+		return listAllFiles(rootAndSub, root, rootAndSub, excludes);
+	}
+	
+	private List<String> listAllFiles(String dir, String root, String rootAndSub, 
+			List<String> excludes){
+		List<String> ret = new ArrayList<String>();
+		File[] files = new File(dir).listFiles();
+		if(files == null)
+			return ret;
+		
+		for(File file : files) {
+			String path = FileUtil.combinePath(dir, file.getName());
+			if(file.isFile()){
+				String pathAfterSub = FileUtil.getRelativePath(rootAndSub, path);
+				if(FileUtil.matched(pathAfterSub, excludes))
+					continue;
+				ret.add(pathAfterSub);
+			} else {	// directory
+				ret.addAll(listAllFiles(path, root, rootAndSub, excludes));
+			}
+		}
+		return ret;
+	}
+	
+	public void listAllFilesFileInfo(String[] args, String subdir,
+			List<Pair> dirSrcMap, 
+			List<String> excludes, Collection<FileInfo> ret) 
+			throws OdenIncompleteArgumentException{
+		if(args.length < 1)
+			throw new OdenIncompleteArgumentException(args);
+		
+		final String root = normalizedPath(args);
+		final String rootAndSub = FileUtil.combinePath(root, subdir);
+		listAllFilesFileInfo(rootAndSub, rootAndSub, dirSrcMap, excludes, ret);
+	}
+	
+	private void listAllFilesFileInfo(String dir, String root,
+			List<Pair> dirSrcMap, 
+			List<String> excludes, Collection<FileInfo> ret){
+		File[] files = new File(dir).listFiles();
+		if(files == null) return;
+		
+		for(File file : files) {
+			String path = FileUtil.combinePath(dir, file.getName());
+			if(file.isFile()){
+				String pathAfterSub = FileUtil.getRelativePath(root, path);
+				if(FileUtil.matched(pathAfterSub, excludes))
+					continue;
+				long date = getSrcDate(pathAfterSub, dirSrcMap);
+				ret.add(new FileInfo(pathAfterSub, false, 
+						date == 0L ? file.lastModified() : date, 
+						file.length()));
+			} else {	// directory
+				listAllFilesFileInfo(path, root, dirSrcMap, excludes, ret);
+			}
+		}
+	}
+	
+	private long getSrcDate(String path, List<Pair> dirSrcMap){
+		for(Pair p : dirSrcMap){
+			String dir = p.getArg0();
+			if(path.startsWith(dir)){
+				long date = getDate(p.getArg1(), 
+						path.substring(dir.length()));
+				if(date != 0L) 
+					return date;
+			}
+		}
+		return 0L;
+	}
+	
+	private long getDate(String parent, String child) {
+		if(child.endsWith(".class"))
+			return new File(parent, getSrcFileName(child)).lastModified();
+		return new File(parent, child).lastModified();
+	}
+
+	private String getSrcFileName(String classFile) {
+		int i = classFile.indexOf('$');
+		if(i > 0)
+			return classFile.substring(0, i) + ".java";
+		return classFile.substring(0, 
+				classFile.length() - ".class".length()) + ".java"; 
 	}
 	
 	public void close(String[] args) {
@@ -176,7 +321,9 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 	 * @return
 	 * @throws OdenException
 	 */
-	public File getFile(String[] repoargs, String fpath, String destpath) throws OdenException {		
+	public File getFile(String[] repoargs, String fpath, String destpath) throws OdenException {
+		repoargs = normalizeArgs(repoargs);
+		destpath = toAbsolutePath(destpath);
 		File result = null;
 		
 		FatInputStream in = null;
@@ -210,16 +357,108 @@ public class FileSystemRepositoryImpl extends AbstractRepositoryimpl {
 		return System.currentTimeMillis();
 	}
 	
-	protected void normalizeArgs(String[] args) {
-		args[0] = normalizeURI(args[0]);
+	protected String[] normalizeArgs(String[] args) {
+		String protocol = getProtocol();
+		return new String[]{ protocol + toAbsolutePath(
+				args[0].substring(protocol.length())) };
+	}
+	
+	protected String normalizedPath(String[] args){
+		if(args.length < 1) return null;
+		return toAbsolutePath(args[0].substring(
+				getProtocol().length()));
 	}
 
-	private String normalizeURI(String s) {
-		String protocol = getProtocol();
-		String path = s.substring(protocol.length());
-		if(FileUtil.isAbsolutePath(path))
-			return s;
-		return protocol + FileUtil.resolveDotNatationPath(
+	private String toAbsolutePath(String path) {
+		if(StringUtil.empty(path) || FileUtil.isAbsolutePath(path))
+			return path;
+		return FileUtil.resolveDotNatationPath(
 				BundleUtil.odenHome().getPath() + "/" + path);
+	}
+	
+	/**
+	 * find dir whose name is src/main/java, src/main/resources,
+	 * src/test/java, src/test/resources, src
+	 */
+	public List<String> getSourceDirs(String[] repoArgs){
+		List<String> ret = new ArrayList<String>();
+		String root = normalizedPath(repoArgs);
+		File dir = new File(root);
+		if(!dir.exists()) return ret;
+		
+		File src = findDirFile(dir, "src", null);
+		if(src == null) return ret;
+		for(File f : src.listFiles()){
+			if(f.isFile()) continue;
+			if(f.getName().equals("main") ||
+					f.getName().equals("test")){
+				for(File ff: f.listFiles()){
+					if(ff.isFile()) continue;
+					if(ff.getName().equals("java") || 
+							ff.getName().equals("resources")){
+						// src/main/java or src/main/resources
+						ret.add(FileUtil.getRelativePath(
+								root, ff.getAbsolutePath()));	
+					}
+				}
+				if(ret.isEmpty()) 
+					ret.add(FileUtil.getRelativePath(
+							root, f.getAbsolutePath()));	// src/main
+			}
+			if(!ret.isEmpty()) break;
+		}
+		if(ret.isEmpty()) 
+			ret.add(FileUtil.getRelativePath(
+					root, src.getAbsolutePath()));	// src
+		return ret;
+	}
+
+	public String getAbsolutePathFromParent(String[] repoArgs, String name){
+		File dir = new File(normalizedPath(repoArgs));
+		
+		File parent = dir.getParentFile();
+		for(int i=0; i<4; i++){
+			if(parent == null) break;
+			File f = new File(parent, name);
+			if(f.exists() && f.isDirectory()){
+				return f.getAbsolutePath();
+			}
+			parent = parent.getParentFile();
+		}
+		return null;
+	}
+	
+	/**
+	 * get dir whose name is dirName. if there are one more dirs,
+	 * outer most dir is first. <br/>
+	 * e.g. if you want to find WEB-INF, but there are some WEB-INF
+	 * like a/WEB-INF, a/b/WEB-INF, a/b/c/WEB-INF, this method will
+	 * return a/WEB-INF
+	 */
+	public String findDir(String[] repoArgs, String dirName,
+			String exclude){
+		String root = normalizedPath(repoArgs);
+		File dir = new File(root);
+		if(!dir.exists()) return null;
+		
+		File f = findDirFile(dir, dirName, 
+				exclude == null ? null : new File(exclude));
+		return f == null ? null : 
+			FileUtil.getRelativePath(root, f.getAbsolutePath());
+	}
+	
+	private File findDirFile(File dir, String dirName,
+			File exclude){
+		Queue<File> q = new LinkedList<File>();
+		q.add(dir);
+		while(!q.isEmpty()){
+			File f = q.remove();
+			if(f.isFile()) continue;
+			if(f.getName().equals(dirName) && ( exclude == null ||
+					!f.getAbsolutePath().equals(exclude.getAbsolutePath()) ) )
+				return f;
+			q.addAll(Arrays.asList(f.listFiles()));
+		}
+		return null;
 	}
 }

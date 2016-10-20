@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+<!-- oden web admin-tiles-definition-START -->
+	<!-- login -->
+	<definition name="login" template="/login.jsp"/>
+	<!-- deploy -->
+	<definition name="jobLayout" template="/WEB-INF/jsp/deploy/job.jsp"/>
+	<definition name="jobdetailLayout" template="/WEB-INF/jsp/deploy/jobdetail.jsp"/>
+	<definition name="deployLayout" template="/WEB-INF/jsp/deploy/deploy.jsp"/>
+	<definition name="compareLayout" template="/WEB-INF/jsp/deploy/compare.jsp"/>
+	<definition name="scriptLayout" template="/WEB-INF/jsp/deploy/script.jsp"/>
+	<!-- history -->
+	<definition name="historyLayout" template="/WEB-INF/jsp/history/history.jsp"/>
+	<definition name="historydetailLayout" template="/WEB-INF/jsp/history/historydetail.jsp"/>
+	<!-- log -->
+	<definition name="logLayout" template="/WEB-INF/jsp/log/log.jsp"/>
+	<!-- status -->
+	<definition name="statusLayout" template="/WEB-INF/jsp/status/status.jsp"/>
+	
+    <definition name="error" extends="jsonLayout">
+        <put-attribute name="body" value="/common/error.jsp" />
+    </definition>
+	<!-- Add new tiles definition here -->
+    <definition name="jsonLayout" template="/WEB-INF/jsp/layouts/standard.jsp">
+        <put-attribute name="top" value="/WEB-INF/jsp/layouts/top.jsp" />
+        <put-attribute name="left" value="/WEB-INF/jsp/layouts/left.jsp" />
+        <put-attribute name="body" expression="${requestScope.body}" />
+    </definition>
+<!-- oden web admin-tiles-definition-END -->
+</tiles-definitions>

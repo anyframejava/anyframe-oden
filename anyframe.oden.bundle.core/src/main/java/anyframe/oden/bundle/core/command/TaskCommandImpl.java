@@ -49,7 +49,7 @@ import anyframe.oden.bundle.core.record.RecordElement2;
  * @author joon1k
  *
  */
-public class TaskCommandImpl extends OdenCommand {	
+public class TaskCommandImpl extends OdenCommand {	 
 	public final static String TASK_NODE = "task";
 	
 	public final static String TEST_ACTION = "test";
@@ -155,8 +155,7 @@ public class TaskCommandImpl extends OdenCommand {
 				if(doInfoAction(task).length() == 0) 
 					throw new OdenException("Couldn't find a task: " + cmd.getActionArg());
 				
-				boolean isSync = cmd.getOption(SYNC_OPT) != null;
-				
+				boolean isSync = cmd.getOption(SYNC_OPT) != null;				
 				String txid = deploy(task, isSync, extractUserName(cmd));
 				if(isSync){
 					RecordElement2 r = deploylog.search(txid,

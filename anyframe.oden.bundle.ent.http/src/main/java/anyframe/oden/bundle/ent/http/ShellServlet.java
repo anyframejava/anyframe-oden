@@ -18,11 +18,10 @@
  */
 package anyframe.oden.bundle.ent.http;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +32,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.ungoverned.osgi.service.shell.ShellService;
+
+import anyframe.oden.bundle.common.Logger;
 
 /**
  * Servlet to make availble to execute commands in the OSGi Shell.
@@ -102,16 +103,17 @@ public class ShellServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		PrintStream out = null;
-		PrintStream err = null;
+//		PrintStream err = null;
 
 		req.setCharacterEncoding("utf-8");
 		res.setContentType("charset=utf-8");
 		res.setCharacterEncoding("utf-8");
 		try {
-			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-			ByteArrayOutputStream bErr = new ByteArrayOutputStream();
-			out = new PrintStream(bOut);
-			err = new PrintStream(bErr);
+//			ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+//			ByteArrayOutputStream bErr = new ByteArrayOutputStream();
+			out = new PrintStream(new BufferedOutputStream(
+					res.getOutputStream()));
+//			err = new PrintStream(bErr);
 			
 			// execute command & its results are already written to the out or err.
 			BufferedReader reader = null;
@@ -125,33 +127,37 @@ public class ShellServlet extends HttpServlet {
 					cmd+= " -_user " + userName(req);
 				}
 				
-				shellService.executeCommand(cmd, out, err);
+				long t = System.currentTimeMillis();
+				Logger.info("Command Launched: " + cmd + "\n");
+				shellService.executeCommand(cmd, out, out);
+				Logger.info("Command Finished in " 
+						+ (System.currentTimeMillis() - t) + "ms\n");
 			} catch (Exception e) {
 				throw new ServletException("Couldn't execute a command", e);
 			} finally {
 				if(reader != null) reader.close();
 			}
 		
-			String sOut = bOut.toString();
-			String sErr = bErr.toString();			
-			PrintWriter writer = null; 
-			
-			try{
-				writer = res.getWriter();
-				if(sErr.length() > 0){	// has error
-					sOut = sErr;
-				}
-				writer.print(sOut);
-			}finally {
-				if(writer != null)
-					writer.close();
-			}
+//			String sOut = bOut.toString();
+//			String sErr = bErr.toString();			
+//			PrintWriter writer = null; 
+//			
+//			try{
+//				writer = res.getWriter();
+//				if(sErr.length() > 0){	// has error
+//					sOut = sErr;
+//				}
+//				writer.print(sOut);
+//			}finally {
+//				if(writer != null)
+//					writer.close();
+//			}
 		} finally {
 			if(out != null)
 				out.close();
 			
-			if(err != null)
-				err.close();
+//			if(err != null)
+//				err.close();
 			
 		}
 	}

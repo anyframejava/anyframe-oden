@@ -336,6 +336,14 @@ public class PolicyCommandImpl extends OdenCommand {
 			throw new OdenException(e1);
 		}
 		
+		long repo_t;
+		try {
+			repo_t = reposvc.getDate(repo.args());
+		} catch (IOException e1) {
+			throw new OdenException(e1);
+		}
+		long repo_t_diff = System.currentTimeMillis() - repo_t;
+		
 		List<String> files = reposvc.resolveFileRegex(repo.args(), includes, excludes);
 		for(String file : files){
 			FatInputStream in = null;
@@ -356,8 +364,9 @@ public class PolicyCommandImpl extends OdenCommand {
 								throw new OdenException("Not writable file.");
 							
 							if(update && !DeployerHelper.isNewFile(
-									ds.getDate(agent.location(), in.getPath()),
-									in.getLastModified()))
+									ds.getDate(agent.location(), in.getPath()) - 
+									dffs.getDiffTime(ds, configService.getAgent(agent.agentName()).getDefaultLocValue()),
+									in.getLastModified() - repo_t_diff))
 								continue;
 							m = Mode.UPDATE;
 						}else {

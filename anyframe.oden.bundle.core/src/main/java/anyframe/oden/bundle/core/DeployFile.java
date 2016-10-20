@@ -21,6 +21,7 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import anyframe.oden.bundle.common.StringUtil;
 import anyframe.oden.bundle.common.Utils;
 import anyframe.oden.bundle.core.command.JSONizable;
 
@@ -39,7 +40,7 @@ public class DeployFile implements JSONizable, Serializable{
 	private Repository repo;
 	
 	private String path;
-
+	
 	private AgentLoc agent;
 	
 	private long size;
@@ -77,7 +78,7 @@ public class DeployFile implements JSONizable, Serializable{
 	public String getPath() {
 		return path;
 	}
-
+	
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -144,6 +145,8 @@ public class DeployFile implements JSONizable, Serializable{
 	}
 	
 	public void setErrorLog(String s) {
+		if(s == null) return;
+		
 		this.errorLog = s.trim();
 		this.success = false;
 	}
@@ -153,12 +156,12 @@ public class DeployFile implements JSONizable, Serializable{
 		if(!(o instanceof DeployFile))
 			return false;
 		DeployFile d = (DeployFile)o;
-		return repo.equals(d.repo) && path.equals(d.path) && agent.equals(d.agent); 
+		return repo.equals(d.repo) && path.equals(d.path) && agent.agentName().equals(d.agent.agentName()); 
 	}
 	
 	@Override
 	public int hashCode() {
-		return Utils.hashCode(repo, path, agent);
+		return Utils.hashCode(repo, path, agent.agentName());
 	}
 
 	public Object jsonize() {
@@ -172,7 +175,7 @@ public class DeployFile implements JSONizable, Serializable{
 					.put("comment", comment)
 					.put("mode", DeployFileUtil.modeToString(mode))
 					.put("success", String.valueOf(success))
-					.put("errorlog", errorLog);
+					.put("errorlog", StringUtil.makeEmpty(errorLog));
 		} catch (JSONException e) {
 		}
 		return new JSONObject();

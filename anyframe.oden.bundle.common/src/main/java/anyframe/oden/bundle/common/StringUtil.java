@@ -15,6 +15,9 @@
  *
  */
 package anyframe.oden.bundle.common;
+
+import java.util.Collection;
+
 /**
  * 
  * Check input string is empty.
@@ -31,5 +34,26 @@ public class StringUtil {
 	 */
 	public static boolean empty(String s){
 		return s == null || s.length() == 0;
+	}
+	
+	public static String makeEmpty(String s){
+		return s == null ? "" : s;
+	}
+	
+	public static boolean equals(String s0, String s1){
+		return (s0 == null && s1 == null) ||
+			(s0 != null && s0.equals(s1));
+	}
+	
+	public static String collectionToString(Collection c){
+		StringBuffer buf = new StringBuffer();
+		int i=0;
+		for(Object o : c){
+			buf.append(o.toString());
+			if(i < c.size()-1)
+				buf.append(", ");
+			i++;
+		}
+		return buf.toString();
 	}
 }

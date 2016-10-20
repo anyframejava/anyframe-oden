@@ -17,10 +17,14 @@
 package anyframe.oden.bundle.hessiansvr;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import anyframe.oden.bundle.common.BundleUtil;
@@ -42,6 +46,8 @@ import anyframe.oden.bundle.deploy.StoppableJob;
  *
  */
 public class DeployerImpl implements DeployerService {
+	private final String HOME = BundleUtil.odenHome().getPath();
+	
 	private Object lock = new Object();
 	
 	public String jvmStat(){
@@ -56,16 +62,16 @@ public class DeployerImpl implements DeployerService {
 	}
 	
 	public boolean exist(String parent, String child) throws Exception{
-		return new File(parent, child).exists();
+		return new File(toAbsPath(parent), child).exists();
 	}
 
 	public boolean writable(String parent, String child) throws Exception{
-		File f = new File(parent, child);
+		File f = new File(toAbsPath(parent), child);
 		return !f.exists() || f.canWrite();
 	}
 	
 	public FileInfo fileInfo(String parent, String child) throws Exception{
-		File f = new File(parent, child);
+		File f = new File(toAbsPath(parent), child);
 		if(f.exists())
 			return new FileInfo(child, f.isDirectory(), f.lastModified(), f.length());
 		return null;
@@ -73,6 +79,7 @@ public class DeployerImpl implements DeployerService {
 	
 	public List<String> resolveFileRegex(String parent, List<String> includes, 
 			List<String> excludes) throws Exception{
+		parent = toAbsPath(parent);		
 		boolean recursive = hasRecursive(includes);
 		String common = FileUtil.commonParent(includes);
 		if(common != null){
@@ -100,15 +107,14 @@ public class DeployerImpl implements DeployerService {
 		if(files != null){
 			for(File file : files) {				
 				String path = new File(parent, file.getName()).getPath(); 
-				if(file == null || file.isHidden() || !file.canRead()) 
-					continue;
 
-				String rpath = FileUtil.getRelativePath(root, path);				
-				if(file.isDirectory() && recursive)
+				if(file.isDirectory() && recursive){
 					matched.addAll(getMatchedFiles(root, path, includes, excludes, recursive));
-				else
+				}else{
+					String rpath = FileUtil.getRelativePath(root, path);
 					if(FileUtil.matched(rpath, includes, excludes))
-						matched.add(rpath);				
+						matched.add(rpath);
+				}
 			}
 		}
 		return matched;
@@ -117,11 +123,24 @@ public class DeployerImpl implements DeployerService {
 	/**
 	 * @return date of the file (parentpath/path). -1 if there's no such file.
 	 */
-	public long getDate(String parentpath, String path) throws Exception{
-		File f = new File(parentpath, path);
-		if(!f.isAbsolute())
+	public long getDate(String parent, String path) throws Exception{
+		File f = new File(toAbsPath(parent), path);
+		if(!f.exists() || !f.isAbsolute())
 			return -1L;
 		return f.lastModified();
+	}
+	
+	public void setDate(String parent, String path, long date) 
+			throws Exception{
+		File f = new File(toAbsPath(parent), path);
+		if(!f.exists() || !f.isAbsolute())
+			throw new FileNotFoundException(f.getPath());
+		
+		synchronized (lock) {
+			if(!f.setLastModified(date))
+				throw new IOException("Fail to set date: " 
+						+ f.getPath() + ", " + date);	
+		}
 	}
 	
 	private Map<String, DeployOutputStream> fileStreams =
@@ -131,7 +150,13 @@ public class DeployerImpl implements DeployerService {
 	
 	enum MODE {INIT, WRITE, CLOSE}
 	
-	public void init(String parent, String path, long date) throws Exception{
+//	public void init(String parent, String path, long date) throws Exception{
+//		init(parent, path, date, true);
+//	}
+	
+	public void init(String parent, String path, 
+			long date, boolean useTmp) throws Exception{
+		parent = toAbsPath(parent);
 		synchronized (lock) {
 			if(mode != MODE.INIT){
 				// close all open streams.
@@ -148,11 +173,14 @@ public class DeployerImpl implements DeployerService {
 			if(fileStreams.containsKey(key))
 				throw new IOException("Couldn't open the file again: " + 
 						FileUtil.combinePath(parent, path));
-			fileStreams.put(key, new DeployOutputStream(parent, path, date));
+			fileStreams.put(key, new DeployOutputStream(
+					parent, path, date, useTmp));
 		}
 	}
 	
-	public boolean write(String parent, String path, ByteArray buf) throws Exception {
+	public boolean write(String parent, String path, 
+			ByteArray buf) throws Exception {
+		parent = toAbsPath(parent);
 		synchronized (lock) {
 			if(mode == MODE.CLOSE)
 				throw new IOException("Writing any bytes is not allowed while closing mode.");
@@ -168,14 +196,17 @@ public class DeployerImpl implements DeployerService {
 	
 	public DoneFileInfo close(String parent, String path, 
 			List<String> updatefiles, String bakdir) throws Exception {
+		parent = toAbsPath(parent);
+		bakdir = toAbsPath(bakdir);
 		synchronized (lock) {
 			mode = MODE.CLOSE;
 			
 			final String key = parent + path;
 			
-			if(fileStreams.containsKey(key))
-				return fileStreams.remove(key).close(updatefiles, bakdir);
-			return null;
+			DeployOutputStream stream = fileStreams.remove(key);
+			if(stream == null) 
+				return null;
+			return stream.close(updatefiles, bakdir);
 		}
 	}
 	
@@ -189,23 +220,21 @@ public class DeployerImpl implements DeployerService {
 	
 	public DoneFileInfo compress(String id, String srcdir, String destFile) throws Exception {
 		synchronized (lock) {
-			job = new CompressJob(id, srcdir, destFile);
+			job = new CompressJob(id, toAbsPath(srcdir), toAbsPath(destFile));
 			return (DoneFileInfo) job.start();
 		}
 	}
 
 	public List<DoneFileInfo> extract(String id, String srcdir, String zipname, String destdir) throws Exception {
 		synchronized (lock) {
-			job = new ExtractJob(id, srcdir, zipname, destdir);
+			job = new ExtractJob(id, toAbsPath(srcdir), zipname, toAbsPath(destdir));
 			return (List<DoneFileInfo>) job.start();
 		}
 	}
 
 	public void removeFile(String dir, String filename) throws Exception{
 		synchronized (lock) {
-			File s = new File(dir, filename);
-			if(!s.isAbsolute())
-				throw new IOException("Absolute path is allowed only: " + s);
+			File s = new File(toAbsPath(dir), filename);
 			if(s.exists() && !s.delete())
 				throw new IOException("Fail to remove file: " + s);	
 		}
@@ -213,19 +242,39 @@ public class DeployerImpl implements DeployerService {
 
 	public List<DoneFileInfo> backupNRemoveDir(String id, String dir, String bak) throws Exception {
 		synchronized (lock) {
-			job = new RemoveDirJob(id, dir, bak);
+			job = new RemoveDirJob(id, toAbsPath(dir), toAbsPath(bak));
 			return (List<DoneFileInfo>) job.start();
 		}
 	}
 	
-	public List<FileInfo> listAllFiles(String id, String path) throws Exception{
+	public List<FileInfo> listAllFilesAsJob(String id, String path) throws Exception{
 		synchronized (lock) {
-			job = new ListFilesJob(id, path);
+			job = new ListFilesJob(id, toAbsPath(path));
 			return (List<FileInfo>) job.start();
 		}
 	}
 	
+	public List<FileInfo> listAllFiles(String dir) throws Exception{
+		dir = toAbsPath(dir);
+		File d = new File(dir);
+		if(!d.isDirectory())
+			return Collections.EMPTY_LIST;
+		
+		List<FileInfo> ret = new ArrayList<FileInfo>();
+		FileUtil.listAllFiles(ret, dir, d);
+		return ret;
+	}
 	
+	public Set<FileInfo> listAllFilesAsSet(String dir) throws Exception{
+		dir = toAbsPath(dir);
+		File d = new File(dir);
+		if(!d.isDirectory())
+			return Collections.EMPTY_SET;
+		
+		Set<FileInfo> ret = new HashSet<FileInfo>();
+		FileUtil.listAllFiles(ret, dir, d);
+		return ret;
+	}
 	
 	/**
 	 * used before restoring snapshots.
@@ -270,19 +319,18 @@ public class DeployerImpl implements DeployerService {
 	 */
 	public DoneFileInfo backupNCopy(String srcPath, String filePath, 
 			String destPath, String bakPath) throws Exception {
+		srcPath = toAbsPath(srcPath);
+		destPath = toAbsPath(destPath);
+		bakPath = toAbsPath(bakPath);
 		synchronized (lock) {
-			if(!new File(srcPath).isAbsolute() || 
-					!new File(destPath).isAbsolute() ||
-					!new File(srcPath, filePath).exists())
-				throw new IOException("Wrong path: " + srcPath + " or " + destPath);
+			if(!new File(srcPath, filePath).exists())
+				throw new IOException("File not found: " + new File(srcPath, filePath).getPath());
 			
 			boolean success = true;
 			boolean srcExist = false;
 			
 			//backup
-			if(bakPath != null ){
-				if(!new File(bakPath).isAbsolute())
-					throw new IOException("Absolute path is allowed only: " + bakPath); 
+			if(bakPath != null ){ 
 				srcExist = DeployerUtils.undoBackup(destPath, filePath, bakPath);
 			}
 				
@@ -304,11 +352,9 @@ public class DeployerImpl implements DeployerService {
 	 * @throws IOException 
 	 */
 	public DoneFileInfo backupNRemove(String srcPath, String filePath, String bakPath) throws Exception {
+		srcPath = toAbsPath(srcPath);
+		bakPath = toAbsPath(bakPath);
 		synchronized (lock) {
-			if(!new File(srcPath).isAbsolute() || (bakPath != null &&
-					!new File(bakPath).isAbsolute()) )
-				throw new IOException("Wrong path: " + srcPath + " or " + bakPath);
-			
 			boolean success = true;
 			boolean srcExist = false;
 			
@@ -321,19 +367,46 @@ public class DeployerImpl implements DeployerService {
 			if(f.exists() && !f.delete())
 				throw new IOException("Fail to remove file: " + new File(srcPath, filePath));
 			
+			// remove parent directory if empty
+			removeEmptyParent(f);
+			
 			return new DoneFileInfo(FileUtil.combinePath(srcPath, filePath), false, srcdate, srcsz, srcExist, success);
 		}
 	}
 	
+	private void removeEmptyParent(File f) {
+		File parent = f.getParentFile();
+		if(parent == null)
+			return;
+		
+		String[] items = parent.list();
+		if(items == null || items.length > 0)
+			return;
+		
+		try{
+			if(parent.delete());
+				removeEmptyParent(parent);
+		}catch(Exception e){
+		}
+	}
+
 	public boolean touchAvailable(){
 		return true;
 	}
 	
 	public String execShellCommand(String command, String dir, long timeout) throws Exception{
-		return new Launcher(new Proc(command, dir), timeout).start();
+		return new Launcher(new Proc(command, 
+				toAbsPath(dir), timeout), timeout).start();
 	}
 
 	public String odenHome(){
-		return BundleUtil.odenHome().getPath();
+		return HOME;
+	}
+	
+	private String toAbsPath(String path){
+		if(path == null || FileUtil.isAbsolutePath(path))
+			return path;
+		return FileUtil.resolveDotNatationPath(
+				FileUtil.combinePath(HOME, path));
 	}
 }

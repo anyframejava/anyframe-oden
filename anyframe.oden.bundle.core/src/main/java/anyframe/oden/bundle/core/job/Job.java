@@ -36,6 +36,7 @@ public abstract class Job {
 	protected boolean stop = false;
 	protected long date;
 	protected String desc = "";
+	protected String currentWork = "";
 	protected BundleContext context = null;
 	
 	protected int additionalWorks = 1; 
@@ -63,6 +64,10 @@ public abstract class Job {
 	
 	public String desc() {
 		return desc;
+	}
+	
+	public String getCurrentWork(){
+		return currentWork;
 	}
 		
 	public int progress(){

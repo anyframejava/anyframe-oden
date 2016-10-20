@@ -81,8 +81,7 @@ public class DeployLogImpl implements DeployLogService {
 				fout.writeObject(r);	
 			}
 		}catch(IOException e) {
-			throw new OdenException("Couldn't write a deploy log to a file: " + 
-					f.getAbsolutePath());
+			throw new OdenException(e);
 		}finally {
 			try { if(fout != null) fout.close(); } catch (IOException e) { }
 		}

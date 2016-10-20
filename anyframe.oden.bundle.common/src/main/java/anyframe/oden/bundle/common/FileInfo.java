@@ -83,4 +83,16 @@ public class FileInfo implements Serializable{
 		this.size = size;
 	}
 	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof FileInfo))
+			return false;
+		FileInfo d = (FileInfo)o;
+		return path.equals(d.path); 
+	}
+	
+	@Override
+	public int hashCode() {
+		return Utils.hashCode(path);
+	}
 }

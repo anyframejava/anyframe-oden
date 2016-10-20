@@ -25,6 +25,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,7 @@ public class Activator implements BundleActivator {
     private transient BundleContext m_context = null;
     private transient ShellGate m_shell = null;
     private transient LogService log = null;
+    private transient Set<String> availableCmds = null;
 
 	public void start(BundleContext context) throws Exception {
 		 m_context = context;
@@ -221,6 +223,20 @@ public class Activator implements BundleActivator {
 	        context.registerService(
 	            org.apache.felix.shell.Command.class.getName(),
 	            new VersionCommandImpl(m_context), null);
+	        
+	        loadAvailableCommandNames(context);
+	}
+
+	private void loadAvailableCommandNames(BundleContext context) {
+		String names = context.getProperty("cmd.available");
+		if(names == null){
+			// Do not return empty collection!!
+			availableCmds = null;
+		} else {
+			availableCmds = new HashSet<String>();
+			for(String s: names.split("\\s"))
+				availableCmds.add(s);
+		}
 	}
 
 	public void stop(BundleContext context)
@@ -285,18 +301,27 @@ public class Activator implements BundleActivator {
             List<String> cmds = new ArrayList<String>(); 
             for(String name : ks){
             	Command cmd = (Command) m_commandNameMap.get(name);
-            	if(cmd instanceof CustomCommand)
-            		cmds.add(name);
+            	if(availableCmds == null){	// oden 1.x
+            		if(cmd instanceof CustomCommand)
+            			cmds.add(name);
+            	}else{		// oden 2.x
+            		if(availableCmds.contains(cmd.getName()))
+	            		cmds.add(name);
+            	}
             }
-            return _convert(cmds);
+            
+            if(availableCmds != null && cmds.size() != availableCmds.size())
+            	throw new RuntimeException("Fail to load: " 
+            			+ notLoadedCommands(availableCmds, cmds));
+            return cmds.toArray(new String[cmds.size()]);
         }
         
-        private synchronized String[] _convert(List<String> srcs){
-        	String[] dest = new String[srcs.size()];
-        	for(int i=0; i<dest.length; i++){
-        		dest[i] = srcs.get(i);
-        	}
-        	return dest;
+        private Set<String> notLoadedCommands(Set<String> available, 
+        		List<String> loaded){
+        	Set<String> ret = new HashSet<String>(available);
+        	for(String c : loaded)
+        		ret.remove(c);
+        	return ret;
         }
         
         public synchronized String getCommandUsage(String name)

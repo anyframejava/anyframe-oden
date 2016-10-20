@@ -1,0 +1,609 @@
+body { margin-top:0; margin-left:0; margin-right:0; margin-bottom:0;background-color: #FFFFFF;}
+td { font-size: 9pt; color: #58595B; font-style: normal; font-weight: normal; font-family:"verdana", "dotum"}
+
+
+.ct_box    {font-family:"verdana"; font-size:9pt; border-left:1px solid #CECFCE;  border-right:1px solid #CECFCE; border-bottom:1px solid #CECFCE; 
+            color:#000000; background-color:#FFFFFF;}            
+            
+.ct_name     {font-size: 10.5pt; COLOR: #104A93; font-weight:bold; text-decoration: none; font-family:"verdana", "dotum"; letter-spacing:-1;}
+.ct_ttl      {font-size: 9pt; COLOR: #104A93; font-weight:bold; text-decoration: none; font-family:"verdana", "dotum"; letter-spacing:-1;}
+.ct_village  {font-size: 9pt; COLOR: #427DC6; font-weight:bold; text-decoration: none; font-family:"verdana", "dotum"; letter-spacing:-1;}
+.ct_date     {font-size: 9pt; COLOR: #295D8C; text-decoration: none; font-family:"verdana", "dotum";}
+.ct_ttl01     {
+       font-size: 11px; COLOR: #555; 
+       text-decoration: none; font-family: "verdana"; font-weight:bold; 
+	   padding-top:3px;
+	   background: url(../images/ttl_00.png) no-repeat left top;
+}
+.ct_ttl02     {font-size: 9pt; COLOR: #004D73; text-decoration: none; font-family:"verdana", "dotum";}
+.ct_ttl03     {font-size: 9pt; COLOR: #002C41; text-decoration: none; font-family:"verdana", "dotum"; font-weight:bold; padding-top:3px;} 
+
+.ct_line   {height:1px; background-color:#A8BAD4}
+.ct_line01 {height:1px; background-color:#E9F6FF}
+
+.ct_list           {font-size: 9pt; color: #343434; font-family:"verdana", "dotum"; padding-top:5px; height:23px}
+.ct_list A:link    {font-size: 9pt; color: #343434; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list A:visited {font-size: 9pt; color: #343434; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list A:active  {font-size: 9pt; color: #343434; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list A:hover   {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum";}
+
+.ct_list01           {font-size: 9pt; color: #525152; font-family:"verdana", "dotum"; padding-top:5px; height:23px}
+.ct_list01 A:link    {font-size: 9pt; color: #525152; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list01 A:visited {font-size: 9pt; color: #525152; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list01 A:active  {font-size: 9pt; color: #525152; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list01 A:hover   {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum";}
+
+.ct_input      {font-size:12px; border:1px solid #468720; color:#777777; background-color:#ffffff; font-family:"verdana", "dotum"; padding-top:2px;}
+.ct_input_g    {font-size:9pt; border:1px solid #9cacc5; color:#777777; background-color:#ffffff; font-family:"verdana", "dotum";
+text-indent:2px;height:19px;}
+.ct_input_bg    {font-size:9pt; border:1px solid #ADAEAD; color:#777777; background-color:#dddddd; font-family:"verdana", "dotum"; padding-top:2px;}
+.ct_input_login    {font-size:12px; border:1px solid #9cacc5; color:#777777; background-color:#ffffff; font-family:"verdana", "dotum"; padding-top:2px;
+text-indent:2px;height:18px;}
+
+select {border:1px solid #ADAEAD; color:#777777; background-color:#ffffff; font-family:"verdana", "dotum"; font-size:12px; color:#5D5D5D; line-height:1.3;}
+
+.ct_td {  font-family:"verdana";
+          font-size: 11px;
+          color: #fff;
+          background-color:#586384; height:21px;
+		  padding: 0 10px 0 10px;
+		  font-weight:bold;
+		  line-height:27px;
+}
+.ct_write          {font-size: 9pt; color: #181818; font-family:"verdana", "dotum"; padding:3px 0px 0px 10px; background-color:#F5F5F5; height:26px;}
+.ct_write01        {font-size: 12px; color: #565656; font-family:"verdana", "dotum"; padding:3px 0px 3px 6px; line-height:21px;height:21px;}
+
+.ct_line02 {width:1px; background-color:#ffffff}
+
+.ct_list_b {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum"; height:30px; background-color:#E3E3E3; text-align:center;}
+
+
+.ct_list_pop          {font-size: 9pt; color: #666666; font-family:"verdana", "dotum"; padding-top:2px; height:30px;}
+.ct_list_pop A:link    {font-size: 9pt; color: #666666; text-decoration: underline; font-family:"verdana", "dotum"}
+.ct_list_pop A:visited {font-size: 9pt; color: #666666; text-decoration: underline; font-family:"verdana", "dotum"}
+.ct_list_pop A:active  {font-size: 9pt; color: #666666; text-decoration: underline; font-family:"verdana", "dotum"}
+.ct_list_pop A:hover   {font-size: 9pt; color: #000000; text-decoration: underline; font-family:"verdana", "dotum"}
+
+
+.ct_list_no          {font-size: 9pt; color: #666666; font-family:"verdana", "dotum";}
+.ct_list_no A:link    {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list_no A:visited {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list_no A:active  {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_list_no A:hover   {font-size: 9pt; color: #808285; text-decoration: none; font-family:"verdana", "dotum"}
+
+
+.ct_btn               {font-size: 9pt; color: #000000; font-family:"verdana", "dotum";}
+.ct_btn A:link    {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn A:visited {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn A:active  {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn A:hover   {font-size: 9pt; color: #000000; text-decoration: none; font-family:"verdana", "dotum"}
+
+.ct_btn01               {font-size: 9pt; color: #666666; font-family:"verdana", "dotum";}
+.ct_btn01 A:link    {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn01 A:visited {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn01 A:active  {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+.ct_btn01 A:hover   {font-size: 9pt; color: #666666; text-decoration: none; font-family:"verdana", "dotum"}
+
+/* 페이징 */
+.page           {font-size: 12px; color: #3D3D3D; text-decoration: none; font-family: "verdana";}
+.page A:link    {font-size: 12px; color: #3D3D3D; text-decoration: none; font-family: "verdana";}  
+.page A:visited {font-size: 12px; color: #3D3D3D; text-decoration: none; font-family: "verdana";}
+.page A:active  {font-size: 12px; color: #3D3D3D; text-decoration: none; font-family: "verdana";}
+.page A:hover   {font-size: 12px; color: #5980a4; text-decoration:underline; font-family: "verdana";}
+
+.page_s         {font-size: 12px; color: #000000; text-decoration: underline; font-weight:bold; font-family: "verdana"}
+
+/* test */
+/* A CSS Framework by Mike Stenhouse of Content with Style
+
+     Color pallete:
+             #444        - dark gray (text)
+             #3e9ade - medium blue (title)
+             #b4c24b - lime (header 1)
+             #ebf5fc - light cyan (hover text, footer)
+             #d7e9f5    - medium cyan (tab)
+             #1465b7 - dark blue (tab text, hyperlink)
+             #ccc         - medium gray (line)
+             #f7f7f7 - light gray (form background)
+             #f90        - orange (required *)
+*/
+
+/* TYPOGRAPHY */
+    body {
+        text-align: left;
+        font-family:"verdana",verdana, arial, helvetica, sans-serif;
+        font-size: 76%;
+        /*line-height: 1em;*/
+
+    }
+
+    div {
+        font-size: 1em;
+    }
+
+    img {
+        border: 0;
+    }
+
+    /* LINKS */
+        a,a:link
+            a:active {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a:visited {
+            color: #000000;
+            background-color: transparent;
+        }
+
+        a:hover {
+            /*color: #444;*/
+            text-decoration: none;
+        }
+    /* END LINKS */
+
+    /* HEADINGS */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: tahoma, arial, helvetica, sans-serif;
+            font-weight: normal;
+        }
+
+        h1 {
+            /*font-size: 2.2em;*/
+            letter-spacing: -1px;
+            line-height: 1.3em;
+
+            margin: 0 0 0.5em 0;
+            padding: 0;
+            /*color: #b4c24b;*/
+        }
+
+        div#branding h1 {
+            font-size: 9pt;
+            letter-spacing: -1px;
+            margin: 0;
+            /*line-height: 1.5em;*/
+            color: #000000;
+			text-decoration: none; font-family:"verdana", "dotum"; height:30px; text-align:left;            
+        }
+        
+        div#branding p {
+            margin: 0;
+            line-height: 1em;
+        }
+
+        h2 {
+            font-size: 1.4em;
+            line-height: 1.5em;
+            margin: 0 0 0.5em 0;
+            padding: 0;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            line-height: 1.3em;
+            margin: 0 0 0.5em 0;
+            padding: 0;
+            color: black;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            line-height: 1.3em;
+            margin: 0 0 0.25em 0;
+            padding: 0;
+            color: black;
+        }
+
+        h5 {
+            font-size: 1.1em;
+            line-height: 1.3em;
+            margin: 0 0 0.25em 0;
+            padding: 0;
+            color: black;
+        }
+
+        h6 {
+            font-size: 1em;
+            line-height: 1.3em;
+            margin: 0 0 0.25em 0;
+            padding: 0;
+            color: black;
+        }
+    /* END HEADINGS */
+
+    /* TEXT */
+        p {
+            font-size: 1em;
+            margin: 0 0 1.5em 0;
+            padding: 0;
+            line-height: 1.4em;
+        }
+
+        blockquote {
+            border-left: 10px solid #ddd;
+            margin-left: 10px;
+        }
+
+        pre {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        strong,b {
+            font-weight: bold;
+        }
+
+        em,i {
+            font-style: italic;
+        }
+
+        code {
+            font-family: "courier new", courier, monospace;
+            font-size: 12px;
+            white-space: pre;
+        }
+    /* END TEXT */
+
+    /* LISTS */
+        ul.glassList {
+            list-style: url(../../images/aquadot.jpg) disc outside;
+            vertical-align: top;
+            /*line-height: 1.5em;*/
+        }
+        dl {
+            margin: 0 0 1.5em 0;
+            padding: 0;
+            /*line-height: 1.4em;*/
+        }
+
+        dl dt {
+            font-weight: bold;
+            margin: 0.25em 0 0.25em 0;
+            padding: 0;
+        }
+
+        dl dd {
+            margin: 0 0 0 30px;
+            padding: 0;
+        }
+
+    /* END LISTS */
+
+    /* TABLE */
+        table {
+            font-size: 1em;
+            margin: 0 0 0 0;
+        }
+
+        table caption {
+            /*font-weight: bold;*/
+            margin: 0 0 0 0;
+            padding: 0 0 1.5em 0;
+        }
+
+        th {
+		    font-family:"verdana";
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+			color: #fff;
+			background-color:#586384;
+			height:22px;
+			padding:0;
+        }
+
+        /*********************************
+           Project: CSS Table Galery
+           Title: Like Adwords
+           Author: Cleiton Francisco
+           URL: http://www.cleiton.net/
+           Country: Brazil
+           Update: 2005-12-18
+         *******************************/
+
+            .table {
+                border-collapse: collapse;
+                border: 0px #fff;
+                color: #000;
+                background: #fff;
+                width: 100%;
+            }
+                .table caption {
+                    padding: 0 0.6em 0.8em;
+                    font-size: 1.3em;
+                    /*font-weight: bold;*/
+                    text-align: center;
+                    color: #000;
+                    background: transparent;
+                }
+              
+
+    /* END TABLE */
+
+    hr {
+        display: none;
+    }
+ 
+    div.hr {
+        height: 1px;
+        margin: 1.5em 10px;
+        border-bottom: 1px dotted black;
+    }
+/* END TYPOGRAPHY */
+
+form {padding:0px; margin:0px}
+.mainimg {
+	width: 679px;
+	height: 375px;
+	background: url(../images/login_bg.png) no-repeat left top;
+}
+
+.footintro {
+	width: 679px;
+	height: 36px;
+	background: url(../images/foot_01.png) no-repeat left top;
+}
+
+#Topapplication {
+	height: 79px;
+	background: url(../images/bg_movie.png) no-repeat left top;
+}
+
+#Topplugin {
+	height: 79px;
+	background: url(../images/bg_plg.png) no-repeat left top;
+}
+.toptitle {
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	padding-top:13px;
+	padding-left:110px;
+}
+.toptitle a:link{
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	text-decoration:none;
+	padding-top:13px;
+}
+.toptitle a:hover{
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	text-decoration:none;
+	padding-top:13px;
+}
+.toptitle a:visited{
+	font-size: 18px;
+	font-weight: bold;
+	color: #fff;
+	text-decoration:none;
+	padding-top:13px;
+}
+
+.scrollTable {
+    border:0px solid #cecece ;
+}
+tr.board td {
+    height:21px;
+    font-family:"verdana","dotum";
+    font-size:12px;
+	color: #555;
+	padding-top:3px;
+	padding-left: 5px;
+	padding-right: 5px;
+	border-bottom:1px solid #cecece ;
+	border-left:0px solid #cecece ;
+	border-right:1px solid #cecece ;
+}
+tr.board td a{
+    height:21px;
+    font-family:"verdana","dotum";
+    font-size:12px;color: #555;
+	padding-top:4px;
+}
+
+tr.board td a:hover {
+     text-decoration:underline;
+	 color: #000;
+}
+tr.board td a:visited {
+     text-decoration:underline;
+	 color: #555;
+}
+   
+td.underline a {
+     font-family:"verdana","dotum";
+     text-decoration:underline;
+	 color: #555;
+}
+td.underline a:hover {
+     font-family:"verdana","dotum";
+     text-decoration:underline;
+	 color: #000;
+}
+th.underline a:visited {
+     font-family:"verdana","dotum";
+     text-decoration:underline;
+	 color: #555;
+}
+
+#main {
+    margin:0;
+    padding:0;
+}
+td.ct_write01 {
+    background-color:#f2f2f2;
+}
+
+/* for Spring JS validation input */
+input, select, textarea {
+		font-size:9pt; 
+		color:#777777; 
+		background-color:#ffffff; 
+		font-family:"verdana", "dotum";
+		text-indent:2px;height:19px;
+    }
+.tundra .dijitTooltipContainer { 
+    /* 
+            The part with the text. 
+
+            NOTE:  
+                    FF doesn't clip images used as CSS bgs if you specify a border 
+                   radius. If you use a solid color, it does. Webkit gets it right. 
+                    Sigh. 
+           background: #ffffff url("images/popupMenuBg.gif") repeat-x bottom left; 
+    */ 
+    background-color: #fafafa; 
+    border:1px solid #b6c7d5; 
+    padding:0.45em; 
+    border-radius: 6px; 
+    -moz-border-radius: 7px; 
+    -webkit-border-radius: 6px; 
+    font-size : 11px;
+ } 
+ 
+ /* for ie */
+ .ui-jqgrid .ui-jqgrid-htable th{
+ 	white-space: normal !important;
+    height:auto;
+    min-height:25px;
+ }
+ 
+ /* for ff */
+ .ui-jqgrid .ui-jqgrid-htable th div{
+ 	white-space: normal !important;
+    height:auto;
+ }
+ .ui-jqgrid tr.jqgrow td{
+ 	white-space: normal !important;
+    height:auto;
+    min-height:25px;
+ }
+
+/* add 2010.08.========================================================================================================*/
+
+/* login --------------------------------------------------------------------------------------------------------------*/
+ /* login layout */
+.hidden {position:absolute;visibility:hidden; top:-10000px; left:-10000px;}
+.clear {clear: both;}
+.btn {display:block;text-indent:-1000em; overflow:hidden;}
+button {text-indent: -9999px; font-size: 0px; cursor: pointer; border:none;}
+
+#login_wrap	{height:430px; margin:0 auto; text-align:center;}
+#login_content {width:674px; margin:0 auto; text-align:center;}
+
+.login_info {position:absolute; top:340px; left:165px; width:554px; height:50px; padding-right:120px; text-align:right;}
+
+/* login UI */
+#loginForm {position: relative; width: 674x; height: 430px;}
+#loginForm .ubtn{position:absolute;width:60px;height:45px ;top:28px; left:142px;}
+#loginForm .ubtn label{position:absolute; top:-2px; left:17px;}
+#loginForm .uid {position:absolute; top:0; left:175px;}
+#loginForm .upw {position:absolute; top:0; left:282px;}
+#loginForm #loginBtn {position:absolute;display:block;width: 47px; height: 21px; background: url(../images/btn_login.gif) no-repeat left top; top:0; left:109px;}
+
+.issue		{ width:672px; background-color:#E9ECF1; border:1px solid #C7C7C9; text-align:left; margin-top:2px;} 
+.issue td	{ font-size: 12px; font-family:"dotum" color:#777; line-height:16px;}
+
+/* content --------------------------------------------------------------------------------------------------------------*/
+legend, caption { display:none; clear:both;font-weight:bold; font-size: 70%; font-family:"dotum"; }
+fieldset, blockquote, iframe { margin:0; padding:0; border:none; }
+
+#content    {width:100%; height:100%;}
+
+.listbox	{ width:880px;}
+.checkbox	{line-height:18px; border:none !important;}
+.selectbox	{font-family:"dotum"; font-size:1.0em; color:#666; line-height:18px;}
+.textarea	{
+	border:1px solid #DADADA; 
+	padding:2px 3px; overflow:auto; word-break:break-all;
+	line-height:18px;
+	font-size-adjust:none;
+	scrollbar-3dlight-color:#D6D6D6;
+	scrollbar-arrow-color:#565656;
+	scrollbar-base-color:#e1ecfd;
+	scrollbar-darkshadow-color:#FFFFFF;
+	scrollbar-face-color:#FFFFFF;
+	scrollbar-highlight-color:#FFFFF;
+	scrollbar-shadow-color:#acacac;
+}
+
+/* input table */
+.input_table table { width:890px; border-collapse:collapse; border:2px solid #A6C9E2;}
+.input_table table caption { display:none; }
+.input_table th,
+.input_table td { background:#fff; height:20px; padding:3px 5px; vertical-align:middle;}
+.input_table th { color:#4675A9; background-color:fff; text-align:left; white-space:nowrap; font-weight:bold; padding-left:10px;}
+.input_table input {font-family:"verdana", "Dotum"; font-size:9pt; line-height:16px; padding:1px 2px; border:1px solid #CCC; color:#666;  margin:2px 0; background:url(../images/validationInputBg.gif) #fff repeat-x left top;}
+
+/* input table_g */
+.input_table_g table { width:888px; border-collapse:collapse; border:1px solid #C7C7C9;}
+.input_table_g table caption { display:none; }
+.input_table_g th,
+.input_table_g td { background-color:#E9ECF1;  height:20px; padding:3px 5px; vertical-align:middle;}
+.input_table_g th { background-color:#E9ECF1; color:#58595B; text-align:center; white-space:nowrap; font-weight:bold; padding-left:10px;}
+.input_table_g input {font-family:"verdana", "Dotum"; font-size:1.0em; line-height:16px; padding:1px 2px; border:1px solid #CCC; color:#666;  margin:2px 0; background:url(../images/validationInputBg.gif) #fff repeat-x left top;}
+
+/* sub title */
+.pageSubtitle h3 { font-size:1.2em; font-weight:bold; background:url(../images/pageTitle_blt.gif) no-repeat 2px 50%; padding-left:20px; color:#333; }
+.pageSubtitle h4 { font-size:1.0em; font-weight:bold; background:url(../images/subtitle_blt.gif) no-repeat 2px 50%; padding-left:10px; color:#4f4f4f; }
+
+/* list scroll */
+#scrollarea              	{
+							  scrollbar-3dlight-color:c6d7fe;
+						      scrollbar-arrow-color:265fad;
+							  scrollbar-base-color:e1ecfd;
+							  scrollbar-darkshadow-color:FFFFFF;
+							  scrollbar-face-color:FFFFFF;
+							  scrollbar-highlight-color:FFFFF;
+							  scrollbar-shadow-color:90adef;
+							  overflow:auto;
+							  height:100%; 
+							  margin:0px ;
+                             }
+
+/* buttion3 */
+a.btn3,
+a.btn3 span,
+a.btn3 button,
+a.btn3 input { color:#393939; position:relative; margin:0; display:inline-block; border:0; font-size:1.0em; font-family:"arial","Dotum"; font-weight:bold; white-space:nowrap; background:url(../images/btn_bg3.gif) no-repeat; vertical-align:middle; overflow:visible; }
+a.btn3 { text-decoration:none; padding:0; background-position:left top; margin-left:5px;}
+a.btn3 span,
+a.btn3 button,
+a.btn3 input { height:19px; left:9px; *top:0px;
+_top:0; padding:0 6px 0 5px; line-height:20px; background-position:right top; cursor:pointer; }
+a.btn3 span {
+*top:-1px; _top:0px; }
+a.btn3 { margin-right:3px; }
+
+
+/* buttion */
+#button { width:888px; border-collapse:collapse;}
+
+/* main tab for firefox */
+span.ui-tabs-close{ float : left; }
+.ui-corner-top {-moz-border-radius-topleft:0px; -moz-border-radius-topright:0px;}
+
+/* popup button background, icon delete */
+.ui-widget-content .fm-button { border: 0px; background: #FFF; font-weight: bold; color: #333; outline: none; background-image:url();}
+
+/* popup button new image */
+#dData {background-image: url(../images/btn_bg_ok.gif);}
+#eData {background-image: url(../images/btn_bg_cancel.gif);}
+
+/* page navigation input box */
+.ui-jqgrid .ui-pg-input{height:18px;}
+
+/* job detail inner grid border duplicate */
+.input_table .listbox TABLE{border:0px;}
+
+.source_table_g TABLE{width:875px;}
+.sourcebox{width:875px;}
+
+/* job detail validator INPUT text box */
+.tundra .dijitTextBox{padding-top:0px;}
+#repository,#job_name,#source_dir,#source_checkout,#server_name,#server_url,#server_path,#script_name,#script_path,#script_script{height:18px; padding:0px;}

@@ -7,12 +7,15 @@ public class Launcher {
 	Watchdog watchdog;
 	
 	public Launcher(Proc proc){
-		this(proc, 60000);
+		this(proc, 20000);
 	}
 	
 	public Launcher(Proc proc, long timeout) {
 		this.proc = proc;
-		watchdog = new Watchdog(proc, timeout);
+		// proc will be finished in timeout
+		// but some case, it is not finished
+		// after waiting some secs, and kill that process forcefully.
+		watchdog = new Watchdog(proc, timeout+3000);
 	}
 
 	public String start() throws Exception{
@@ -37,19 +40,21 @@ class Watchdog extends Thread{
 	
 	@Override
 	public void run() {
+		if(timeout == -1L)
+			return;
+		
 		long start = System.currentTimeMillis();
 		long remain;
 		while( !listener.isFinished() &&
 				(remain = timeout - (System.currentTimeMillis() - start)) > 0){
 			synchronized (listener) {
 				try {
-					listener.wait(remain);
+//					listener.wait(remain);
+					listener.wait(1000);
 				} catch (InterruptedException e) {
 				}	
 			}
 		}
-			
-		if(!listener.isFinished())
-			listener.timedout();
+		listener.timedout();
 	}
 }

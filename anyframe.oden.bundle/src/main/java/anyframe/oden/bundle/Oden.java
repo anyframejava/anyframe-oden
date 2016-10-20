@@ -35,7 +35,6 @@ import org.apache.felix.framework.cache.BundleCache;
 import org.apache.felix.framework.util.StringMap;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 
 /**
  * OSGi Framework Launcher. Lauch OSGi Framework, start some bundles
@@ -139,18 +138,18 @@ public class Oden {
         Map configMap = new StringMap(false);
         
         // This information is from felix 1.8.0
-        configMap.put(Constants.FRAMEWORK_SYSTEMPACKAGES,
-            "org.osgi.framework; version=1.4.0," +
-            "org.osgi.service.packageadmin; version=1.2.0," +
-            "org.osgi.service.startlevel; version=1.1.0," +
-            "org.osgi.service.url; version=1.0.0," +
-            "org.osgi.util.tracker; version=1.3.3");
+//        configMap.put(Constants.FRAMEWORK_SYSTEMPACKAGES,
+//            "org.osgi.framework; version=1.4.0," +
+//            "org.osgi.service.packageadmin; version=1.2.0," +
+//            "org.osgi.service.startlevel; version=1.1.0," +
+//            "org.osgi.service.url; version=1.0.0," +
+//            "org.osgi.util.tracker; version=1.3.3");
         configMap.put(BundleCache.CACHE_ROOTDIR_PROP, cache.getPath());
         configMap.put("osgi.shell.telnet", "on");
         configMap.put("obr.repository.url", "http://felix.apache.org/obr/releases.xml");
         configMap.put("org.osgi.framework.storage.clean", "onFirstInit");
-        configMap.put("org.osgi.framework.system.packages.extra", 
-        		"javax.naming, javax.naming.spi");
+//        configMap.put("org.osgi.framework.system.packages.extra", 
+//        		"javax.naming, javax.naming.spi");
         
         Properties thirdProp = loadINI(config);
         if(thirdProp != null){

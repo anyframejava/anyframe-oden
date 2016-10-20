@@ -33,28 +33,15 @@ public abstract class AbstractRepositoryimpl implements RepositoryService {
 		if(args.length == 0)
 			return false;
 		if(args[0].startsWith(getProtocol())){
-			normalizeArgs(args);
 			return true;
 		}
 		return false;
 	}
-	
-	/**
-	 * If args have a relative path, this will be converted to
-	 * absolute path. If not, do nothing.
-	 * 
-	 * @param args
-	 */
-	abstract protected void normalizeArgs(String[] args);
-	
-	protected String stripProtocol(String uri) {
-		StringBuffer buf = new StringBuffer(uri);
 		
-		// remove protocol
-		if(uri.startsWith(getProtocol())){
-			buf.delete(0, getProtocol().length());
-		}
-		return buf.toString();
+	protected String stripProtocol(String uri) {
+		if(!uri.startsWith(getProtocol()))
+			return uri;
+		return uri.substring(getProtocol().length());
 	}
 
 	

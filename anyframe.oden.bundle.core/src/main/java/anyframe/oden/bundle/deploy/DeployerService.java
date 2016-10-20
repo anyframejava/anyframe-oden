@@ -17,6 +17,7 @@
 package anyframe.oden.bundle.deploy;
 
 import java.util.List;
+import java.util.Set;
 
 import anyframe.oden.bundle.common.FileInfo;
 
@@ -37,7 +38,10 @@ public interface DeployerService {
 	 * @param date
 	 * @throws Exception
 	 */
-	public void init(String parent, String relpath, long date) throws Exception;
+//	public void init(String parent, String relpath, long date) throws Exception;
+	
+	public void init(String parent, String path, 
+			long date, boolean useTmp) throws Exception;
 	
 	public boolean write(String parent, String path, ByteArray buf) throws Exception;
 	
@@ -150,6 +154,9 @@ public interface DeployerService {
 	 */
 	public long getDate(String parentpath, String path) throws Exception ;
 	
+	public void setDate(String parent, String path, long date) 
+			throws Exception;
+	
 	/**
 	 * backup directory to the bak and remove it
 	 * 
@@ -192,14 +199,19 @@ public interface DeployerService {
 	public boolean alive() throws Exception;
 	
 	/**
-	 * get all nested files information which are in the path. 
+	 * get all nested files information which are in the path.
+	 * cancellable by stop(id); 
 	 * 
 	 * @param id
 	 * @param path
 	 * @return
 	 * @throws Exception
 	 */
-	public List<FileInfo> listAllFiles(String id, String path) throws Exception;
+	public List<FileInfo> listAllFilesAsJob(String id, String path) throws Exception;
+	
+	public List<FileInfo> listAllFiles(String dir) throws Exception;
+	
+	public Set<FileInfo> listAllFilesAsSet(String dir) throws Exception;
 	
 	public boolean touchAvailable() throws Exception;
 	
