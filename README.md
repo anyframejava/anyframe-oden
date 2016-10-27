@@ -2,7 +2,8 @@ Anyframe Oden
 ===
 Anyframe Open Deployment ENvironment (이하 ODEN)은 CI (Continuous Integration) 환경을 통해 빌드된 어플리케이션 컴포넌트 및 각종 설정파일, 웹파일 등을 원하는 배포대상서버에 편리하게 배포할 수 있도록 하는 배포관리 툴이다.
 
-### 특
+
+### Features
 최근의 일반적인 중대형 개발 프로젝트의 프로세스는 요구정의로부터 시작하여 분석 및 아키텍처정의, 설계, 개발, 이행 등으로 진행하는 것이 최근의 추세이며, 여러 벤더들은 이러한 각 공정 단계에 특화된 다양한 툴을 제공하고 있다.
 그러나 분석/아키텍처정의/설계 단계에서 활용할 수 있는 다양한 툴과는 달리, 개발단계 이후 활용할 수 있는 툴의 범위는 다소 부족한 듯 하다. 특히, 개발한 어플리케이션 컴포넌트들을 개발서버 및 테스트서버 혹은 그 너머의 운영서버 등에 배포할 수 있는 전문화된 배포관리 툴에 대한 선택의 폭은 매우 작은 것이 현실이다.
 
@@ -67,10 +68,8 @@ ODEN은 다음과 같은 주요 특징을 지닌다.
 
 #### ant연계
 * 위에 추가한 Job(myapp)를 ant로 배포하고자 하는 경우 아래와 같이 ant스크립트에 추가
-<pre><code>
-<target name="deploy">
-  <exec executable="{ODEN path}/core/bin/runc.cmd" dir="{ODEN path}/core/bin" failonerror="true">
-    <arg line-"deploy run myapp"/>
-  </exec>
-</target>
-</code></pre>
+	<target name="deploy">
+      <exec executable="{ODEN path}/core/bin/runc.cmd" dir="{ODEN path}/core/bin" failonerror="true">
+        <arg line-"deploy run myapp"/>
+      </exec>
+	</target>
