@@ -69,10 +69,9 @@ ODEN은 다음과 같은 주요 특징을 지닌다.
 #### ant연계
 * 위에 추가한 Job(myapp)를 ant로 배포하고자 하는 경우 아래와 같이 ant스크립트에 추가
 
-<pre><code>
-  <target name="deploy">
-    <exec executable="{ODEN 설치경로}/core/bin/runc.cmd" dir="{ODEN 설치경로}/core/bin" failonerror="true">
-    <arg line-"deploy run myapp"/>
-    </exec>
-  </target>
-</code></pre> 
+    <target name="deploy">
+        <exec executable="{ODEN 설치경로}/core/bin/runc.cmd" dir="{ODEN 설치경로}/core/bin" failonerror="true">
+        <arg line-"deploy run myapp"/>
+        </exec>
+    </target>
+
