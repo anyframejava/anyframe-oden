@@ -387,8 +387,14 @@ public class DeployerImpl implements DeployerService {
 		synchronized (lock) {
 			if (!src.exists() || src.isDirectory())
 				throw new IOException("Couldn't find: " + src);
-			bakdir = toAbsPath(bakdir);
 
+			BundleContext context = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
+			if (context.getProperty("deploy.undo.loc") != null){
+				bakdir = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+						bakdir.substring(bakdir.lastIndexOf("/") == -1 ? 0 : bakdir.lastIndexOf("/"), bakdir.length()));
+			}
+			bakdir = toAbsPath(bakdir);
+			
 			Map<String, FileInfo> extractedfiles = new HashMap<String, FileInfo>();
 
 			ZipFile zip = new ZipFile(src);
@@ -458,6 +464,12 @@ public class DeployerImpl implements DeployerService {
 	public DoneFileInfo close(String parent, String path,
 			List<String> updatefiles, String bakdir) throws Exception {
 		parent = toAbsPath(parent);
+		BundleContext context = FrameworkUtil.getBundle(this.getClass())
+				.getBundleContext();
+		if (context.getProperty("deploy.undo.loc") != null){
+			bakdir = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+					bakdir.substring(bakdir.lastIndexOf("/") == -1 ? 0 : bakdir.lastIndexOf("/"), bakdir.length()));
+		}
 		bakdir = toAbsPath(bakdir);
 		synchronized (lock) {
 			// mode = MODE.CLOSE;
@@ -685,8 +697,16 @@ public class DeployerImpl implements DeployerService {
 	 */
 	public DoneFileInfo backupNCopy(String srcPath, String filePath,
 			String destPath, String bakPath, int backupcnt) throws Exception {
-		srcPath = toAbsPath(srcPath);
 		destPath = toAbsPath(destPath);
+		BundleContext context = FrameworkUtil.getBundle(this.getClass())
+				.getBundleContext();
+		if (context.getProperty("deploy.undo.loc") != null){
+			bakPath = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+					bakPath.substring(bakPath.lastIndexOf("/") == -1 ? 0 : bakPath.lastIndexOf("/"), bakPath.length()));
+			srcPath = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+					srcPath.substring(srcPath.lastIndexOf("/") == -1 ? 0 : srcPath.lastIndexOf("/"), srcPath.length()));
+		}
+		srcPath = toAbsPath(srcPath);
 		bakPath = toAbsPath(bakPath);
 		synchronized (lock) {
 			if (!new File(srcPath, filePath).exists())
@@ -723,6 +743,15 @@ public class DeployerImpl implements DeployerService {
 	 */
 	public DoneFileInfo backupNRemove(String srcPath, String filePath,
 			String bakPath, int backupcnt) throws Exception {
+		
+		BundleContext context = FrameworkUtil.getBundle(this.getClass())
+				.getBundleContext();
+		if (context.getProperty("deploy.undo.loc") != null){
+			bakPath = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+					bakPath.substring(bakPath.lastIndexOf("/") == -1 ? 0 : bakPath.lastIndexOf("/"), bakPath.length()));
+			srcPath = FileUtil.combinePath(context.getProperty("deploy.undo.loc"), 
+					srcPath.substring(srcPath.lastIndexOf("/") == -1 ? 0 : srcPath.lastIndexOf("/"), srcPath.length()));
+		}
 		srcPath = toAbsPath(srcPath);
 		bakPath = toAbsPath(bakPath);
 
