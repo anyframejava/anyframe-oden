@@ -628,6 +628,8 @@ public class DeployerImpl implements DeployerService {
 						.replace(path, listFilesRoot.concat("/"), ""), false, DateUtil
 						.toStringDate(file.lastModified()), file.length()));
 			} else { // directory
+				if (FileUtil.matched(path, excludes))
+					continue;
 				ret.addAll(getAllFilesAsCondition(fromDate, toDate, path,
 						excludes));
 			}

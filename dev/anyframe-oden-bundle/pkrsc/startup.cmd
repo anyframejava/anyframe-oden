@@ -12,7 +12,7 @@
 set APPNAME=ODEN_SERVER
 set APP_VERSION=2.6.2
 set INI=../conf/oden.ini
-set JAVA_BIN=C:\Program Files\Java\jdk1.7.0_80\bin\java
+set JAVA_BIN=java
 set JVM_OPTION=-Xmx256m -XX:NewRatio=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=25 -Dfile.encoding=utf-8
 set APP_CMD="%JAVA_BIN%" %JVM_OPTION% -jar oden-%APP_VERSION%.jar
 set INFO_FILE=%APPNAME%.txt
