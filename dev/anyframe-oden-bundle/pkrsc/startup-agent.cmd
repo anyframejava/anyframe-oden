@@ -12,7 +12,7 @@
 set APPNAME=ODEN_AGENT
 set APP_VERSION=2.6.2
 set INI=../conf/agent.ini
-set JAVA_BIN=C:\Program Files\Java\jdk1.7.0_80\bin\java
+set JAVA_BIN=java
 set JVM_OPTION=-Xmx32m -XX:NewRatio=1 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=25
 set APP_CMD="%JAVA_BIN%" %JVM_OPTION% -jar oden-%APP_VERSION%.jar conf/agent.ini
 set INFO_FILE=%APPNAME%.txt
