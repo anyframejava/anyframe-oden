@@ -137,7 +137,7 @@ public abstract class CompressJob extends Job {
 							FileUtil.replace(src, root, ""), f.getPath()));
 					jout.putNextEntry(entry);
 					total += FileUtil.copy(in, jout);
-				} catch(FileNotFoundException e){
+				} catch(IOException e){
 					e.getStackTrace();
 				} finally {
 					if (in != null)
