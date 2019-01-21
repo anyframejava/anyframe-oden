@@ -125,17 +125,24 @@ public abstract class CompressJob extends Job {
 				if (path.get(f.getPath()) != null)
 					continue;
 				path.put(f.getPath(), f);
-
 				InputStream in = null;
-				String src = FileUtil.replace(f.getRepo().args()[0], "file://",
-						"");
-				in = new BufferedInputStream(new FileInputStream(new File(
-						FileUtil.combinePath(src, f.getPath()))));
+				
+				try {
+					String src = FileUtil.replace(f.getRepo().args()[0], "file://",
+							"");
+					in = new BufferedInputStream(new FileInputStream(new File(
+							FileUtil.combinePath(src, f.getPath()))));
 
-				ZipEntry entry = new ZipEntry(FileUtil.combinePath(
-						FileUtil.replace(src, root, ""), f.getPath()));
-				jout.putNextEntry(entry);
-				total += FileUtil.copy(in, jout);
+					ZipEntry entry = new ZipEntry(FileUtil.combinePath(
+							FileUtil.replace(src, root, ""), f.getPath()));
+					jout.putNextEntry(entry);
+					total += FileUtil.copy(in, jout);
+				} catch(FileNotFoundException e){
+					e.getStackTrace();
+				} finally {
+					if (in != null)
+						in.close();
+				}
 			}
 		} catch (Exception e) {
 			e.getStackTrace();
